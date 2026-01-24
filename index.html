@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interlinear Daily Bread</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Biblical Language & Serif Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=SBL+Hebrew&family=Gentium+Plus:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Import Map: Fixes the 'Failed to resolve module specifier react' error -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@19",
+        "react-dom/client": "https://esm.sh/react-dom@19/client",
+        "react/jsx-runtime": "https://esm.sh/react@19/jsx-runtime"
+      }
+    }
+    </script>
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #fdfcfb;
+            scroll-behavior: smooth;
+        }
+        .hebrew { 
+            font-family: 'SBL Hebrew', serif; 
+            direction: rtl; 
+        }
+        .greek {
+            font-family: 'Gentium Plus', serif;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdfcfb; }
+        ::-webkit-scrollbar-thumb { background: #e7e5e4; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d6d3d1; }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="root"></div>
+
+    <!-- Application Code -->
+    <script type="text/tsx">
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+
+/** --- CONFIGURATION --- **/
+const TRANSLATION_REGISTRY = {
+  // Original Language (Always present as 'content')
+  original: {
+    source: 'original', // Explicit source key for data lookup
+    label: (isHebrew) => `ORIGINAL ${isHebrew ? 'HEBREW' : 'GREEK'}`,
+    isHebrewGreek: true
+  },
+  // English Parallels (Detected by bibleId)
+  kjv: {
+    idPrefix: 'de4e12af',
+    label: 'KJV - King James Version'
+  },
+  lsv: {
+    idPrefix: '06125ada', // Covers 06125adad2d5898a-01
+    altIds: ['01b29f4b342acc35-01'],
+    label: 'LSV - Literal Standard Version',
+    attribution: {
+      text: '©',
+      link: '#footer',
+      title: 'View Copyright Information'
+    }
+  },
+  web: {
+    idPrefix: '9879dbb7',
+    label: 'WEB - World English Bible'
+  },
+  nlt: {
+    idPrefix: 'd6e14a62',
+    label: 'NLT - New Living Translation',
+    attribution: {
+        text: '©',
+        link: '#footer', // Placeholder, would need update if NLT specific footer requirement
+        title: 'View Copyright Information'
+    }
+  }
+};
+
+/** --- DATA UTILITIES --- **/
+const walkItems = (items, map, versionKey) => {
+  if (!items) return;
+  items.forEach((item) => {
+    if (item.attrs?.verseId) {
+      const vid = item.attrs.verseId;
+      if (!map[vid]) map[vid] = {};
+      if (!map[vid][versionKey]) map[vid][versionKey] = [];
+      if (item.type === 'text' && item.text) {
+        map[vid][versionKey].push(item.text);
+      }
+    }
+    if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey);
+  });
+};
+
+const processContent = (contentArray, map, versionKey) => {
+  if (!contentArray) return;
+  contentArray.forEach(section => { if (section.items) walkItems(section.items, map, versionKey); });
+};
+
+const loadDailyBread = async (dateFolder) => {
+  const manifestPath = `data/${dateFolder}/manifest.json`;
+  const manifestRes = await fetch(manifestPath);
+  if (!manifestRes.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
+  const manifest = await manifestRes.json();
+  const verseMap = {};
+  const availableKeys = new Set(['original']); // Track what we found
+
+  const results = await Promise.all(
+    manifest.files.map(fileName => fetch(`data/${dateFolder}/${fileName}`).then(res => res.json()))
+  );
+
+  results.forEach((source) => {
+    const data = source.data;
+    if (!data) return;
+
+    // 1. Process Original Content (if present)
+    if (data.content) {
+      processContent(data.content, verseMap, 'original');
+    }
+
+    // 2. Process Parallels (Dynamic Discovery)
+    if (data.parallels) {
+      data.parallels.forEach(parallel => {
+         // Find which registry key matches this parallel's bibleId
+         const matchedKey = Object.keys(TRANSLATION_REGISTRY).find(key => {
+            const config = TRANSLATION_REGISTRY[key];
+            if (!config.idPrefix) return false; // Skip 'original'
+            if (parallel.bibleId.includes(config.idPrefix)) return true;
+            if (config.altIds && config.altIds.some(id => parallel.bibleId === id)) return true;
+            return false;
+         });
+
+         if (matchedKey && parallel.content) {
+            processContent(parallel.content, verseMap, matchedKey);
+            availableKeys.add(matchedKey);
+         }
+      });
+    }
+  });
+  
+  // Sort keys to ensure consistent order (e.g. KJV, LSV, etc.)
+  const sortedKeys = Array.from(availableKeys).filter(k => k !== 'original');
+  return { verseMap, label: manifest.label, availableTranslations: sortedKeys };
+};
+
+/** --- APP COMPONENT --- **/
+const BOOK_NAMES = {
+  GEN: 'Genesis', EXO: 'Exodus', LEV: 'Leviticus', NUM: 'Numbers', DEU: 'Deuteronomy', PSA: 'Psalms', PRO: 'Proverbs', MAT: 'Matthew', MRK: 'Mark', LUK: 'Luke', JHN: 'John'
+};
+
+const PILL_LABELS = ['OT', 'NT', 'PS', 'PR'];
+
+const App = () => {
+  // Generates MMDD format (e.g., Jan 8 -> "0108")
+  const getFormattedDate = () => {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${month}${day}`;
+  };
+
+  const [verseMap, setVerseMap] = useState(null);
+  const [readingLabel, setReadingLabel] = useState("");
+  const [loading, setLoading] = useState(true);
+  // Dynamically set based on today's date
+  const [currentDate, setCurrentDate] = useState(getFormattedDate());
+  const [playbackStatus, setPlaybackStatus] = useState('stopped');
+  const [activeVerseId, setActiveVerseId] = useState(null); // Visual position (scroll tracking)
+  const [playbackVerseId, setPlaybackVerseId] = useState(null); // Where playback is at
+  
+  // Dynamic State for Translation Slots
+  const [availableTranslations, setAvailableTranslations] = useState([]);
+  const [focalTranslation, setFocalTranslation] = useState(null); // Slot 3 (Bottom)
+  const [compareTranslation, setCompareTranslation] = useState(null); // Slot 2 (Middle)
+
+  // Dropdown States
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
+  const [isFocalOpen, setIsFocalOpen] = useState(false);
+
+  const synthRef = useRef(window.speechSynthesis);
+  const isTransitioningRef = useRef(false);
+  const playbackStatusRef = useRef('stopped'); // Track playback status in ref for callbacks
+
+  // Handler for Focal Translation change with auto-swap logic for Compare slot
+  const handleFocalChange = (newFocal) => {
+    if (newFocal === compareTranslation) {
+        // If user picks a focal that matches current compare, we must change compare.
+        // Pick the first available key that is NOT the new focal.
+        const newCompare = availableTranslations.find(k => k !== newFocal);
+        setCompareTranslation(newCompare);
+    }
+    setFocalTranslation(newFocal);
+    setIsFocalOpen(false);
+  };
+
+  // Helper to format MMDD into a human date like "Jan 2nd"
+  const formatDate = (mmdd) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    const m = parseInt(mmdd.substring(0, 2)) - 1;
+    const d = parseInt(mmdd.substring(2, 4));
+    const j = d % 10, k = d % 100;
+    let suffix = "th";
+    if (j == 1 && k != 11) suffix = "st";
+    else if (j == 2 && k != 12) suffix = "nd";
+    else if (j == 3 && k != 13) suffix = "rd";
+    return `${months[m]} ${d}${suffix}`;
+  };
+
+  const getSectionIndex = (vid) => {
+    if (!vid) return -1;
+    const book = vid.split('.')[0];
+    if (book === 'PSA') return 2;
+    if (book === 'PRO') return 3;
+    const ntBooks = ['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'];
+    return ntBooks.includes(book) ? 1 : 0;
+  };
+
+  const sortedVids = useMemo(() => {
+    if (!verseMap) return [];
+    return Object.keys(verseMap).sort((a, b) => {
+      const wA = getSectionIndex(a), wB = getSectionIndex(b);
+      if (wA !== wB) return wA - wB;
+      return a.localeCompare(b, undefined, { numeric: true });
+    });
+  }, [verseMap]);
+
+  const labelParts = useMemo(() => readingLabel.split(',').map(s => s.trim()), [readingLabel]);
+  const activeSectionIndex = useMemo(() => getSectionIndex(playbackStatus === 'playing' ? playbackVerseId || sortedVids[0] : activeVerseId || sortedVids[0]), [playbackStatus, playbackVerseId, activeVerseId, sortedVids]);
+
+  // Dynamically generate the slots based on the selected focal/compare translations
+  const dynamicSlots = useMemo(() => {
+    if (!focalTranslation || !compareTranslation) return { top: TRANSLATION_REGISTRY.original, middle: {}, bottom: {} };
+
+    const focalConfig = TRANSLATION_REGISTRY[focalTranslation];
+    const compareConfig = TRANSLATION_REGISTRY[compareTranslation];
+
+    return {
+        top: TRANSLATION_REGISTRY.original,
+        middle: {
+            source: compareTranslation,
+            label: compareConfig?.label || compareTranslation.toUpperCase(),
+            isHebrewGreek: false
+        },
+        bottom: {
+            source: focalTranslation,
+            label: focalConfig?.label || focalTranslation.toUpperCase(),
+            isFocal: true,
+            isHebrewGreek: false,
+            attribution: focalConfig?.attribution
+        }
+    };
+  }, [focalTranslation, compareTranslation]);
+
+  useEffect(() => {
+    if (playbackStatus === 'playing' || loading || !verseMap || sortedVids.length === 0) return;
+    const observer = new IntersectionObserver((entries) => {
+      const intersecting = entries.filter(e => e.isIntersecting);
+      if (intersecting.length > 0) {
+        const bestEntry = intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top - 120) - Math.abs(b.boundingClientRect.top - 120))[0];
+        setActiveVerseId(bestEntry.target.id.replace('verse-', ''));
+      }
+    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+    sortedVids.forEach((vid) => {
+      const el = document.getElementById(`verse-${vid}`);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [playbackStatus, loading, verseMap, sortedVids]);
+
+  useEffect(() => {
+    playbackStatusRef.current = playbackStatus;
+  }, [playbackStatus]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const initDay = async () => {
+      setLoading(true);
+      synthRef.current.cancel();
+      setPlaybackStatus('stopped');
+      setPlaybackVerseId(null);
+      setActiveVerseId(null);
+      try {
+        const data = await loadDailyBread(currentDate);
+        if (!isMounted) return;
+        setVerseMap(data.verseMap);
+        setReadingLabel(data.label);
+        setAvailableTranslations(data.availableTranslations);
+
+        // Smart Defaults: 
+        // 1. Try to keep current selection if valid.
+        // 2. Fallback to LSV then KJV if available.
+        // 3. Fallback to first available.
+        const keys = data.availableTranslations;
+        if (keys.length > 0) {
+           let newFocal = keys.includes(focalTranslation) ? focalTranslation : (keys.includes('lsv') ? 'lsv' : keys[0]);
+           let newCompare = keys.includes(compareTranslation) ? compareTranslation : (keys.includes('kjv') ? 'kjv' : keys.find(k => k !== newFocal) || keys[0]);
+           
+           // If we only have one translation, ensure both slots aren't empty (though rendering handles this)
+           if (newCompare === newFocal && keys.length > 1) {
+              newCompare = keys.find(k => k !== newFocal);
+           }
+
+           setFocalTranslation(newFocal);
+           setCompareTranslation(newCompare);
+        }
+
+        setLoading(false);
+      } catch (err) { if (isMounted) setLoading(false); }
+    };
+    initDay();
+    return () => { isMounted = false; };
+  }, [currentDate]);
+  const playVerse = (vid, previousVid = null) => {
+    if (!verseMap || !verseMap[vid]) return;
+
+    // 1. CRITICAL: Stop any current speech
+    window.speechSynthesis.cancel();
+
+    setPlaybackVerseId(vid);
+
+    // 2. Prepare SPEECH-only text (Focal Version)
+    // Find the focal slot from our dynamic slots (it's always the bottom one now)
+    const focalSlot = dynamicSlots.bottom;
+    if (!focalSlot || !verseMap[vid][focalSlot.source]) return;
+
+    const rawText = verseMap[vid][focalSlot.source].join(' ').trim();
+    // Improve pronunciation: 
+    // 1. YHWH -> Yaw-weigh
+    // 2. Remove all square brackets [ and ] to prevent voices from reading "bracket"
+    const speechText = rawText
+        .replace(/YHWH/g, 'Yaw-weigh')
+        .replace(/[\[\]]/g, ''); 
+
+    const el = document.getElementById(`verse-${vid}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const currentIdx = getSectionIndex(vid);
+    const prevIdx = previousVid ? getSectionIndex(previousVid) : -1; // Always trigger intro if no previous verse
+    
+    // 3. Voice Selection
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) || voices[0];
+    
+    // 5. Play LSV Verse with corrected pronunciation
+    const mainUtterance = new SpeechSynthesisUtterance(speechText);
+    mainUtterance.voice = preferredVoice;
+    mainUtterance.rate = 0.9;
+
+    // 6. Move to next verse automatically
+    mainUtterance.onend = () => {
+        if (playbackStatusRef.current !== 'playing') return; // Don't advance if paused/stopped
+        const currentIndex = sortedVids.indexOf(vid);
+        if (currentIndex < sortedVids.length - 1) {
+            playVerse(sortedVids[currentIndex + 1], vid);
+        } else {
+            setPlaybackStatus('stopped');
+            setPlaybackVerseId(null);
+        }
+    };
+
+    // 4. Handle Section Intro (chain before main utterance)
+    if (currentIdx !== prevIdx) {
+        const [book, ch, verse] = vid.split('.');
+        
+        // Find first and last verses in this section
+        const sectionVids = sortedVids.filter(v => getSectionIndex(v) === currentIdx);
+        const lastVid = sectionVids[sectionVids.length - 1];
+        const [endBook, endCh, endVerse] = lastVid.split('.');
+        
+        // Build intro text with range
+        let introText = '';
+        if (currentIdx === 0) {
+            introText = `Today's reading from the Old Testament, ${BOOK_NAMES[book] || book} chapter ${ch} verse ${verse}`;
+        } else if (currentIdx === 1) {
+            introText = `Today's reading from the New Testament, ${BOOK_NAMES[book] || book} chapter ${ch} verse ${verse}`;
+        } else if (currentIdx === 2) {
+            introText = `Today's reading from the Psalms, chapter ${ch} verse ${verse}`;
+        } else {
+            introText = `Today's reading from the Proverbs, chapter ${ch} verse ${verse}`;
+        }
+        
+        // Add end range if different from start
+        if (lastVid !== vid) {
+            if (endCh !== ch) {
+                introText += ` to chapter ${endCh} verse ${endVerse}`;
+            } else {
+                introText += ` to verse ${endVerse}`;
+            }
+        }
+      
+        const intro = new SpeechSynthesisUtterance(introText);
+        intro.voice = preferredVoice; 
+        intro.rate = 0.9;
+        intro.onend = () => {
+            window.speechSynthesis.speak(mainUtterance);
+        };
+        window.speechSynthesis.speak(intro);
+    } else {
+        window.speechSynthesis.speak(mainUtterance);
+    }
+};
+
+  const handleToggle = () => {
+    if (playbackStatus === 'playing') { 
+      synthRef.current.pause(); 
+      setPlaybackStatus('paused');
+      isTransitioningRef.current = false; 
+    }
+    else if (playbackStatus === 'paused') { 
+      setPlaybackStatus('playing');
+      isTransitioningRef.current = true;
+      // Resume from current highlighted verse (where user scrolled to while paused)
+      const resumeVerse = activeVerseId || playbackVerseId || sortedVids[0];
+      if (resumeVerse && verseMap[resumeVerse]) {
+        playVerse(resumeVerse);
+      }
+    }
+    else { 
+      setPlaybackStatus('playing'); 
+      isTransitioningRef.current = true; 
+      // Start from current visible verse, or first verse if none visible
+      const startVerse = activeVerseId || sortedVids[0];
+      setPlaybackVerseId(startVerse);
+      playVerse(startVerse);
+    }
+  };
+
+  const navigateDate = (direction) => {
+    const month = parseInt(currentDate.substring(0, 2)), day = parseInt(currentDate.substring(2, 4));
+    const date = new Date(2024, month - 1, day); date.setDate(date.getDate() + direction);
+    const nm = String(date.getMonth() + 1).padStart(2, '0'), nd = String(date.getDate()).padStart(2, '0');
+    setCurrentDate(`${nm}${nd}`); window.scrollTo({ top: 0 });
+  };
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#fdfcfb]"><div className="text-center"><div className="w-8 h-8 border-2 border-stone-200 border-t-stone-800 rounded-full animate-spin mx-auto mb-4"></div><p className="text-stone-400 font-serif italic text-xs uppercase tracking-widest">Loading God's Word</p></div></div>;
+
+  return (
+    <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
+      <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 h-8 md:h-10">
+          <div className="flex items-center gap-1 min-w-0 flex-1">
+             <div className="flex items-center bg-stone-100 rounded-md px-0.5">
+               <button onClick={() => navigateDate(-1)} className="p-1 font-black text-stone-900 hover:text-amber-500"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
+               <h1 className="text-[11px] md:text-sm font-black text-stone-900 uppercase px-1 whitespace-nowrap">{formatDate(currentDate)}</h1>
+               <button onClick={() => navigateDate(1)} className="p-1 font-black text-stone-900 hover:text-amber-500"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></button>
+             </div>
+             <div className="flex items-center gap-1 min-w-0 overflow-hidden">
+                {labelParts.map((part, i) => (
+                  <div key={i} className={`transition-all duration-500 flex items-center shrink-0 ${activeSectionIndex === i ? 'bg-amber-600 px-2 py-0.5 rounded-full shadow-sm' : ''}`}>
+                    {activeSectionIndex === i ? <span className="text-[10px] md:text-xs font-bold text-white whitespace-nowrap">{part}</span> : <span className="text-[9px] font-black text-stone-300 uppercase tracking-tighter">{PILL_LABELS[i]}</span>}
+                  </div>
+                ))}
+             </div>
+          </div>
+             <div className="flex items-center gap-2 shrink-0">
+             {/* Slot 2 Selector (Middle) */}
+             {/* Only show selector if there are enough options to actually make a choice (i.e. > 2 options total, because 1 is focal) */}
+             {availableTranslations.length > 2 ? (
+              <div className="relative">
+                <button onClick={() => { setIsCompareOpen(!isCompareOpen); setIsFocalOpen(false); }} className="flex items-center gap-1 text-[9px] md:text-[10px] font-bold uppercase text-stone-300 hover:text-stone-500 transition-colors" title="Select Translation for Middle Slot">
+                  CMP: {compareTranslation ? compareTranslation.toUpperCase() : '-'}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                </button>
+                {isCompareOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsCompareOpen(false)}></div>
+                    <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
+                      {availableTranslations.filter(k => k !== focalTranslation).map(key => (
+                        <button key={key} onClick={() => { setCompareTranslation(key); setIsCompareOpen(false); }} className={`block w-full text-left px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 ${compareTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>{key}</button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+             ) : (
+                /* Static Label if only 2 options exist (since the other MUST be the compare version) */
+                availableTranslations.length > 1 && (
+                  <span className="text-[9px] md:text-[10px] font-bold uppercase text-stone-300 cursor-default" title="Middle Slot (Fixed)">
+                    CMP: {compareTranslation ? compareTranslation.toUpperCase() : '-'}
+                  </span>
+                )
+             )}
+
+             {/* Slot 3 Selector (Focal) */}
+             {availableTranslations.length > 0 && (
+              <div className="relative mr-1">
+                <button onClick={() => { setIsFocalOpen(!isFocalOpen); setIsCompareOpen(false); }} className="flex items-center gap-1 text-[10px] md:text-xs font-black uppercase text-stone-400 hover:text-stone-800 transition-colors" title="Select Focal (Audio) Translation">
+                  {focalTranslation ? focalTranslation.toUpperCase() : '-'}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                </button>
+                {isFocalOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsFocalOpen(false)}></div>
+                    <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
+                      {availableTranslations.map(key => (
+                        <button key={key} onClick={() => handleFocalChange(key)} className={`block w-full text-left px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 ${focalTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>{key}</button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+             )}
+
+             {playbackStatus !== 'stopped' && <button onClick={() => { synthRef.current.cancel(); setPlaybackStatus('stopped'); }} className="p-1.5 text-stone-300 hover:text-red-500"><svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
+             <button onClick={handleToggle} className={`px-3 md:px-5 py-1 rounded-full font-black text-[12px] md:text-[12px] uppercase tracking-tighter transition-all ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto py-3 md:py-6 px-2 space-y-6 md:space-y-10">
+        {sortedVids.map(vid => {
+          const data = verseMap[vid], isActive = (playbackStatus === 'playing' ? playbackVerseId === vid : activeVerseId === vid), book = vid.split('.')[0];
+          const isHebrew = !['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'].includes(book);
+          const [bookAbbr, ch, vs] = vid.split('.');
+          const displayVid = `${BOOK_NAMES[bookAbbr] || bookAbbr} ${ch}:${vs}`;
+          
+          return (
+            <div key={vid} id={`verse-${vid}`} className={`transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${playbackStatus === 'playing' && playbackVerseId !== vid ? 'opacity-10 grayscale' : 'opacity-100'}`}>
+              <div className="flex flex-col gap-1">
+                {/* SLOT 1: TOP (Usually Original) */}
+                {(() => {
+                   const slot = dynamicSlots.top;
+                   const text = data[slot.source]?.join('') || '';
+                   const label = typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
+                   return (
+                     <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
+                       <div className="flex justify-between items-center mb-0.5">
+                         <span className={`text-[7px] md:text-[10px] uppercase font-black tracking-widest ${isActive ? 'text-amber-500' : 'text-stone-300'}`}>{label}</span>
+                         <span className={`text-[7px] md:text-[10px] font-mono font-bold text-stone-300 ${isActive ? 'text-amber-500' : 'text-stone-300'} uppercase`}>{displayVid}</span>
+                       </div>
+                       <div className={`leading-tight tracking-tight break-words ${slot.isHebrewGreek ? (isHebrew ? 'hebrew text-[12px] md:text-xl text-right' : 'greek text-base md:text-lg text-left') : 'text-lg md:text-3xl font-serif italic'}`} style={{ direction: slot.isHebrewGreek && isHebrew ? 'rtl' : 'ltr' }}>
+                         <span className={isActive ? 'text-white' : 'text-stone-400'}>{text}</span>
+                       </div>
+                     </div>
+                   );
+                })()}
+
+                {/* SLOT 2: MIDDLE (Secondary) */}
+                {(() => {
+                   const slot = dynamicSlots.middle;
+                   const text = data[slot.source]?.join('') || '';
+                   return (
+                    <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
+                      <div className="flex justify-between items-center mb-0.5">
+                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{slot.label}</span>
+                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{displayVid}</span></div>
+                      <div><span className={`text-lg md:text-3xl font-serif italic leading-tight tracking-tight ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>{text}</span></div>
+                    </div>
+                   );
+                })()}
+
+                {/* SLOT 3: BOTTOM (Focal) */}
+                {(() => {
+                   const slot = dynamicSlots.bottom;
+                   const text = data[slot.source]?.join(' ') || '';
+                   return (
+                    <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-amber-100 shadow-xl border-amber-500 ring-1 ring-amber-500/50' : 'bg-white/40 border-transparent opacity-80'}`}>
+                      <div className="flex justify-between items-center mb-0.5">
+                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>
+                          {slot.label} 
+                          {slot.attribution && (
+                            <a 
+                              href={slot.attribution.link} 
+                              className="inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 hover:text-amber-600 cursor-pointer"
+                              title={slot.attribution.title}
+                            > 
+                              {slot.attribution.text} 
+                            </a>
+                          )}
+                        </span>
+                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>{displayVid}</span></div>
+                        <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-400'}`}>{text}</div>
+                    </div>
+                   );
+                })()}
+              </div>
+            </div>
+          );
+        })}
+        
+      </main>
+      <footer id="footer" className="w-full bg-stone-100 border-t border-stone-200 mt-2 py-2 px-1">
+        
+        <div className="max-w-4xl mx-auto text-[8px] md:text-[8px] text-stone-500 leading-relaxed text-center font-serif">
+          <span className="font-serif italic block mb-1 tracking-widest text-stone-400 max-w-xl mx-auto">{readingLabel}</span>
+          <p className="mb-2">
+            <span className="font-bold block mb-1 uppercase tracking-widest text-stone-400">Copyright & Attributions</span>
+            The <strong>Literal Standard Version (LSV)</strong> of The Holy Bible is a registered copyright of Covenant Press and the Covenant Christian Coalition (© 2020), 
+            released under the <a href="creativecommons.org" target="_blank" rel="noopener noreferrer" className="text-amber-700 underline">Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)</a> license. 
+            Attribution provided per licensor request: LSV text provided by <a href="https://lsvbible.com" target="_blank" rel="noopener noreferrer" className="text-amber-700 underline">lsvbible.com</a>. 
+            Audio pronunciation modified for clarity (YHWH to Yahweh).
+          </p>
+          
+          <p className="mb-2">
+            The <strong>King James Version (KJV)</strong> and <strong>World English Bible (WEB)</strong> are in the public domain. 
+            Greek (SBLGNT) and Hebrew (WLC) texts are provided for educational purposes.
+          </p>
+
+          <div className="pt-2 border-t border-stone-200 text-stone-400">
+            &copy; 2025-2026 <a href="https://mt-sin.ai" target="_blank" rel="noopener noreferrer" className="text-stone-400 underline">Mt. Sinai LLC</a>. This project is a derivative work licensed under <a href="creativecommons.org" target="_blank" rel="noopener noreferrer" className="text-stone-400 underline">CC BY-SA 4.0</a>.
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  );
+};
+
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
+    </script>
+    <!-- The ESM Run script to execute the TSX code -->
+    <script src="https://esm.sh/run" type="module"></script>
+</body>
+</html>
