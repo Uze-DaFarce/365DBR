@@ -86,24 +86,34 @@ const TRANSLATION_REGISTRY = {
 };
 
 /** --- DATA UTILITIES --- **/
-const walkItems = (items, map, versionKey) => {
+const walkItems = (items, map, versionKey, useOrgId) => {
   if (!items) return;
   items.forEach((item) => {
     if (item.attrs?.verseId) {
-      const vid = item.attrs.verseId;
-      if (!map[vid]) map[vid] = {};
-      if (!map[vid][versionKey]) map[vid][versionKey] = [];
+      let keyVid = item.attrs.verseId;
+      // If parallels have explicit mapping to original verse (verseOrgIds), use it.
+      if (useOrgId && item.attrs.verseOrgIds && item.attrs.verseOrgIds.length > 0) {
+        keyVid = item.attrs.verseOrgIds[0];
+      }
+
+      if (!map[keyVid]) map[keyVid] = {};
+      if (!map[keyVid][versionKey]) {
+         map[keyVid][versionKey] = {
+            text: [],
+            displayVid: item.attrs.verseId // Store the native ID for display (e.g. LEV.6.1)
+         };
+      }
       if (item.type === 'text' && item.text) {
-        map[vid][versionKey].push(item.text);
+        map[keyVid][versionKey].text.push(item.text);
       }
     }
-    if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey);
+    if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey, useOrgId);
   });
 };
 
-const processContent = (contentArray, map, versionKey) => {
+const processContent = (contentArray, map, versionKey, useOrgId = false) => {
   if (!contentArray) return;
-  contentArray.forEach(section => { if (section.items) walkItems(section.items, map, versionKey); });
+  contentArray.forEach(section => { if (section.items) walkItems(section.items, map, versionKey, useOrgId); });
 };
 
 const loadDailyBread = async (dateFolder) => {
@@ -124,7 +134,7 @@ const loadDailyBread = async (dateFolder) => {
 
     // 1. Process Original Content (if present)
     if (data.content) {
-      processContent(data.content, verseMap, 'original');
+      processContent(data.content, verseMap, 'original', false);
     }
 
     // 2. Process Parallels (Dynamic Discovery)
@@ -140,7 +150,7 @@ const loadDailyBread = async (dateFolder) => {
          });
 
          if (matchedKey && parallel.content) {
-            processContent(parallel.content, verseMap, matchedKey);
+            processContent(parallel.content, verseMap, matchedKey, true);
             availableKeys.add(matchedKey);
          }
       });
@@ -330,9 +340,10 @@ const App = () => {
     // 2. Prepare SPEECH-only text (Focal Version)
     // Find the focal slot from our dynamic slots (it's always the bottom one now)
     const focalSlot = dynamicSlots.bottom;
-    if (!focalSlot || !verseMap[vid][focalSlot.source]) return;
+    const slotData = verseMap[vid][focalSlot.source];
+    if (!focalSlot || !slotData) return;
 
-    const rawText = verseMap[vid][focalSlot.source].join(' ').trim();
+    const rawText = slotData.text.join(' ').trim();
     // Improve pronunciation: 
     // 1. YHWH -> Yaw-weigh
     // 2. Remove all square brackets [ and ] to prevent voices from reading "bracket"
@@ -436,7 +447,8 @@ const App = () => {
 
   const navigateDate = (direction) => {
     const month = parseInt(currentDate.substring(0, 2)), day = parseInt(currentDate.substring(2, 4));
-    const date = new Date(2024, month - 1, day); date.setDate(date.getDate() + direction);
+    // Use 2025 (non-leap year) to ensure Feb 28 -> Mar 1 transition matches the data generation
+    const date = new Date(2025, month - 1, day); date.setDate(date.getDate() + direction);
     const nm = String(date.getMonth() + 1).padStart(2, '0'), nd = String(date.getDate()).padStart(2, '0');
     setCurrentDate(`${nm}${nd}`); window.scrollTo({ top: 0 });
   };
@@ -520,8 +532,13 @@ const App = () => {
         {sortedVids.map(vid => {
           const data = verseMap[vid], isActive = (playbackStatus === 'playing' ? playbackVerseId === vid : activeVerseId === vid), book = vid.split('.')[0];
           const isHebrew = !['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'].includes(book);
-          const [bookAbbr, ch, vs] = vid.split('.');
-          const displayVid = `${BOOK_NAMES[bookAbbr] || bookAbbr} ${ch}:${vs}`;
+
+          // Helper to get display label for specific slot, fallback to row vid
+          const getDisplayLabel = (slotData) => {
+             const displayVid = slotData?.displayVid || vid;
+             const [bookAbbr, ch, vs] = displayVid.split('.');
+             return `${BOOK_NAMES[bookAbbr] || bookAbbr} ${ch}:${vs}`;
+          };
           
           return (
             <div key={vid} id={`verse-${vid}`} className={`transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${playbackStatus === 'playing' && playbackVerseId !== vid ? 'opacity-10 grayscale' : 'opacity-100'}`}>
@@ -529,13 +546,16 @@ const App = () => {
                 {/* SLOT 1: TOP (Usually Original) */}
                 {(() => {
                    const slot = dynamicSlots.top;
-                   const text = data[slot.source]?.join('') || '';
+                   const slotData = data[slot.source];
+                   const text = slotData?.text?.join('') || '';
                    const label = typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
+                   const displayLabel = getDisplayLabel(slotData);
+
                    return (
                      <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
                        <div className="flex justify-between items-center mb-0.5">
                          <span className={`text-[7px] md:text-[10px] uppercase font-black tracking-widest ${isActive ? 'text-amber-500' : 'text-stone-300'}`}>{label}</span>
-                         <span className={`text-[7px] md:text-[10px] font-mono font-bold text-stone-300 ${isActive ? 'text-amber-500' : 'text-stone-300'} uppercase`}>{displayVid}</span>
+                         <span className={`text-[7px] md:text-[10px] font-mono font-bold text-stone-300 ${isActive ? 'text-amber-500' : 'text-stone-300'} uppercase`}>{displayLabel}</span>
                        </div>
                        <div className={`leading-tight tracking-tight break-words ${slot.isHebrewGreek ? (isHebrew ? 'hebrew text-[12px] md:text-xl text-right' : 'greek text-base md:text-lg text-left') : 'text-lg md:text-3xl font-serif italic'}`} style={{ direction: slot.isHebrewGreek && isHebrew ? 'rtl' : 'ltr' }}>
                          <span className={isActive ? 'text-white' : 'text-stone-400'}>{text}</span>
@@ -547,12 +567,15 @@ const App = () => {
                 {/* SLOT 2: MIDDLE (Secondary) */}
                 {(() => {
                    const slot = dynamicSlots.middle;
-                   const text = data[slot.source]?.join('') || '';
+                   const slotData = data[slot.source];
+                   const text = slotData?.text?.join('') || '';
+                   const displayLabel = getDisplayLabel(slotData);
+
                    return (
                     <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
                       <div className="flex justify-between items-center mb-0.5">
                         <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{slot.label}</span>
-                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{displayVid}</span></div>
+                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{displayLabel}</span></div>
                       <div><span className={`text-lg md:text-3xl font-serif italic leading-tight tracking-tight ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>{text}</span></div>
                     </div>
                    );
@@ -561,7 +584,10 @@ const App = () => {
                 {/* SLOT 3: BOTTOM (Focal) */}
                 {(() => {
                    const slot = dynamicSlots.bottom;
-                   const text = data[slot.source]?.join(' ') || '';
+                   const slotData = data[slot.source];
+                   const text = slotData?.text?.join(' ') || '';
+                   const displayLabel = getDisplayLabel(slotData);
+
                    return (
                     <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-amber-100 shadow-xl border-amber-500 ring-1 ring-amber-500/50' : 'bg-white/40 border-transparent opacity-80'}`}>
                       <div className="flex justify-between items-center mb-0.5">
@@ -577,7 +603,7 @@ const App = () => {
                             </a>
                           )}
                         </span>
-                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>{displayVid}</span></div>
+                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>{displayLabel}</span></div>
                         <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-400'}`}>{text}</div>
                     </div>
                    );
