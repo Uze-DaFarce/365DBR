@@ -349,6 +349,7 @@ const App = () => {
     // 2. Remove all square brackets [ and ] to prevent voices from reading "bracket"
     const speechText = rawText
         .replace(/YHWH/g, 'Yaw-weigh')
+        .replace(/WHO/g, 'Who')
         .replace(/[\[\]]/g, ''); 
 
     const el = document.getElementById(`verse-${vid}`);
