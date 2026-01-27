@@ -339,15 +339,16 @@
 
     /* Footer */
     footer { background-color: #2e133a; color: #e5e7eb; padding: 80px 24px 40px; border-top: 4px solid #F4A623; }
-    .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; justify-items: center; text-align: center; }
+    .footer-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
     .footer-section h4 { color: #FFFFFF; font-size: 18px; margin-bottom: 24px; font-weight: 700; }
     .footer-section p, .footer-section a { color: #9ca3af; text-decoration: none; display: block; margin-bottom: 12px; line-height: 1.6; transition: color 0.2s; }
-    .footer-section a:hover { color: #F4A623; transform: translateX(4px); display: inline-block; }
+    .footer-section a:hover { color: #F4A623; }
     .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 32px; text-align: center; color: #6b7280; font-size: 14px; }
 
-    .social-links { display: flex; gap: 16px; margin-top: 20px; }
-    .social-links a { color: #FFFFFF !important; background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s ease !important; }
-    .social-links a:hover { background: #F4A623; color: #401b51 !important; transform: translateY(-4px) !important; }
+    .social-links { display: flex; gap: 16px; margin-top: 20px; justify-content: center; }
+    .social-links a { color: #FFFFFF !important; background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s ease, color 0.3s ease !important; }
+    .social-links a:hover { background: #F4A623; color: #401b51 !important; }
     .social-links svg { width: 20px; height: 20px; fill: currentColor; }
 
     /* Review Card */

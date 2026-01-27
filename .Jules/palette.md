@@ -13,3 +13,5 @@
     *   *Fix:* Restored all 16 reviews, using a "Read More" toggle to manage visual clutter.
 2.  **Grid Layouts:** `auto-fit` can create awkward "orphan" items (e.g., 3 items on row 1, 1 on row 2).
     *   *Fix:* Use explicit media queries to force 4-col, 2-col, or 1-col layouts (powers of 2) to ensure balanced rows.
+3.  **Hover States:** Avoid `transform: translate` on hover for small UI elements like social icons if it causes visual "jumping" or layout shifts that annoy users.
+    *   *Fix:* Use color/background transitions instead of movement for cleaner interaction.
