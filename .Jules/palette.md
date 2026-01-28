@@ -15,3 +15,7 @@
     *   *Fix:* Use explicit media queries to force 4-col, 2-col, or 1-col layouts (powers of 2) to ensure balanced rows.
 3.  **Hover States:** Avoid `transform: translate` on hover for small UI elements like social icons if it causes visual "jumping" or layout shifts that annoy users.
     *   *Fix:* Use color/background transitions instead of movement for cleaner interaction.
+
+## 2025-05-20 - Accessible Accordion Animation
+**Learning:** `display: none` is necessary for accessibility (hiding content from screen readers) but prevents CSS transitions.
+**Action:** Use a combination of `grid-template-rows` transition for the visual animation and the `transitionend` event listener to toggle the `hidden` class (display: none). This ensures both a smooth delight (animation) and robust accessibility.
