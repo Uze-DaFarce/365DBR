@@ -338,8 +338,8 @@
 
     /* Footer */
     footer { background-color: #2e133a; color: #e5e7eb; padding: 80px 24px 40px; border-top: 4px solid #F4A623; }
-    .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; justify-items: center; text-align: center; }
-    .footer-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; flex-wrap: wrap; gap: 64px; margin-bottom: 48px; text-align: center; }
+    .footer-section { display: flex; flex-direction: column; align-items: center; max-width: 300px; }
     .footer-section h4 { color: #FFFFFF; font-size: 18px; margin-bottom: 24px; font-weight: 700; }
     .footer-section p, .footer-section a { color: #9ca3af; text-decoration: none; display: block; margin-bottom: 12px; line-height: 1.6; transition: color 0.2s; }
     .footer-section a:hover { color: #F4A623; }
@@ -380,7 +380,7 @@
     }
 
     @media (max-width: 900px) {
-      .footer-content { grid-template-columns: 1fr 1fr; }
+      .footer-content { flex-direction: column; gap: 40px; }
       .contact-grid { grid-template-columns: 1fr; }
       .hero h1 { font-size: 48px; }
       .package-featured { transform: scale(1); }
@@ -464,10 +464,6 @@
       <section id="services" class="section-light">
         <div class="container">
           <div class="section-header">
-            <div style="display: flex; justify-content: center; gap: 24px; margin-bottom: 24px;">
-              <img src="pics/badges/proadvisor_gold.png" alt="QuickBooks ProAdvisor Gold" style="height: 80px; width: auto;">
-              <img src="pics/badges/payroll_certified.png" alt="QuickBooks Payroll Certified" style="height: 80px; width: auto;">
-            </div>
             <h2>Our Business Services</h2>
             <p>Comprehensive solutions delivered with excellence, integrity, and devotion</p>
           </div>
@@ -502,9 +498,17 @@
 
       <section id="bookkeeping" class="section-gray">
         <div class="container">
-          <div class="section-header">
-            <h2>Bookkeeping Service Packages</h2>
-            <p>Choose the package that fits your business needs</p>
+          <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; max-width: 1000px;">
+            <a href="https://www.credly.com/badges/7cfafeac-8522-43fe-b6e4-520f90216959/public_url" target="_blank" style="flex: 0 0 auto;">
+              <img src="pics/badges/intuit-proadvisor-badge-tier-gold.png" alt="QuickBooks ProAdvisor Gold" style="height: 100px; width: auto;">
+            </a>
+            <div style="flex: 1; text-align: center; min-width: 300px;">
+              <h2>Bookkeeping Service Packages</h2>
+              <p>Choose the package that fits your business needs</p>
+            </div>
+            <a href="https://www.credly.com/badges/d0414d5f-f1ad-4f1a-9e7f-a9e890d3469b/public_url" target="_blank" style="flex: 0 0 auto;">
+              <img src="pics/badges/Quickbooks Payroll Certification.png" alt="QuickBooks Payroll Certified" style="height: 100px; width: auto;">
+            </a>
           </div>
           <div class="packages-table">
             <div class="package-card">
@@ -552,6 +556,43 @@
               <li style="padding: 16px 0; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 16px;"><span style="color: #F4A623; font-weight: 800; font-size: 20px;">+</span> Setup Financial Records in QuickBooks - $500-$1,000 (includes first month of bookkeeping)</li>
               <li style="padding: 16px 0; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 16px;"><span style="color: #F4A623; font-weight: 800; font-size: 20px;">+</span> Cleanup Financial Records in QuickBooks - $200 per month of cleanup performed</li>
             </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="ministry" class="section-light">
+        <div class="container">
+          <div class="section-header">
+            <h2>Our Ministry Projects</h2>
+            <p>Resources and tools we provide to support the Christian community</p>
+          </div>
+          <div class="services-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+            <div class="project-card">
+              <img src="pics/projects/bible.jpg" alt="Open Bible" class="project-image">
+              <div class="project-content">
+                <h3>365DBR</h3>
+                <p>Read the Bible cover to cover in a Year in less than 15 minutes per day. A balanced plan presenting original texts alongside literal English translations. Totally free and ad-free.</p>
+                <a href="https://mt-sin.ai/365DBR/" class="service-link" target="_blank">Start Reading →</a>
+              </div>
+            </div>
+            <div class="project-card">
+              <img src="pics/projects/kids.jpg" alt="Children Reading" class="project-image">
+              <div class="project-content">
+                <h3>DayByDayKids</h3>
+                <p>Christian education resources for children. Helping families raise the next generation in faith with engaging content and activities.</p>
+                <a href="https://daybydaykids.com" class="service-link" target="_blank">Visit Website →</a>
+              </div>
+            </div>
+            <div class="project-card">
+              <div class="project-image" style="background: linear-gradient(45deg, #F4A623, #ffb845); display: flex; align-items: center; justify-content: center;">
+                <div style="font-size: 64px;">🥚</div>
+              </div>
+              <div class="project-content">
+                <h3>He Is Risen! Game</h3>
+                <p>A Christian Easter Egg Hunt Game. Hunt with P.A.L. for the Meaning of Easter in this interactive experience.</p>
+                <a href="/HeIsRisen/" class="service-link" target="_blank">Play Now →</a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -660,42 +701,7 @@
         </div>
       </section>
 
-      <section id="ministry" class="section-light">
-        <div class="container">
-          <div class="section-header">
-            <h2>Our Ministry Projects</h2>
-            <p>Resources and tools we provide to support the Christian community</p>
-          </div>
-          <div class="services-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
-            <div class="project-card">
-              <img src="pics/projects/bible.jpg" alt="Open Bible" class="project-image">
-              <div class="project-content">
-                <h3>365DBR</h3>
-                <p>Read the Bible cover to cover in a Year in less than 15 minutes per day. A balanced plan presenting original texts alongside literal English translations. Totally free and ad-free.</p>
-                <a href="https://mt-sin.ai/365DBR/" class="service-link" target="_blank">Start Reading →</a>
-              </div>
-            </div>
-            <div class="project-card">
-              <img src="pics/projects/kids.jpg" alt="Children Reading" class="project-image">
-              <div class="project-content">
-                <h3>DayByDayKids</h3>
-                <p>Christian education resources for children. Helping families raise the next generation in faith with engaging content and activities.</p>
-                <a href="https://daybydaykids.com" class="service-link" target="_blank">Visit Website →</a>
-              </div>
-            </div>
-            <div class="project-card">
-              <div class="project-image" style="background: linear-gradient(45deg, #F4A623, #ffb845); display: flex; align-items: center; justify-content: center;">
-                <div style="font-size: 64px;">🥚</div>
-              </div>
-              <div class="project-content">
-                <h3>He Is Risen! Game</h3>
-                <p>A Christian Easter Egg Hunt Game. Hunt with P.A.L. for the Meaning of Easter in this interactive experience.</p>
-                <a href="/HeIsRisen/" class="service-link" target="_blank">Play Now →</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       <section id="contact" class="section-gray">
         <div class="container">
