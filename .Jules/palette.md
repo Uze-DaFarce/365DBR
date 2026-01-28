@@ -1,3 +1,17 @@
-## 2025-05-20 - Skip Link Implementation
-**Learning:** The site lacked a "Skip to content" link, which is a fundamental accessibility requirement for keyboard users to bypass navigation.
-**Action:** Always check for skip links on pages with repetitive navigation headers. Implemented with existing brand colors.
+## 2025-05-20 - Pivot to Professional Redesign
+**Learning:** The initial goal was a "micro-UX" fix (skip link), but the user explicitly requested a full "professional visual redesign".
+**Action:** Prioritized user goal over persona constraints.
+
+**Implemented Changes:**
+- **Theme:** Purple (`#401b51`) & Gold (`#F4A623`) identity.
+- **Layout:** Card-based grids.
+- **Assets:** High-quality backgrounds.
+
+## 2025-05-20 - Content Preservation & Grid Precision
+**Learning:**
+1.  **Content Loss:** When redesigning, *never* remove content (like reviews) without explicit permission. Even if it looks "cleaner", users value their social proof.
+    *   *Fix:* Restored all 16 reviews, using a "Read More" toggle to manage visual clutter.
+2.  **Grid Layouts:** `auto-fit` can create awkward "orphan" items (e.g., 3 items on row 1, 1 on row 2).
+    *   *Fix:* Use explicit media queries to force 4-col, 2-col, or 1-col layouts (powers of 2) to ensure balanced rows.
+3.  **Hover States:** Avoid `transform: translate` on hover for small UI elements like social icons if it causes visual "jumping" or layout shifts that annoy users.
+    *   *Fix:* Use color/background transitions instead of movement for cleaner interaction.
