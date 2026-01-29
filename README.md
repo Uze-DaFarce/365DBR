@@ -2,6 +2,18 @@
 
 This project contains tools to generate and execute a Balanced 365-Day Bible Reading Plan. It focuses on presenting the original texts (Hebrew Masoretic Text for OT, Greek Textus Receptus/Majority Text for NT) alongside literal English translations (KJV, LSV).
 
+## Project Goal
+The goal of this project is to provide a daily Bible reading application that guides the user through the entire Bible in exactly one year. It is designed to be a spiritual resource, offering daily food for the soul and wisdom for those who seek it.
+
+## Daily Reading Structure
+Each day's reading is carefully structured to provide a balanced diet of scripture, containing:
+*   **Old Testament (OT):** A sequential reading through the Old Testament books (excluding Psalms and Proverbs).
+*   **New Testament (NT):** A sequential reading through the New Testament.
+*   **Psalms:** Songs of praise and prayer.
+*   **Proverbs:** Words of wisdom.
+
+This structure ensures that every day includes portions from different parts of the Bible, rather than reading through one section at a time.
+
 ## Copyright & Usage Notice
 
 **© 2026 Mt. Sinai LLC. All Rights Reserved.**
