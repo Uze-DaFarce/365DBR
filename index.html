@@ -167,6 +167,13 @@ const BOOK_NAMES = {
   GEN: 'Genesis', EXO: 'Exodus', LEV: 'Leviticus', NUM: 'Numbers', DEU: 'Deuteronomy', PSA: 'Psalms', PRO: 'Proverbs', MAT: 'Matthew', MRK: 'Mark', LUK: 'Luke', JHN: 'John'
 };
 
+const BIBLE_BOOK_ORDER = [
+  // OT
+  "GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1SA", "2SA", "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "JOB", "PSA", "PRO", "ECC", "SON", "ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOE", "AMO", "OBA", "JON", "MIC", "NAH", "HAB", "ZEP", "HAG", "ZEC", "MAL",
+  // NT
+  "MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"
+];
+
 const PILL_LABELS = ['OT', 'NT', 'PS', 'PR'];
 
 const App = () => {
@@ -237,8 +244,18 @@ const App = () => {
   const sortedVids = useMemo(() => {
     if (!verseMap) return [];
     return Object.keys(verseMap).sort((a, b) => {
+      // 1. Primary Sort: By Section (OT, NT, Psalms, Proverbs)
       const wA = getSectionIndex(a), wB = getSectionIndex(b);
       if (wA !== wB) return wA - wB;
+
+      // 2. Secondary Sort: By Book Order (Canonical)
+      const bookA = a.split('.')[0];
+      const bookB = b.split('.')[0];
+      if (bookA !== bookB) {
+        return BIBLE_BOOK_ORDER.indexOf(bookA) - BIBLE_BOOK_ORDER.indexOf(bookB);
+      }
+
+      // 3. Tertiary Sort: By Chapter/Verse (Numeric)
       return a.localeCompare(b, undefined, { numeric: true });
     });
   }, [verseMap]);
