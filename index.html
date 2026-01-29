@@ -438,6 +438,16 @@
     #more-reviews > div {
       min-height: 0;
     }
+
+    /* Accessibility: Focus Indicators (Palette) */
+    :focus-visible {
+      outline: 3px solid #401b51;
+      outline-offset: 4px;
+    }
+    header :focus-visible,
+    footer :focus-visible {
+      outline-color: #F4A623;
+    }
   </style>
   <style>@view-transition { navigation: auto; }</style>
  </head>
