@@ -419,7 +419,9 @@ const App = () => {
         
         // Add end range if different from start
         if (lastVid !== vid) {
-            if (endCh !== ch) {
+            if (book !== endBook) {
+                introText += ` to ${BOOK_NAMES[endBook] || endBook} chapter ${endCh} verse ${endVerse}`;
+            } else if (endCh !== ch) {
                 introText += ` to chapter ${endCh} verse ${endVerse}`;
             } else {
                 introText += ` to verse ${endVerse}`;
