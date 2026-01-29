@@ -421,6 +421,23 @@
       .footer-section a { display: inline-block; margin: 0 8px; }
       .social-links { justify-content: center; }
     }
+
+    /* Reviews Toggle Animation */
+    #more-reviews {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.5s ease-out;
+      overflow: hidden;
+    }
+    #more-reviews.hidden {
+      display: none;
+    }
+    #more-reviews.reviews-expanded {
+      grid-template-rows: 1fr;
+    }
+    #more-reviews > div {
+      min-height: 0;
+    }
   </style>
   <style>@view-transition { navigation: auto; }</style>
  </head>
@@ -630,7 +647,7 @@
             </div>
           </div>
 
-          <div id="more-reviews" class="hidden">
+          <div id="more-reviews" class="hidden" role="region" aria-label="Additional reviews">
             <div style="columns: 2 350px; gap: 24px;">
               <div class="review-card">
                 <p class="review-text">"You are the best and always come to the rescue of difficult IAM set up and conversations. I greatly thank you for your assistance, ALWAYS!"</p>
@@ -665,7 +682,7 @@
             </div>
           </div>
 
-          <button id="toggle-reviews-btn" class="btn-outline" onclick="document.getElementById('more-reviews').classList.remove('hidden');this.style.display='none'">Read More Client Stories</button>
+          <button id="toggle-reviews-btn" class="btn-outline" aria-expanded="false" aria-controls="more-reviews">Read More Client Stories</button>
         </div>
       </section>
 
@@ -830,6 +847,39 @@
       });
 
       document.getElementById('copyright').innerHTML = `© 2024-${new Date().getFullYear()} Mt. Sinai LLC. All rights reserved. | Serving God through excellence in business.`;
+
+      // Reviews Toggle Logic
+      const toggleBtn = document.getElementById('toggle-reviews-btn');
+      const reviewsContainer = document.getElementById('more-reviews');
+
+      if (toggleBtn && reviewsContainer) {
+        toggleBtn.addEventListener('click', () => {
+          const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+
+          if (!isExpanded) {
+            // EXPAND
+            reviewsContainer.classList.remove('hidden');
+            // Small timeout to allow display:block to apply before animating
+            setTimeout(() => {
+                reviewsContainer.classList.add('reviews-expanded');
+            }, 10);
+            toggleBtn.textContent = 'Show Less Client Stories';
+            toggleBtn.setAttribute('aria-expanded', 'true');
+          } else {
+            // COLLAPSE
+            reviewsContainer.classList.remove('reviews-expanded');
+            toggleBtn.textContent = 'Read More Client Stories';
+            toggleBtn.setAttribute('aria-expanded', 'false');
+
+            // Wait for transition to finish before hiding
+            reviewsContainer.addEventListener('transitionend', function() {
+              if (toggleBtn.getAttribute('aria-expanded') === 'false') {
+                reviewsContainer.classList.add('hidden');
+              }
+            }, { once: true });
+          }
+        });
+      }
     </script>
  </body>
 </html>
