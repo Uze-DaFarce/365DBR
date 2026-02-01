@@ -109,7 +109,7 @@ const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
             displayVid: item.attrs.verseId // Store the native ID for display (e.g. LEV.6.1)
          };
       }
-
+      
       // Flush buffer if exists (orphaned content found BEFORE this verse belongs here, e.g. Titles)
       if (buffer && buffer.text.length > 0) {
          map[keyVid][versionKey].text.push(...buffer.text);
@@ -143,7 +143,7 @@ const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
             }
         }
     }
-
+    
     // 3. Recurse
     if (item.items && item.items.length > 0) {
         walkItems(item.items, map, versionKey, useOrgId, buffer, context);
@@ -157,11 +157,11 @@ const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
 const processContent = (contentArray, map, versionKey, useOrgId = false) => {
   if (!contentArray) return;
   // Buffer context for this processing pass
-  const buffer = { text: [] };
+  const buffer = { text: [] }; 
   // Context MUST be shared across the entire section to track lastSeenVid linearly
   const context = { activeVid: null, lastSeenVid: null };
-  contentArray.forEach(section => {
-      if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context);
+  contentArray.forEach(section => { 
+      if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context); 
   });
 };
 
@@ -340,7 +340,7 @@ const App = () => {
   const groupedVids = useMemo(() => {
       const groups = [];
       let i = 0;
-
+      
       const hasTranslationContent = (vid) => {
           if (!verseMap || !verseMap[vid]) return false;
           const t1 = dynamicSlots.middle.source;
@@ -354,7 +354,7 @@ const App = () => {
       while (i < sortedVids.length) {
           const currentVid = sortedVids[i];
           const group = [currentVid];
-
+          
           // Check if we need to merge with next
           // Condition: Current has NO English, Next HAS English, Same Chapter
           // This catches the Psalm Title (Verse 1) vs English (Verse 1 in Verse 2 slot) case
@@ -363,7 +363,7 @@ const App = () => {
               // Ensure same book/chapter to avoid merges across boundaries
               const [b1, c1] = currentVid.split('.');
               const [b2, c2] = nextVid.split('.');
-
+              
               if (b1 === b2 && c1 === c2 && hasTranslationContent(nextVid)) {
                   group.push(nextVid);
                   i++; // Skip next one since we consumed it
@@ -435,25 +435,39 @@ const App = () => {
     initDay();
     return () => { isMounted = false; };
   }, [currentDate]);
+
   const playVerse = (vid, previousVid = null) => {
-    if (!verseMap || !verseMap[vid]) return;
+    if (!verseMap) return;
+
+    // 1. Resolve Group Logic: We always play "Groups"
+    // Find the group containing this vid
+    const group = groupedVids.find(g => g.includes(vid)) || [vid];
+    const leaderVid = group[0];
 
     // 1. CRITICAL: Stop any current speech
     window.speechSynthesis.cancel();
 
-    setPlaybackVerseId(vid);
+    setPlaybackVerseId(leaderVid);
 
     // 2. Prepare SPEECH-only text (Focal Version)
-    // Find the focal slot from our dynamic slots (it's always the bottom one now)
+    // Accumulate English text for the whole group
     const focalSlot = dynamicSlots.bottom;
-    const slotData = verseMap[vid][focalSlot.source];
+    if (!focalSlot) return;
 
-    // If no text content (e.g. gap due to versification merge), skip to next automatically
-    const rawText = (slotData && slotData.text) ? slotData.text.join(' ').trim() : '';
+    let groupText = '';
+    group.forEach(gVid => {
+        const slotData = verseMap[gVid] ? verseMap[gVid][focalSlot.source] : null;
+        if (slotData && slotData.text) {
+            groupText += slotData.text.join(' ').trim() + ' ';
+        }
+    });
+    
+    const rawText = groupText.trim();
     if (!rawText) {
-        const currentIndex = sortedVids.indexOf(vid);
-        if (currentIndex < sortedVids.length - 1) {
-            playVerse(sortedVids[currentIndex + 1], previousVid);
+        // Skip to next GROUP if this group is empty
+        const currentGroupIdx = groupedVids.findIndex(g => g[0] === leaderVid);
+        if (currentGroupIdx < groupedVids.length - 1) {
+            playVerse(groupedVids[currentGroupIdx + 1][0], previousVid);
         } else {
             setPlaybackStatus('stopped');
             setPlaybackVerseId(null);
@@ -462,18 +476,17 @@ const App = () => {
     }
 
     // Improve pronunciation: 
-    // 1. YHWH -> Yaw-weigh
-    // 2. Remove all square brackets [ and ] to prevent voices from reading "bracket"
     const speechText = rawText
         .replace(/YHWH/g, 'Yaw-weigh')
         .replace(/WHO/g, 'Who')
         .replace(/[\[\]]/g, ''); 
 
-    const el = document.getElementById(`verse-${vid}`);
+    // Scroll to the LEADER vid container
+    const el = document.getElementById(`verse-${leaderVid}`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    const currentIdx = getSectionIndex(vid);
-    const prevIdx = previousVid ? getSectionIndex(previousVid) : -1; // Always trigger intro if no previous verse
+    const currentIdx = getSectionIndex(leaderVid);
+    const prevIdx = previousVid ? getSectionIndex(previousVid) : -1; 
     
     // 3. Voice Selection
     const voices = window.speechSynthesis.getVoices();
@@ -484,28 +497,43 @@ const App = () => {
     mainUtterance.voice = preferredVoice;
     mainUtterance.rate = 0.9;
 
-    // 6. Move to next verse automatically
+    // 6. Move to next GROUP automatically
     mainUtterance.onend = () => {
-        if (playbackStatusRef.current !== 'playing') return; // Don't advance if paused/stopped
-        const currentIndex = sortedVids.indexOf(vid);
-        if (currentIndex < sortedVids.length - 1) {
-            playVerse(sortedVids[currentIndex + 1], vid);
+        if (playbackStatusRef.current !== 'playing') return; 
+        const currentGroupIdx = groupedVids.findIndex(g => g[0] === leaderVid);
+        if (currentGroupIdx < groupedVids.length - 1) {
+            playVerse(groupedVids[currentGroupIdx + 1][0], leaderVid);
         } else {
             setPlaybackStatus('stopped');
             setPlaybackVerseId(null);
         }
     };
 
-    // 4. Handle Section Intro (chain before main utterance)
+    // 4. Handle Section Intro
     if (currentIdx !== prevIdx) {
-        const [book, ch, verse] = vid.split('.');
+        // Range calc based on Group Leaders to accurately reflect visual start/end
+        const sectionGroups = groupedVids.filter(g => getSectionIndex(g[0]) === currentIdx);
         
-        // Find first and last verses in this section
-        const sectionVids = sortedVids.filter(v => getSectionIndex(v) === currentIdx);
-        const lastVid = sectionVids[sectionVids.length - 1];
-        const [endBook, endCh, endVerse] = lastVid.split('.');
+        // Start: First Group's First Vid
+        const startVid = sectionGroups[0][0]; 
+        // End: Last Group's *Last* Vid (to get true extent)
+        const lastGroup = sectionGroups[sectionGroups.length - 1];
+        const endVid = lastGroup[lastGroup.length - 1];
+
+        // For display labels in intro, we want to align with English perception.
+        // If Hebrew 19.1 (Title) is merged with 19.2 (Verse 1), English readers see "19:1".
+        // The `getSlotContent` logic handles rendering labels, but here we just need rough "Chapter X Verse Y".
+        // We'll use the *English Mapped* verse ID if possible for the intro to match user expectation.
         
-        // Build intro text with range
+        const getEnglishVid = (v) => {
+             const d = verseMap[v];
+             const t = d ? d[focalSlot.source] : null;
+             return t?.displayVid || v;
+        };
+
+        const [book, ch, verse] = getEnglishVid(startVid).split('.');
+        const [endBook, endCh, endVerse] = getEnglishVid(endVid).split('.');
+        
         let introText = '';
         if (currentIdx === 0) {
             introText = `Today's reading from the Old Testament, ${BOOK_NAMES[book] || book} chapter ${ch} verse ${verse}`;
@@ -517,8 +545,7 @@ const App = () => {
             introText = `Today's reading from the Proverbs, chapter ${ch} verse ${verse}`;
         }
         
-        // Add end range if different from start
-        if (lastVid !== vid) {
+        if (startVid !== endVid) { // Compare original IDs for range check
             if (book !== endBook) {
                 introText += ` to ${BOOK_NAMES[endBook] || endBook} chapter ${endCh} verse ${endVerse}`;
             } else if (endCh !== ch) {
@@ -658,17 +685,17 @@ const App = () => {
           // Helper to accumulate content across grouped verses
           const getSlotContent = (slot) => {
               if (!slot || !slot.source) return { text: '', displayLabel: '' };
-
+              
               let fullText = '';
               let displayLabel = '';
-
+              
               group.forEach((gVid, idx) => {
                   const data = verseMap[gVid];
                   const slotData = data ? data[slot.source] : null;
                   if (slotData && slotData.text && slotData.text.length > 0) {
                       const sep = (slot.isHebrewGreek) ? ' ' : ' ';
                       fullText += (fullText ? sep : '') + slotData.text.join(slot.isHebrewGreek ? '' : ' ');
-
+                      
                       // Use the display label of the first valid entry found
                       if (!displayLabel) {
                           const dVid = slotData.displayVid || gVid;
@@ -677,13 +704,13 @@ const App = () => {
                       }
                   }
               });
-
+              
               // Fallback label if no content found
               if (!displayLabel) {
                   const [b, c, v] = vid.split('.');
                   displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
               }
-
+              
               return { text: fullText, displayLabel };
           };
 
