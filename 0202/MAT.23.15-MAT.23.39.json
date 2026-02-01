@@ -1,0 +1,2843 @@
+{
+  "data": {
+    "id": "MAT.23.15-MAT.23.39",
+    "orgId": "MAT.23.15-MAT.23.39",
+    "bibleId": "7644de2e4c5188e5-01",
+    "bookId": "MAT",
+    "chapterIds": [
+      "MAT.23"
+    ],
+    "reference": "ΚΑΤΑ ΜΑΤΘΑΙΟΝ 23:15-39",
+    "content": [
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Οὐαὶ ὑμῖν, γραμματεῖς καὶ Φαρισαῖοι, ὑποκριταί, ὅτι περιάγετε τὴν θάλασσαν καὶ τὴν ξηρὰν ποιῆσαι ἕνα προσήλυτον, καὶ ὅταν γένηται, ποιεῖτε αὐτὸν υἱὸν γεέννης διπλότερον ὑμῶν.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.15",
+                  "verseOrgIds": [
+                    "MAT.23.15"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Οὐαὶ ὑμῖν, ὁδηγοὶ τυφλοί, οἱ λέγοντες, Ὃς ἂν ὀμόσῃ ἐν τῷ ναῷ, οὐδέν ἐστιν· ὃς δ᾽ ἂν ὀμόσῃ ἐν τῷ χρυσῷ τοῦ ναοῦ, ὀφείλει.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.16",
+                  "verseOrgIds": [
+                    "MAT.23.16"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.16",
+              "verseOrgIds": [
+                "MAT.23.16"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Μωροὶ καὶ τυφλοί· τίς γὰρ μείζων ἐστίν, ὁ χρυσός, ἢ ὁ ναὸς ὁ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.17",
+                  "verseOrgIds": [
+                    "MAT.23.17"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.17",
+              "verseOrgIds": [
+                "MAT.23.17"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἁγιάζων τὸν χρυσόν;",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.17",
+                  "verseOrgIds": [
+                    "MAT.23.17"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.17",
+              "verseOrgIds": [
+                "MAT.23.17"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Καί, Ὃς",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.18",
+                  "verseOrgIds": [
+                    "MAT.23.18"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.18",
+              "verseOrgIds": [
+                "MAT.23.18"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἐὰν ὀμόσῃ ἐν τῷ θυσιαστηρίῳ, οὐδέν ἐστιν· ὃς δ᾽ ἂν ὀμόσῃ ἐν τῷ δώρῳ τῷ ἐπάνω αὐτοῦ, ὀφείλει.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.18",
+                  "verseOrgIds": [
+                    "MAT.23.18"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.18",
+              "verseOrgIds": [
+                "MAT.23.18"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Μωροὶ καὶ τυφλοί· τί γὰρ μεῖζον, τὸ δῶρον, ἢ τὸ θυσιαστήριον τὸ ἁγιάζον τὸ δῶρον;",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.19",
+                  "verseOrgIds": [
+                    "MAT.23.19"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.19",
+              "verseOrgIds": [
+                "MAT.23.19"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Ὁ οὖν ὀμόσας ἐν τῷ θυσιαστηρίῳ ὀμνύει ἐν αὐτῷ καὶ ἐν πᾶσι τοῖς ἐπάνω αὐτοῦ·",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.20",
+                  "verseOrgIds": [
+                    "MAT.23.20"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.20",
+              "verseOrgIds": [
+                "MAT.23.20"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "καὶ ὁ ὀμόσας ἐν τῷ ναῷ ὀμνύει ἐν αὐτῷ καὶ ἐν τῷ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.21",
+                  "verseOrgIds": [
+                    "MAT.23.21"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.21",
+              "verseOrgIds": [
+                "MAT.23.21"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "κατοικήσαντι αὐτόν·",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.21",
+                  "verseOrgIds": [
+                    "MAT.23.21"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.21",
+              "verseOrgIds": [
+                "MAT.23.21"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "καὶ ὁ ὀμόσας ἐν τῷ οὐρανῷ ὀμνύει ἐν τῷ θρόνῳ τοῦ Θεοῦ καὶ ἐν τῷ καθημένῳ ἐπάνω αὐτοῦ.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.22",
+                  "verseOrgIds": [
+                    "MAT.23.22"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Οὐαὶ ὑμῖν, γραμματεῖς καὶ Φαρισαῖοι, ὑποκριταί, ὅτι ἀποδεκατοῦτε τὸ ἡδύοσμον καὶ τὸ ἄνηθον καὶ τὸ κύμινον, καὶ ἀφήκατε τὰ βαρύτερα τοῦ νόμου, τὴν κρίσιν καὶ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.23",
+                  "verseOrgIds": [
+                    "MAT.23.23"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.23",
+              "verseOrgIds": [
+                "MAT.23.23"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "τὸν ἔλεον καὶ τὴν πίστιν·",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.23",
+                  "verseOrgIds": [
+                    "MAT.23.23"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.23",
+              "verseOrgIds": [
+                "MAT.23.23"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ταῦτα ἔδει ποιῆσαι, κἀκεῖνα μὴ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.23",
+                  "verseOrgIds": [
+                    "MAT.23.23"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.23",
+              "verseOrgIds": [
+                "MAT.23.23"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἀφιέναι.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.23",
+                  "verseOrgIds": [
+                    "MAT.23.23"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.23",
+              "verseOrgIds": [
+                "MAT.23.23"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Ὁδηγοὶ τυφλοί,",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.24",
+                  "verseOrgIds": [
+                    "MAT.23.24"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.24",
+              "verseOrgIds": [
+                "MAT.23.24"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "οἱ διϋλίζοντες τὸν κώνωπα, τὴν δὲ κάμηλον καταπίνοντες.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.24",
+                  "verseOrgIds": [
+                    "MAT.23.24"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Οὐαὶ ὑμῖν, γραμματεῖς καὶ Φαρισαῖοι, ὑποκριταί, ὅτι καθαρίζετε τὸ ἔξωθεν τοῦ ποτηρίου καὶ τῆς παροψίδος, ἔσωθεν δὲ γέμουσιν ἐξ ἁρπαγῆς καὶ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.25",
+                  "verseOrgIds": [
+                    "MAT.23.25"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.25",
+              "verseOrgIds": [
+                "MAT.23.25"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἀδικίας.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.25",
+                  "verseOrgIds": [
+                    "MAT.23.25"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.25",
+              "verseOrgIds": [
+                "MAT.23.25"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Φαρισαῖε τυφλέ, καθάρισον πρῶτον τὸ ἐντὸς τοῦ ποτηρίου",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.26",
+                  "verseOrgIds": [
+                    "MAT.23.26"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.26",
+              "verseOrgIds": [
+                "MAT.23.26"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "καὶ τῆς παροψίδος, ἵνα γένηται καὶ τὸ ἐκτὸς",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.26",
+                  "verseOrgIds": [
+                    "MAT.23.26"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.26",
+              "verseOrgIds": [
+                "MAT.23.26"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "αὐτῶν καθαρόν.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.26",
+                  "verseOrgIds": [
+                    "MAT.23.26"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Οὐαὶ ὑμῖν, γραμματεῖς καὶ Φαρισαῖοι, ὑποκριταί, ὅτι παρομοιάζετε τάφοις κεκονιαμένοις, οἵτινες ἔξωθεν μὲν φαίνονται ὡραῖοι, ἔσωθεν δὲ γέμουσιν ὀστέων νεκρῶν καὶ πάσης ἀκαθαρσίας.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.27",
+                  "verseOrgIds": [
+                    "MAT.23.27"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.27",
+              "verseOrgIds": [
+                "MAT.23.27"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Οὕτω καὶ ὑμεῖς ἔξωθεν μὲν φαίνεσθε τοῖς ἀνθρώποις δίκαιοι, ἔσωθεν δὲ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.28",
+                  "verseOrgIds": [
+                    "MAT.23.28"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.28",
+              "verseOrgIds": [
+                "MAT.23.28"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "μεστοί ἐστε ὑποκρίσεως καὶ ἀνομίας.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.28",
+                  "verseOrgIds": [
+                    "MAT.23.28"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Οὐαὶ ὑμῖν, γραμματεῖς καὶ Φαρισαῖοι, ὑποκριταί, ὅτι οἰκοδομεῖτε τοὺς τάφους τῶν προφητῶν, καὶ κοσμεῖτε τὰ μνημεῖα τῶν δικαίων,",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.29",
+                  "verseOrgIds": [
+                    "MAT.23.29"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.29",
+              "verseOrgIds": [
+                "MAT.23.29"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "καὶ λέγετε, Εἰ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.30",
+                  "verseOrgIds": [
+                    "MAT.23.30"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.30",
+              "verseOrgIds": [
+                "MAT.23.30"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἦμεν ἐν ταῖς ἡμέραις τῶν πατέρων ἡμῶν, οὐκ ἂν",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.30",
+                  "verseOrgIds": [
+                    "MAT.23.30"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.30",
+              "verseOrgIds": [
+                "MAT.23.30"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἦμεν",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.30",
+                  "verseOrgIds": [
+                    "MAT.23.30"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.30",
+              "verseOrgIds": [
+                "MAT.23.30"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "κοινωνοὶ αὐτῶν ἐν τῷ αἵματι τῶν προφητῶν.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.30",
+                  "verseOrgIds": [
+                    "MAT.23.30"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.30",
+              "verseOrgIds": [
+                "MAT.23.30"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Ὥστε μαρτυρεῖτε ἑαυτοῖς ὅτι υἱοί ἐστε τῶν φονευσάντων τοὺς προφήτας·",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.31",
+                  "verseOrgIds": [
+                    "MAT.23.31"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.31",
+              "verseOrgIds": [
+                "MAT.23.31"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "καὶ ὑμεῖς πληρώσατε τὸ μέτρον τῶν πατέρων ὑμῶν.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.32",
+                  "verseOrgIds": [
+                    "MAT.23.32"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.32",
+              "verseOrgIds": [
+                "MAT.23.32"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Ὄφεις, γεννήματα ἐχιδνῶν, πῶς φύγητε ἀπὸ τῆς κρίσεως τῆς γεέννης;",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.33",
+                  "verseOrgIds": [
+                    "MAT.23.33"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.33",
+              "verseOrgIds": [
+                "MAT.23.33"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Διὰ τοῦτο, ἰδού, ἐγὼ ἀποστέλλω πρὸς ὑμᾶς προφήτας καὶ σοφοὺς καὶ γραμματεῖς·",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.34",
+                  "verseOrgIds": [
+                    "MAT.23.34"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.34",
+              "verseOrgIds": [
+                "MAT.23.34"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "καὶ ἐξ αὐτῶν ἀποκτενεῖτε καὶ σταυρώσετε, καὶ ἐξ αὐτῶν μαστιγώσετε ἐν ταῖς συναγωγαῖς ὑμῶν καὶ διώξετε ἀπὸ πόλεως εἰς πόλιν·",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.34",
+                  "verseOrgIds": [
+                    "MAT.23.34"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.34",
+              "verseOrgIds": [
+                "MAT.23.34"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ὅπως ἔλθῃ ἐφ᾽ ὑμᾶς πᾶν αἷμα δίκαιον",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.35",
+                  "verseOrgIds": [
+                    "MAT.23.35"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.35",
+              "verseOrgIds": [
+                "MAT.23.35"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἐκχυνόμενον ἐπὶ τῆς γῆς, ἀπὸ τοῦ αἵματος Ἄβελ τοῦ δικαίου ἕως τοῦ αἵματος Ζαχαρίου υἱοῦ Βαραχίου, ὃν ἐφονεύσατε μεταξὺ τοῦ ναοῦ καὶ τοῦ θυσιαστηρίου.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.35",
+                  "verseOrgIds": [
+                    "MAT.23.35"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.35",
+              "verseOrgIds": [
+                "MAT.23.35"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Ἀμὴν λέγω ὑμῖν",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.36",
+                  "verseOrgIds": [
+                    "MAT.23.36"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.36",
+              "verseOrgIds": [
+                "MAT.23.36"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ὅτι ἥξει",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.36",
+                  "verseOrgIds": [
+                    "MAT.23.36"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.36",
+              "verseOrgIds": [
+                "MAT.23.36"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "πάντα ταῦτα ἐπὶ τὴν γενεὰν ταύτην.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.36",
+                  "verseOrgIds": [
+                    "MAT.23.36"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "s"
+        },
+        "items": [
+          {
+            "text": "The Lament over Jerusalem",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Ἱερουσαλήμ, Ἱερουσαλήμ, ἡ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.37",
+                  "verseOrgIds": [
+                    "MAT.23.37"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.37",
+              "verseOrgIds": [
+                "MAT.23.37"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἀποκτένουσα τοὺς προφήτας καὶ λιθοβολοῦσα τοὺς ἀπεσταλμένους πρὸς αὐτήν, ποσάκις ἠθέλησα ἐπισυναγαγεῖν τὰ τέκνα σου, ὃν τρόπον",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.37",
+                  "verseOrgIds": [
+                    "MAT.23.37"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.37",
+              "verseOrgIds": [
+                "MAT.23.37"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἐπισυνάγει ὄρνις τὰ νοσσία",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.37",
+                  "verseOrgIds": [
+                    "MAT.23.37"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.37",
+              "verseOrgIds": [
+                "MAT.23.37"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἑαυτῆς ὑπὸ τὰς πτέρυγας, καὶ οὐκ ἠθελήσατε.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.37",
+                  "verseOrgIds": [
+                    "MAT.23.37"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.37",
+              "verseOrgIds": [
+                "MAT.23.37"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Ἰδού, ἀφίεται ὑμῖν ὁ οἶκος ὑμῶν",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.38",
+                  "verseOrgIds": [
+                    "MAT.23.38"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.38",
+              "verseOrgIds": [
+                "MAT.23.38"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "ἔρημος.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.38",
+                  "verseOrgIds": [
+                    "MAT.23.38"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "MAT.23.38",
+              "verseOrgIds": [
+                "MAT.23.38"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "wj"
+            },
+            "items": [
+              {
+                "text": "Λέγω γὰρ ὑμῖν, οὐ μή με ἴδητε ἀπ᾽ ἄρτι ἕως ἂν εἴπητε, Εὐλογημένος ὁ ἐρχόμενος ἐν ὀνόματι Κυρίου.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.39",
+                  "verseOrgIds": [
+                    "MAT.23.39"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "verseCount": 25,
+    "copyright": "Public Domain",
+    "parallels": [
+      {
+        "id": "MAT.23.15-MAT.23.39",
+        "orgId": "MAT.23.15-MAT.23.39",
+        "bibleId": "de4e12af7f28f599-01",
+        "bookId": "MAT",
+        "chapterIds": [
+          "MAT.23"
+        ],
+        "reference": "Matthew 23:15-39",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Woe unto you, scribes and Pharisees, hypocrites! for ye compass sea and land to make one proselyte, and when he is made, ye make him twofold more the child of hell than yourselves.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.15",
+                      "verseOrgIds": [
+                        "MAT.23.15"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.15",
+                  "verseOrgIds": [
+                    "MAT.23.15"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Woe unto you, ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.16",
+                      "verseOrgIds": [
+                        "MAT.23.16"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "ye",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.16",
+                          "verseOrgIds": [
+                            "MAT.23.16"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " blind guides, which say, Whosoever shall swear by the temple, it is nothing; but whosoever shall swear by the gold of the temple, he is a debtor!",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.16",
+                      "verseOrgIds": [
+                        "MAT.23.16"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.16",
+                  "verseOrgIds": [
+                    "MAT.23.16"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "Ye",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.17",
+                          "verseOrgIds": [
+                            "MAT.23.17"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " fools and blind: for whether is greater, the gold, or the temple that sanctifieth the gold?",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.17",
+                      "verseOrgIds": [
+                        "MAT.23.17"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.17",
+                  "verseOrgIds": [
+                    "MAT.23.17"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "And, Whosoever shall swear by the altar, it is nothing; but whosoever sweareth by the gift that is upon it, he is guilty.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.18",
+                      "verseOrgIds": [
+                        "MAT.23.18"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.18",
+                  "verseOrgIds": [
+                    "MAT.23.18"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "Ye",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.19",
+                          "verseOrgIds": [
+                            "MAT.23.19"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " fools and blind: for whether ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.19",
+                      "verseOrgIds": [
+                        "MAT.23.19"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "is",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.19",
+                          "verseOrgIds": [
+                            "MAT.23.19"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " greater, the gift, or the altar that sanctifieth the gift?",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.19",
+                      "verseOrgIds": [
+                        "MAT.23.19"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.19",
+                  "verseOrgIds": [
+                    "MAT.23.19"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Whoso therefore shall swear by the altar, sweareth by it, and by all things thereon.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.20",
+                      "verseOrgIds": [
+                        "MAT.23.20"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.20",
+                  "verseOrgIds": [
+                    "MAT.23.20"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "And whoso shall swear by the temple, sweareth by it, and by him that dwelleth therein.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.21",
+                      "verseOrgIds": [
+                        "MAT.23.21"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.21",
+                  "verseOrgIds": [
+                    "MAT.23.21"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "And he that shall swear by heaven, sweareth by the throne of God, and by him that sitteth thereon.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.22",
+                      "verseOrgIds": [
+                        "MAT.23.22"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.22",
+                  "verseOrgIds": [
+                    "MAT.23.22"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Woe unto you, scribes and Pharisees, hypocrites! for ye pay tithe of mint and anise and cummin, and have omitted the weightier ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.23",
+                      "verseOrgIds": [
+                        "MAT.23.23"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "matters",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.23",
+                          "verseOrgIds": [
+                            "MAT.23.23"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " of the law, judgment, mercy, and faith: these ought ye to have done, and not to leave the other undone.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.23",
+                      "verseOrgIds": [
+                        "MAT.23.23"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.23",
+                  "verseOrgIds": [
+                    "MAT.23.23"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "Ye",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.24",
+                          "verseOrgIds": [
+                            "MAT.23.24"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " blind guides, which strain at a gnat, and swallow a camel.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.24",
+                      "verseOrgIds": [
+                        "MAT.23.24"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.24",
+                  "verseOrgIds": [
+                    "MAT.23.24"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Woe unto you, scribes and Pharisees, hypocrites! for ye make clean the outside of the cup and of the platter, but within they are full of extortion and excess.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.25",
+                      "verseOrgIds": [
+                        "MAT.23.25"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.25",
+                  "verseOrgIds": [
+                    "MAT.23.25"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "Thou",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.26",
+                          "verseOrgIds": [
+                            "MAT.23.26"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " blind Pharisee, cleanse first that ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.26",
+                      "verseOrgIds": [
+                        "MAT.23.26"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "which is",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.26",
+                          "verseOrgIds": [
+                            "MAT.23.26"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " within the cup and platter, that the outside of them may be clean also.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.26",
+                      "verseOrgIds": [
+                        "MAT.23.26"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.26",
+                  "verseOrgIds": [
+                    "MAT.23.26"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Woe unto you, scribes and Pharisees, hypocrites! for ye are like unto whited sepulchres, which indeed appear beautiful outward, but are within full of dead ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.27",
+                      "verseOrgIds": [
+                        "MAT.23.27"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "men’s",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.27",
+                          "verseOrgIds": [
+                            "MAT.23.27"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " bones, and of all uncleanness.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.27",
+                      "verseOrgIds": [
+                        "MAT.23.27"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.27",
+                  "verseOrgIds": [
+                    "MAT.23.27"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Even so ye also outwardly appear righteous unto men, but within ye are full of hypocrisy and iniquity.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.28",
+                      "verseOrgIds": [
+                        "MAT.23.28"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.28",
+                  "verseOrgIds": [
+                    "MAT.23.28"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Woe unto you, scribes and Pharisees, hypocrites! because ye build the tombs of the prophets, and garnish the sepulchres of the righteous,",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.29",
+                      "verseOrgIds": [
+                        "MAT.23.29"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.29",
+                  "verseOrgIds": [
+                    "MAT.23.29"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "And say, If we had been in the days of our fathers, we would not have been partakers with them in the blood of the prophets.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.30",
+                      "verseOrgIds": [
+                        "MAT.23.30"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.30",
+                  "verseOrgIds": [
+                    "MAT.23.30"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Wherefore ye be witnesses unto yourselves, that ye are the children of them which killed the prophets.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.31",
+                      "verseOrgIds": [
+                        "MAT.23.31"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.31",
+                  "verseOrgIds": [
+                    "MAT.23.31"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Fill ye up then the measure of your fathers.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.32",
+                      "verseOrgIds": [
+                        "MAT.23.32"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.32",
+                  "verseOrgIds": [
+                    "MAT.23.32"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "Ye",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.33",
+                          "verseOrgIds": [
+                            "MAT.23.33"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " serpents, ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.33",
+                      "verseOrgIds": [
+                        "MAT.23.33"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "ye",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.33",
+                          "verseOrgIds": [
+                            "MAT.23.33"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " generation of vipers, how can ye escape the damnation of hell?",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.33",
+                      "verseOrgIds": [
+                        "MAT.23.33"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "¶ Wherefore, behold, I send unto you prophets, and wise men, and scribes: and ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.34",
+                      "verseOrgIds": [
+                        "MAT.23.34"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "some",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.34",
+                          "verseOrgIds": [
+                            "MAT.23.34"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " of them ye shall kill and crucify; and ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.34",
+                      "verseOrgIds": [
+                        "MAT.23.34"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "some",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.34",
+                          "verseOrgIds": [
+                            "MAT.23.34"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " of them shall ye scourge in your synagogues, and persecute ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.34",
+                      "verseOrgIds": [
+                        "MAT.23.34"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "them",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.34",
+                          "verseOrgIds": [
+                            "MAT.23.34"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " from city to city:",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.34",
+                      "verseOrgIds": [
+                        "MAT.23.34"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.34",
+                  "verseOrgIds": [
+                    "MAT.23.34"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "That upon you may come all the righteous blood shed upon the earth, from the blood of righteous Abel unto the blood of Zacharias son of Barachias, whom ye slew between the temple and the altar.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.35",
+                      "verseOrgIds": [
+                        "MAT.23.35"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.35",
+                  "verseOrgIds": [
+                    "MAT.23.35"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Verily I say unto you, All these things shall come upon this generation.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.36",
+                      "verseOrgIds": [
+                        "MAT.23.36"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.36",
+                  "verseOrgIds": [
+                    "MAT.23.36"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "O Jerusalem, Jerusalem, ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.37",
+                      "verseOrgIds": [
+                        "MAT.23.37"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "thou",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.37",
+                          "verseOrgIds": [
+                            "MAT.23.37"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " that killest the prophets, and stonest them which are sent unto thee, how often would I have gathered thy children together, even as a hen gathereth her chickens under ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.37",
+                      "verseOrgIds": [
+                        "MAT.23.37"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "her",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.37",
+                          "verseOrgIds": [
+                            "MAT.23.37"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " wings, and ye would not!",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.37",
+                      "verseOrgIds": [
+                        "MAT.23.37"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.37",
+                  "verseOrgIds": [
+                    "MAT.23.37"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "Behold, your house is left unto you desolate.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.38",
+                      "verseOrgIds": [
+                        "MAT.23.38"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.38",
+                  "verseOrgIds": [
+                    "MAT.23.38"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "wj"
+                },
+                "items": [
+                  {
+                    "text": "For I say unto you, Ye shall not see me henceforth, till ye shall say, Blessed ",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.39",
+                      "verseOrgIds": [
+                        "MAT.23.39"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "char",
+                    "type": "tag",
+                    "attrs": {
+                      "style": "add"
+                    },
+                    "items": [
+                      {
+                        "text": "is",
+                        "type": "text",
+                        "attrs": {
+                          "verseId": "MAT.23.39",
+                          "verseOrgIds": [
+                            "MAT.23.39"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " he that cometh in the name of the Lord.",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "MAT.23.39",
+                      "verseOrgIds": [
+                        "MAT.23.39"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "verseCount": 25,
+        "copyright": "PUBLIC DOMAIN except in the United Kingdom, where a Crown Copyright applies to printing the KJV. See http://www.cambridge.org/about-us/who-we-are/queens-printers-patent"
+      },
+      {
+        "id": "MAT.23.15-MAT.23.39",
+        "orgId": "MAT.23.15-MAT.23.39",
+        "bibleId": "01b29f4b342acc35-01",
+        "bookId": "MAT",
+        "chapterIds": [
+          "MAT.23"
+        ],
+        "reference": "Matthew 23:15-39",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "Woe to you, scribes and Pharisees, hypocrites! Because you go around the sea and the dry land to make one proselyte, and whenever it may happen—you make him a son of Gehenna twofold more than yourselves. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.15",
+                  "verseOrgIds": [
+                    "MAT.23.15"
+                  ]
+                }
+              },
+              {
+                "text": "Woe to you, blind guides, who are saying, Whoever may swear by the temple, it is nothing, but whoever may swear by the gold of the temple—is debtor! ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.16",
+                  "verseOrgIds": [
+                    "MAT.23.16"
+                  ]
+                }
+              },
+              {
+                "text": "Fools and blind! For which [is] greater, the gold, or the temple that is sanctifying the gold? ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.17",
+                  "verseOrgIds": [
+                    "MAT.23.17"
+                  ]
+                }
+              },
+              {
+                "text": "And, Whoever may swear by the altar, it is nothing, but whoever may swear by the gift that is on it—is debtor! ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.18",
+                  "verseOrgIds": [
+                    "MAT.23.18"
+                  ]
+                }
+              },
+              {
+                "text": "Fools and blind! For which [is] greater, the gift, or the altar that is sanctifying the gift? ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.19",
+                  "verseOrgIds": [
+                    "MAT.23.19"
+                  ]
+                }
+              },
+              {
+                "text": "He therefore who swore by the altar, swears by it, and by all things on it; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.20",
+                  "verseOrgIds": [
+                    "MAT.23.20"
+                  ]
+                }
+              },
+              {
+                "text": "and he who swore by the temple, swears by it, and by Him who is dwelling in it; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.21",
+                  "verseOrgIds": [
+                    "MAT.23.21"
+                  ]
+                }
+              },
+              {
+                "text": "and he who swore by Heaven, swears by the throne of God, and by Him who is sitting on it. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.22",
+                  "verseOrgIds": [
+                    "MAT.23.22"
+                  ]
+                }
+              },
+              {
+                "text": "Woe to you, scribes and Pharisees, hypocrites! Because you give tithe of the mint, and the dill, and the cumin, and neglected the weightier things of the Law—judgment, and kindness, and faith; these it was necessary to do, and those not to neglect. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.23",
+                  "verseOrgIds": [
+                    "MAT.23.23"
+                  ]
+                }
+              },
+              {
+                "text": "Blind guides! Who are straining out the gnat, and are swallowing the camel. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.24",
+                  "verseOrgIds": [
+                    "MAT.23.24"
+                  ]
+                }
+              },
+              {
+                "text": "Woe to you, scribes and Pharisees, hypocrites! Because you make clean the outside of the cup and the plate, and within they are full of robbery and self-indulgence. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.25",
+                  "verseOrgIds": [
+                    "MAT.23.25"
+                  ]
+                }
+              },
+              {
+                "text": "Blind Pharisee! First cleanse the inside of the cup and the plate, that the outside of them may also become clean. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.26",
+                  "verseOrgIds": [
+                    "MAT.23.26"
+                  ]
+                }
+              },
+              {
+                "text": "Woe to you, scribes and Pharisees, hypocrites! Because you are like to whitewashed graves, which outwardly indeed appear beautiful, and within are full of bones of dead men, and of all uncleanness; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.27",
+                  "verseOrgIds": [
+                    "MAT.23.27"
+                  ]
+                }
+              },
+              {
+                "text": "so also you outwardly indeed appear to men righteous, and within you are full of hypocrisy and lawlessness. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.28",
+                  "verseOrgIds": [
+                    "MAT.23.28"
+                  ]
+                }
+              },
+              {
+                "text": "Woe to you, scribes and Pharisees, hypocrites! Because you build the graves of the prophets, and adorn the tombs of the righteous, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.29",
+                  "verseOrgIds": [
+                    "MAT.23.29"
+                  ]
+                }
+              },
+              {
+                "text": "and say, If we had been in the days of our fathers, we would not have been partakers with them in the blood of the prophets. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.30",
+                  "verseOrgIds": [
+                    "MAT.23.30"
+                  ]
+                }
+              },
+              {
+                "text": "So that you testify to yourselves that you are sons of them who murdered the prophets; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.31",
+                  "verseOrgIds": [
+                    "MAT.23.31"
+                  ]
+                }
+              },
+              {
+                "text": "and you fill up the measure of your fathers. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.32",
+                  "verseOrgIds": [
+                    "MAT.23.32"
+                  ]
+                }
+              },
+              {
+                "text": "Serpents! Brood of vipers! How may you escape from the judgment of Gehenna? ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.33",
+                  "verseOrgIds": [
+                    "MAT.23.33"
+                  ]
+                }
+              },
+              {
+                "text": "Because of this, behold, I send to you prophets, and wise men, and scribes, and of them you will kill and crucify, and of them you will scourge in your synagogues, and will pursue from city to city, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.34",
+                  "verseOrgIds": [
+                    "MAT.23.34"
+                  ]
+                }
+              },
+              {
+                "text": "that on you may come all the righteous blood being poured out on the earth from the blood of Abel the righteous, to the blood of Zacharias son of Barachias, whom you murdered between the temple and the altar: ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.35",
+                  "verseOrgIds": [
+                    "MAT.23.35"
+                  ]
+                }
+              },
+              {
+                "text": "truly I say to you, all these things will come on this generation. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.36",
+                  "verseOrgIds": [
+                    "MAT.23.36"
+                  ]
+                }
+              },
+              {
+                "text": "Jerusalem, Jerusalem, that are killing the prophets, and stoning those sent to you, how often I willed to gather your children together, as a hen gathers her own chickens under the wings, and you did not will. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.37",
+                  "verseOrgIds": [
+                    "MAT.23.37"
+                  ]
+                }
+              },
+              {
+                "text": "Behold, your house is left to you desolate; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.38",
+                  "verseOrgIds": [
+                    "MAT.23.38"
+                  ]
+                }
+              },
+              {
+                "text": "for I say to you, you may not see Me from now on, until you may say, Blessed [is] He who is coming in the Name of the LORD.”",
+                "type": "text",
+                "attrs": {
+                  "verseId": "MAT.23.39",
+                  "verseOrgIds": [
+                    "MAT.23.39"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 25,
+        "copyright": "The Literal Standard Version of The Holy Bible is a registered copyright of Covenant Press and the Covenant Christian Coalition (© 2020), but has been subsequently released under the Creative Commons Attribution-ShareAlike license (CC BY-SA) per our desire to provide God’s word freely. Covenant Press requests that the text remain unaltered in the English language and that translations based on the LSV maintain the same spirit of faithfulness to the original Hebrew, Aramaic, and Greek text. Attribution of minor citations for personal or non-commercial use can be provided as simply “LSV” or “Literal Standard Version.” Citations for commercial use, or distribution of the entire LSV Bible or entire book(s) of the LSV Bible, must be fully attributed and include both “Literal Standard Version (LSV)” and the name of our organization. Covenant Press is soliciting partnerships with Bible publishers that are interested in the LSV project. For queries about partnering with us, please email the translation team at covenantpress@ccc.one. To learn more, visit lsvbible.com. The purpose behind the LSV is to provide readers with a modern, easy-to-read, literal, and accurate translation of the Bible that is free to read, distribute, and translate from. We pray that God will use the LSV to illuminate the hearts and minds of multitudes with the good news that His Son Jesus Christ came in the flesh, died for our sins as a substitutionary sacrifice, rose bodily from the dead, and is coming back again."
+      }
+    ]
+  },
+  "meta": {
+    "fumsToken": "G84BQBwHzrkrrkIUuPZdi8hs7V2cU_nopERucgc3dVc8gnuz6HT1HTynA9XAAUfZhgNa_6cLXzAKS-m6TQ9FtKMvmlGu2fu-LhD-k5w3H9_cO2NaV91UK0PoloTkr7T65ttpYUozaSmdjkAtH0oIhPZr6EpOzQ0SFHC8Jzr54TEc6FND6EtSZhEu2Zi0ZsGLHXB8N81-Xx3iTrHjh2dgiKKkU9tA2cvJy6VfojO7bN10qfLwQ4VhY5QgfvSH-V3IouIwRRuVa9VW_DG-17ceOOt99YV87JrMwr1KsdhGwfQSmxltyAoH"
+  }
+}
