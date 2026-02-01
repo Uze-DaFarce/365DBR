@@ -86,7 +86,7 @@ const TRANSLATION_REGISTRY = {
 };
 
 /** --- DATA UTILITIES --- **/
-const walkItems = (items, map, versionKey, useOrgId) => {
+const walkItems = (items, map, versionKey, useOrgId, buffer) => {
   if (!items) return;
   items.forEach((item) => {
     if (item.attrs?.verseId) {
@@ -103,17 +103,34 @@ const walkItems = (items, map, versionKey, useOrgId) => {
             displayVid: item.attrs.verseId // Store the native ID for display (e.g. LEV.6.1)
          };
       }
+
+      // Flush buffer if exists (capturing orphaned titles/intros)
+      if (buffer && buffer.text.length > 0) {
+         map[keyVid][versionKey].text.push(...buffer.text);
+         buffer.text = []; // Clear buffer
+      }
+
       if (item.type === 'text' && item.text) {
         map[keyVid][versionKey].text.push(item.text);
       }
+    } else {
+        // No verseId? Check if it's text content we should capture (e.g. Titles)
+        if (buffer && item.type === 'text' && item.text && item.text.trim().length > 0) {
+            buffer.text.push(item.text);
+        }
     }
-    if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey, useOrgId);
+
+    if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey, useOrgId, buffer);
   });
 };
 
 const processContent = (contentArray, map, versionKey, useOrgId = false) => {
   if (!contentArray) return;
-  contentArray.forEach(section => { if (section.items) walkItems(section.items, map, versionKey, useOrgId); });
+  // Buffer context for this processing pass
+  const buffer = { text: [] };
+  contentArray.forEach(section => {
+      if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer);
+  });
 };
 
 const loadDailyBread = async (dateFolder) => {
@@ -287,8 +304,47 @@ const App = () => {
     };
   }, [focalTranslation, compareTranslation]);
 
+  // Grouping Logic to handle versification mismatches (e.g. Psalm Titles)
+  const groupedVids = useMemo(() => {
+      const groups = [];
+      let i = 0;
+
+      const hasTranslationContent = (vid) => {
+          if (!verseMap || !verseMap[vid]) return false;
+          const t1 = dynamicSlots.middle.source;
+          const t2 = dynamicSlots.bottom.source;
+          // Check if either slot has content
+          const hasT1 = t1 && verseMap[vid][t1] && verseMap[vid][t1].text.length > 0;
+          const hasT2 = t2 && verseMap[vid][t2] && verseMap[vid][t2].text.length > 0;
+          return hasT1 || hasT2;
+      };
+
+      while (i < sortedVids.length) {
+          const currentVid = sortedVids[i];
+          const group = [currentVid];
+
+          // Check if we need to merge with next
+          // Condition: Current has NO English, Next HAS English, Same Chapter
+          // This catches the Psalm Title (Verse 1) vs English (Verse 1 in Verse 2 slot) case
+          if (!hasTranslationContent(currentVid) && i + 1 < sortedVids.length) {
+              const nextVid = sortedVids[i+1];
+              // Ensure same book/chapter to avoid merges across boundaries
+              const [b1, c1] = currentVid.split('.');
+              const [b2, c2] = nextVid.split('.');
+
+              if (b1 === b2 && c1 === c2 && hasTranslationContent(nextVid)) {
+                  group.push(nextVid);
+                  i++; // Skip next one since we consumed it
+              }
+          }
+          groups.push(group);
+          i++;
+      }
+      return groups;
+  }, [sortedVids, dynamicSlots, verseMap]);
+
   useEffect(() => {
-    if (playbackStatus === 'playing' || loading || !verseMap || sortedVids.length === 0) return;
+    if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0) return;
     const observer = new IntersectionObserver((entries) => {
       const intersecting = entries.filter(e => e.isIntersecting);
       if (intersecting.length > 0) {
@@ -296,12 +352,13 @@ const App = () => {
         setActiveVerseId(bestEntry.target.id.replace('verse-', ''));
       }
     }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
-    sortedVids.forEach((vid) => {
+    groupedVids.forEach((group) => {
+      const vid = group[0]; // Observe the group container ID
       const el = document.getElementById(`verse-${vid}`);
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
-  }, [playbackStatus, loading, verseMap, sortedVids]);
+  }, [playbackStatus, loading, verseMap, groupedVids]);
 
   useEffect(() => {
     playbackStatusRef.current = playbackStatus;
@@ -358,9 +415,20 @@ const App = () => {
     // Find the focal slot from our dynamic slots (it's always the bottom one now)
     const focalSlot = dynamicSlots.bottom;
     const slotData = verseMap[vid][focalSlot.source];
-    if (!focalSlot || !slotData) return;
 
-    const rawText = slotData.text.join(' ').trim();
+    // If no text content (e.g. gap due to versification merge), skip to next automatically
+    const rawText = (slotData && slotData.text) ? slotData.text.join(' ').trim() : '';
+    if (!rawText) {
+        const currentIndex = sortedVids.indexOf(vid);
+        if (currentIndex < sortedVids.length - 1) {
+            playVerse(sortedVids[currentIndex + 1], previousVid);
+        } else {
+            setPlaybackStatus('stopped');
+            setPlaybackVerseId(null);
+        }
+        return;
+    }
+
     // Improve pronunciation: 
     // 1. YHWH -> Yaw-weigh
     // 2. Remove all square brackets [ and ] to prevent voices from reading "bracket"
@@ -549,27 +617,52 @@ const App = () => {
       </header>
 
       <main className="max-w-4xl mx-auto py-3 md:py-6 px-2 space-y-6 md:space-y-10">
-        {sortedVids.map(vid => {
-          const data = verseMap[vid], isActive = (playbackStatus === 'playing' ? playbackVerseId === vid : activeVerseId === vid), book = vid.split('.')[0];
+        {groupedVids.map(group => {
+          const vid = group[0]; // Primary ID for the block
+          const isActive = (playbackStatus === 'playing' ? group.includes(playbackVerseId) : group.includes(activeVerseId));
+          const book = vid.split('.')[0];
           const isHebrew = !['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'].includes(book);
 
-          // Helper to get display label for specific slot, fallback to row vid
-          const getDisplayLabel = (slotData) => {
-             const displayVid = slotData?.displayVid || vid;
-             const [bookAbbr, ch, vs] = displayVid.split('.');
-             return `${BOOK_NAMES[bookAbbr] || bookAbbr} ${ch}:${vs}`;
+          // Helper to accumulate content across grouped verses
+          const getSlotContent = (slot) => {
+              if (!slot || !slot.source) return { text: '', displayLabel: '' };
+
+              let fullText = '';
+              let displayLabel = '';
+
+              group.forEach((gVid, idx) => {
+                  const data = verseMap[gVid];
+                  const slotData = data ? data[slot.source] : null;
+                  if (slotData && slotData.text && slotData.text.length > 0) {
+                      const sep = (slot.isHebrewGreek) ? ' ' : ' ';
+                      fullText += (fullText ? sep : '') + slotData.text.join(slot.isHebrewGreek ? '' : ' ');
+
+                      // Use the display label of the first valid entry found
+                      if (!displayLabel) {
+                          const dVid = slotData.displayVid || gVid;
+                          const [b, c, v] = dVid.split('.');
+                          displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
+                      }
+                  }
+              });
+
+              // Fallback label if no content found
+              if (!displayLabel) {
+                  const [b, c, v] = vid.split('.');
+                  displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
+              }
+
+              return { text: fullText, displayLabel };
           };
-          
+
           return (
-            <div key={vid} id={`verse-${vid}`} className={`transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${playbackStatus === 'playing' && playbackVerseId !== vid ? 'opacity-10 grayscale' : 'opacity-100'}`}>
+            <div key={vid} id={`verse-${vid}`} className={`transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${playbackStatus === 'playing' && !group.includes(playbackVerseId) ? 'opacity-10 grayscale' : 'opacity-100'}`}>
               <div className="flex flex-col gap-1">
                 {/* SLOT 1: TOP (Usually Original) */}
                 {(() => {
                    const slot = dynamicSlots.top;
-                   const slotData = data[slot.source];
-                   const text = slotData?.text?.join('') || '';
+                   const { text, displayLabel } = getSlotContent(slot);
                    const label = typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
-                   const displayLabel = getDisplayLabel(slotData);
 
                    return (
                      <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
@@ -587,9 +680,7 @@ const App = () => {
                 {/* SLOT 2: MIDDLE (Secondary) */}
                 {(() => {
                    const slot = dynamicSlots.middle;
-                   const slotData = data[slot.source];
-                   const text = slotData?.text?.join('') || '';
-                   const displayLabel = getDisplayLabel(slotData);
+                   const { text, displayLabel } = getSlotContent(slot);
 
                    return (
                     <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
@@ -604,9 +695,7 @@ const App = () => {
                 {/* SLOT 3: BOTTOM (Focal) */}
                 {(() => {
                    const slot = dynamicSlots.bottom;
-                   const slotData = data[slot.source];
-                   const text = slotData?.text?.join(' ') || '';
-                   const displayLabel = getDisplayLabel(slotData);
+                   const { text, displayLabel } = getSlotContent(slot);
 
                    return (
                     <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-amber-100 shadow-xl border-amber-500 ring-1 ring-amber-500/50' : 'bg-white/40 border-transparent opacity-80'}`}>
