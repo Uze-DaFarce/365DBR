@@ -86,15 +86,21 @@ const TRANSLATION_REGISTRY = {
 };
 
 /** --- DATA UTILITIES --- **/
-const walkItems = (items, map, versionKey, useOrgId, buffer) => {
+// Recursive walker with active verse context to safely handle nested structures and orphans
+const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
   if (!items) return;
   items.forEach((item) => {
+    let previousActiveVid = context.activeVid; // Store stack for backtracking
+
+    // 1. Enter Verse Scope?
     if (item.attrs?.verseId) {
       let keyVid = item.attrs.verseId;
       // If parallels have explicit mapping to original verse (verseOrgIds), use it.
       if (useOrgId && item.attrs.verseOrgIds && item.attrs.verseOrgIds.length > 0) {
         keyVid = item.attrs.verseOrgIds[0];
       }
+      context.activeVid = keyVid;
+      context.lastSeenVid = keyVid; // Track linear progression across hierarchy
 
       if (!map[keyVid]) map[keyVid] = {};
       if (!map[keyVid][versionKey]) {
@@ -104,23 +110,47 @@ const walkItems = (items, map, versionKey, useOrgId, buffer) => {
          };
       }
 
-      // Flush buffer if exists (capturing orphaned titles/intros)
+      // Flush buffer if exists (orphaned content found BEFORE this verse belongs here, e.g. Titles)
       if (buffer && buffer.text.length > 0) {
          map[keyVid][versionKey].text.push(...buffer.text);
          buffer.text = []; // Clear buffer
       }
+    }
 
-      if (item.type === 'text' && item.text) {
-        map[keyVid][versionKey].text.push(item.text);
-      }
-    } else {
-        // No verseId? Check if it's text content we should capture (e.g. Titles)
-        if (buffer && item.type === 'text' && item.text && item.text.trim().length > 0) {
-            buffer.text.push(item.text);
+    // 2. Process Text Content
+    if (item.type === 'text' && item.text) {
+        if (context.activeVid) {
+            // Case A: Inside a verse container. Safe add.
+            if (map[context.activeVid] && map[context.activeVid][versionKey]) {
+                map[context.activeVid][versionKey].text.push(item.text);
+            }
+        } else {
+            // Case B: Orphaned Text (No active container)
+            if (item.text.trim().length > 0) {
+                if (context.lastSeenVid) {
+                    // Sub-case B1: We have seen a verse before. This orphan likely belongs to it (e.g. formatting sibling).
+                    // Append to PREVIOUS/LAST SEEN verse.
+                    if (map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
+                        map[context.lastSeenVid][versionKey].text.push(item.text);
+                    }
+                } else {
+                    // Sub-case B2: No verse seen yet (Start of file). This is likely a Title.
+                    // Buffer it for the NEXT verse.
+                    if (buffer) {
+                        buffer.text.push(item.text);
+                    }
+                }
+            }
         }
     }
 
-    if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey, useOrgId, buffer);
+    // 3. Recurse
+    if (item.items && item.items.length > 0) {
+        walkItems(item.items, map, versionKey, useOrgId, buffer, context);
+    }
+
+    // 4. Exit Scope
+    context.activeVid = previousActiveVid;
   });
 };
 
@@ -128,8 +158,10 @@ const processContent = (contentArray, map, versionKey, useOrgId = false) => {
   if (!contentArray) return;
   // Buffer context for this processing pass
   const buffer = { text: [] };
+  // Context MUST be shared across the entire section to track lastSeenVid linearly
+  const context = { activeVid: null, lastSeenVid: null };
   contentArray.forEach(section => {
-      if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer);
+      if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context);
   });
 };
 
