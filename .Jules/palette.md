@@ -19,3 +19,9 @@
 ## 2025-05-20 - Accessible Accordion Animation
 **Learning:** `display: none` is necessary for accessibility (hiding content from screen readers) but prevents CSS transitions.
 **Action:** Use a combination of `grid-template-rows` transition for the visual animation and the `transitionend` event listener to toggle the `hidden` class (display: none). This ensures both a smooth delight (animation) and robust accessibility.
+
+## 2025-05-21 - Focus Indicators & Transition Performance
+**Learning:**
+1. **Focus Visibility:** Standard `transition: all` on links causes focus outlines to animate from 0px width, making them feel sluggish or invisible during rapid keyboard navigation.
+   * *Fix:* Changed `transition: all` to `transition: color` (or specific properties) on `nav a` to ensure the focus ring appears instantly.
+2. **Accessible Colors:** Applied specific focus colors: Purple (`#401b51`) for light backgrounds and Gold (`#F4A623`) for dark contexts (Header, Footer) to ensure 3:1+ contrast ratio.
