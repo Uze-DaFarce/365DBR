@@ -20,6 +20,11 @@
 **Learning:** `display: none` is necessary for accessibility (hiding content from screen readers) but prevents CSS transitions.
 **Action:** Use a combination of `grid-template-rows` transition for the visual animation and the `transitionend` event listener to toggle the `hidden` class (display: none). This ensures both a smooth delight (animation) and robust accessibility.
 
+## 2025-05-20 - Context-Aware Focus Indicators
+**Learning:** Default focus rings often fail contrast requirements on branded backgrounds. A single global focus color (e.g., Purple) becomes invisible on a Purple header/footer.
+**Action:** Implemented context-aware focus colors using CSS nesting or specific selectors.
+*   **Default:** Purple (`#401b51`) for light backgrounds.
+*   **Dark Contexts:** Gold (`#F4A623`) for Header/Footer elements to ensure high visibility and brand alignment.
 ## 2026-01-29 - Brand-Aligned Focus Indicators
 **Learning:** Default browser focus rings (usually blue) often clash with brand palettes or lack sufficient contrast against custom backgrounds (like purple headers).
 **Action:** Implemented a pattern of context-aware `:focus-visible` styles:
