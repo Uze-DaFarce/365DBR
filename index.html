@@ -322,7 +322,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                   {slot.attribution && (
                     <a
                       href={slot.attribution.link}
-                      className="inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 hover:text-amber-600 cursor-pointer"
+                              className="inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 hover:text-amber-600 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm"
                       title={slot.attribution.title}
                     >
                       {slot.attribution.text}
