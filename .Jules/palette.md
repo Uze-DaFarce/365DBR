@@ -19,3 +19,9 @@
 ## 2025-05-20 - Accessible Accordion Animation
 **Learning:** `display: none` is necessary for accessibility (hiding content from screen readers) but prevents CSS transitions.
 **Action:** Use a combination of `grid-template-rows` transition for the visual animation and the `transitionend` event listener to toggle the `hidden` class (display: none). This ensures both a smooth delight (animation) and robust accessibility.
+
+## 2026-01-29 - Brand-Aligned Focus Indicators
+**Learning:** Default browser focus rings (usually blue) often clash with brand palettes or lack sufficient contrast against custom backgrounds (like purple headers).
+**Action:** Implemented a pattern of context-aware `:focus-visible` styles:
+1.  **Global Default:** Brand Primary Color (Purple) with `outline-offset` for visibility on white.
+2.  **Dark Contexts:** Brand Secondary Color (Gold) for high contrast on dark backgrounds (Header/Footer).
