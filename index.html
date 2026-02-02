@@ -171,7 +171,7 @@
       text-decoration: none;
       font-weight: 500;
       font-size: 16px;
-      transition: all 0.3s ease;
+      transition: color 0.3s ease;
       position: relative;
       white-space: nowrap;
     }
@@ -449,6 +449,16 @@
       min-height: 0;
     }
 
+    /* Accessibility: Focus Indicators */
+    :focus-visible {
+      outline: 3px solid #401b51;
+      outline-offset: 2px;
+    }
+    header :focus-visible,
+    footer :focus-visible,
+    .mission-box :focus-visible {
+      outline-color: #F4A623;
+    }
     /* Universal Focus States for Accessibility */
     :focus-visible {
       outline: 3px solid #401b51;
