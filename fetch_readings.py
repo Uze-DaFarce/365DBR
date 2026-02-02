@@ -37,6 +37,17 @@ def get_api_key():
     print(f"DEBUG: Using API Key: '{masked_key}' (Length: {len(key)})")
     return key
 
+def validate_safe_path(name):
+    """
+    Validates that the filename/path component is safe and does not contain
+    directory traversal characters or separators.
+    """
+    if ".." in name:
+        return False
+    if "/" in name or "\\" in name:
+        return False
+    return True
+
 def fetch_passage(api_key, bible_id, passage_range):
     """
     Fetches a passage from api.bible.
@@ -101,6 +112,11 @@ def translate_range_for_bible(range_str, bible_id):
 
 def process_day(day_entry, api_key, output_dir):
     day_id = day_entry['day']
+
+    # Security Check: Validate day_id
+    if not validate_safe_path(day_id):
+        raise ValueError(f"[Security Error] Invalid day_id detected: '{day_id}'. Path traversal characters detected.")
+
     api_format = day_entry['api_format'] # "EXO.7.1-EXO.8.32,MAT..."
     label = day_entry['text_friendly']
     
@@ -129,6 +145,10 @@ def process_day(day_entry, api_key, output_dir):
     for i, rng_str in enumerate(ranges):
         if i >= len(section_defs): break
         
+        # Security Check: Validate rng_str
+        if not validate_safe_path(rng_str):
+            raise ValueError(f"[Security Error] Invalid range string detected: '{rng_str}'. Path traversal characters detected.")
+
         section_name, bible_id = section_defs[i]
         filename = f"{rng_str}.json"
         filepath = os.path.join(day_dir, filename)
