@@ -96,6 +96,16 @@
     p { margin-bottom: 20px; line-height: 1.6; color: #4b5563; }
 
     /* Accessibility */
+    :focus-visible {
+      outline: 3px solid #401b51;
+      outline-offset: 4px;
+    }
+
+    header :focus-visible,
+    footer :focus-visible {
+      outline-color: #F4A623;
+    }
+
     .skip-link {
       position: absolute;
       top: -9999px;
