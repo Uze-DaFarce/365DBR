@@ -181,7 +181,7 @@
       white-space: nowrap;
     }
 
-    nav a:hover { color: #F4A623; }
+    nav a:hover, nav a.active { color: #F4A623; }
     nav a::after {
       content: '';
       position: absolute;
@@ -192,7 +192,7 @@
       background-color: #F4A623;
       transition: width 0.3s ease;
     }
-    nav a:hover::after { width: 100%; }
+    nav a:hover::after, nav a.active::after { width: 100%; }
 
     .header-right-group {
       display: inline-flex;

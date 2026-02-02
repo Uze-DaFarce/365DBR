@@ -35,3 +35,12 @@
 **Action:** Implemented a pattern of context-aware `:focus-visible` styles:
 1.  **Global Default:** Brand Primary Color (Purple) with `outline-offset` for visibility on white.
 2.  **Dark Contexts:** Brand Secondary Color (Gold) for high contrast on dark backgrounds (Header/Footer).
+
+## 2026-02-02 - Active Nav State & Wayfinding
+**Learning:**
+On single-page sites with sticky headers, users often lose context of "where they are" relative to the navigation structure. Relying solely on hover states makes the interface feel static and unresponsive.
+**Action:**
+Implemented an "Active Nav State" pattern:
+1.  **Visual Feedback:** Applied the same styles as `:hover` (Color/Underline) to the `.active` class for consistency.
+2.  **Logic:** Used a "Last Passed" algorithm in JS (checking scroll position against target offsets) to ensure the active state persists even when scrolling through "gap" sections (like #bookkeeping) that aren't explicitly in the top-level nav but belong to the previous section's flow.
+3.  **Accessibility:** Added `aria-current="page"` dynamically to the active link to communicate context to assistive technologies.

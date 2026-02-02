@@ -55,3 +55,37 @@ if (toggleBtn && reviewsContainer) {
     }
   });
 }
+
+// Active Nav State logic
+const navLinks = document.querySelectorAll('nav a');
+// Map nav links to their target elements
+const navTargets = Array.from(navLinks).map(link => {
+  const id = link.getAttribute('href').substring(1);
+  return {
+    link: link,
+    target: document.getElementById(id)
+  };
+}).filter(item => item.target !== null);
+
+window.addEventListener('scroll', () => {
+  const offset = 120; // Header height + buffer
+  let activeLink = null;
+
+  // Find the last section that has been passed
+  navTargets.forEach(item => {
+    if (window.scrollY >= item.target.offsetTop - offset) {
+      activeLink = item.link;
+    }
+  });
+
+  // Apply active class
+  navLinks.forEach(link => {
+    if (link === activeLink) {
+      link.classList.add('active');
+      link.setAttribute('aria-current', 'page');
+    } else {
+      link.classList.remove('active');
+      link.removeAttribute('aria-current');
+    }
+  });
+});
