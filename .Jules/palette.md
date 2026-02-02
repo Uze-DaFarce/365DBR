@@ -25,3 +25,13 @@
 1. **Focus Visibility:** Standard `transition: all` on links causes focus outlines to animate from 0px width, making them feel sluggish or invisible during rapid keyboard navigation.
    * *Fix:* Changed `transition: all` to `transition: color` (or specific properties) on `nav a` to ensure the focus ring appears instantly.
 2. **Accessible Colors:** Applied specific focus colors: Purple (`#401b51`) for light backgrounds and Gold (`#F4A623`) for dark contexts (Header, Footer) to ensure 3:1+ contrast ratio.
+## 2025-05-20 - Context-Aware Focus Indicators
+**Learning:** Default focus rings often fail contrast requirements on branded backgrounds. A single global focus color (e.g., Purple) becomes invisible on a Purple header/footer.
+**Action:** Implemented context-aware focus colors using CSS nesting or specific selectors.
+*   **Default:** Purple (`#401b51`) for light backgrounds.
+*   **Dark Contexts:** Gold (`#F4A623`) for Header/Footer elements to ensure high visibility and brand alignment.
+## 2026-01-29 - Brand-Aligned Focus Indicators
+**Learning:** Default browser focus rings (usually blue) often clash with brand palettes or lack sufficient contrast against custom backgrounds (like purple headers).
+**Action:** Implemented a pattern of context-aware `:focus-visible` styles:
+1.  **Global Default:** Brand Primary Color (Purple) with `outline-offset` for visibility on white.
+2.  **Dark Contexts:** Brand Secondary Color (Gold) for high contrast on dark backgrounds (Header/Footer).
