@@ -115,8 +115,7 @@ def process_day(day_entry, api_key, output_dir):
 
     # Security Check: Validate day_id
     if not validate_safe_path(day_id):
-        print(f"  [Security Error] Invalid day_id detected: '{day_id}'. Skipping.")
-        return
+        raise ValueError(f"[Security Error] Invalid day_id detected: '{day_id}'. Path traversal characters detected.")
 
     api_format = day_entry['api_format'] # "EXO.7.1-EXO.8.32,MAT..."
     label = day_entry['text_friendly']
@@ -148,8 +147,7 @@ def process_day(day_entry, api_key, output_dir):
         
         # Security Check: Validate rng_str
         if not validate_safe_path(rng_str):
-            print(f"  [Security Error] Invalid range string detected: '{rng_str}'. Skipping file.")
-            continue
+            raise ValueError(f"[Security Error] Invalid range string detected: '{rng_str}'. Path traversal characters detected.")
 
         section_name, bible_id = section_defs[i]
         filename = f"{rng_str}.json"
