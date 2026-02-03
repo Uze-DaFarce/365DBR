@@ -397,6 +397,23 @@ const App = () => {
   }, [playbackStatus]);
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.ctrlKey || e.metaKey || e.altKey) return;
+      switch(e.key) {
+        case 'ArrowLeft': navigateDate(-1); break;
+        case 'ArrowRight': navigateDate(1); break;
+        case 'k': case 'K': handleToggle(); break;
+        case 'Escape':
+          if (isCompareOpen || isFocalOpen) { setIsCompareOpen(false); setIsFocalOpen(false); }
+          else if (playbackStatus !== 'stopped') { synthRef.current.cancel(); setPlaybackStatus('stopped'); }
+          break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentDate, playbackStatus, isCompareOpen, isFocalOpen]);
+
+  useEffect(() => {
     let isMounted = true;
     const initDay = async () => {
       setLoading(true);
@@ -608,9 +625,9 @@ const App = () => {
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 h-8 md:h-10">
           <div className="flex items-center gap-1 min-w-0 flex-1">
              <div className="flex items-center bg-stone-100 rounded-md px-0.5">
-               <button onClick={() => navigateDate(-1)} aria-label="Previous Day" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
+               <button onClick={() => navigateDate(-1)} aria-label="Previous Day" title="Previous Day (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
                <h1 className="text-[11px] md:text-sm font-black text-stone-900 uppercase px-1 whitespace-nowrap">{formatDate(currentDate)}</h1>
-               <button onClick={() => navigateDate(1)} aria-label="Next Day" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></button>
+               <button onClick={() => navigateDate(1)} aria-label="Next Day" title="Next Day (Right Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></button>
              </div>
              <div className="flex items-center gap-1 min-w-0 overflow-hidden">
                 {labelParts.map((part, i) => (
@@ -669,8 +686,8 @@ const App = () => {
               </div>
              )}
 
-             {playbackStatus !== 'stopped' && <button onClick={() => { synthRef.current.cancel(); setPlaybackStatus('stopped'); }} aria-label="Stop Playback" className="p-1.5 text-stone-300 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"><svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
-             <button onClick={handleToggle} className={`px-3 md:px-5 py-1 rounded-full font-black text-[12px] md:text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
+             {playbackStatus !== 'stopped' && <button onClick={() => { synthRef.current.cancel(); setPlaybackStatus('stopped'); }} aria-label="Stop Playback" title="Stop Playback (Escape)" className="p-1.5 text-stone-300 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"><svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
+             <button onClick={handleToggle} title="Toggle Playback (k)" className={`px-3 md:px-5 py-1 rounded-full font-black text-[12px] md:text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
           </div>
         </div>
       </header>
