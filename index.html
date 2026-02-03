@@ -64,6 +64,7 @@ const TRANSLATION_REGISTRY = {
     idPrefix: '06125ada', // Covers 06125adad2d5898a-01
     altIds: ['01b29f4b342acc35-01'],
     label: 'LSV - Literal Standard Version',
+    ignoreOrgIdForBooks: ['PSA'], // Catch-case: Fixes Psalms title mapping mismatch in LSV data
     attribution: {
       text: '©',
       link: '#footer',
@@ -199,7 +200,10 @@ const loadDailyBread = async (dateFolder) => {
          });
 
          if (matchedKey && parallel.content) {
-            processContent(parallel.content, verseMap, matchedKey, true);
+            // Check for book-specific overrides (e.g. LSV Psalms data mismatch)
+            const config = TRANSLATION_REGISTRY[matchedKey];
+            const useOrgId = !config.ignoreOrgIdForBooks?.includes(parallel.bookId);
+            processContent(parallel.content, verseMap, matchedKey, useOrgId);
             availableKeys.add(matchedKey);
          }
       });
