@@ -1,14 +1,3 @@
-// Smooth scrolling with sticky header offset
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-});
-
 // Simple success overlay for forms
 document.querySelectorAll('a[href*="docs.google.com"]').forEach(a => {
   a.addEventListener('click', () => {
