@@ -497,6 +497,50 @@
     .skip-link:focus {
       outline-color: #401b51;
     }
+
+    /* Back to Top Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background-color: #F4A623;
+      color: #401b51;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease, opacity 0.3s ease, visibility 0.3s;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+    }
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .back-to-top:hover {
+      background-color: #ffb845;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    .back-to-top:focus-visible {
+      outline: 3px solid #401b51;
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .back-to-top {
+        transition: none;
+        transform: none !important;
+      }
+    }
   </style>
   <style>@view-transition { navigation: auto; }</style>
  </head>
@@ -881,6 +925,12 @@
         <p id="copyright">© 2024-2025 Mt. Sinai LLC. All rights reserved. | Serving God through excellence in business.</p>
       </div>
     </footer>
+
+    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 15l-6-6-6 6"/>
+      </svg>
+    </button>
 
     <script src="js/script.js" defer></script>
  </body>
