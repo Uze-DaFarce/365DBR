@@ -225,6 +225,102 @@ const BIBLE_BOOK_ORDER = [
 
 const PILL_LABELS = ['OT', 'NT', 'PS', 'PR'];
 
+const getSectionIndex = (vid) => {
+    if (!vid) return -1;
+    const book = vid.split('.')[0];
+    if (book === 'PSA') return 2;
+    if (book === 'PRO') return 3;
+    const ntBooks = ['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'];
+    return ntBooks.includes(book) ? 1 : 0;
+};
+
+const generateSmartLabel = (verseMap, focalKey) => {
+    if (!verseMap) return "";
+
+    const parseVid = (vid) => {
+        const parts = vid.split('.');
+        return { book: parts[0], chapter: parseInt(parts[1]), verse: parseInt(parts[2]) };
+    };
+
+    const getEngVid = (vid) => {
+        if (!focalKey) return vid;
+        const d = verseMap[vid];
+        if (d && d[focalKey] && d[focalKey].displayVid) {
+            return d[focalKey].displayVid;
+        }
+        return vid;
+    };
+
+    const vids = Object.keys(verseMap).sort((a, b) => {
+      const wA = getSectionIndex(a), wB = getSectionIndex(b);
+      if (wA !== wB) return wA - wB;
+      const bookA = a.split('.')[0], bookB = b.split('.')[0];
+      if (bookA !== bookB) return BIBLE_BOOK_ORDER.indexOf(bookA) - BIBLE_BOOK_ORDER.indexOf(bookB);
+      return a.localeCompare(b, undefined, { numeric: true });
+    });
+
+    const sections = [[], [], [], []];
+    vids.forEach(vid => sections[getSectionIndex(vid)].push(vid));
+
+    const parts = [];
+    sections.forEach((grp, idx) => {
+        if (grp.length === 0) return;
+
+        const startVid = grp[0];
+        const endVid = grp[grp.length - 1];
+
+        // English Range
+        const sEngVid = getEngVid(startVid);
+        const eEngVid = getEngVid(endVid);
+        const sEng = parseVid(sEngVid);
+        const eEng = parseVid(eEngVid);
+
+        let engStr = `${sEng.book} ${sEng.chapter}:${sEng.verse}`;
+        if (sEngVid !== eEngVid) {
+            if (sEng.book === eEng.book) {
+                if (sEng.chapter === eEng.chapter) {
+                    engStr += `-${eEng.verse}`;
+                } else {
+                    engStr += `-${eEng.chapter}:${eEng.verse}`;
+                }
+            } else {
+                engStr += ` – ${eEng.book} ${eEng.chapter}:${eEng.verse}`;
+            }
+        }
+
+        // Original Range
+        const sOrig = parseVid(startVid);
+        const eOrig = parseVid(endVid);
+        let origStr = `${sOrig.book} ${sOrig.chapter}:${sOrig.verse}`;
+        if (startVid !== endVid) {
+            if (sOrig.book === eOrig.book) {
+                 if (sOrig.chapter === eOrig.chapter) {
+                    origStr += `-${eOrig.verse}`;
+                } else {
+                    origStr += `-${eOrig.chapter}:${eOrig.verse}`;
+                }
+            } else {
+                origStr += ` – ${eOrig.book} ${eOrig.chapter}:${eOrig.verse}`;
+            }
+        }
+
+        if (engStr !== origStr) {
+            const suffix = (idx === 1) ? "OG" : "OH";
+            // Shorten Orig if matches Eng context
+            let shortOrig = origStr;
+            // 1. Same Book
+            if (sOrig.book === sEng.book && (sEng.book === eEng.book) && (sOrig.book === eOrig.book)) {
+                 shortOrig = shortOrig.replace(`${sOrig.book} `, '');
+            }
+            parts.push(`${engStr} (${shortOrig} ${suffix}*)`);
+        } else {
+            parts.push(engStr);
+        }
+    });
+
+    return parts.join(', ');
+};
+
 const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed }) => {
     const vid = group[0];
     const book = vid.split('.')[0];
@@ -260,7 +356,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
     };
 
     return (
-        <div id={`verse-${vid}`} className={`transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'}`}>
+        <div id={`verse-${vid}`} className={`verse-block transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'}`}>
             <div className="flex flex-col gap-1">
             {/* SLOT 1: TOP (Usually Original) */}
             {(() => {
@@ -382,14 +478,7 @@ const App = () => {
     return `${months[m]} ${d}${suffix}`;
   };
 
-  const getSectionIndex = (vid) => {
-    if (!vid) return -1;
-    const book = vid.split('.')[0];
-    if (book === 'PSA') return 2;
-    if (book === 'PRO') return 3;
-    const ntBooks = ['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'];
-    return ntBooks.includes(book) ? 1 : 0;
-  };
+  // getSectionIndex moved outside App
 
   const sortedVids = useMemo(() => {
     if (!verseMap) return [];
@@ -497,6 +586,15 @@ const App = () => {
     playbackStatusRef.current = playbackStatus;
   }, [playbackStatus]);
 
+  // Update Reading Label when verseMap or focalTranslation changes
+  useEffect(() => {
+      if (!verseMap) return;
+      // Use focalTranslation if available, else first English (if available), else null
+      // Note: availableTranslations logic is in local state, but usually matches what was loaded
+      const label = generateSmartLabel(verseMap, focalTranslation);
+      setReadingLabel(label);
+  }, [verseMap, focalTranslation]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -526,7 +624,7 @@ const App = () => {
         const data = await loadDailyBread(currentDate);
         if (!isMounted) return;
         setVerseMap(data.verseMap);
-        setReadingLabel(data.label);
+        // setReadingLabel(data.label); // REMOVED: Now handled by useEffect
         setAvailableTranslations(data.availableTranslations);
 
         // Smart Defaults: 
@@ -818,6 +916,9 @@ const App = () => {
         
         <div className="max-w-4xl mx-auto text-[8px] md:text-[8px] text-stone-500 leading-relaxed text-center font-serif">
           <span className="font-serif italic block mb-1 tracking-widest text-stone-400 max-w-xl mx-auto">{readingLabel}</span>
+          <p className="mb-2 text-[7px] text-stone-400">
+            <span id="orig-note">* OH = Original Hebrew / OG = Original Greek versification.</span>
+          </p>
           <p className="mb-2">
             <span className="font-bold block mb-1 uppercase tracking-widest text-stone-400">Copyright & Attributions</span>
             The <strong>Literal Standard Version (LSV)</strong> of The Holy Bible is a registered copyright of Covenant Press and the Covenant Christian Coalition (© 2020), 
