@@ -498,12 +498,23 @@ const App = () => {
 
     // 4. Handle Section Intro (chain before main utterance)
     if (currentIdx !== prevIdx) {
-        const [book, ch, verse] = vid.split('.');
+        // Use Display ID (Original Language) for announcements to match Hebrew visuals
+        const getDisplayVid = (v) => {
+            if (verseMap && verseMap[v] && verseMap[v].original && verseMap[v].original.displayVid) {
+                return verseMap[v].original.displayVid;
+            }
+            return v;
+        };
+
+        const displayVid = getDisplayVid(vid);
+        const [book, ch, verse] = displayVid.split('.');
         
         // Find first and last verses in this section
         const sectionVids = sortedVids.filter(v => getSectionIndex(v) === currentIdx);
         const lastVid = sectionVids[sectionVids.length - 1];
-        const [endBook, endCh, endVerse] = lastVid.split('.');
+
+        const displayEndVid = getDisplayVid(lastVid);
+        const [endBook, endCh, endVerse] = displayEndVid.split('.');
         
         // Build intro text with range
         let introText = '';
