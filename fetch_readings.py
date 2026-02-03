@@ -82,17 +82,15 @@ def fetch_passage(api_key, bible_id, passage_range):
     try:
         with urllib.request.urlopen(req) as response:
             if response.status != 200:
-                print(f"  [Error] API returned status {response.status} for {passage_range}")
-                return None
+                raise RuntimeError(f"API returned status {response.status} for {passage_range}")
             data = json.loads(response.read().decode('utf-8'))
             return data
     except urllib.error.HTTPError as e:
-        print(f"  [Error] HTTP {e.code}: {e.reason} for {passage_range}")
-        print(f"  URL: {full_url}")
-        return None
+        # Re-raise with context
+        raise RuntimeError(f"HTTP {e.code}: {e.reason} for {passage_range} (URL: {full_url})") from e
     except Exception as e:
-        print(f"  [Error] {str(e)} for {passage_range}")
-        return None
+        # Re-raise
+        raise RuntimeError(f"Network/Parse Error: {str(e)} for {passage_range}") from e
 
 def translate_range_for_bible(range_str, bible_id):
     """
@@ -160,13 +158,10 @@ def process_day(day_entry, api_key, output_dir):
         print(f"  Fetching {section_name}: {api_rng_str} (file: {filename})...")
         data = fetch_passage(api_key, bible_id, api_rng_str)
         
-        if data:
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-            files_list.append(filename)
-            time.sleep(0.1) 
-        else:
-            print(f"  [Failed] Could not save {filename}")
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        files_list.append(filename)
+        time.sleep(0.1)
             
     # Create Manifest
     manifest = {
