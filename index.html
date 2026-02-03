@@ -225,6 +225,107 @@ const BIBLE_BOOK_ORDER = [
 
 const PILL_LABELS = ['OT', 'NT', 'PS', 'PR'];
 
+const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed }) => {
+    const vid = group[0];
+    const book = vid.split('.')[0];
+    const isHebrew = !['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'].includes(book);
+
+    const getSlotContent = (slot) => {
+        if (!slot || !slot.source) return { text: '', displayLabel: '' };
+
+        let fullText = '';
+        let displayLabel = '';
+
+        group.forEach((gVid) => {
+            const data = verseMap[gVid];
+            const slotData = data ? data[slot.source] : null;
+            if (slotData && slotData.text && slotData.text.length > 0) {
+                const sep = (slot.isHebrewGreek) ? ' ' : ' ';
+                fullText += (fullText ? sep : '') + slotData.text.join(slot.isHebrewGreek ? '' : ' ');
+
+                if (!displayLabel) {
+                    const dVid = slotData.displayVid || gVid;
+                    const [b, c, v] = dVid.split('.');
+                    displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
+                }
+            }
+        });
+
+        if (!displayLabel) {
+            const [b, c, v] = vid.split('.');
+            displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
+        }
+
+        return { text: fullText, displayLabel };
+    };
+
+    return (
+        <div id={`verse-${vid}`} className={`transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'}`}>
+            <div className="flex flex-col gap-1">
+            {/* SLOT 1: TOP (Usually Original) */}
+            {(() => {
+                const slot = dynamicSlots.top;
+                const { text, displayLabel } = getSlotContent(slot);
+                const label = typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
+
+                return (
+                    <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
+                    <div className="flex justify-between items-center mb-0.5">
+                        <span className={`text-[7px] md:text-[10px] uppercase font-black tracking-widest ${isActive ? 'text-amber-500' : 'text-stone-300'}`}>{label}</span>
+                        <span className={`text-[7px] md:text-[10px] font-mono font-bold text-stone-300 ${isActive ? 'text-amber-500' : 'text-stone-300'} uppercase`}>{displayLabel}</span>
+                    </div>
+                    <div className={`leading-tight tracking-tight break-words ${slot.isHebrewGreek ? (isHebrew ? 'hebrew text-[12px] md:text-xl text-right' : 'greek text-base md:text-lg text-left') : 'text-lg md:text-3xl font-serif italic'}`} style={{ direction: slot.isHebrewGreek && isHebrew ? 'rtl' : 'ltr' }}>
+                        <span className={isActive ? 'text-white' : 'text-stone-400'}>{text}</span>
+                    </div>
+                    </div>
+                );
+            })()}
+
+            {/* SLOT 2: MIDDLE (Secondary) */}
+            {(() => {
+                const slot = dynamicSlots.middle;
+                const { text, displayLabel } = getSlotContent(slot);
+
+                return (
+                <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
+                    <div className="flex justify-between items-center mb-0.5">
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{slot.label}</span>
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{displayLabel}</span></div>
+                    <div><span className={`text-lg md:text-3xl font-serif italic leading-tight tracking-tight ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>{text}</span></div>
+                </div>
+                );
+            })()}
+
+            {/* SLOT 3: BOTTOM (Focal) */}
+            {(() => {
+                const slot = dynamicSlots.bottom;
+                const { text, displayLabel } = getSlotContent(slot);
+
+                return (
+                <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-amber-100 shadow-xl border-amber-500 ring-1 ring-amber-500/50' : 'bg-white/40 border-transparent opacity-80'}`}>
+                    <div className="flex justify-between items-center mb-0.5">
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>
+                        {slot.label}
+                        {slot.attribution && (
+                        <a
+                            href={slot.attribution.link}
+                            className="inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 hover:text-amber-600 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm"
+                            title={slot.attribution.title}
+                        >
+                            {slot.attribution.text}
+                        </a>
+                        )}
+                    </span>
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>{displayLabel}</span></div>
+                    <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-400'}`}>{text}</div>
+                </div>
+                );
+            })()}
+            </div>
+        </div>
+    );
+});
+
 const App = () => {
   // Generates MMDD format (e.g., Jan 8 -> "0108")
   const getFormattedDate = () => {
@@ -677,108 +778,22 @@ const App = () => {
 
       <main className="max-w-4xl mx-auto py-3 md:py-6 px-2 space-y-6 md:space-y-10">
         {groupedVids.map(group => {
-          const vid = group[0]; // Primary ID for the block
-          const isActive = (playbackStatus === 'playing' ? group.includes(playbackVerseId) : group.includes(activeVerseId));
-          const book = vid.split('.')[0];
-          const isHebrew = !['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'].includes(book);
+            const vid = group[0];
+            const isPlaying = playbackStatus === 'playing';
+            const isCurrentGroup = isPlaying ? group.includes(playbackVerseId) : false;
+            const isActive = isPlaying ? isCurrentGroup : group.includes(activeVerseId);
+            const isDimmed = isPlaying && !isCurrentGroup;
 
-          // Helper to accumulate content across grouped verses
-          const getSlotContent = (slot) => {
-              if (!slot || !slot.source) return { text: '', displayLabel: '' };
-              
-              let fullText = '';
-              let displayLabel = '';
-              
-              group.forEach((gVid, idx) => {
-                  const data = verseMap[gVid];
-                  const slotData = data ? data[slot.source] : null;
-                  if (slotData && slotData.text && slotData.text.length > 0) {
-                      const sep = (slot.isHebrewGreek) ? ' ' : ' ';
-                      fullText += (fullText ? sep : '') + slotData.text.join(slot.isHebrewGreek ? '' : ' ');
-                      
-                      // Use the display label of the first valid entry found
-                      if (!displayLabel) {
-                          const dVid = slotData.displayVid || gVid;
-                          const [b, c, v] = dVid.split('.');
-                          displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
-                      }
-                  }
-              });
-              
-              // Fallback label if no content found
-              if (!displayLabel) {
-                  const [b, c, v] = vid.split('.');
-                  displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
-              }
-              
-              return { text: fullText, displayLabel };
-          };
-
-          return (
-            <div key={vid} id={`verse-${vid}`} className={`transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${playbackStatus === 'playing' && !group.includes(playbackVerseId) ? 'opacity-10 grayscale' : 'opacity-100'}`}>
-              <div className="flex flex-col gap-1">
-                {/* SLOT 1: TOP (Usually Original) */}
-                {(() => {
-                   const slot = dynamicSlots.top;
-                   const { text, displayLabel } = getSlotContent(slot);
-                   const label = typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
-
-                   return (
-                     <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
-                       <div className="flex justify-between items-center mb-0.5">
-                         <span className={`text-[7px] md:text-[10px] uppercase font-black tracking-widest ${isActive ? 'text-amber-500' : 'text-stone-300'}`}>{label}</span>
-                         <span className={`text-[7px] md:text-[10px] font-mono font-bold text-stone-300 ${isActive ? 'text-amber-500' : 'text-stone-300'} uppercase`}>{displayLabel}</span>
-                       </div>
-                       <div className={`leading-tight tracking-tight break-words ${slot.isHebrewGreek ? (isHebrew ? 'hebrew text-[12px] md:text-xl text-right' : 'greek text-base md:text-lg text-left') : 'text-lg md:text-3xl font-serif italic'}`} style={{ direction: slot.isHebrewGreek && isHebrew ? 'rtl' : 'ltr' }}>
-                         <span className={isActive ? 'text-white' : 'text-stone-400'}>{text}</span>
-                       </div>
-                     </div>
-                   );
-                })()}
-
-                {/* SLOT 2: MIDDLE (Secondary) */}
-                {(() => {
-                   const slot = dynamicSlots.middle;
-                   const { text, displayLabel } = getSlotContent(slot);
-
-                   return (
-                    <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
-                      <div className="flex justify-between items-center mb-0.5">
-                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{slot.label}</span>
-                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{displayLabel}</span></div>
-                      <div><span className={`text-lg md:text-3xl font-serif italic leading-tight tracking-tight ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>{text}</span></div>
-                    </div>
-                   );
-                })()}
-
-                {/* SLOT 3: BOTTOM (Focal) */}
-                {(() => {
-                   const slot = dynamicSlots.bottom;
-                   const { text, displayLabel } = getSlotContent(slot);
-
-                   return (
-                    <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-amber-100 shadow-xl border-amber-500 ring-1 ring-amber-500/50' : 'bg-white/40 border-transparent opacity-80'}`}>
-                      <div className="flex justify-between items-center mb-0.5">
-                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>
-                          {slot.label} 
-                          {slot.attribution && (
-                            <a 
-                              href={slot.attribution.link} 
-                              className="inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 hover:text-amber-600 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm"
-                              title={slot.attribution.title}
-                            > 
-                              {slot.attribution.text} 
-                            </a>
-                          )}
-                        </span>
-                        <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>{displayLabel}</span></div>
-                        <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-400'}`}>{text}</div>
-                    </div>
-                   );
-                })()}
-              </div>
-            </div>
-          );
+            return (
+                <VerseGroup
+                    key={vid}
+                    group={group}
+                    verseMap={verseMap}
+                    dynamicSlots={dynamicSlots}
+                    isActive={isActive}
+                    isDimmed={isDimmed}
+                />
+            );
         })}
         
       </main>
