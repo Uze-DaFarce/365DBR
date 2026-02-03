@@ -23,6 +23,25 @@ OT_HEBREW_BOOK_MAP = {
     "SON": "SNG"
 }
 
+BOOK_NAMES = {
+    "GEN": "Genesis", "EXO": "Exodus", "LEV": "Leviticus", "NUM": "Numbers", "DEU": "Deuteronomy",
+    "JOS": "Joshua", "JDG": "Judges", "RUT": "Ruth", "1SA": "1 Samuel", "2SA": "2 Samuel",
+    "1KI": "1 Kings", "2KI": "2 Kings", "1CH": "1 Chronicles", "2CH": "2 Chronicles", "EZR": "Ezra",
+    "NEH": "Nehemiah", "EST": "Esther", "JOB": "Job", "PSA": "Psalms", "PRO": "Proverbs",
+    "ECC": "Ecclesiastes", "SON": "Song of Solomon", "ISA": "Isaiah", "JER": "Jeremiah", "LAM": "Lamentations",
+    "EZK": "Ezekiel", "DAN": "Daniel", "HOS": "Hosea", "JOE": "Joel", "AMO": "Amos", "OBA": "Obadiah",
+    "JON": "Jonah", "MIC": "Micah", "NAH": "Nahum", "HAB": "Habakkuk", "ZEP": "Zephaniah", "HAG": "Haggai",
+    "ZEC": "Zechariah", "MAL": "Malachi",
+    "MAT": "Matthew", "MRK": "Mark", "LUK": "Luke", "JHN": "John", "ACT": "Acts", "ROM": "Romans",
+    "1CO": "1 Corinthians", "2CO": "2 Corinthians", "GAL": "Galatians", "EPH": "Ephesians",
+    "PHP": "Philippians", "COL": "Colossians", "1TH": "1 Thessalonians", "2TH": "2 Thessalonians",
+    "1TI": "1 Timothy", "2TI": "2 Timothy", "TIT": "Titus", "PHM": "Philemon", "HEB": "Hebrews",
+    "JAS": "James", "1PE": "1 Peter", "2PE": "2 Peter", "1JN": "1 John", "2JN": "2 John",
+    "3JN": "3 John", "JUD": "Jude", "REV": "Revelation"
+}
+
+NAME_TO_CODE = {v: k for k, v in BOOK_NAMES.items()}
+
 def get_api_key():
     key = os.environ.get("API_BIBLE_KEY")
     if not key:
@@ -118,6 +137,14 @@ def process_day(day_entry, api_key, output_dir):
     api_format = day_entry['api_format'] # "EXO.7.1-EXO.8.32,MAT..."
     label = day_entry['text_friendly']
     
+    # FUTURE PROOFING: Convert long book names to short codes in the label
+    # e.g., "Psalms 19:7-14" -> "PSA 19:7-14"
+    # Sort by length descending to avoid partial matches (e.g. replacing 'John' inside '1 John')
+    sorted_names = sorted(NAME_TO_CODE.keys(), key=len, reverse=True)
+    for name in sorted_names:
+        if name in label:
+            label = label.replace(name, NAME_TO_CODE[name])
+
     print(f"Processing Day {day_id}...")
     
     # Create directory: root/day_id/
