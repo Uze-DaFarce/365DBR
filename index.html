@@ -331,6 +331,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
         let fullText = '';
         let displayLabel = '';
+        const contributing = [];
 
         group.forEach((gVid) => {
             const data = verseMap[gVid];
@@ -339,16 +340,38 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                 const sep = (slot.isHebrewGreek) ? ' ' : ' ';
                 fullText += (fullText ? sep : '') + slotData.text.join(slot.isHebrewGreek ? '' : ' ');
 
-                if (!displayLabel) {
-                    const dVid = slotData.displayVid || gVid;
-                    const [b, c, v] = dVid.split('.');
-                    displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
-                }
+                contributing.push(slotData.displayVid || gVid);
             }
         });
 
-        if (!displayLabel) {
-            const [b, c, v] = vid.split('.');
+        if (contributing.length > 0) {
+            const first = contributing[0];
+            const last = contributing[contributing.length - 1];
+
+            const parse = (v) => {
+                 const p = v.split('.');
+                 return { b: p[0], c: parseInt(p[1]), v: parseInt(p[2]) };
+            };
+
+            const s = parse(first);
+            const e = parse(last);
+            const bName = BOOK_NAMES[s.b] || s.b;
+
+            if (first === last) {
+                displayLabel = `${bName} ${s.c}:${s.v}`;
+            } else if (s.b === e.b) {
+                 if (s.c === e.c) {
+                     displayLabel = `${bName} ${s.c}:${s.v}-${e.v}`;
+                 } else {
+                     displayLabel = `${bName} ${s.c}:${s.v}-${e.c}:${e.v}`;
+                 }
+            } else {
+                 const eName = BOOK_NAMES[e.b] || e.b;
+                 displayLabel = `${bName} ${s.c}:${s.v} - ${eName} ${e.c}:${e.v}`;
+            }
+
+        } else if (group.length > 0) {
+            const [b, c, v] = group[0].split('.');
             displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
         }
 
