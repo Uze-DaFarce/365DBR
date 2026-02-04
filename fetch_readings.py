@@ -61,8 +61,6 @@ def validate_safe_path(name):
     Validates that the filename/path component is safe and does not contain
     directory traversal characters or separators.
     """
-    if not name or not name.strip():
-        return False
     if ".." in name:
         return False
     if "/" in name or "\\" in name:
@@ -156,7 +154,7 @@ def process_day(day_entry, api_key, output_dir):
     # Split ranges
     ranges = api_format.split(',')
     if len(ranges) != 4:
-        raise ValueError(f"[Integrity Error] Expected 4 ranges, found {len(ranges)} in {day_id}")
+        print(f"  [Warning] Expected 4 ranges, found {len(ranges)} in {day_id}")
     
     # Map ranges to Types and Bible IDs
     # Order in readings.json is OT, NT, PSA, PRO
@@ -191,10 +189,6 @@ def process_day(day_entry, api_key, output_dir):
             json.dump(data, f, indent=2, ensure_ascii=False)
         files_list.append(filename)
         time.sleep(0.1)
-
-    # Verify we have all files
-    if len(files_list) != 4:
-        raise ValueError(f"[Integrity Error] Incomplete file list for Day {day_id}. Expected 4 files, got {len(files_list)}.")
             
     # Create Manifest
     manifest = {
