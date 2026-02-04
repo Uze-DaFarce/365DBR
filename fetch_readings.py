@@ -175,7 +175,16 @@ def process_day(day_entry, api_key, output_dir):
         # Handle split ranges (e.g. JOB...;ECC...)
         sub_ranges = composite_rng_str.split(';')
         
-        for rng_str in sub_ranges:
+        # Legacy Data Fix: Handle JOB-ECC gap for users with outdated readings.json
+        # The script doesn't know verse counts, so we must hardcode this specific fix.
+        fixed_ranges = []
+        for r in sub_ranges:
+            if r == "JOB.41.1-ECC.1.18":
+                fixed_ranges.extend(["JOB.41.1-JOB.42.17", "ECC.1.1-ECC.1.18"])
+            else:
+                fixed_ranges.append(r)
+
+        for rng_str in fixed_ranges:
             # Security Check: Validate rng_str
             if not validate_safe_path(rng_str):
                 raise ValueError(f"[Security Error] Invalid range string detected: '{rng_str}'. Path traversal characters detected.")
