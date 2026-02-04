@@ -174,7 +174,19 @@ const loadDailyBread = async (dateFolder) => {
   const availableKeys = new Set(['original']); // Track what we found
 
   const results = await Promise.all(
-    manifest.files.map(fileName => fetch(`data/${dateFolder}/${fileName}`).then(res => res.json()))
+    manifest.files.map(async fileName => {
+        const res = await fetch(`data/${dateFolder}/${fileName}`);
+        if (!res.ok) throw new Error(`Failed to load ${fileName} (Status: ${res.status})`);
+        const json = await res.json();
+        // Integrity Check: Must have data.content OR data.parallels
+        // Our API response wrapper usually has { data: { content: ... } } or { data: { parallels: ... } }
+        // But api.bible returns { data: { content: ... } }
+        // Let's check for 'data' property
+        if (!json || !json.data) {
+             throw new Error(`Invalid data structure in ${fileName}`);
+        }
+        return json;
+    })
   );
 
   results.forEach((source) => {
@@ -672,8 +684,9 @@ const App = () => {
 
         setLoading(false);
       } catch (err) {
+        console.error("Data loading error:", err);
         if (isMounted) {
-            setError(err.message || "Unable to load reading.");
+            setError(err.message || "Unknown error occurred while loading reading.");
             setLoading(false);
         }
       }
@@ -847,6 +860,19 @@ const App = () => {
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#fdfcfb]"><div className="text-center"><div className="w-8 h-8 border-2 border-stone-200 border-t-stone-800 rounded-full animate-spin mx-auto mb-4"></div><p className="text-stone-400 font-serif italic text-xs uppercase tracking-widest">Loading God's Word</p></div></div>;
+
+  if (error) return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fdfcfb] px-4">
+          <div className="max-w-md w-full bg-white border-l-4 border-red-500 shadow-lg rounded-r-lg p-6">
+              <h2 className="text-xl font-bold text-stone-800 mb-2 font-serif">Data Integrity Error</h2>
+              <p className="text-stone-600 mb-4 text-sm">{error}</p>
+              <div className="flex justify-end gap-2">
+                  <button onClick={() => window.location.reload()} className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold uppercase tracking-wider rounded transition-colors">Reload</button>
+                  <button onClick={() => navigateDate(1)} className="px-4 py-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold uppercase tracking-wider rounded transition-colors">Next Day</button>
+              </div>
+          </div>
+      </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
