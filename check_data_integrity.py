@@ -39,7 +39,14 @@ def get_expected_verse_count(range_str):
     """
     Calculates the expected verse count for a given range string (e.g. 'GEN.1.1-GEN.1.31')
     using the local BIBLE_DATA source of truth.
+    Handles semicolon-separated multi-ranges (e.g. 'A-B;C-D').
     """
+    if ';' in range_str:
+        total = 0
+        for sub in range_str.split(';'):
+            total += get_expected_verse_count(sub)
+        return total
+
     if '-' not in range_str:
         return 1 # Single verse?
 
@@ -187,38 +194,41 @@ def verify_with_api(readings_path, day_limit=1):
             ("PRO", OT_HEBREW_ID, ranges[3])
         ]
 
-        for label, bible_id, rng in sections:
-            # Need to translate range for Hebrew bible if needed (e.g. JOE -> JOL)
-            # We reuse the logic if possible or reimplement simple map
-            from fetch_readings import translate_range_for_bible
-            api_rng = translate_range_for_bible(rng, bible_id)
+        for label, bible_id, composite_rng in sections:
+            sub_ranges = composite_rng.split(';')
 
-            url = f"{API_BASE_URL}/bibles/{bible_id}/passages/{api_rng}?include-verse-spans=true"
-            req = urllib.request.Request(url, headers={"api-key": api_key})
+            for rng in sub_ranges:
+                # Need to translate range for Hebrew bible if needed (e.g. JOE -> JOL)
+                # We reuse the logic if possible or reimplement simple map
+                from fetch_readings import translate_range_for_bible
+                api_rng = translate_range_for_bible(rng, bible_id)
 
-            try:
-                with urllib.request.urlopen(req) as res:
-                    if res.status == 200:
-                        data = json.loads(res.read().decode('utf-8'))
-                        # Count verses in response?
-                        # API returns content. We can count verse spans or HTML tags.
-                        # Easier: api.bible returns `verseCount` in `data` sometimes, or we count manually.
-                        # Actually api.bible 'passages' endpoint returns content.
-                        # Let's count the `verseId` attributes or just check length roughly.
-                        # "orgId" is better for Hebrew.
+                url = f"{API_BASE_URL}/bibles/{bible_id}/passages/{api_rng}?include-verse-spans=true"
+                req = urllib.request.Request(url, headers={"api-key": api_key})
 
-                        content = data['data']['content']
-                        # Rough check: does it look empty?
-                        if len(content) < 50:
-                            print(f"    ⚠️ {label} content seems suspiciously short ({len(content)} chars).")
+                try:
+                    with urllib.request.urlopen(req) as res:
+                        if res.status == 200:
+                            data = json.loads(res.read().decode('utf-8'))
+                            # Count verses in response?
+                            # API returns content. We can count verse spans or HTML tags.
+                            # Easier: api.bible returns `verseCount` in `data` sometimes, or we count manually.
+                            # Actually api.bible 'passages' endpoint returns content.
+                            # Let's count the `verseId` attributes or just check length roughly.
+                            # "orgId" is better for Hebrew.
+
+                            content = data['data']['content']
+                            # Rough check: does it look empty?
+                            if len(content) < 50:
+                                print(f"    ⚠️ {label} ({rng}) content seems suspiciously short ({len(content)} chars).")
+                            else:
+                                print(f"    ✅ {label} ({rng}) API fetch successful.")
                         else:
-                            print(f"    ✅ {label} API fetch successful.")
-                    else:
-                        print(f"    ❌ {label} API Error {res.status}")
-            except Exception as e:
-                print(f"    ❌ {label} Exception: {str(e)}")
+                            print(f"    ❌ {label} ({rng}) API Error {res.status}")
+                except Exception as e:
+                    print(f"    ❌ {label} ({rng}) Exception: {str(e)}")
 
-            time.sleep(0.2) # Rate limit
+                time.sleep(0.2) # Rate limit
 
 def main():
     parser = argparse.ArgumentParser(description="Sentinel Data Integrity Checker")

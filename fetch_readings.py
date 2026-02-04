@@ -167,28 +167,33 @@ def process_day(day_entry, api_key, output_dir):
     
     files_list = []
     
-    for i, rng_str in enumerate(ranges):
+    for i, composite_rng_str in enumerate(ranges):
         if i >= len(section_defs): break
         
-        # Security Check: Validate rng_str
-        if not validate_safe_path(rng_str):
-            raise ValueError(f"[Security Error] Invalid range string detected: '{rng_str}'. Path traversal characters detected.")
-
         section_name, bible_id = section_defs[i]
-        filename = f"{rng_str}.json"
-        filepath = os.path.join(day_dir, filename)
+
+        # Handle split ranges (e.g. JOB...;ECC...)
+        sub_ranges = composite_rng_str.split(';')
         
-        # Translate range if needed (e.g. JOE -> JOL)
-        api_rng_str = translate_range_for_bible(rng_str, bible_id)
-        
-        # Always fetch to allow updates/fixes
-        print(f"  Fetching {section_name}: {api_rng_str} (file: {filename})...")
-        data = fetch_passage(api_key, bible_id, api_rng_str)
-        
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-        files_list.append(filename)
-        time.sleep(0.1)
+        for rng_str in sub_ranges:
+            # Security Check: Validate rng_str
+            if not validate_safe_path(rng_str):
+                raise ValueError(f"[Security Error] Invalid range string detected: '{rng_str}'. Path traversal characters detected.")
+
+            filename = f"{rng_str}.json"
+            filepath = os.path.join(day_dir, filename)
+
+            # Translate range if needed (e.g. JOE -> JOL)
+            api_rng_str = translate_range_for_bible(rng_str, bible_id)
+
+            # Always fetch to allow updates/fixes
+            print(f"  Fetching {section_name}: {api_rng_str} (file: {filename})...")
+            data = fetch_passage(api_key, bible_id, api_rng_str)
+
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            files_list.append(filename)
+            time.sleep(0.1)
             
     # Create Manifest
     manifest = {
