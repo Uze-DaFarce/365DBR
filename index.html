@@ -900,22 +900,26 @@ const App = () => {
                   const sectionNames = ['Old Testament', 'New Testament', 'Psalms', 'Proverbs'];
 
                   return (
-                    <div
+                    <button
                         key={i}
+                        type="button"
                         onClick={() => scrollToSection(i)}
                         title={isClickable ? `Jump to ${sectionNames[i]}` : ''}
-                        className={`transition-all duration-500 flex items-center shrink-0 ${isActive
+                        aria-label={isActive ? `Current section: ${sectionNames[i]}` : `Jump to ${sectionNames[i]}`}
+                        aria-current={isActive ? 'step' : undefined}
+                        aria-disabled={!isClickable && !isActive}
+                        className={`transition-all duration-500 flex items-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${isActive
                             ? 'bg-amber-600 px-2 py-0.5 rounded-full shadow-sm cursor-default'
                             : isClickable
                                 ? 'px-1.5 py-0.5 rounded hover:bg-stone-200 cursor-pointer text-stone-300 hover:text-stone-600'
-                                : 'px-1.5 py-0.5 cursor-default text-stone-300 opacity-50'
+                                : 'px-1.5 py-0.5 rounded cursor-default text-stone-300 opacity-50'
                         }`}
                     >
                         {isActive
                             ? <span className="text-[10px] md:text-xs font-bold text-white whitespace-nowrap">{part}</span>
                             : <span className="text-[9px] font-black uppercase tracking-tighter">{PILL_LABELS[i]}</span>
                         }
-                    </div>
+                    </button>
                   );
                 })}
              </div>
