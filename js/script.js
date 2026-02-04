@@ -3,14 +3,33 @@ document.querySelectorAll('a[href*="docs.google.com"]').forEach(a => {
   a.addEventListener('click', () => {
     const o = document.createElement('div');
     o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(64,27,81,0.95);color:white;z-index:9999;display:flex;align-items:center;justify-content:center;font-size:18px;text-align:center;padding:20px;';
-    o.innerHTML = '<div><div style="font-size:40px;margin-bottom:12px;">🙏</div>Thank you! We will review your message and reply soon.<br>Typically next business day.</div>';
+
+    // Security enhancement: Use DOM creation instead of innerHTML to prevent XSS risks
+    const container = document.createElement('div');
+
+    const emojiDiv = document.createElement('div');
+    emojiDiv.style.fontSize = '40px';
+    emojiDiv.style.marginBottom = '12px';
+    emojiDiv.textContent = '🙏';
+    container.appendChild(emojiDiv);
+
+    const text1 = document.createTextNode('Thank you! We will review your message and reply soon.');
+    container.appendChild(text1);
+
+    container.appendChild(document.createElement('br'));
+
+    const text2 = document.createTextNode('Typically next business day.');
+    container.appendChild(text2);
+
+    o.appendChild(container);
+
     o.onclick = () => o.remove();
     document.body.appendChild(o);
     setTimeout(() => o.remove(), 8000);
   });
 });
 
-document.getElementById('copyright').innerHTML = `© 2024-${new Date().getFullYear()} Mt. Sinai LLC. All rights reserved. | Serving God through excellence in business.`;
+document.getElementById('copyright').textContent = `© 2024-${new Date().getFullYear()} Mt. Sinai LLC. All rights reserved. | Serving God through excellence in business.`;
 
 // Reviews Toggle Logic
 const toggleBtn = document.getElementById('toggle-reviews-btn');
