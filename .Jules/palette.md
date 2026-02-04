@@ -44,3 +44,12 @@ Implemented an "Active Nav State" pattern:
 1.  **Visual Feedback:** Applied the same styles as `:hover` (Color/Underline) to the `.active` class for consistency.
 2.  **Logic:** Used a "Last Passed" algorithm in JS (checking scroll position against target offsets) to ensure the active state persists even when scrolling through "gap" sections (like #bookkeeping) that aren't explicitly in the top-level nav but belong to the previous section's flow.
 3.  **Accessibility:** Added `aria-current="page"` dynamically to the active link to communicate context to assistive technologies.
+
+## 2026-02-03 - Accessible Modal Overlay Pattern
+**Learning:**
+Custom JS-based overlays/modals often lack basic accessibility features (focus trap, ARIA roles, keyboard dismissal), creating barriers for keyboard and screen reader users.
+**Action:**
+Implemented a robust pattern for dynamic overlays:
+1.  **Roles:** `role="alertdialog"` and `aria-modal="true"`.
+2.  **Focus Management:** Explicitly move focus to the overlay on open (`tabindex="0"`), and restore focus to the triggering element on close.
+3.  **Keyboard Support:** Listen for `Escape`, `Enter`, and `Space` to allow dismissal without a mouse.
