@@ -137,6 +137,32 @@ def validate_safe_path(name):
         return False
     return True
 
+def validate_api_response(data, context_info=""):
+    """
+    Validates that the API response contains actual content.
+    Fail Fast!
+    """
+    if not isinstance(data, dict):
+        raise ValueError(f"[Data Integrity] Invalid response type for {context_info}: Expected dict, got {type(data)}")
+
+    if 'data' not in data:
+         raise ValueError(f"[Data Integrity] Missing 'data' key in response for {context_info}")
+
+    inner_data = data['data']
+    if inner_data is None:
+         raise ValueError(f"[Data Integrity] Data block is None in response for {context_info}")
+
+    if 'content' not in inner_data:
+        raise ValueError(f"[Data Integrity] Missing 'content' field in response for {context_info}")
+
+    content = inner_data['content']
+    # 10 chars is a safe lower bound. "Jesus wept" is shortest verse.
+    # HTML wrapper usually adds more: <p class="p"><span data-number="35" class="v">35</span>Jesus wept.</p>
+    if not content or len(str(content).strip()) < 10:
+        raise ValueError(f"[Data Integrity] Content suspiciously empty/short ({len(str(content)) if content else 0} chars) for {context_info}")
+
+    return True
+
 def fetch_passage(api_key, bible_id, passage_range):
     """
     Fetches a passage from api.bible.
@@ -319,6 +345,10 @@ def process_day(day_entry, api_key, output_dir):
             
             try:
                 data = fetch_passage(api_key, bible_id, api_rng_str)
+
+                # Security/Integrity Check: Validate content before writing
+                validate_api_response(data, context_info=f"{filename} ({api_rng_str})")
+
                 with open(filepath, 'w', encoding='utf-8') as f:
                     json.dump(data, f, indent=2, ensure_ascii=False)
                 files_list.append(filename)
