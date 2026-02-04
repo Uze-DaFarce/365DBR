@@ -2017,8 +2017,8 @@
   },
   {
     "day": "0913",
-    "api_format": "JOB.41.1-ECC.1.18,1CO.15.22-1CO.15.42,PSA.106.33-PSA.106.39,PRO.22.26-PRO.22.29",
-    "text_friendly": "Job 41:1 \u2013 Ecclesiastes 1:18, 1 Corinthians 15:22\u201342, Psalms 106:33\u201339, Proverbs 22:26\u201329",
+    "api_format": "JOB.41.1-JOB.42.17;ECC.1.1-ECC.1.18,1CO.15.22-1CO.15.42,PSA.106.33-PSA.106.39,PRO.22.26-PRO.22.29",
+    "text_friendly": "Job 41:1 \u2013 42:17, Ecclesiastes 1:1\u201318, 1 Corinthians 15:22\u201342, Psalms 106:33\u201339, Proverbs 22:26\u201329",
     "ot_verse_count": 61,
     "nt_verse_count": 21,
     "ps_verse_count": 7,

@@ -248,6 +248,40 @@ def format_friendly_range(start_loc, end_loc):
     else:
         return f"{BOOK_NAMES[start_loc.book]} {start_loc.chapter}:{start_loc.verse} – {BOOK_NAMES[end_loc.book]} {end_loc.chapter}:{end_loc.verse}"
 
+def get_ranges_handling_gaps(nav, start_idx, end_idx):
+    """
+    Splits the range [start_idx, end_idx] into multiple sub-ranges if it spans
+    across non-adjacent books in the canonical order (ALL_BOOKS).
+    Returns a list of tuples: [(sub_start_idx, sub_end_idx), ...]
+    """
+    ranges = []
+    current_start = start_idx
+
+    for i in range(start_idx, end_idx):
+        curr_verse = nav.get_verse_at(i)
+        next_verse = nav.get_verse_at(i+1)
+
+        curr_book_idx = ALL_BOOKS.index(curr_verse.book)
+        next_book_idx = ALL_BOOKS.index(next_verse.book)
+
+        # Check continuity:
+        # 1. Same book -> OK
+        # 2. Different book, but canonical neighbor (diff is 1) -> OK
+        # 3. Otherwise -> GAP -> Split
+
+        if curr_verse.book == next_verse.book:
+            continue
+        elif next_book_idx == curr_book_idx + 1:
+            continue
+        else:
+            # Gap detected (e.g. JOB->ECC skipping PSA,PRO)
+            ranges.append((current_start, i))
+            current_start = i + 1
+
+    # Append final range
+    ranges.append((current_start, end_idx))
+    return ranges
+
 def main():
     ot_nav = BibleNavigator(OT_SEQUENTIAL_BOOKS)
     nt_nav = BibleNavigator(NT_BOOKS)
@@ -309,22 +343,28 @@ def main():
         pr_end_idx, pr_count = pr_nav.get_reading(pr_idx, pr_target, i, snap_radius=2)
         
         # Formatting
-        ot_start = ot_nav.get_verse_at(ot_idx)
-        ot_end = ot_nav.get_verse_at(ot_end_idx)
-        nt_start = nt_nav.get_verse_at(nt_idx)
-        nt_end = nt_nav.get_verse_at(nt_end_idx)
-        ps_start = ps_nav.get_verse_at(ps_idx)
-        ps_end = ps_nav.get_verse_at(ps_end_idx)
-        pr_start = pr_nav.get_verse_at(pr_idx)
-        pr_end = pr_nav.get_verse_at(pr_end_idx)
+        # Generate API Strings and Friendly Texts handling potential gaps (mostly for OT)
+        def process_section_ranges(nav, s_idx, e_idx):
+            sub_ranges = get_ranges_handling_gaps(nav, s_idx, e_idx)
+            api_parts = []
+            friendly_parts_inner = []
+
+            for (s, e) in sub_ranges:
+                s_v = nav.get_verse_at(s)
+                e_v = nav.get_verse_at(e)
+                api_parts.append(f"{s_v}-{e_v}")
+                friendly_parts_inner.append(format_friendly_range(s_v, e_v))
+
+            return ";".join(api_parts), ", ".join(friendly_parts_inner)
+
+        ot_api, ot_friendly = process_section_ranges(ot_nav, ot_idx, ot_end_idx)
+        nt_api, nt_friendly = process_section_ranges(nt_nav, nt_idx, nt_end_idx)
+        ps_api, ps_friendly = process_section_ranges(ps_nav, ps_idx, ps_end_idx)
+        pr_api, pr_friendly = process_section_ranges(pr_nav, pr_idx, pr_end_idx)
+
+        api_str = f"{ot_api},{nt_api},{ps_api},{pr_api}"
         
-        api_str = f"{ot_start}-{ot_end},{nt_start}-{nt_end},{ps_start}-{ps_end},{pr_start}-{pr_end}"
-        friendly_parts = [
-            format_friendly_range(ot_start, ot_end),
-            format_friendly_range(nt_start, nt_end),
-            format_friendly_range(ps_start, ps_end),
-            format_friendly_range(pr_start, pr_end)
-        ]
+        friendly_parts = [ot_friendly, nt_friendly, ps_friendly, pr_friendly]
         text_friendly = ", ".join(friendly_parts)
         
         entry = {
