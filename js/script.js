@@ -75,42 +75,72 @@ const navTargets = Array.from(navLinks).map(link => {
   };
 }).filter(item => item.target !== null);
 
-window.addEventListener('scroll', () => {
+const backToTopBtn = document.getElementById('back-to-top');
+
+// ⚡ Bolt: Optimize Scroll Handling
+// Throttling scroll events with requestAnimationFrame to reduce main thread blocking
+// and minimizing DOM updates to prevent layout thrashing.
+let isTicking = false;
+let lastActiveLink = null;
+let isBackToTopVisible = false;
+
+function onScroll() {
+  const currentScrollY = window.scrollY;
+  if (!isTicking) {
+    window.requestAnimationFrame(() => {
+      updateScrollState(currentScrollY);
+      isTicking = false;
+    });
+    isTicking = true;
+  }
+}
+
+function updateScrollState(scrollY) {
+  // 1. Active Nav State
   const offset = 120; // Header height + buffer
   let activeLink = null;
 
   // Find the last section that has been passed
   navTargets.forEach(item => {
-    if (window.scrollY >= item.target.offsetTop - offset) {
+    if (scrollY >= item.target.offsetTop - offset) {
       activeLink = item.link;
     }
   });
 
-  // Apply active class
-  navLinks.forEach(link => {
-    if (link === activeLink) {
-      link.classList.add('active');
-      link.setAttribute('aria-current', 'page');
-    } else {
-      link.classList.remove('active');
-      link.removeAttribute('aria-current');
-    }
-  });
-});
+  // Only update DOM if active link changed
+  if (activeLink !== lastActiveLink) {
+    navLinks.forEach(link => {
+      if (link === activeLink) {
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.classList.remove('active');
+        link.removeAttribute('aria-current');
+      }
+    });
+    lastActiveLink = activeLink;
+  }
 
-// Back to Top Button Logic
-const backToTopBtn = document.getElementById('back-to-top');
+  // 2. Back to Top Button Visibility
+  if (backToTopBtn) {
+    const shouldBeVisible = scrollY > 500;
+    if (shouldBeVisible !== isBackToTopVisible) {
+      if (shouldBeVisible) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+      isBackToTopVisible = shouldBeVisible;
+    }
+  }
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+
+// Initial check on load
+updateScrollState(window.scrollY);
 
 if (backToTopBtn) {
-  window.addEventListener('scroll', () => {
-    // Show button when scrolled down 500px
-    if (window.scrollY > 500) {
-      backToTopBtn.classList.add('visible');
-    } else {
-      backToTopBtn.classList.remove('visible');
-    }
-  });
-
   backToTopBtn.addEventListener('click', () => {
     window.scrollTo({
       top: 0,
