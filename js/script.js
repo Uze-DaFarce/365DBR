@@ -1,8 +1,15 @@
 // Simple success overlay for forms
-document.querySelectorAll('a[href*="docs.google.com"]').forEach(a => {
-  a.addEventListener('click', () => {
+document.querySelectorAll('a[href*="docs.google.com"]').forEach(trigger => {
+  trigger.addEventListener('click', () => {
     const o = document.createElement('div');
-    o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(64,27,81,0.95);color:white;z-index:9999;display:flex;align-items:center;justify-content:center;font-size:18px;text-align:center;padding:20px;';
+    // Added accessibility roles and tabindex for focus management
+    o.setAttribute('role', 'alertdialog');
+    o.setAttribute('aria-modal', 'true');
+    o.setAttribute('tabindex', '0');
+    o.setAttribute('aria-label', 'Submission confirmation: Thank you! We will review your message. Press Escape to dismiss.');
+
+    // Added cursor: pointer to indicate interactivity
+    o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(64,27,81,0.95);color:white;z-index:9999;display:flex;align-items:center;justify-content:center;font-size:18px;text-align:center;padding:20px;cursor:pointer;';
 
     // Security enhancement: Use DOM creation instead of innerHTML to prevent XSS risks
     const container = document.createElement('div');
@@ -23,9 +30,28 @@ document.querySelectorAll('a[href*="docs.google.com"]').forEach(a => {
 
     o.appendChild(container);
 
-    o.onclick = () => o.remove();
+    const dismiss = () => {
+      o.remove();
+      // Restore focus to the trigger element
+      trigger.focus();
+    };
+
+    o.onclick = dismiss;
+
+    // Handle keyboard dismissal
+    o.onkeydown = (e) => {
+      if (['Escape', 'Enter', ' '].includes(e.key)) {
+        e.preventDefault();
+        dismiss();
+      }
+    };
+
     document.body.appendChild(o);
-    setTimeout(() => o.remove(), 8000);
+    o.focus(); // Set focus to overlay immediately
+
+    setTimeout(() => {
+      if (document.body.contains(o)) dismiss();
+    }, 8000);
   });
 });
 
