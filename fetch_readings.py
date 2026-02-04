@@ -230,9 +230,34 @@ def main():
     # 3. Filter Entries
     targets = []
     if args.day:
-        targets = [r for r in readings if r['day'] == args.day]
+        if '-' in args.day:
+            start, end = args.day.split('-')
+            # Lexicographical comparison works for MMDD strings
+            targets = [r for r in readings if r['day'] >= start and r['day'] <= end]
+        else:
+            targets = [r for r in readings if r['day'] == args.day]
     elif args.month:
-        targets = [r for r in readings if r['day'].startswith(args.month)]
+        if '-' in args.month:
+            start_m, end_m = args.month.split('-')
+            # Handle month wrap-around if needed, but simpler linear check first
+            # Assuming strictly increasing months in file? No, file is sorted by date usually.
+            # Convert to ints for range check
+            s_int = int(start_m)
+            e_int = int(end_m)
+
+            # Helper to check if month is in range [s, e] (inclusive)
+            # Handles wrap around logic like 12-02 (Dec, Jan, Feb)
+            def is_in_month_range(day_str, s, e):
+                m = int(day_str[:2])
+                if s <= e:
+                    return s <= m <= e
+                else:
+                    # Wrap around: (m >= s) OR (m <= e)
+                    return m >= s or m <= e
+
+            targets = [r for r in readings if is_in_month_range(r['day'], s_int, e_int)]
+        else:
+            targets = [r for r in readings if r['day'].startswith(args.month)]
     elif args.all:
         targets = readings
     else:
