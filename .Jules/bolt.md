@@ -7,3 +7,7 @@
 ## 2026-02-03 - Native CSS Smooth Scroll
 **Learning:** Replacing JS-based smooth scrolling with `html { scroll-behavior: smooth; }` reduces main thread work, enables native accessibility support (reduced-motion), and fixes deep linking (URL hash updates), which JS implementations often break by preventing default.
 **Action:** Always prefer native CSS over JS for scrolling behaviors in static sites.
+
+## 2026-02-04 - Image Decoding & Priority
+**Learning:** `fetchpriority="high"` on the LCP preload link significantly hints priority to the browser, while `decoding="async"` on below-the-fold images effectively moves decoding off the main thread, reducing UI jank during scroll without visual side effects.
+**Action:** Default to `decoding="async"` for all below-fold images and `fetchpriority="high"` for the explicit LCP preload.
