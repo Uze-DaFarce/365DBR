@@ -235,6 +235,10 @@ const BIBLE_BOOK_ORDER = [
   "MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"
 ];
 
+// O(1) Lookups for Sorting
+const BIBLE_BOOK_ORDER_MAP = new Map(BIBLE_BOOK_ORDER.map((b, i) => [b, i]));
+const NT_BOOKS = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
+
 const PILL_LABELS = ['OT', 'NT', 'PS', 'PR'];
 
 const getSectionIndex = (vid) => {
@@ -242,8 +246,7 @@ const getSectionIndex = (vid) => {
     const book = vid.split('.')[0];
     if (book === 'PSA') return 2;
     if (book === 'PRO') return 3;
-    const ntBooks = ['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'];
-    return ntBooks.includes(book) ? 1 : 0;
+    return NT_BOOKS.has(book) ? 1 : 0;
 };
 
 const generateSmartLabel = (verseMap, focalKey) => {
@@ -267,7 +270,9 @@ const generateSmartLabel = (verseMap, focalKey) => {
       const wA = getSectionIndex(a), wB = getSectionIndex(b);
       if (wA !== wB) return wA - wB;
       const bookA = a.split('.')[0], bookB = b.split('.')[0];
-      if (bookA !== bookB) return BIBLE_BOOK_ORDER.indexOf(bookA) - BIBLE_BOOK_ORDER.indexOf(bookB);
+      if (bookA !== bookB) {
+         return (BIBLE_BOOK_ORDER_MAP.get(bookA) ?? 999) - (BIBLE_BOOK_ORDER_MAP.get(bookB) ?? 999);
+      }
       return a.localeCompare(b, undefined, { numeric: true });
     });
 
@@ -595,7 +600,9 @@ const App = () => {
       const bookA = a.split('.')[0];
       const bookB = b.split('.')[0];
       if (bookA !== bookB) {
-        return BIBLE_BOOK_ORDER.indexOf(bookA) - BIBLE_BOOK_ORDER.indexOf(bookB);
+        const idxA = BIBLE_BOOK_ORDER_MAP.get(bookA) ?? 999;
+        const idxB = BIBLE_BOOK_ORDER_MAP.get(bookB) ?? 999;
+        return idxA - idxB;
       }
 
       // 3. Tertiary Sort: By Chapter/Verse (Numeric)
