@@ -458,28 +458,96 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 });
 
 const App = () => {
-  // Generates MMDD format (e.g., Jan 8 -> "0108")
-  const getFormattedDate = () => {
+  // Helper to resolve initial state from URL -> LocalStorage -> Today
+  const getInitialState = () => {
+    // 1. URL Parameter (High Priority)
+    const params = new URLSearchParams(window.location.search);
+    const urlDate = params.get('startDate');
+    if (urlDate && /^\d{4}$/.test(urlDate)) {
+        // Try to load extra settings from storage even if URL overrides date
+        try {
+            const saved = localStorage.getItem('biblical_reading_state');
+            if (saved) {
+                const state = JSON.parse(saved);
+                // If the stored date matches the URL date, we can restore the exact position!
+                // If not, we still restore translation preferences.
+                return { ...state, date: urlDate, verseId: (state.date === urlDate ? state.verseId : null) };
+            }
+        } catch (e) {}
+        return { date: urlDate };
+    }
+
+    // 2. Saved Session
+    try {
+        const saved = localStorage.getItem('biblical_reading_state');
+        if (saved) {
+            const state = JSON.parse(saved);
+            if (state.date && /^\d{4}$/.test(state.date)) {
+                return state;
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to load saved state", e);
+    }
+
+    // 3. Today (Fallback)
     const now = new Date();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    return `${month}${day}`;
+    return { date: `${month}${day}` };
   };
+
+  const initialState = useMemo(() => getInitialState(), []);
 
   const [verseMap, setVerseMap] = useState(null);
   const [readingLabel, setReadingLabel] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // Dynamically set based on today's date
-  const [currentDate, setCurrentDate] = useState(getFormattedDate());
+
+  const [currentDate, setCurrentDate] = useState(initialState.date);
   const [playbackStatus, setPlaybackStatus] = useState('stopped');
   const [activeVerseId, setActiveVerseId] = useState(null); // Visual position (scroll tracking)
   const [playbackVerseId, setPlaybackVerseId] = useState(null); // Where playback is at
   
   // Dynamic State for Translation Slots
   const [availableTranslations, setAvailableTranslations] = useState([]);
-  const [focalTranslation, setFocalTranslation] = useState(null); // Slot 3 (Bottom)
-  const [compareTranslation, setCompareTranslation] = useState(null); // Slot 2 (Middle)
+  const [focalTranslation, setFocalTranslation] = useState(initialState.focal || null); // Slot 3 (Bottom)
+  const [compareTranslation, setCompareTranslation] = useState(initialState.compare || null); // Slot 2 (Middle)
+
+  // Scroll target for restoration
+  const [targetScrollVerse, setTargetScrollVerse] = useState(initialState.verseId || null);
+
+  // Persistence
+  useEffect(() => {
+      if (loading) return; // Don't save state while loading/initializing
+      const state = {
+          date: currentDate,
+          focal: focalTranslation,
+          compare: compareTranslation,
+          verseId: activeVerseId
+      };
+      localStorage.setItem('biblical_reading_state', JSON.stringify(state));
+  }, [currentDate, focalTranslation, compareTranslation, activeVerseId, loading]);
+
+  // URL Sync
+  useEffect(() => {
+      const url = new URL(window.location);
+      if (url.searchParams.get('startDate') !== currentDate) {
+          url.searchParams.set('startDate', currentDate);
+          window.history.pushState({}, '', url);
+      }
+  }, [currentDate]);
+
+  // Scroll Restoration
+  useEffect(() => {
+      if (!loading && targetScrollVerse && verseMap) {
+          const el = document.getElementById(`verse-${targetScrollVerse}`);
+          if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              setTargetScrollVerse(null);
+          }
+      }
+  }, [loading, targetScrollVerse, verseMap]);
 
   // Dropdown States
   const [isCompareOpen, setIsCompareOpen] = useState(false);
