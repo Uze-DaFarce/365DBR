@@ -343,74 +343,84 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
     const book = vid.split('.')[0];
     const isHebrew = !['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'].includes(book);
 
-    const getSlotContent = (slot) => {
-        if (!slot || !slot.source) return { text: '', displayLabel: '' };
+    // ⚡ Bolt Optimization: Memoize content generation to prevent expensive string operations
+    // on every render (e.g. during scroll/highlight transitions).
+    // The content only changes if translations or data change, not when 'isActive' toggles.
+    const renderedSlots = useMemo(() => {
+        const getSlotContent = (slot) => {
+            if (!slot || !slot.source) return { text: '', displayLabel: '' };
 
-        let fullText = '';
-        let displayLabel = '';
-        const contributing = [];
+            let fullText = '';
+            let displayLabel = '';
+            const contributing = [];
 
-        group.forEach((gVid) => {
-            const data = verseMap[gVid];
-            const slotData = data ? data[slot.source] : null;
-            if (slotData && slotData.text && slotData.text.length > 0) {
-                const sep = (slot.isHebrewGreek) ? ' ' : ' ';
-                fullText += (fullText ? sep : '') + slotData.text.join(slot.isHebrewGreek ? '' : ' ');
+            group.forEach((gVid) => {
+                const data = verseMap[gVid];
+                const slotData = data ? data[slot.source] : null;
+                if (slotData && slotData.text && slotData.text.length > 0) {
+                    const sep = (slot.isHebrewGreek) ? ' ' : ' ';
+                    fullText += (fullText ? sep : '') + slotData.text.join(slot.isHebrewGreek ? '' : ' ');
 
-                contributing.push(slotData.displayVid || gVid);
+                    contributing.push(slotData.displayVid || gVid);
+                }
+            });
+
+            if (contributing.length > 0) {
+                const first = contributing[0];
+                const last = contributing[contributing.length - 1];
+
+                const parse = (v) => {
+                    const p = v.split('.');
+                    return { b: p[0], c: parseInt(p[1]), v: parseInt(p[2]) };
+                };
+
+                const s = parse(first);
+                const e = parse(last);
+                const bName = BOOK_NAMES[s.b] || s.b;
+
+                if (first === last) {
+                    displayLabel = `${bName} ${s.c}:${s.v}`;
+                } else if (s.b === e.b) {
+                    if (s.c === e.c) {
+                        displayLabel = `${bName} ${s.c}:${s.v}-${e.v}`;
+                    } else {
+                        displayLabel = `${bName} ${s.c}:${s.v}-${e.c}:${e.v}`;
+                    }
+                } else {
+                    const eName = BOOK_NAMES[e.b] || e.b;
+                    displayLabel = `${bName} ${s.c}:${s.v} - ${eName} ${e.c}:${e.v}`;
+                }
+
+            } else if (group.length > 0) {
+                const [b, c, v] = group[0].split('.');
+                displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
             }
-        });
 
-        if (contributing.length > 0) {
-            const first = contributing[0];
-            const last = contributing[contributing.length - 1];
+            return { text: fullText, displayLabel };
+        };
 
-            const parse = (v) => {
-                 const p = v.split('.');
-                 return { b: p[0], c: parseInt(p[1]), v: parseInt(p[2]) };
-            };
+        const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
 
-            const s = parse(first);
-            const e = parse(last);
-            const bName = BOOK_NAMES[s.b] || s.b;
-
-            if (first === last) {
-                displayLabel = `${bName} ${s.c}:${s.v}`;
-            } else if (s.b === e.b) {
-                 if (s.c === e.c) {
-                     displayLabel = `${bName} ${s.c}:${s.v}-${e.v}`;
-                 } else {
-                     displayLabel = `${bName} ${s.c}:${s.v}-${e.c}:${e.v}`;
-                 }
-            } else {
-                 const eName = BOOK_NAMES[e.b] || e.b;
-                 displayLabel = `${bName} ${s.c}:${s.v} - ${eName} ${e.c}:${e.v}`;
-            }
-
-        } else if (group.length > 0) {
-            const [b, c, v] = group[0].split('.');
-            displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
-        }
-
-        return { text: fullText, displayLabel };
-    };
+        return {
+            top: { ...getSlotContent(dynamicSlots.top), label: getLabel(dynamicSlots.top), config: dynamicSlots.top },
+            middle: { ...getSlotContent(dynamicSlots.middle), label: getLabel(dynamicSlots.middle), config: dynamicSlots.middle },
+            bottom: { ...getSlotContent(dynamicSlots.bottom), label: getLabel(dynamicSlots.bottom), config: dynamicSlots.bottom, attribution: dynamicSlots.bottom.attribution }
+        };
+    }, [group, verseMap, dynamicSlots, isHebrew]);
 
     return (
         <div id={`verse-${vid}`} className={`verse-block transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'}`}>
             <div className="flex flex-col gap-1">
             {/* SLOT 1: TOP (Usually Original) */}
             {(() => {
-                const slot = dynamicSlots.top;
-                const { text, displayLabel } = getSlotContent(slot);
-                const label = typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
-
+                const { text, displayLabel, label, config } = renderedSlots.top;
                 return (
                     <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
                     <div className="flex justify-between items-center mb-0.5">
                         <span className={`text-[7px] md:text-[10px] uppercase font-black tracking-widest ${isActive ? 'text-amber-500' : 'text-stone-300'}`}>{label}</span>
                         <span className={`text-[7px] md:text-[10px] font-mono font-bold text-stone-300 ${isActive ? 'text-amber-500' : 'text-stone-300'} uppercase`}>{displayLabel}</span>
                     </div>
-                    <div className={`leading-tight tracking-tight break-words ${slot.isHebrewGreek ? (isHebrew ? 'hebrew text-[12px] md:text-xl text-right' : 'greek text-base md:text-lg text-left') : 'text-lg md:text-3xl font-serif italic'}`} style={{ direction: slot.isHebrewGreek && isHebrew ? 'rtl' : 'ltr' }}>
+                    <div className={`leading-tight tracking-tight break-words ${config.isHebrewGreek ? (isHebrew ? 'hebrew text-[12px] md:text-xl text-right' : 'greek text-base md:text-lg text-left') : 'text-lg md:text-3xl font-serif italic'}`} style={{ direction: config.isHebrewGreek && isHebrew ? 'rtl' : 'ltr' }}>
                         <span className={isActive ? 'text-white' : 'text-stone-400'}>{text}</span>
                     </div>
                     </div>
@@ -419,13 +429,11 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
             {/* SLOT 2: MIDDLE (Secondary) */}
             {(() => {
-                const slot = dynamicSlots.middle;
-                const { text, displayLabel } = getSlotContent(slot);
-
+                const { text, displayLabel, label } = renderedSlots.middle;
                 return (
                 <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
                     <div className="flex justify-between items-center mb-0.5">
-                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{slot.label}</span>
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{label}</span>
                     <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-300'}`}>{displayLabel}</span></div>
                     <div><span className={`text-lg md:text-3xl font-serif italic leading-tight tracking-tight ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>{text}</span></div>
                 </div>
@@ -434,21 +442,19 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
             {/* SLOT 3: BOTTOM (Focal) */}
             {(() => {
-                const slot = dynamicSlots.bottom;
-                const { text, displayLabel } = getSlotContent(slot);
-
+                const { text, displayLabel, label, attribution } = renderedSlots.bottom;
                 return (
                 <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-amber-100 shadow-xl border-amber-500 ring-1 ring-amber-500/50' : 'bg-white/40 border-transparent opacity-80'}`}>
                     <div className="flex justify-between items-center mb-0.5">
                     <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>
-                        {slot.label}
-                        {slot.attribution && (
+                        {label}
+                        {attribution && (
                         <a
-                            href={slot.attribution.link}
+                            href={attribution.link}
                             className="inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 hover:text-amber-600 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm"
-                            title={slot.attribution.title}
+                            title={attribution.title}
                         >
-                            {slot.attribution.text}
+                            {attribution.text}
                         </a>
                         )}
                     </span>
