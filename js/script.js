@@ -172,5 +172,11 @@ if (backToTopBtn) {
       top: 0,
       behavior: 'smooth'
     });
+    // Move focus to the top of the page (Logo) to prevent focus trap
+    // as the button becomes invisible after scrolling
+    const logo = document.querySelector('.logo');
+    if (logo) {
+      logo.focus({ preventScroll: true });
+    }
   });
 }

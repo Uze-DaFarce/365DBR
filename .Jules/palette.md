@@ -59,3 +59,10 @@ Implemented a robust pattern for dynamic overlays:
 Using emojis or icons as primary visual anchors (e.g., in service cards or lists) creates auditory clutter for screen reader users if not properly managed. Hearing "Chart increasing" before "Bookkeeping" is redundant and distracting.
 **Action:**
 Systematically apply `aria-hidden="true"` to all decorative icon containers. For mixed content (e.g., `<li>📊 <a...`), wrap the decorative element in a `<span>` to apply the attribute without hiding the semantic content.
+
+## 2026-02-05 - Clickable Cards & Focus Management
+**Learning:**
+1. **Clickable Cards:** Users expect cards to be clickable. The most robust accessible pattern is expanding the primary link's hit area using `::after` (absolute position) over a `position: relative` card container. This preserves semantic HTML structure.
+2. **Focus Traps:** "Back to Top" buttons that disappear (via `visibility: hidden` or `display: none`) must explicitly move focus to a logical start point (e.g., Logo) to prevent leaving keyboard users stranded.
+**Action:**
+Applied `position: relative` to cards and `::after` overlay to links. Updated JS to focus logo on scroll-to-top.
