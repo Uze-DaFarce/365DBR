@@ -53,3 +53,9 @@ Implemented a robust pattern for dynamic overlays:
 1.  **Roles:** `role="alertdialog"` and `aria-modal="true"`.
 2.  **Focus Management:** Explicitly move focus to the overlay on open (`tabindex="0"`), and restore focus to the triggering element on close.
 3.  **Keyboard Support:** Listen for `Escape`, `Enter`, and `Space` to allow dismissal without a mouse.
+
+## 2026-02-04 - Decorative Icon Accessibility
+**Learning:**
+Using emojis or icons as primary visual anchors (e.g., in service cards or lists) creates auditory clutter for screen reader users if not properly managed. Hearing "Chart increasing" before "Bookkeeping" is redundant and distracting.
+**Action:**
+Systematically apply `aria-hidden="true"` to all decorative icon containers. For mixed content (e.g., `<li>📊 <a...`), wrap the decorative element in a `<span>` to apply the attribute without hiding the semantic content.
