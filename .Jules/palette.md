@@ -5,3 +5,7 @@
 ## 2025-02-18 - Keyboard Shortcuts for Sequential Content
 **Learning:** For apps with sequential navigation (like a daily reader), keyboard shortcuts (Arrows, Space/k) significantly improve usability and are expected by power users.
 **Action:** Always map Left/Right arrows to previous/next navigation and provide visual hints (e.g. in tooltips) for discovery.
+
+## 2026-02-05 - Skip Links for Sticky Headers
+**Learning:** In single-page apps with complex sticky headers (nav, settings, playback controls), keyboard users are forced to tab through 10+ elements before reaching the content. This causes fatigue and makes the app feel "heavy".
+**Action:** Always include a "Skip to Content" link (`href="#main"`) as the first interactive element. Use `sr-only focus:not-sr-only` to keep it hidden until needed, and ensure the target has `tabIndex="-1"` and `outline-none` for correct focus behavior without visual clutter.
