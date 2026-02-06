@@ -9,3 +9,8 @@
 **Vulnerability:** Lack of a clear channel for security researchers to report vulnerabilities can lead to irresponsible disclosure or unpatched issues.
 **Learning:** Even static sites benefit from a formal security policy.
 **Prevention:** Added `.well-known/security.txt` following RFC 9116 to define contact methods and policy expiration.
+
+## 2026-02-06 - Maximized CSP for Static Sites
+**Vulnerability:** Incremental CSP hardening leaves gaps and annoys developers. Meta-tag CSPs have limitations (e.g., `frame-ancestors` is ignored).
+**Learning:** To "max out" a meta-tag CSP for a static site, enable `require-trusted-types-for 'script'` and `worker-src 'none'` alongside standard directives. Do not attempt `frame-ancestors` in meta tags.
+**Prevention:** Enforce a comprehensive CSP in a single pass: `default-src 'self'`, strict `script-src` (no 'unsafe-inline' if possible), `worker-src 'none'`, and Trusted Types.
