@@ -249,7 +249,7 @@ const getSectionIndex = (vid) => {
     return NT_BOOKS.has(book) ? 1 : 0;
 };
 
-const generateSmartLabel = (verseMap, focalKey) => {
+const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
     if (!verseMap) return "";
 
     const parseVid = (vid) => {
@@ -266,15 +266,7 @@ const generateSmartLabel = (verseMap, focalKey) => {
         return vid;
     };
 
-    const vids = Object.keys(verseMap).sort((a, b) => {
-      const wA = getSectionIndex(a), wB = getSectionIndex(b);
-      if (wA !== wB) return wA - wB;
-      const bookA = a.split('.')[0], bookB = b.split('.')[0];
-      if (bookA !== bookB) {
-         return (BIBLE_BOOK_ORDER_MAP.get(bookA) ?? 999) - (BIBLE_BOOK_ORDER_MAP.get(bookB) ?? 999);
-      }
-      return a.localeCompare(b, undefined, { numeric: true });
-    });
+    const vids = sortedVids || [];
 
     const sections = [[], [], [], []];
     vids.forEach(vid => sections[getSectionIndex(vid)].push(vid));
@@ -708,9 +700,9 @@ const App = () => {
       if (!verseMap) return;
       // Use focalTranslation if available, else first English (if available), else null
       // Note: availableTranslations logic is in local state, but usually matches what was loaded
-      const label = generateSmartLabel(verseMap, focalTranslation);
+      const label = generateSmartLabel(verseMap, sortedVids, focalTranslation);
       setReadingLabel(label);
-  }, [verseMap, focalTranslation]);
+  }, [verseMap, sortedVids, focalTranslation]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
