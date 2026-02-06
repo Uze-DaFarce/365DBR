@@ -245,36 +245,49 @@ def split_cross_book_range(range_str):
         return [range_str]
 
     # It is a cross book range.
-    # Use BIBLE_DATA to find end of first book.
-    # Note: range_str comes from readings.json which uses Standard Codes (e.g. SON not SNG).
-    # fetch_readings logic:
-    #   rng_str (Standard) -> translate -> api_rng_str (Hebrew) -> fetch
-    #   If 404, we call this with rng_str (Standard).
+    # Use BIBLE_DATA to find all books involved
+    all_books = list(BIBLE_DATA.keys())
 
-    if start_book not in BIBLE_DATA:
-        print(f"  [Warning] Unknown book {start_book} in range {range_str}, cannot split safely.")
+    if start_book not in all_books or end_book not in all_books:
+        print(f"  [Warning] Unknown book {start_book} or {end_book} in range {range_str}, cannot split safely.")
         return [range_str]
 
-    # Get last chapter and verse of start_book
+    start_idx = all_books.index(start_book)
+    end_idx = all_books.index(end_book)
+
+    if start_idx > end_idx:
+         print(f"  [Warning] Invalid range order {start_book}-{end_book}, cannot split safely.")
+         return [range_str]
+
+    result_ranges = []
+
+    # 1. Start Book: Start -> End of Start Book
     chapters = BIBLE_DATA[start_book]
     last_ch_num = len(chapters)
     last_v_num = chapters[-1]
 
-    # First range: Start -> End of Start Book
     # Parse start details to reconstruct fully
     start_parts = start_str.split('.')
     start_loc = f"{start_parts[0]}.{start_parts[1]}.{start_parts[2]}" # Keep it clean
 
-    first_range = f"{start_loc}-{start_book}.{last_ch_num}.{last_v_num}"
+    result_ranges.append(f"{start_loc}-{start_book}.{last_ch_num}.{last_v_num}")
 
-    # Second range: Start of End Book -> End
+    # 2. Intermediate Books (Full)
+    for i in range(start_idx + 1, end_idx):
+        mid_book = all_books[i]
+        chapters = BIBLE_DATA[mid_book]
+        last_ch = len(chapters)
+        last_v = chapters[-1]
+        result_ranges.append(f"{mid_book}.1.1-{mid_book}.{last_ch}.{last_v}")
+
+    # 3. End Book: Start of End Book -> End
     # Parse end details
     end_parts = end_str.split('.')
     end_loc = f"{end_parts[0]}.{end_parts[1]}.{end_parts[2]}"
 
-    second_range = f"{end_book}.1.1-{end_loc}"
+    result_ranges.append(f"{end_book}.1.1-{end_loc}")
 
-    return [first_range, second_range]
+    return result_ranges
 
 def process_day(day_entry, api_key, output_dir):
     day_id = day_entry['day']
