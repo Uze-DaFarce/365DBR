@@ -1013,14 +1013,21 @@ const App = () => {
               <div className="relative">
                 <button onClick={() => { setIsCompareOpen(!isCompareOpen); setIsFocalOpen(false); }} aria-haspopup="true" aria-expanded={isCompareOpen} aria-label="Select Comparison Translation" className="flex items-center gap-1 text-[9px] md:text-[10px] font-bold uppercase text-stone-300 hover:text-stone-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Translation for Middle Slot">
                   CMP: {compareTranslation ? compareTranslation.toUpperCase() : '-'}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isCompareOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                 </button>
                 {isCompareOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsCompareOpen(false)}></div>
                     <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
                       {availableTranslations.filter(k => k !== focalTranslation).map(key => (
-                        <button key={key} onClick={() => { setCompareTranslation(key); setIsCompareOpen(false); }} className={`block w-full text-left px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus:bg-stone-100 ${compareTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>{key}</button>
+                        <button key={key} onClick={() => { setCompareTranslation(key); setIsCompareOpen(false); }} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${compareTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
+                          <span>{key}</span>
+                          {compareTranslation === key && (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
                       ))}
                     </div>
                   </>
@@ -1040,14 +1047,21 @@ const App = () => {
               <div className="relative mr-1">
                 <button onClick={() => { setIsFocalOpen(!isFocalOpen); setIsCompareOpen(false); }} aria-haspopup="true" aria-expanded={isFocalOpen} aria-label="Select Focal Translation" className="flex items-center gap-1 text-[10px] md:text-xs font-black uppercase text-stone-400 hover:text-stone-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Focal (Audio) Translation">
                   {focalTranslation ? focalTranslation.toUpperCase() : '-'}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isFocalOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                 </button>
                 {isFocalOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsFocalOpen(false)}></div>
                     <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
                       {availableTranslations.map(key => (
-                        <button key={key} onClick={() => handleFocalChange(key)} className={`block w-full text-left px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus:bg-stone-100 ${focalTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>{key}</button>
+                        <button key={key} onClick={() => handleFocalChange(key)} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${focalTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
+                          <span>{key}</span>
+                          {focalTranslation === key && (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
                       ))}
                     </div>
                   </>
