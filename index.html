@@ -292,6 +292,7 @@
       height: 100%;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
     .service-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
     .service-icon {
@@ -310,6 +311,15 @@
     }
     .service-link:hover { color: #F4A623; }
 
+    /* 🎨 Palette: Make entire card clickable */
+    .service-card .service-link::after,
+    .project-card .service-link::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 1;
+    }
+
     /* Project Cards (Ministry) */
     .project-card {
       background-color: #FFFFFF;
@@ -318,6 +328,7 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       border: 1px solid rgba(0,0,0,0.05);
+      position: relative;
     }
     .project-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
     .project-image {
