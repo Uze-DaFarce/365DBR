@@ -2,6 +2,7 @@ import json
 import os
 import argparse
 import time
+import re
 import urllib.request
 import urllib.error
 import urllib.parse
@@ -136,6 +137,25 @@ def validate_safe_path(name):
     if "/" in name or "\\" in name:
         return False
     return True
+
+def validate_args(args):
+    """
+    Validates command line arguments to prevent injection or misuse.
+    """
+    # 1. Validate Output Directory
+    # We allow full paths if they are safe, but simplest check is no '..'
+    if args.out and ".." in args.out:
+        raise ValueError(f"[Security Error] Invalid output path: '{args.out}'. Path traversal detected.")
+
+    # 2. Validate Day Format (MMDD or MMDD-MMDD)
+    if args.day:
+        if not re.match(r'^(\d{4}|\d{4}-\d{4})$', args.day):
+             raise ValueError(f"[Input Error] Invalid day format: '{args.day}'. Expected MMDD or MMDD-MMDD.")
+
+    # 3. Validate Month Format (MM or MM-MM)
+    if args.month:
+        if not re.match(r'^(\d{2}|\d{2}-\d{2})$', args.month):
+             raise ValueError(f"[Input Error] Invalid month format: '{args.month}'. Expected MM or MM-MM.")
 
 def validate_api_response(data, context_info=""):
     """
@@ -425,7 +445,7 @@ def process_day(day_entry, api_key, output_dir):
     # Split ranges
     ranges = api_format.split(',')
     if len(ranges) != 4:
-        print(f"  [Warning] Expected 4 ranges, found {len(ranges)} in {day_id}")
+        raise ValueError(f"[Data Integrity] Expected 4 ranges, found {len(ranges)} in {day_id}")
     
     # Map ranges to Types and Bible IDs
     # Order in readings.json is OT, NT, PSA, PRO
@@ -514,6 +534,9 @@ def main():
     parser.add_argument("--out", default="data", help="Output directory (root folder containing day folders)")
     
     args = parser.parse_args()
+
+    # 0. Validate Arguments
+    validate_args(args)
     
     # 1. Load Readings
     if not os.path.exists(args.readings):
