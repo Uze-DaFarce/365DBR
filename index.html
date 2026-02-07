@@ -460,6 +460,50 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
     );
 });
 
+// Helper to format MMDD into a human date like "Jan 2nd"
+const formatDate = (mmdd) => {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+  const m = parseInt(mmdd.substring(0, 2)) - 1;
+  const d = parseInt(mmdd.substring(2, 4));
+  const j = d % 10, k = d % 100;
+  let suffix = "th";
+  if (j == 1 && k != 11) suffix = "st";
+  else if (j == 2 && k != 12) suffix = "nd";
+  else if (j == 3 && k != 13) suffix = "rd";
+  return `${months[m]} ${d}${suffix}`;
+};
+
+const Loader = () => (
+  <div role="status" aria-live="polite" className="flex flex-col items-center justify-center py-20 md:py-32">
+    <div className="w-8 h-8 border-2 border-stone-200 border-t-stone-800 rounded-full animate-spin mb-4"></div>
+    <p className="text-stone-400 font-serif italic text-xs uppercase tracking-widest">Loading God's Word</p>
+  </div>
+);
+
+const ErrorDisplay = ({ error, date, onRetry }) => (
+  <div className="flex flex-col items-center justify-center py-12 px-4 text-center animate-in fade-in zoom-in duration-300">
+    <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4 ring-1 ring-red-100">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+    </div>
+    <h3 className="text-lg font-serif font-bold text-stone-800 mb-2">Reading Unavailable</h3>
+    <p className="text-stone-500 text-sm mb-6 max-w-xs mx-auto leading-relaxed">
+        We couldn't load the reading for <span className="font-semibold text-stone-700">{formatDate(date)}</span>.
+        {error ? ` (${error})` : " It might be missing or you may be offline."}
+    </p>
+    <button
+        onClick={onRetry}
+        className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-md text-xs font-bold uppercase tracking-wider text-stone-600 hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-1 shadow-sm"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Retry Connection
+    </button>
+  </div>
+);
+
 const App = () => {
   // Helper to resolve initial state from URL -> LocalStorage -> Today
   const getInitialState = () => {
@@ -570,19 +614,6 @@ const App = () => {
     }
     setFocalTranslation(newFocal);
     setIsFocalOpen(false);
-  };
-
-  // Helper to format MMDD into a human date like "Jan 2nd"
-  const formatDate = (mmdd) => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
-    const m = parseInt(mmdd.substring(0, 2)) - 1;
-    const d = parseInt(mmdd.substring(2, 4));
-    const j = d % 10, k = d % 100;
-    let suffix = "th";
-    if (j == 1 && k != 11) suffix = "st";
-    else if (j == 2 && k != 12) suffix = "nd";
-    else if (j == 3 && k != 13) suffix = "rd";
-    return `${months[m]} ${d}${suffix}`;
   };
 
   // getSectionIndex moved outside App
@@ -941,21 +972,6 @@ const App = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#fdfcfb]"><div className="text-center"><div className="w-8 h-8 border-2 border-stone-200 border-t-stone-800 rounded-full animate-spin mx-auto mb-4"></div><p className="text-stone-400 font-serif italic text-xs uppercase tracking-widest">Loading God's Word</p></div></div>;
-
-  if (error) return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fdfcfb] px-4">
-          <div className="max-w-md w-full bg-white border-l-4 border-red-500 shadow-lg rounded-r-lg p-6">
-              <h2 className="text-xl font-bold text-stone-800 mb-2 font-serif">Data Integrity Error</h2>
-              <p className="text-stone-600 mb-4 text-sm">{error}</p>
-              <div className="flex justify-end gap-2">
-                  <button onClick={() => window.location.reload()} className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold uppercase tracking-wider rounded transition-colors">Reload</button>
-                  <button onClick={() => navigateDate(1)} className="px-4 py-2 bg-stone-800 hover:bg-stone-900 text-white text-xs font-bold uppercase tracking-wider rounded transition-colors">Next Day</button>
-              </div>
-          </div>
-      </div>
-  );
-
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-stone-900 focus:text-white focus:font-bold focus:rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xl transition-all">Skip to Content</a>
@@ -1068,28 +1084,10 @@ const App = () => {
       </header>
 
       <main id="main-content" tabIndex={-1} className="max-w-4xl mx-auto py-3 md:py-6 px-2 space-y-6 md:space-y-10 outline-none">
-        {error ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4 text-center animate-in fade-in zoom-in duration-300">
-            <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4 ring-1 ring-red-100">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-            </div>
-            <h3 className="text-lg font-serif font-bold text-stone-800 mb-2">Reading Unavailable</h3>
-            <p className="text-stone-500 text-sm mb-6 max-w-xs mx-auto leading-relaxed">
-                We couldn't load the reading for <span className="font-semibold text-stone-700">{formatDate(currentDate)}</span>.
-                It might be missing or you may be offline.
-            </p>
-            <button
-                onClick={() => window.location.reload()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-md text-xs font-bold uppercase tracking-wider text-stone-600 hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-1 shadow-sm"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Retry Connection
-            </button>
-          </div>
+        {loading ? (
+          <Loader />
+        ) : error ? (
+          <ErrorDisplay error={error} date={currentDate} onRetry={() => window.location.reload()} />
         ) : groupedVids.map(group => {
             const vid = group[0];
             const isPlaying = playbackStatus === 'playing';

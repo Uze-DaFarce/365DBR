@@ -13,3 +13,7 @@
 ## 2026-02-19 - Manual State Indicators
 **Learning:** In "home-grown" UI components (like manual dropdowns in embedded React), users lack standard cues like checkmarks or focus trapping. Visual feedback becomes critical.
 **Action:** Always explicitely add state indicators (checkmarks for selection, rotation for open state) to custom controls, as they won't inherit browser or library defaults.
+
+## 2026-02-23 - Persisting Layout Context
+**Learning:** In single-page apps, replacing the entire UI with a full-screen loader during navigation (even for 200ms) causes jarring layout shifts and disorients users, especially when navigation controls disappear.
+**Action:** Always Implement an "App Shell" pattern where the `<Header>` and `<Footer>` remain visible during loading states. Only the content area (`<main>`) should display the spinner/skeleton.
