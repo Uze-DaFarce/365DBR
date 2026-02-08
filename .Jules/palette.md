@@ -66,3 +66,12 @@ Systematically apply `aria-hidden="true"` to all decorative icon containers. For
 2. **Focus Traps:** "Back to Top" buttons that disappear (via `visibility: hidden` or `display: none`) must explicitly move focus to a logical start point (e.g., Logo) to prevent leaving keyboard users stranded.
 **Action:**
 Applied `position: relative` to cards and `::after` overlay to links. Updated JS to focus logo on scroll-to-top.
+
+## 2026-02-06 - Honest Form Handoffs
+**Learning:**
+Triggering a "Submission Confirmation" overlay when a user merely opens an external form (like Google Forms) is misleading and confusing UX. Users may believe they have already submitted data when they haven't started.
+**Action:**
+Updated the interstitial overlay to be an "External Link Warning" instead of a "Success Message".
+*   **Visuals:** Changed emoji to 📝 (Memo) and text to "Opening Secure Form...".
+*   **Instruction:** Added clear subtext "Please complete your request in the new tab" to set correct expectations.
+*   **Accessibility:** Added `aria-label` with "(opens in new tab)" to all triggering links.

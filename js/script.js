@@ -6,7 +6,7 @@ document.querySelectorAll('a[href*="docs.google.com"]').forEach(trigger => {
     o.setAttribute('role', 'alertdialog');
     o.setAttribute('aria-modal', 'true');
     o.setAttribute('tabindex', '0');
-    o.setAttribute('aria-label', 'Submission confirmation: Thank you! We will review your message. Press Escape to dismiss.');
+    o.setAttribute('aria-label', 'Opening Secure Form: Please complete your request in the new tab. Press Escape to dismiss.');
 
     // Added cursor: pointer to indicate interactivity
     o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(64,27,81,0.95);color:white;z-index:9999;display:flex;align-items:center;justify-content:center;font-size:18px;text-align:center;padding:20px;cursor:pointer;';
@@ -17,15 +17,15 @@ document.querySelectorAll('a[href*="docs.google.com"]').forEach(trigger => {
     const emojiDiv = document.createElement('div');
     emojiDiv.style.fontSize = '40px';
     emojiDiv.style.marginBottom = '12px';
-    emojiDiv.textContent = '🙏';
+    emojiDiv.textContent = '📝';
     container.appendChild(emojiDiv);
 
-    const text1 = document.createTextNode('Thank you! We will review your message and reply soon.');
+    const text1 = document.createTextNode('Opening Secure Form...');
     container.appendChild(text1);
 
     container.appendChild(document.createElement('br'));
 
-    const text2 = document.createTextNode('Typically next business day.');
+    const text2 = document.createTextNode('Please complete your request in the new tab.');
     container.appendChild(text2);
 
     o.appendChild(container);
