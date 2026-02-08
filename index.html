@@ -243,7 +243,7 @@ const PILL_LABELS = ['OT', 'NT', 'PS', 'PR'];
 
 const getSectionIndex = (vid) => {
     if (!vid) return -1;
-    const book = vid.split('.')[0];
+    const book = vid.substring(0, 3);
     if (book === 'PSA') return 2;
     if (book === 'PRO') return 3;
     return NT_BOOKS.has(book) ? 1 : 0;
@@ -332,8 +332,8 @@ const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
 
 const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed }) => {
     const vid = group[0];
-    const book = vid.split('.')[0];
-    const isHebrew = !['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'].includes(book);
+    const book = vid.substring(0, 3);
+    const isHebrew = !NT_BOOKS.has(book);
 
     // ⚡ Bolt Optimization: Memoize content generation to prevent expensive string operations
     // on every render (e.g. during scroll/highlight transitions).
