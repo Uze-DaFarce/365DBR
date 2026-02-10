@@ -19,3 +19,7 @@
 **Vulnerability:** Default crawler behavior indexes all accessible directories, potentially exposing `.git` metadata or internal documentation (`.Jules`) if server directory listing is enabled or paths are guessed.
 **Learning:** In static hosting environments without server-side access controls (like .htaccess), `robots.txt` acts as a critical line of defense against information leakage via search engines.
 **Prevention:** Explicitly `Disallow` known sensitive directories (like `/.git/` and `/.Jules/`) in `robots.txt` to prevent indexing.
+## 2026-02-08 - Defense in Depth with robots.txt
+**Vulnerability:** Default server configurations may inadvertently expose hidden directories (like `.git/` or `.Jules/`) containing sensitive metadata or journals.
+**Learning:** Relying solely on "security through obscurity" (hidden folders) or web server config is risky; `robots.txt` acts as an additional, though advisory, layer of defense against reputable crawlers.
+**Prevention:** Explicitly disallow sensitive paths in `robots.txt` to signal intent and prevent accidental indexing by search engines.
