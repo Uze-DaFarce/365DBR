@@ -66,3 +66,13 @@ Systematically apply `aria-hidden="true"` to all decorative icon containers. For
 2. **Focus Traps:** "Back to Top" buttons that disappear (via `visibility: hidden` or `display: none`) must explicitly move focus to a logical start point (e.g., Logo) to prevent leaving keyboard users stranded.
 **Action:**
 Applied `position: relative` to cards and `::after` overlay to links. Updated JS to focus logo on scroll-to-top.
+
+## 2026-02-06 - Form Handoff Pattern
+**Learning:**
+External forms (like Google Forms) create a disconnect when users click a "Contact" button and are immediately taken away. Standard "success" overlays on the original tab confuse users who haven't submitted anything yet.
+**Action:**
+Implemented a "Form Handoff" overlay:
+1. **Expectation Management:** Changed text from "Thank you" to "Opening Secure Form...".
+2. **Visual Cue:** Used a Memo emoji (📝) instead of Prayer Hands (🙏).
+3. **Accessibility:** Updated `aria-label` to explicitly state "Form Handoff".
+This pattern ensures users know they are entering a secure external flow.
