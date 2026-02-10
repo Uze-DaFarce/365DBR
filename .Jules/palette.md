@@ -25,3 +25,7 @@
 ## 2026-02-08 - Mode-Dependent Interactions
 **Learning:** During passive consumption modes (like auto-scrolling playback), "lean-in" interactive elements (like Copy buttons) become moving targets that create visual noise and user frustration.
 **Action:** Hide secondary interactive elements during passive modes (playback). The interface should be "calm" when the user is watching/listening, and "active" when the user is in control.
+
+## 2026-02-10 - Programmatic Shortcut Discovery
+**Learning:** While visual tooltips help mouse users discover keyboard shortcuts, screen reader users are often left guessing.
+**Action:** Always add the `aria-keyshortcuts` attribute (e.g., `aria-keyshortcuts="ArrowLeft"`) to interactive elements that have associated key listeners. This makes the invisible shortcuts explicit to assistive technologies without cluttering the visual UI.
