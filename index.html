@@ -35,6 +35,10 @@
   <!-- ⚡ Bolt: Preload Hero Image for LCP -->
   <link rel="preload" as="image" href="pics/backgrounds/hero.webp" fetchpriority="high">
 
+  <!-- ⚡ Bolt: Optimize External Connections -->
+  <link rel="preconnect" href="https://docs.google.com">
+  <link rel="dns-prefetch" href="https://docs.google.com">
+
   <!-- Security: Content Security Policy -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; frame-src 'none'; object-src 'none'; worker-src 'none'; base-uri 'self'; form-action 'self' https://docs.google.com; upgrade-insecure-requests; require-trusted-types-for 'script';">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -74,7 +78,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&amp;family=Source+Sans+Pro:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&amp;family=Source+Sans+Pro:wght@400;600&amp;display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -246,7 +250,7 @@
     }
     .hero-content { max-width: 900px; margin: 0 auto; }
     .hero h1 { color: #401b51; font-size: 64px; margin-bottom: 32px; letter-spacing: -0.03em; }
-    .hero p { font-size: 22px; color: #4b5563; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto; font-weight: 500; }
+    .hero p { font-size: 22px; color: #4b5563; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto; font-weight: 400; }
     .hero-cta { display: inline-flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
 
     /* Buttons */
@@ -348,10 +352,10 @@
     .package-featured { border: 2px solid #F4A623; transform: scale(1.05); z-index: 10; box-shadow: 0 20px 40px rgba(64, 27, 81, 0.1); }
     .package-badge { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); background-color: #F4A623; color: #401b51; padding: 6px 20px; border-radius: 24px; font-size: 14px; font-weight: 800; text-transform: uppercase; box-shadow: 0 4px 10px rgba(244, 166, 35, 0.4); }
     .package-name { font-size: 24px; font-weight: 700; color: #401b51; margin-bottom: 16px; }
-    .package-price { font-size: 48px; font-weight: 800; color: #401b51; margin-bottom: 32px; letter-spacing: -0.05em; }
+    .package-price { font-family: 'Inter', sans-serif; font-size: 48px; font-weight: 800; color: #401b51; margin-bottom: 32px; letter-spacing: -0.05em; }
     .package-features { list-style: none; text-align: left; margin-bottom: 40px; }
     .package-features li { padding: 16px 0; border-bottom: 1px solid #f3f4f6; display: flex; align-items: flex-start; gap: 16px; color: #4b5563; }
-    .check-icon { color: #10B981; font-weight: 800; flex-shrink: 0; background: rgba(16, 185, 129, 0.1); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .check-icon { color: #10B981; font-weight: 600; flex-shrink: 0; background: rgba(16, 185, 129, 0.1); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
 
     /* Team */
     .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-top: 48px; }
@@ -816,7 +820,7 @@
             </div>
             <div class="mission-box" style="background: linear-gradient(135deg, #401b51 0%, #2a3f6f 100%); color: #FFFFFF; padding: 48px; border-radius: 16px; border-left: 8px solid #F4A623; box-shadow: 0 10px 30px rgba(64, 27, 81, 0.15);">
               <h3 style="color: #F4A623; font-size: 28px;">Our Mission</h3>
-              <p style="font-style: italic; font-size: 24px; font-weight: 300; color: #FFFFFF;">"Each task, even the most ordinary, is sacred when done for God. We are called to work with excellence, integrity, and devotion, knowing that Christ Himself is whom we serve as we serve our clients."</p>
+              <p style="font-style: italic; font-size: 24px; font-weight: 400; color: #FFFFFF;">"Each task, even the most ordinary, is sacred when done for God. We are called to work with excellence, integrity, and devotion, knowing that Christ Himself is whom we serve as we serve our clients."</p>
             </div>
           </div>
           <div class="team-grid">
