@@ -457,7 +457,7 @@ def process_day(day_entry, api_key, output_dir):
     ]
     
     files_list = []
-    pending_writes = [] # (filepath, data) - Atomic Write Buffer
+    pending_writes = [] # Buffer for atomic writes
     
     for i, composite_rng_str in enumerate(ranges):
         if i >= len(section_defs): break
@@ -495,7 +495,7 @@ def process_day(day_entry, api_key, output_dir):
                 # Sentinel Integrity Check: Ensure verse count matches BIBLE_DATA
                 validate_content_integrity(data, rng_str)
 
-                # Atomic Write: Store in memory first
+                # Buffer the write instead of writing immediately
                 pending_writes.append((filepath, data))
                 files_list.append(filename)
                 time.sleep(0.1)
@@ -515,11 +515,11 @@ def process_day(day_entry, api_key, output_dir):
                 # If not recovered, raise
                 raise e
 
-    # All parts fetched successfully. Commit to disk.
-    print(f"  [Atomic Write] Writing {len(pending_writes)} files for Day {day_id}...")
-    for fpath, content in pending_writes:
+    # Commit the buffered writes (Atomic Write)
+    print(f"  Verifying and writing {len(pending_writes)} files for Day {day_id}...")
+    for fpath, fdata in pending_writes:
         with open(fpath, 'w', encoding='utf-8') as f:
-            json.dump(content, f, indent=2, ensure_ascii=False)
+            json.dump(fdata, f, indent=2, ensure_ascii=False)
 
     # Create Manifest
     manifest = {

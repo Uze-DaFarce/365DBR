@@ -240,11 +240,10 @@ const BIBLE_BOOK_ORDER_MAP = new Map(BIBLE_BOOK_ORDER.map((b, i) => [b, i]));
 const NT_BOOKS = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
 
 const PILL_LABELS = ['OT', 'NT', 'PS', 'PR'];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
 
 const getSectionIndex = (vid) => {
     if (!vid) return -1;
-    const book = vid.substring(0, 3);
+    const book = vid.split('.')[0];
     if (book === 'PSA') return 2;
     if (book === 'PRO') return 3;
     return NT_BOOKS.has(book) ? 1 : 0;
@@ -331,54 +330,10 @@ const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
     return parts.join(', ');
 };
 
-const CopyButton = ({ text, reference }) => {
-    const [status, setStatus] = useState('idle');
-
-    useEffect(() => {
-        setStatus('idle');
-    }, [text, reference]);
-
-    const handleCopy = async (e) => {
-        e.stopPropagation();
-        if (!navigator.clipboard) return;
-        try {
-            setStatus('copying');
-            const content = `${text}\n— ${reference}`;
-            await navigator.clipboard.writeText(content);
-            setStatus('copied');
-            setTimeout(() => setStatus('idle'), 2000);
-        } catch (err) {
-            console.error("Failed to copy", err);
-            setStatus('idle');
-        }
-    };
-
-    return (
-        <button
-            onClick={handleCopy}
-            type="button"
-            className="ml-2 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-            aria-label={status === 'copied' ? "Copied" : "Copy verse"}
-            title="Copy to Clipboard"
-        >
-            {status === 'copied' ? (
-                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-green-600" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-            ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-current opacity-50 hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                </svg>
-            )}
-        </button>
-    );
-};
-
-const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying }) => {
+const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed }) => {
     const vid = group[0];
-    const book = vid.substring(0, 3);
-    // ⚡ Bolt Optimization: Use O(1) Set lookup instead of O(N) array includes + allocation
-    const isHebrew = !NT_BOOKS.has(book);
+    const book = vid.split('.')[0];
+    const isHebrew = !['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'].includes(book);
 
     // ⚡ Bolt Optimization: Memoize content generation to prevent expensive string operations
     // on every render (e.g. during scroll/highlight transitions).
@@ -495,11 +450,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                         </a>
                         )}
                     </span>
-                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>
-                        <span>{displayLabel}</span>
-                        {isActive && !isPlaying && <CopyButton text={text} reference={displayLabel} />}
-                    </div>
-                    </div>
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>{displayLabel}</span></div>
                     <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-400'}`}>{text}</div>
                 </div>
                 );
@@ -511,6 +462,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
 // Helper to format MMDD into a human date like "Jan 2nd"
 const formatDate = (mmdd) => {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
   const m = parseInt(mmdd.substring(0, 2)) - 1;
   const d = parseInt(mmdd.substring(2, 4));
   const j = d % 10, k = d % 100;
@@ -518,7 +470,7 @@ const formatDate = (mmdd) => {
   if (j == 1 && k != 11) suffix = "st";
   else if (j == 2 && k != 12) suffix = "nd";
   else if (j == 3 && k != 13) suffix = "rd";
-  return `${MONTHS[m]} ${d}${suffix}`;
+  return `${months[m]} ${d}${suffix}`;
 };
 
 const Loader = () => (
@@ -1151,7 +1103,6 @@ const App = () => {
                     dynamicSlots={dynamicSlots}
                     isActive={isActive}
                     isDimmed={isDimmed}
-                    isPlaying={isPlaying}
                 />
             );
         })}
