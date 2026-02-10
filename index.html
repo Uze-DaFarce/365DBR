@@ -240,7 +240,6 @@ const BIBLE_BOOK_ORDER_MAP = new Map(BIBLE_BOOK_ORDER.map((b, i) => [b, i]));
 const NT_BOOKS = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
 
 const PILL_LABELS = ['OT', 'NT', 'PS', 'PR'];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
 
 const getSectionIndex = (vid) => {
     if (!vid) return -1;
@@ -334,7 +333,6 @@ const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
 const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed }) => {
     const vid = group[0];
     const book = vid.substring(0, 3);
-    // ⚡ Bolt Optimization: Use O(1) Set lookup instead of O(N) array includes + allocation
     const isHebrew = !NT_BOOKS.has(book);
 
     // ⚡ Bolt Optimization: Memoize content generation to prevent expensive string operations
@@ -464,6 +462,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
 // Helper to format MMDD into a human date like "Jan 2nd"
 const formatDate = (mmdd) => {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
   const m = parseInt(mmdd.substring(0, 2)) - 1;
   const d = parseInt(mmdd.substring(2, 4));
   const j = d % 10, k = d % 100;
@@ -471,7 +470,7 @@ const formatDate = (mmdd) => {
   if (j == 1 && k != 11) suffix = "st";
   else if (j == 2 && k != 12) suffix = "nd";
   else if (j == 3 && k != 13) suffix = "rd";
-  return `${MONTHS[m]} ${d}${suffix}`;
+  return `${months[m]} ${d}${suffix}`;
 };
 
 const Loader = () => (
