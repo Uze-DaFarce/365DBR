@@ -244,7 +244,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept"
 
 const getSectionIndex = (vid) => {
     if (!vid) return -1;
-    const book = vid.split('.')[0];
+    const book = vid.substring(0, 3);
     if (book === 'PSA') return 2;
     if (book === 'PRO') return 3;
     return NT_BOOKS.has(book) ? 1 : 0;
@@ -333,7 +333,7 @@ const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
 
 const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed }) => {
     const vid = group[0];
-    const book = vid.split('.')[0];
+    const book = vid.substring(0, 3);
     // ⚡ Bolt Optimization: Use O(1) Set lookup instead of O(N) array includes + allocation
     const isHebrew = !NT_BOOKS.has(book);
 
