@@ -21,3 +21,7 @@
 ## 2026-02-08 - Contextual Actions on Active State
 **Learning:** In a long list of items (verses), placing action buttons (like Copy) on every item creates visual clutter and tab-order fatigue.
 **Action:** Only reveal contextual actions on the "active" or "focused" item. This keeps the UI clean while ensuring the feature is available when the user's attention is on that specific content. Use conditional rendering (e.g., `{isActive && <Button />}`) to manage focus order efficiently.
+
+## 2026-02-08 - Mode-Dependent Interactions
+**Learning:** During passive consumption modes (like auto-scrolling playback), "lean-in" interactive elements (like Copy buttons) become moving targets that create visual noise and user frustration.
+**Action:** Hide secondary interactive elements during passive modes (playback). The interface should be "calm" when the user is watching/listening, and "active" when the user is in control.

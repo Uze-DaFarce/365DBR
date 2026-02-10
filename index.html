@@ -373,7 +373,7 @@ const CopyButton = ({ text, reference }) => {
     );
 };
 
-const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed }) => {
+const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying }) => {
     const vid = group[0];
     const book = vid.split('.')[0];
     const isHebrew = !['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JN', '2JN', '3JN', 'JUD', 'REV'].includes(book);
@@ -495,7 +495,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                     </span>
                     <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>
                         <span>{displayLabel}</span>
-                        {isActive && <CopyButton text={text} reference={displayLabel} />}
+                        {isActive && !isPlaying && <CopyButton text={text} reference={displayLabel} />}
                     </div>
                     </div>
                     <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-400'}`}>{text}</div>
@@ -1150,6 +1150,7 @@ const App = () => {
                     dynamicSlots={dynamicSlots}
                     isActive={isActive}
                     isDimmed={isDimmed}
+                    isPlaying={isPlaying}
                 />
             );
         })}
