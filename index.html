@@ -220,6 +220,19 @@ const loadDailyBread = async (dateFolder) => {
   
   // Sort keys to ensure consistent order (e.g. KJV, LSV, etc.)
   const sortedKeys = Array.from(availableKeys).filter(k => k !== 'original');
+
+  // ⚡ Bolt Optimization: Flatten text arrays into single strings to reduce memory and render cost
+  Object.values(verseMap).forEach(verseData => {
+      Object.keys(verseData).forEach(key => {
+          const entry = verseData[key];
+          if (entry.text && Array.isArray(entry.text)) {
+              const config = TRANSLATION_REGISTRY[key];
+              const separator = config && config.isHebrewGreek ? '' : ' ';
+              entry.text = entry.text.join(separator);
+          }
+      });
+  });
+
   return { verseMap, label: manifest.label, availableTranslations: sortedKeys };
 };
 
@@ -394,9 +407,9 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
             group.forEach((gVid) => {
                 const data = verseMap[gVid];
                 const slotData = data ? data[slot.source] : null;
-                if (slotData && slotData.text && slotData.text.length > 0) {
-                    const sep = (slot.isHebrewGreek) ? ' ' : ' ';
-                    fullText += (fullText ? sep : '') + slotData.text.join(slot.isHebrewGreek ? '' : ' ');
+                if (slotData && slotData.text) {
+                    // ⚡ Bolt Optimization: Text is now pre-joined in loadDailyBread
+                    fullText += (fullText ? ' ' : '') + slotData.text;
 
                     contributing.push(slotData.displayVid || gVid);
                 }
