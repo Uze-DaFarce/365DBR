@@ -23,3 +23,8 @@
 **Vulnerability:** Default server configurations may inadvertently expose hidden directories (like `.git/` or `.Jules/`) containing sensitive metadata or journals.
 **Learning:** Relying solely on "security through obscurity" (hidden folders) or web server config is risky; `robots.txt` acts as an additional, though advisory, layer of defense against reputable crawlers.
 **Prevention:** Explicitly disallow sensitive paths in `robots.txt` to signal intent and prevent accidental indexing by search engines.
+
+## 2026-02-09 - CSP Violation by Inline Scripts
+**Vulnerability:** An inline script block for critical functionality (clipboard copy) violated the strict `script-src 'self'` CSP directive, rendering the feature non-functional.
+**Learning:** Defining a strict CSP in `<meta>` tags without auditing existing codebase for inline scripts creates a false sense of security and breaks functionality.
+**Prevention:** Audit all `<script>` tags before enforcing `script-src 'self'`. Move logic to external files to ensure compliance and functionality.
