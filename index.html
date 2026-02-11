@@ -344,7 +344,7 @@ const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
     return parts.join(', ');
 };
 
-const CopyButton = ({ text, reference }) => {
+const CopyButton = ({ text, reference, ...props }) => {
     const [status, setStatus] = useState('idle');
 
     useEffect(() => {
@@ -368,6 +368,7 @@ const CopyButton = ({ text, reference }) => {
 
     return (
         <button
+            {...props}
             onClick={handleCopy}
             type="button"
             className="ml-2 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
@@ -459,7 +460,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
     }, [group, verseMap, dynamicSlots, isHebrew]);
 
     return (
-        <div id={`verse-${vid}`} className={`verse-block transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'}`}>
+        <div id={`verse-${vid}`} className={`verse-block group transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'}`}>
             <div className="flex flex-col gap-1">
             {/* SLOT 1: TOP (Usually Original) */}
             {(() => {
@@ -510,7 +511,16 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                     </span>
                     <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? 'text-amber-700' : 'text-stone-300'}`}>
                         <span>{displayLabel}</span>
-                        {isActive && !isPlaying && <CopyButton text={text} reference={displayLabel} />}
+                        {!isPlaying && (
+                            <span className={`transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100'}`}>
+                                <CopyButton
+                                    text={text}
+                                    reference={displayLabel}
+                                    tabIndex={isActive ? 0 : -1}
+                                    aria-hidden={!isActive}
+                                />
+                            </span>
+                        )}
                     </div>
                     </div>
                     <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-400'}`}>{text}</div>

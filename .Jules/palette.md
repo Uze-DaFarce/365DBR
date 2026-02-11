@@ -33,3 +33,7 @@
 ## 2026-02-18 - Quick Return to Present
 **Learning:** In date-based navigation apps, users often get lost in past/future dates and need a quick way to return to "Today" without manually navigating or refreshing.
 **Action:** Make the current date display interactive (e.g., a button) when it deviates from the actual today, providing a one-click "Jump to Today" action.
+
+## 2026-02-24 - Progressive Disclosure for Mouse vs Keyboard
+**Learning:** Mouse users can easily scan and target arbitrary items, while keyboard users rely on linear navigation. Forcing keyboard users to tab through actions for every item in a long list is tedious.
+**Action:** Allow mouse users to reveal actions via hover on *any* item (using `group-hover`), but restrict keyboard access (via `tabIndex`) to only the *active* or *focused* item to keep the tab order clean.
