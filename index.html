@@ -377,6 +377,68 @@
     .contact-details a { color: #4b5563; text-decoration: none; transition: color 0.3s ease; }
     .contact-details a:hover { color: #F4A623; }
 
+
+    /* 🎨 Palette: Copy Button UX */
+    .copy-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 8px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.2s ease;
+      vertical-align: middle;
+      gap: 4px;
+    }
+    .copy-btn:hover {
+      color: #F4A623;
+      background-color: rgba(64, 27, 81, 0.05);
+      transform: scale(1.1);
+    }
+    .copy-btn:focus-visible {
+      outline: 2px solid #F4A623;
+      outline-offset: 2px;
+      color: #401b51;
+    }
+
+    /* Tooltip */
+    .tooltip-text {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #401b51;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      animation: fadeIn 0.2s forwards;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+    .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -4px;
+      border-width: 4px;
+      border-style: solid;
+      border-color: #401b51 transparent transparent transparent;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
     /* Footer */
     footer { background-color: #2e133a; color: #e5e7eb; padding: 80px 24px 40px; border-top: 4px solid #F4A623; }
     .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; flex-wrap: wrap; gap: 64px; margin-bottom: 48px; text-align: center; }
