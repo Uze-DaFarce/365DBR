@@ -101,6 +101,26 @@ const navTargets = Array.from(navLinks).map(link => {
   };
 }).filter(item => item.target !== null);
 
+// ⚡ Bolt: Cache offsets to prevent reflow during scroll
+let sectionOffsets = [];
+function updateOffsets() {
+  sectionOffsets = navTargets.map(item => ({
+    link: item.link,
+    offset: item.target.offsetTop
+  }));
+}
+
+// Initial cache
+updateOffsets();
+
+// Update offsets when layout changes (e.g. reviews toggle)
+if (window.ResizeObserver) {
+  new ResizeObserver(updateOffsets).observe(document.body);
+} else {
+  // Fallback
+  window.addEventListener('resize', updateOffsets);
+}
+
 const backToTopBtn = document.getElementById('back-to-top');
 
 // ⚡ Bolt: Optimize Scroll Handling
@@ -126,12 +146,13 @@ function updateScrollState(scrollY) {
   const offset = 120; // Header height + buffer
   let activeLink = null;
 
-  // Find the last section that has been passed
-  navTargets.forEach(item => {
-    if (scrollY >= item.target.offsetTop - offset) {
-      activeLink = item.link;
+  // Find the last section that has been passed (Iterate backwards for efficiency)
+  for (let i = sectionOffsets.length - 1; i >= 0; i--) {
+    if (scrollY >= sectionOffsets[i].offset - offset) {
+      activeLink = sectionOffsets[i].link;
+      break;
     }
-  });
+  }
 
   // Only update DOM if active link changed
   if (activeLink !== lastActiveLink) {
