@@ -103,6 +103,17 @@ const navTargets = Array.from(navLinks).map(link => {
 
 // ⚡ Bolt: Cache offsets to prevent reflow during scroll
 let sectionOffsets = [];
+
+// ⚡ Bolt: Debounce function to limit execution frequency
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
+
 function updateOffsets() {
   sectionOffsets = navTargets.map(item => ({
     link: item.link,
@@ -113,12 +124,15 @@ function updateOffsets() {
 // Initial cache
 updateOffsets();
 
+// ⚡ Bolt: Debounce resize handler to prevent layout thrashing
+const debouncedUpdateOffsets = debounce(updateOffsets, 100);
+
 // Update offsets when layout changes (e.g. reviews toggle)
 if (window.ResizeObserver) {
-  new ResizeObserver(updateOffsets).observe(document.body);
+  new ResizeObserver(debouncedUpdateOffsets).observe(document.body);
 } else {
   // Fallback
-  window.addEventListener('resize', updateOffsets);
+  window.addEventListener('resize', debouncedUpdateOffsets);
 }
 
 const backToTopBtn = document.getElementById('back-to-top');
