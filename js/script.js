@@ -202,24 +202,77 @@ if (backToTopBtn) {
   });
 }
 
+// Helper to create SVG elements
+function createSVG(type) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  svg.setAttribute('width', '18');
+  svg.setAttribute('height', '18');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+
+  if (type === 'check') {
+    const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    polyline.setAttribute('points', '20 6 9 17 4 12');
+    svg.appendChild(polyline);
+  } else if (type === 'copy') {
+    svg.classList.add('copy-icon');
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', '9');
+    rect.setAttribute('y', '9');
+    rect.setAttribute('width', '13');
+    rect.setAttribute('height', '13');
+    rect.setAttribute('rx', '2');
+    rect.setAttribute('ry', '2');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1');
+    svg.appendChild(rect);
+    svg.appendChild(path);
+  }
+  return svg;
+}
+
 // Copy to Clipboard logic
 const copyBtn = document.querySelector('.copy-btn');
 if (copyBtn) {
   copyBtn.addEventListener('click', () => {
     const email = 'truth@mt-sin.ai';
-    navigator.clipboard.writeText(email).then(() => {
-      // const originalHTML = copyBtn.innerHTML;
-      copyBtn.classList.add('copied');
-      copyBtn.setAttribute('aria-label', 'Email copied');
+    navigator.clipboard.writeText(email)
+      .then(() => {
+        copyBtn.classList.add('copied');
+        copyBtn.setAttribute('aria-label', 'Email copied');
 
-      // Change icon to checkmark
-      copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span class="tooltip-text">Copied!</span>';
+        // Clear existing content safely
+        while (copyBtn.firstChild) {
+          copyBtn.removeChild(copyBtn.firstChild);
+        }
 
-      setTimeout(() => {
-        copyBtn.classList.remove('copied');
-        copyBtn.setAttribute('aria-label', 'Copy email address');
-        copyBtn.innerHTML = '<svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-      }, 2000);
-    });
+        // Add Check Icon
+        copyBtn.appendChild(createSVG('check'));
+
+        // Add Tooltip text
+        const tooltip = document.createElement('span');
+        tooltip.className = 'tooltip-text';
+        tooltip.textContent = 'Copied!';
+        copyBtn.appendChild(tooltip);
+
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyBtn.setAttribute('aria-label', 'Copy email address');
+
+          // Clear and restore original icon
+          while (copyBtn.firstChild) {
+            copyBtn.removeChild(copyBtn.firstChild);
+          }
+          copyBtn.appendChild(createSVG('copy'));
+        }, 2000);
+      })
+      .catch(err => {
+        console.error('Failed to copy: ', err);
+      });
   });
 }
