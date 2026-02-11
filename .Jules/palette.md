@@ -29,3 +29,7 @@
 ## 2026-02-10 - Programmatic Shortcut Discovery
 **Learning:** While visual tooltips help mouse users discover keyboard shortcuts, screen reader users are often left guessing.
 **Action:** Always add the `aria-keyshortcuts` attribute (e.g., `aria-keyshortcuts="ArrowLeft"`) to interactive elements that have associated key listeners. This makes the invisible shortcuts explicit to assistive technologies without cluttering the visual UI.
+
+## 2026-02-18 - Quick Return to Present
+**Learning:** In date-based navigation apps, users often get lost in past/future dates and need a quick way to return to "Today" without manually navigating or refreshing.
+**Action:** Make the current date display interactive (e.g., a button) when it deviates from the actual today, providing a one-click "Jump to Today" action.

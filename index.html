@@ -594,6 +594,13 @@ const App = () => {
 
   const initialState = useMemo(() => getInitialState(), []);
 
+  const todayString = useMemo(() => {
+    const now = new Date();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${m}${d}`;
+  }, []);
+
   const [verseMap, setVerseMap] = useState(null);
   const [readingLabel, setReadingLabel] = useState("");
   const [loading, setLoading] = useState(true);
@@ -1028,7 +1035,20 @@ const App = () => {
           <div className="flex items-center gap-1 min-w-0 flex-1">
              <div className="flex items-center bg-stone-100 rounded-md px-0.5">
                <button onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" title="Previous Day (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
-               <h1 className="text-[11px] md:text-sm font-black text-stone-900 uppercase px-1 whitespace-nowrap">{formatDate(currentDate)}</h1>
+               <h1 className="text-[11px] md:text-sm font-black text-stone-900 uppercase whitespace-nowrap flex items-center">
+                  {currentDate === todayString ? (
+                      <span className="px-1 cursor-default">{formatDate(currentDate)}</span>
+                  ) : (
+                      <button
+                          onClick={() => { setCurrentDate(todayString); window.scrollTo({ top: 0 }); }}
+                          title="Jump to Today"
+                          aria-label={`Current reading: ${formatDate(currentDate)}. Click to jump to Today.`}
+                          className="px-1 hover:text-amber-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"
+                      >
+                          {formatDate(currentDate)}
+                      </button>
+                  )}
+               </h1>
                <button onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" title="Next Day (Right Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></button>
              </div>
              <div className="flex items-center gap-1 min-w-0 overflow-hidden">
