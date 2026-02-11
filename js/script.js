@@ -11,13 +11,34 @@ document.querySelectorAll('a[href*="docs.google.com"]').forEach(trigger => {
     // Added cursor: pointer to indicate interactivity
     o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(64,27,81,0.95);color:white;z-index:9999;display:flex;align-items:center;justify-content:center;font-size:18px;text-align:center;padding:20px;cursor:pointer;';
 
+    // 🎨 Palette: Add accessible Close Button
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.setAttribute('aria-label', 'Close');
+    closeBtn.style.cssText = 'position:absolute;top:20px;right:20px;background:none;border:none;color:white;font-size:32px;cursor:pointer;padding:8px;line-height:1;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background-color 0.2s;';
+
+    // Add hover effect via JS since we are using inline styles
+    closeBtn.onmouseenter = () => closeBtn.style.backgroundColor = 'rgba(255,255,255,0.1)';
+    closeBtn.onmouseleave = () => closeBtn.style.backgroundColor = 'transparent';
+
+    // Focus style for keyboard accessibility
+    closeBtn.onfocus = () => closeBtn.style.outline = '2px solid white';
+    closeBtn.onblur = () => closeBtn.style.outline = 'none';
+
+    o.appendChild(closeBtn);
+
     // Security enhancement: Use DOM creation instead of innerHTML to prevent XSS risks
     const container = document.createElement('div');
+    // Ensure description is linked for accessibility
+    const descId = 'form-handoff-desc';
+    container.id = descId;
+    o.setAttribute('aria-describedby', descId);
 
     const emojiDiv = document.createElement('div');
     emojiDiv.style.fontSize = '40px';
     emojiDiv.style.marginBottom = '12px';
     emojiDiv.textContent = '📝';
+    emojiDiv.setAttribute('aria-hidden', 'true'); // Hide decorative emoji from screen readers
     container.appendChild(emojiDiv);
 
     const text1 = document.createTextNode('Opening Secure Form...');
