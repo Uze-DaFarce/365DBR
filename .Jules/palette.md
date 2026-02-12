@@ -37,3 +37,11 @@
 ## 2026-02-24 - Progressive Disclosure for Mouse vs Keyboard
 **Learning:** Mouse users can easily scan and target arbitrary items, while keyboard users rely on linear navigation. Forcing keyboard users to tab through actions for every item in a long list is tedious.
 **Action:** Allow mouse users to reveal actions via hover on *any* item (using `group-hover`), but restrict keyboard access (via `tabIndex`) to only the *active* or *focused* item to keep the tab order clean.
+
+## 2026-02-24 - Discoverability vs Clutter
+**Learning:** While "hover-to-reveal" reduces visual clutter, users perceive it as "hidden" or "easter egg" functionality for core utilities like Copying.
+**Action:** For primary actions (like Copy), prefer persistent visibility (even if subtle) over hidden states. Use opacity/color to manage visual weight instead of  or .
+
+## 2026-02-24 - Discoverability vs Clutter
+**Learning:** While "hover-to-reveal" reduces visual clutter, users perceive it as "hidden" or "easter egg" functionality for core utilities like Copying.
+**Action:** For primary actions (like Copy), prefer persistent visibility (even if subtle) over hidden states. Use opacity/color to manage visual weight instead of `display:none` or `opacity:0`.
