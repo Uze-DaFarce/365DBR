@@ -11,13 +11,41 @@ document.querySelectorAll('a[href*="docs.google.com"]').forEach(trigger => {
     // Added cursor: pointer to indicate interactivity
     o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(64,27,81,0.95);color:white;z-index:9999;display:flex;align-items:center;justify-content:center;font-size:18px;text-align:center;padding:20px;cursor:pointer;';
 
+    // 🎨 Palette: Add accessible Close Button
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.setAttribute('aria-label', 'Close');
+    // Enlarge button and add semi-transparent circle for maximum visibility
+    closeBtn.style.cssText = 'position:absolute;top:32px;right:32px;background:rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.5);color:white;font-size:48px;cursor:pointer;padding:0;line-height:1;width:80px;height:80px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all 0.2s ease;box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
+
+    // Add hover effect via JS since we are using inline styles
+    closeBtn.onmouseenter = () => {
+      closeBtn.style.backgroundColor = 'rgba(255,255,255,0.2)';
+      closeBtn.style.transform = 'scale(1.1)';
+    };
+    closeBtn.onmouseleave = () => {
+      closeBtn.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      closeBtn.style.transform = 'scale(1)';
+    };
+
+    // Focus style for keyboard accessibility
+    closeBtn.onfocus = () => closeBtn.style.outline = '2px solid white';
+    closeBtn.onblur = () => closeBtn.style.outline = 'none';
+
+    o.appendChild(closeBtn);
+
     // Security enhancement: Use DOM creation instead of innerHTML to prevent XSS risks
     const container = document.createElement('div');
+    // Ensure description is linked for accessibility
+    const descId = 'form-handoff-desc';
+    container.id = descId;
+    o.setAttribute('aria-describedby', descId);
 
     const emojiDiv = document.createElement('div');
     emojiDiv.style.fontSize = '40px';
     emojiDiv.style.marginBottom = '12px';
     emojiDiv.textContent = '📝';
+    emojiDiv.setAttribute('aria-hidden', 'true'); // Hide decorative emoji from screen readers
     container.appendChild(emojiDiv);
 
     const text1 = document.createTextNode('Opening Secure Form...');
