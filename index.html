@@ -889,7 +889,8 @@ const App = () => {
     group.forEach(gVid => {
         const slotData = verseMap[gVid] ? verseMap[gVid][focalSlot.source] : null;
         if (slotData && slotData.text) {
-            groupText += slotData.text.join(' ').trim() + ' ';
+            const textStr = Array.isArray(slotData.text) ? slotData.text.join(' ') : slotData.text;
+            groupText += textStr.trim() + ' ';
         }
     });
     
