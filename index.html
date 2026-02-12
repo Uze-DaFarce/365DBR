@@ -221,7 +221,8 @@ const loadDailyBread = async (dateFolder) => {
   // Sort keys to ensure consistent order (e.g. KJV, LSV, etc.)
   const sortedKeys = Array.from(availableKeys).filter(k => k !== 'original');
 
-  // ⚡ Bolt Optimization: Flatten text arrays into single strings to reduce memory and render cost
+  // ⚡ Bolt Optimization: Flatten text arrays into single strings to reduce memory and render cost.
+  // WARNING: If this logic changes (e.g., reverting to arrays), ensure `playVerse` is updated to handle the new format.
   Object.values(verseMap).forEach(verseData => {
       Object.keys(verseData).forEach(key => {
           const entry = verseData[key];
@@ -889,7 +890,9 @@ const App = () => {
     group.forEach(gVid => {
         const slotData = verseMap[gVid] ? verseMap[gVid][focalSlot.source] : null;
         if (slotData && slotData.text) {
-            groupText += slotData.text.join(' ').trim() + ' ';
+            // Robustly handle string (optimized) or array (defensive) text
+            const textStr = Array.isArray(slotData.text) ? slotData.text.join(' ') : slotData.text;
+            groupText += textStr.trim() + ' ';
         }
     });
     
