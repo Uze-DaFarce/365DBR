@@ -1172,8 +1172,10 @@ const App = () => {
         ) : groupedVids.map(group => {
             const vid = group[0];
             const isPlaying = playbackStatus === 'playing';
-            const isCurrentGroup = isPlaying ? group.includes(playbackVerseId) : false;
-            const isActive = isPlaying ? isCurrentGroup : group.includes(activeVerseId);
+            // ⚡ Bolt Optimization: Short-circuit includes() checks for single-item groups (99% of cases).
+            // This avoids O(N) array scans in the hot render path.
+            const isCurrentGroup = isPlaying ? (playbackVerseId === vid || (group.length > 1 && group.includes(playbackVerseId))) : false;
+            const isActive = isPlaying ? isCurrentGroup : (activeVerseId === vid || (group.length > 1 && group.includes(activeVerseId)));
             const isDimmed = isPlaying && !isCurrentGroup;
 
             return (
