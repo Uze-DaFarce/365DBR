@@ -19,9 +19,9 @@ API_BASE_URL = "https://rest.api.bible/v1"
 
 # Hebrew/Greek Verse Counts (Imported from generate_readings.py)
 try:
-    from generate_readings import BIBLE_DATA, BOOK_NAMES
+    from generate_readings import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, NT_BOOKS
 except ImportError:
-    print("Error: Could not import BIBLE_DATA or BOOK_NAMES from generate_readings.py")
+    print("Error: Could not import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, or NT_BOOKS from generate_readings.py")
     exit(1)
 
 # Map Standard Book IDs to OT Hebrew Bible Specific IDs
@@ -32,6 +32,41 @@ OT_HEBREW_BOOK_MAP = {
 }
 
 NAME_TO_CODE = {v: k for k, v in BOOK_NAMES.items()}
+
+def validate_range_for_section(section, range_str):
+    """
+    Validates that the books in the range string belong to the expected section.
+    OT: OT_SEQUENTIAL_BOOKS (Gen-Mal, excluding Psa/Pro)
+    NT: NT_BOOKS (Mat-Rev)
+    PSA: ['PSA']
+    PRO: ['PRO']
+    """
+    parts = range_str.split('-')
+    # Check start and end books.
+    # Intermediate books in split ranges are handled by the fact that split_cross_book_range
+    # generates new ranges, which are then queued and validated individually here.
+
+    books_to_check = [parts[0].split('.')[0]]
+    if len(parts) > 1:
+        books_to_check.append(parts[1].split('.')[0])
+
+    allowed_books = []
+    if section == "OT":
+        allowed_books = OT_SEQUENTIAL_BOOKS
+    elif section == "NT":
+        allowed_books = NT_BOOKS
+    elif section == "PSA":
+        allowed_books = ["PSA"]
+    elif section == "PRO":
+        allowed_books = ["PRO"]
+    else:
+        # Should not happen given hardcoded sections, but safe to ignore unknowns or raise error.
+        # Failing fast is better.
+        raise ValueError(f"[Data Integrity] Unknown section '{section}'.")
+
+    for book in books_to_check:
+        if book not in allowed_books:
+            raise ValueError(f"[Data Integrity] Book '{book}' is not allowed in section '{section}'. Corruption detected.")
 
 def get_api_key():
     key = os.environ.get("API_BIBLE_KEY")
@@ -396,6 +431,10 @@ def process_day(day_entry, api_key, output_dir):
             # Security Check: Validate rng_str
             if not validate_safe_path(rng_str):
                 raise ValueError(f"[Security Error] Invalid range string detected: '{rng_str}'. Path traversal characters detected.")
+
+            # Integrity Check: Validate range belongs to section
+            # This catches cases where a split range (e.g. from a 404 recovery) might include prohibited books for the section.
+            validate_range_for_section(section_name, rng_str)
 
             filename = f"{rng_str}.json"
             filepath = os.path.join(day_dir, filename)
