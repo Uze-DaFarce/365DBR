@@ -15,11 +15,18 @@ document.querySelectorAll('a[href*="docs.google.com"]').forEach(trigger => {
     const closeBtn = document.createElement('button');
     closeBtn.textContent = '✕';
     closeBtn.setAttribute('aria-label', 'Close');
-    closeBtn.style.cssText = 'position:absolute;top:20px;right:20px;background:none;border:none;color:white;font-size:32px;cursor:pointer;padding:8px;line-height:1;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background-color 0.2s;';
+    // Enlarge button and add semi-transparent circle for maximum visibility
+    closeBtn.style.cssText = 'position:absolute;top:32px;right:32px;background:rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.5);color:white;font-size:48px;cursor:pointer;padding:0;line-height:1;width:80px;height:80px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all 0.2s ease;box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
 
     // Add hover effect via JS since we are using inline styles
-    closeBtn.onmouseenter = () => closeBtn.style.backgroundColor = 'rgba(255,255,255,0.1)';
-    closeBtn.onmouseleave = () => closeBtn.style.backgroundColor = 'transparent';
+    closeBtn.onmouseenter = () => {
+      closeBtn.style.backgroundColor = 'rgba(255,255,255,0.2)';
+      closeBtn.style.transform = 'scale(1.1)';
+    };
+    closeBtn.onmouseleave = () => {
+      closeBtn.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      closeBtn.style.transform = 'scale(1)';
+    };
 
     // Focus style for keyboard accessibility
     closeBtn.onfocus = () => closeBtn.style.outline = '2px solid white';
