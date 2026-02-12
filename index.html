@@ -1233,6 +1233,13 @@ const App = () => {
         
         <div className="max-w-4xl mx-auto text-[8px] md:text-[8px] text-stone-500 leading-relaxed text-center font-serif">
           <span className="font-serif italic block mb-1 tracking-widest text-stone-400 max-w-xl mx-auto">{readingLabel}</span>
+
+          <div className="flex justify-center gap-4 my-2 text-[9px] text-stone-400 font-mono uppercase tracking-wider select-none">
+            <span className="flex items-center gap-1"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center">←</kbd> Prev</span>
+            <span className="flex items-center gap-1"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center">→</kbd> Next</span>
+            <span className="flex items-center gap-1"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center">K</kbd> Play/Pause</span>
+          </div>
+
           <p className="mb-2 text-[7px] text-stone-400">
             <span id="orig-note">* OH = Original Hebrew / OG = Original Greek versification.</span>
           </p>
