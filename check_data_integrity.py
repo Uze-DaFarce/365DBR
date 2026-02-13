@@ -6,20 +6,17 @@ import time
 import urllib.request
 import urllib.error
 import urllib.parse
+import re
 
-# Import BIBLE_DATA from generate_readings (assuming it's in the same directory)
-# If import fails, we define a fallback or exit.
+# Import BIBLE_DATA and ALL_BOOKS from generate_readings
 try:
-    from generate_readings import BIBLE_DATA
+    from generate_readings import BIBLE_DATA, ALL_BOOKS
 except ImportError:
-    print("Error: Could not import BIBLE_DATA from generate_readings.py")
+    print("Error: Could not import BIBLE_DATA or ALL_BOOKS from generate_readings.py")
     sys.exit(1)
 
 # API Configuration (Shared with fetch_readings logic)
 API_BASE_URL = "https://rest.api.bible/v1"
-# We need an arbitrary version ID to check metadata.
-# Using KJV (de4e12af7f28f599-01) as a standard reference for verse counts usually matches Protestant canon.
-# However, the repo uses OT_HEBREW_ID for OT counts.
 OT_HEBREW_ID = "0b262f1ed7f084a6-01"
 NT_GREEK_ID = "7644de2e4c5188e5-01"
 
@@ -39,7 +36,7 @@ def get_expected_verse_count(range_str):
     """
     Calculates the expected verse count for a given range string (e.g. 'GEN.1.1-GEN.1.31')
     using the local BIBLE_DATA source of truth.
-    Handles semicolon-separated multi-ranges (e.g. 'A-B;C-D').
+    Handles semicolon-separated multi-ranges and cross-book ranges correctly.
     """
     if ';' in range_str:
         total = 0
@@ -55,57 +52,89 @@ def get_expected_verse_count(range_str):
     end = parse_reference(end_str)
 
     if not start or not end:
+        print(f"Error: Invalid reference format in {range_str}")
         return 0
 
     s_book, s_chap, s_verse = start
     e_book, e_chap, e_verse = end
 
-    if s_book != e_book:
-        # Cross-book logic not implemented for simple verification yet,
-        # but readings.json usually splits them or handles them.
-        # Actually generate_readings handles cross-book ranges in one string: "NUM.36.1-DEU.1.46"
-        # We need to handle this.
-
-        # 1. Count verses in start book from s_chap:s_verse to end
-        total = 0
-
-        # Start Book
-        # Remaining verses in start chapter
-        chapters = BIBLE_DATA[s_book]
-        total += (chapters[s_chap-1] - s_verse + 1)
-        # Remaining chapters in start book
-        for c in range(s_chap, len(chapters)):
-            total += chapters[c]
-
-        # Intermediate Books (if any) - simplified, assuming adjacent for now or loop through order
-        # (Skipping full implementation for brevity unless needed, assuming adjacent books for daily readings)
-
-        # End Book
-        # Verses in end chapter
-        total += e_verse
-        # Full chapters before end chapter
-        chapters_end = BIBLE_DATA[e_book]
-        for c in range(0, e_chap-1):
-            total += chapters_end[c]
-
-        return total
+    # Validate books exist
+    if s_book not in BIBLE_DATA:
+        print(f"Error: Unknown book {s_book}")
+        return 0
+    if e_book not in BIBLE_DATA:
+        print(f"Error: Unknown book {e_book}")
+        return 0
 
     # Same Book
-    if s_chap == e_chap:
-        return e_verse - s_verse + 1
+    if s_book == e_book:
+        if s_chap == e_chap:
+            return e_verse - s_verse + 1
 
-    # Same Book, Different Chapters
-    chapters = BIBLE_DATA[s_book]
-    total = (chapters[s_chap-1] - s_verse + 1) # Rest of start chapter
+        # Same Book, Different Chapters
+        chapters = BIBLE_DATA[s_book]
+        # Rest of start chapter
+        total = (chapters[s_chap-1] - s_verse + 1)
 
-    for c in range(s_chap, e_chap-1):
-        total += chapters[c] # Full intermediate chapters
+        # Full intermediate chapters
+        # range(start, end) excludes end, so range(s_chap, e_chap-1) gives chapters between s_chap and e_chap
+        # BUT chapters array is 0-indexed.
+        # Chapter N is at index N-1.
+        # We want chapters s_chap+1 to e_chap-1.
+        # s_chap+1 index is s_chap.
+        # e_chap-1 index is e_chap-2.
+        # So range(s_chap, e_chap-1) iterates indices of chapters between start and end.
 
-    total += e_verse # Verses in end chapter
+        for c in range(s_chap, e_chap-1):
+            total += chapters[c]
+
+        total += e_verse # Verses in end chapter
+        return total
+
+    # Cross Book
+    try:
+        s_idx = ALL_BOOKS.index(s_book)
+        e_idx = ALL_BOOKS.index(e_book)
+    except ValueError:
+        return 0
+
+    if s_idx > e_idx:
+        print(f"Error: Range {range_str} is backwards or invalid order.")
+        return 0
+
+    total = 0
+
+    # 1. Start Book
+    chapters_s = BIBLE_DATA[s_book]
+    # Remaining verses in start chapter
+    total += (chapters_s[s_chap-1] - s_verse + 1)
+    # Remaining chapters in start book (from s_chap+1 to end)
+    # Indices: s_chap to len-1
+    for c in range(s_chap, len(chapters_s)):
+        total += chapters_s[c]
+
+    # 2. Intermediate Books
+    for i in range(s_idx + 1, e_idx):
+        mid_book = ALL_BOOKS[i]
+        total += sum(BIBLE_DATA[mid_book])
+
+    # 3. End Book
+    chapters_e = BIBLE_DATA[e_book]
+    # Full chapters before end chapter (Ch 1 to e_chap-1)
+    # Indices: 0 to e_chap-2
+    for c in range(0, e_chap-1):
+        total += chapters_e[c]
+    # Verses in end chapter
+    total += e_verse
+
     return total
 
 def verify_local_integrity(readings_path):
     print(f"🔍 Verifying local data integrity for {readings_path}...")
+
+    if not os.path.exists(readings_path):
+        print(f"❌ Error: {readings_path} not found.")
+        return False
 
     with open(readings_path, 'r', encoding='utf-8') as f:
         readings = json.load(f)
@@ -113,6 +142,12 @@ def verify_local_integrity(readings_path):
     errors = 0
     for day in readings:
         day_id = day['day']
+
+        # Validate Day ID format
+        if not re.match(r'^(\d{4}|\d{4}-\d{4})$', day_id):
+             print(f"⚠️ {day_id}: Invalid Day ID format!")
+             errors += 1
+
         api_format = day['api_format']
 
         # Expected counts from JSON
@@ -130,15 +165,11 @@ def verify_local_integrity(readings_path):
             errors += 1
             continue
 
-        # Calculate expected from BIBLE_DATA
-        # Order in api_format is OT, NT, PSA, PRO
-
         calc_ot = get_expected_verse_count(ranges[0])
         calc_nt = get_expected_verse_count(ranges[1])
         calc_ps = get_expected_verse_count(ranges[2])
         calc_pr = get_expected_verse_count(ranges[3])
 
-        # Compare
         if calc_ot != json_counts['OT']:
             print(f"⚠️ {day_id}: OT Count Mismatch! JSON says {json_counts['OT']}, Calc says {calc_ot}")
             errors += 1
@@ -170,22 +201,12 @@ def verify_with_api(readings_path, day_limit=1):
     with open(readings_path, 'r', encoding='utf-8') as f:
         readings = json.load(f)
 
-    # Get current date to test "next day" or just test first entry
-    # For now, let's test the first entry of the current month or just the first entry in list
-    # As per prompt: "12-24 API requests a day"
-
-    # Let's verify the *next* day relative to system time, or just the first X in the list if simple.
-    # To be useful, let's verify a specific day if provided, or just the first few.
     targets = readings[:day_limit]
 
     for day in targets:
         day_id = day['day']
         print(f"  Checking Day {day_id}...")
         ranges = day['api_format'].split(',')
-
-        # We will check the Verse Count reported by the API for the given range
-        # We need to map section to Bible ID.
-        # OT -> Hebrew (OT_HEBREW_ID), NT -> Greek (NT_GREEK_ID)
 
         sections = [
             ("OT", OT_HEBREW_ID, ranges[0]),
@@ -199,7 +220,6 @@ def verify_with_api(readings_path, day_limit=1):
 
             for rng in sub_ranges:
                 # Need to translate range for Hebrew bible if needed (e.g. JOE -> JOL)
-                # We reuse the logic if possible or reimplement simple map
                 from fetch_readings import translate_range_for_bible
                 api_rng = translate_range_for_bible(rng, bible_id)
 
@@ -210,15 +230,7 @@ def verify_with_api(readings_path, day_limit=1):
                     with urllib.request.urlopen(req) as res:
                         if res.status == 200:
                             data = json.loads(res.read().decode('utf-8'))
-                            # Count verses in response?
-                            # API returns content. We can count verse spans or HTML tags.
-                            # Easier: api.bible returns `verseCount` in `data` sometimes, or we count manually.
-                            # Actually api.bible 'passages' endpoint returns content.
-                            # Let's count the `verseId` attributes or just check length roughly.
-                            # "orgId" is better for Hebrew.
-
                             content = data['data']['content']
-                            # Rough check: does it look empty?
                             if len(content) < 50:
                                 print(f"    ⚠️ {label} ({rng}) content seems suspiciously short ({len(content)} chars).")
                             else:
@@ -228,7 +240,7 @@ def verify_with_api(readings_path, day_limit=1):
                 except Exception as e:
                     print(f"    ❌ {label} ({rng}) Exception: {str(e)}")
 
-                time.sleep(0.2) # Rate limit
+                time.sleep(0.2)
 
 def main():
     parser = argparse.ArgumentParser(description="Sentinel Data Integrity Checker")
