@@ -11,3 +11,7 @@
 ## 2026-02-04 - Image Decoding & Priority
 **Learning:** `fetchpriority="high"` on the LCP preload link significantly hints priority to the browser, while `decoding="async"` on below-the-fold images effectively moves decoding off the main thread, reducing UI jank during scroll without visual side effects.
 **Action:** Default to `decoding="async"` for all below-fold images and `fetchpriority="high"` for the explicit LCP preload.
+
+## 2026-02-12 - Asset Reuse & Safe Fallbacks
+**Learning:** Cross-page asset reuse (using the same WebP file on 404 page as the homepage) significantly reduces total payload and leverages browser caching. Using the `<picture>` element with a `source` for the modern format and `img` for the legacy format ensures robust fallback without JavaScript.
+**Action:** Audit secondary pages (like 404) for opportunities to reuse main assets via `<picture>` tags instead of loading unique/legacy formats.
