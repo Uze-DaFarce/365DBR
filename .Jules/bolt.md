@@ -19,3 +19,7 @@
 ## 2026-02-12 - Third-Party Script Performance
 **Learning:** Injected tracking scripts from hosting providers (like GoDaddy's `tccl.min.js`) can impact performance and are outside our direct control.
 **Action:** Monitor these scripts' impact on Core Web Vitals. Since they are required for the hosting platform, ensure our own scripts remain optimized to offset any potential overhead.
+
+## 2026-02-13 - Blocking RUM Scripts
+**Learning:** Blocking hosting provider RUM scripts avoids performance overhead and potential connection errors.
+**Action:** Enforce strict CSP to block these scripts, prioritizing performance and stability.

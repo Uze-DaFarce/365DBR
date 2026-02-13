@@ -33,3 +33,8 @@
 **Vulnerability:** Hosting providers (e.g., GoDaddy) may inject scripts for analytics or tracking, which are blocked by a strict `script-src 'self'` CSP.
 **Learning:** Automatically injected scripts often use inline code or external domains (like `img1.wsimg.com`). These must be explicitly allowed in the CSP.
 **Prevention:** Monitor console errors for blocked scripts. Allow trusted domains and use SHA-256 hashes for specific inline scripts to maintain security without using `'unsafe-inline'`.
+
+## 2026-02-13 - Blocking Hosting Provider Scripts
+**Vulnerability:** Hosting provider scripts can introduce unauthorized tracking and console noise.
+**Learning:** Allowing these scripts compromises the security posture and causes connection errors.
+**Prevention:** Intentionally block hosting provider scripts via strict CSP (`script-src 'self'`) to prevent unauthorized tracking and console noise.
