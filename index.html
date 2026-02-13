@@ -42,7 +42,7 @@
   <link rel="dns-prefetch" href="https://docs.google.com">
 
   <!-- Security: Content Security Policy -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://img1.wsimg.com 'sha256-7EhY8NNXH1EVU/KGjWFpSK4+/zb+WCm/mFGM1S+xwhI='; connect-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; frame-src 'none'; object-src 'none'; worker-src 'none'; base-uri 'self'; form-action 'self' https://docs.google.com; upgrade-insecure-requests; require-trusted-types-for 'script';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; frame-src 'none'; object-src 'none'; worker-src 'none'; base-uri 'self'; form-action 'self' https://docs.google.com; upgrade-insecure-requests; require-trusted-types-for 'script';">
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <!-- Sitemap reference -->
@@ -415,7 +415,7 @@
       position: absolute;
       bottom: 100%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(10px);
       background-color: #401b51;
       color: #fff;
       padding: 4px 8px;
@@ -424,7 +424,8 @@
       white-space: nowrap;
       pointer-events: none;
       opacity: 0;
-      animation: fadeIn 0.2s forwards;
+      visibility: hidden;
+      transition: opacity 0.2s ease, transform 0.2s ease;
       margin-bottom: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
       z-index: 10;
@@ -439,9 +440,12 @@
       border-style: solid;
       border-color: #401b51 transparent transparent transparent;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateX(-50%) translateY(4px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .copy-btn:hover .tooltip-text,
+    .copy-btn:focus-visible .tooltip-text {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
     }
 
     /* Footer */
@@ -927,8 +931,9 @@
                   <h4>Email</h4>
                   <p style="display: flex; align-items: center; gap: 8px;">
                     <a href="mailto:truth@mt-sin.ai" id="email-link">truth@mt-sin.ai</a>
-                    <button class="copy-btn" aria-label="Copy email address" title="Copy email address">
+                    <button class="copy-btn" aria-label="Copy email address">
                       <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                      <span class="tooltip-text">Copy email</span>
                     </button>
                   </p>
                 </div>
