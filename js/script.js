@@ -293,32 +293,37 @@ if (copyBtn) {
     const email = 'truth@mt-sin.ai';
     navigator.clipboard.writeText(email)
       .then(() => {
+        const icon = copyBtn.querySelector('svg');
+        const tooltip = copyBtn.querySelector('.tooltip-text');
+
         copyBtn.classList.add('copied');
         copyBtn.setAttribute('aria-label', 'Email copied');
 
-        // Clear existing content safely
-        while (copyBtn.firstChild) {
-          copyBtn.removeChild(copyBtn.firstChild);
+        // Update Icon
+        if (icon) {
+          icon.replaceWith(createSVG('check'));
         }
 
-        // Add Check Icon
-        copyBtn.appendChild(createSVG('check'));
-
-        // Add Tooltip text
-        const tooltip = document.createElement('span');
-        tooltip.className = 'tooltip-text';
-        tooltip.textContent = 'Copied!';
-        copyBtn.appendChild(tooltip);
+        // Update Tooltip Text
+        if (tooltip) {
+          tooltip.textContent = 'Copied!';
+        }
 
         setTimeout(() => {
           copyBtn.classList.remove('copied');
           copyBtn.setAttribute('aria-label', 'Copy email address');
 
-          // Clear and restore original icon
-          while (copyBtn.firstChild) {
-            copyBtn.removeChild(copyBtn.firstChild);
+          // Restore Icon
+          const currentIcon = copyBtn.querySelector('svg');
+          if (currentIcon) {
+            currentIcon.replaceWith(createSVG('copy'));
           }
-          copyBtn.appendChild(createSVG('copy'));
+
+          // Restore Tooltip Text
+          const currentTooltip = copyBtn.querySelector('.tooltip-text');
+          if (currentTooltip) {
+            currentTooltip.textContent = 'Copy email';
+          }
         }, 2000);
       })
       .catch(err => {

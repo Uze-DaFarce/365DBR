@@ -96,6 +96,14 @@ Added logic to the scroll handler to automatically scroll the active navigation 
 **Learning:** Hosting providers may inject scripts that can manipulate the DOM or add invisible tracking elements.
 **Action:** Be aware that "invisible" scripts (like analytics) might occasionally inject elements that could interfere with layout or accessibility. Inspect the live DOM if unexpected elements appear.
 
+## 2026-02-13 - Persistent Tooltip UX
+**Learning:**
+Traditional `title` attributes are slow to appear and lack styling control. Relying on click-only feedback for "Copy" actions misses the opportunity to guide the user *before* the interaction.
+**Action:**
+Replaced the `title` attribute with a custom, persistently present (but visually toggled) tooltip.
+1.  **Discoverability:** Tooltip appears instantly on hover/focus ("Copy email").
+2.  **Feedback:** Text updates dynamically to "Copied!" on success without layout shifts or DOM thrashing (using `replaceWith` and text updates instead of full rebuilds).
+
 ## 2026-02-13 - Preventing UI Injections
 **Learning:** Blocking hosting provider scripts prevents potential UI injections that can interfere with layout or accessibility.
 **Action:** Enforce strict CSP to ensure no unauthorized elements are injected into the DOM.
