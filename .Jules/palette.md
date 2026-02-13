@@ -85,3 +85,9 @@ Added a high-contrast "✕" button to the Form Handoff overlay.
 1.  **Affordance:** Explicit visual cue to cancel the action.
 2.  **Accessibility:** `aria-label="Close"` and large touch target (44px).
 3.  **Feedback:** Hover/Focus states to indicate interactivity.
+
+## 2026-02-08 - Mobile Nav Auto-Scroll
+**Learning:**
+On mobile devices with horizontally scrolling navigation, the "active" link can become hidden off-screen as the user scrolls down the page (since the nav doesn't automatically follow). This breaks the "Where am I?" feedback loop.
+**Action:**
+Added logic to the scroll handler to automatically scroll the active navigation link into view (`scrollIntoView` with `inline: 'center'`). This ensures the wayfinding indicator is always visible without requiring user interaction.

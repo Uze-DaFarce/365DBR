@@ -202,6 +202,13 @@ function updateScrollState(scrollY) {
       if (link === activeLink) {
         link.classList.add('active');
         link.setAttribute('aria-current', 'page');
+
+        // 🎨 Palette: Ensure active link is visible in scrollable mobile nav
+        link.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'center',
+          block: 'nearest'
+        });
       } else {
         link.classList.remove('active');
         link.removeAttribute('aria-current');
