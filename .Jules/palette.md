@@ -91,3 +91,7 @@ Added a high-contrast "✕" button to the Form Handoff overlay.
 On mobile devices with horizontally scrolling navigation, the "active" link can become hidden off-screen as the user scrolls down the page (since the nav doesn't automatically follow). This breaks the "Where am I?" feedback loop.
 **Action:**
 Added logic to the scroll handler to automatically scroll the active navigation link into view (`scrollIntoView` with `inline: 'center'`). This ensures the wayfinding indicator is always visible without requiring user interaction.
+
+## 2026-02-12 - UI Injection Awareness
+**Learning:** Hosting providers may inject scripts that can manipulate the DOM or add invisible tracking elements.
+**Action:** Be aware that "invisible" scripts (like analytics) might occasionally inject elements that could interfere with layout or accessibility. Inspect the live DOM if unexpected elements appear.
