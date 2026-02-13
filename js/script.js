@@ -1,5 +1,6 @@
 // Simple success overlay for forms
-document.querySelectorAll('a[href*="docs.google.com"]').forEach(trigger => {
+// Security: Use stricter selector to prevent matching malicious links (e.g. evil.com?ref=docs.google.com)
+document.querySelectorAll('a[href^="https://docs.google.com/"]').forEach(trigger => {
   trigger.addEventListener('click', () => {
     const o = document.createElement('div');
     // Added accessibility roles and tabindex for focus management
