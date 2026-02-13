@@ -1,0 +1,27 @@
+<IfModule mod_headers.c>
+  # 🛡️ Sentinel: Security Headers Enhancement
+  # Added to enforce strict security policies at the server level (Apache)
+
+  # Prevent MIME type sniffing
+  Header set X-Content-Type-Options "nosniff"
+
+  # Prevent clickjacking (header defense)
+  Header set X-Frame-Options "DENY"
+
+  # Enable XSS protection filter in legacy browsers
+  Header set X-XSS-Protection "1; mode=block"
+
+  # Strict Referrer Policy to protect user privacy
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # HSTS (Strict Transport Security) - 1 year, include subdomains, preload
+  Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # Permissions Policy - Disable sensitive features not used by the site
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
+  # Content Security Policy (CSP)
+  # Matches index.html policy but adds 'frame-ancestors' (ignored in meta tags) for anti-framing protection.
+  # Note: 404.html has a stricter meta-tag CSP which will take precedence for that page where directives overlap.
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://img1.wsimg.com 'sha256-7EhY8NNXH1EVU/KGjWFpSK4+/zb+WCm/mFGM1S+xwhI='; connect-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; frame-src 'none'; object-src 'none'; worker-src 'none'; base-uri 'self'; form-action 'self' https://docs.google.com; frame-ancestors 'none'; upgrade-insecure-requests; require-trusted-types-for 'script';"
+</IfModule>
