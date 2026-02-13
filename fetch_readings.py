@@ -19,9 +19,9 @@ API_BASE_URL = "https://rest.api.bible/v1"
 
 # Hebrew/Greek Verse Counts (Imported from generate_readings.py)
 try:
-    from generate_readings import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, NT_BOOKS
+    from generate_readings import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, NT_BOOKS, ALL_BOOKS
 except ImportError:
-    print("Error: Could not import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, or NT_BOOKS from generate_readings.py")
+    print("Error: Could not import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, NT_BOOKS, or ALL_BOOKS from generate_readings.py")
     exit(1)
 
 # Map Standard Book IDs to OT Hebrew Bible Specific IDs
@@ -42,13 +42,34 @@ def validate_range_for_section(section, range_str):
     PRO: ['PRO']
     """
     parts = range_str.split('-')
-    # Check start and end books.
-    # Intermediate books in split ranges are handled by the fact that split_cross_book_range
-    # generates new ranges, which are then queued and validated individually here.
 
-    books_to_check = [parts[0].split('.')[0]]
+    start_book = parts[0].split('.')[0]
+    books_to_check = [start_book]
+
     if len(parts) > 1:
-        books_to_check.append(parts[1].split('.')[0])
+        end_book = parts[1].split('.')[0]
+
+        # If range spans books, we MUST check intermediate books too.
+        # This prevents sneaking forbidden books (like PSA/PRO in OT section)
+        # via a bridge range like JOB-ECC.
+        if start_book != end_book:
+            if start_book not in ALL_BOOKS:
+                 raise ValueError(f"[Data Integrity] Unknown start book '{start_book}'")
+            if end_book not in ALL_BOOKS:
+                 raise ValueError(f"[Data Integrity] Unknown end book '{end_book}'")
+
+            s_idx = ALL_BOOKS.index(start_book)
+            e_idx = ALL_BOOKS.index(end_book)
+
+            if s_idx > e_idx:
+                 raise ValueError(f"[Data Integrity] Invalid range order: {start_book} comes after {end_book}")
+
+            # Add all intermediate books + end book
+            for i in range(s_idx + 1, e_idx + 1):
+                books_to_check.append(ALL_BOOKS[i])
+        else:
+             # Same book, just checking start_book is enough (already in list)
+             pass
 
     allowed_books = []
     if section == "OT":
