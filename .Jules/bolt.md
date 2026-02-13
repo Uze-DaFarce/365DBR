@@ -20,6 +20,10 @@
 **Learning:** Injected tracking scripts from hosting providers (like GoDaddy's `tccl.min.js`) can impact performance and are outside our direct control.
 **Action:** Monitor these scripts' impact on Core Web Vitals. Since they are required for the hosting platform, ensure our own scripts remain optimized to offset any potential overhead.
 
+## 2026-02-13 - Font Synthesis Optimization
+**Learning:** Browsers synthesize "faux bold" (and italic) styles when a requested font weight (e.g., 700) isn't loaded, degrading visual quality and performance.
+**Action:** Always verify that CSS `font-weight` values match the actually loaded font files. If a weight is missing, switch the element to a font family that has the weight loaded (e.g., UI elements using Inter 700 instead of Source Sans Pro 700).
+
 ## 2026-02-13 - Blocking RUM Scripts
 **Learning:** Blocking hosting provider RUM scripts avoids performance overhead and potential connection errors.
 **Action:** Enforce strict CSP to block these scripts, prioritizing performance and stability.
