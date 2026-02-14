@@ -450,8 +450,32 @@
 
     /* Footer */
     footer { background-color: #2e133a; color: #e5e7eb; padding: 80px 24px 40px; border-top: 4px solid #F4A623; }
-    .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; flex-wrap: wrap; gap: 64px; margin-bottom: 48px; text-align: center; }
-    .footer-section { display: flex; flex-direction: column; align-items: center; max-width: 300px; }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 48px;
+      text-align: center;
+      justify-items: center;
+    }
+
+    /* Ensure content is centered if grid items don't fill the row */
+    @media (min-width: 1024px) {
+      .footer-content {
+        justify-content: center; /* Centers the grid itself if width is constrained */
+      }
+    }
+
+    .footer-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 280px; /* Prevent overly wide columns on large screens */
+    }
+
     .footer-section h4 { color: #FFFFFF; font-size: 18px; margin-bottom: 24px; font-weight: 700; }
     .footer-section p, .footer-section a { color: #9ca3af; text-decoration: none; display: block; margin-bottom: 12px; line-height: 1.6; transition: color 0.2s; }
     .footer-section a:hover { color: #F4A623; }
@@ -492,7 +516,8 @@
     }
 
     @media (max-width: 900px) {
-      .footer-content { flex-direction: column; gap: 40px; }
+      /* Footer Grid adjusts automatically via auto-fit, but we can tune gap */
+      .footer-content { gap: 40px; }
       .contact-grid { grid-template-columns: 1fr; }
       .hero h1 { font-size: 48px; }
       .package-featured { transform: scale(1); }
@@ -529,8 +554,9 @@
       .hero h1 { font-size: 36px; }
       .services-grid { grid-template-columns: 1fr; }
       .about-content { grid-template-columns: 1fr !important; gap: 32px !important; }
-      .footer-content { grid-template-columns: 1fr; text-align: center; }
-      .footer-section a { display: inline-block; margin: 0 8px; }
+      /* Force single column on mobile to ensure perfect centering */
+      .footer-content { grid-template-columns: 1fr; justify-items: center; }
+      .footer-section { max-width: 100%; } /* Allow full width on mobile */
       .social-links { justify-content: center; }
     }
 
@@ -1007,11 +1033,14 @@
           <a href="#services">Application Implementations</a>
         </div>
         <div class="footer-section">
+          <h4>Projects</h4>
+          <a href="#ministry">Our Ministry Projects</a>
+          <a href="https://mt-sin.ai/365DBR/" target="_blank" rel="noopener noreferrer" aria-label="365DBR (opens in new tab)">365DBR</a>
+          <a href="https://daybydaykids.com" target="_blank" rel="noopener noreferrer" aria-label="DayByDayKids (opens in new tab)">DayByDayKids</a>
+          <a href="/HeIsRisen/" target="_blank" rel="noopener noreferrer" aria-label="He Is Risen! (opens in new tab)">He Is Risen!</a>
+        </div>
+        <div class="footer-section">
           <h4>Company</h4>
-          <a href="#ministry">Projects</a>
-          <a href="https://mt-sin.ai/365DBR/" target="_blank" rel="noopener noreferrer" style="padding-left: 16px; font-size: 14px;" aria-label="365DBR (opens in new tab)">365DBR</a>
-          <a href="https://daybydaykids.com" target="_blank" rel="noopener noreferrer" style="padding-left: 16px; font-size: 14px;" aria-label="DayByDayKids (opens in new tab)">DayByDayKids</a>
-          <a href="/HeIsRisen/" target="_blank" rel="noopener noreferrer" style="padding-left: 16px; font-size: 14px;" aria-label="He Is Risen! (opens in new tab)">He Is Risen!</a>
           <a href="#reviews">Reviews</a>
           <a href="#about">About Us</a>
           <a href="#about">Our Mission</a>
