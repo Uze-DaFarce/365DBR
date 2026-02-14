@@ -107,3 +107,10 @@ Replaced the `title` attribute with a custom, persistently present (but visually
 ## 2026-02-13 - Preventing UI Injections
 **Learning:** Blocking hosting provider scripts prevents potential UI injections that can interfere with layout or accessibility.
 **Action:** Enforce strict CSP to ensure no unauthorized elements are injected into the DOM.
+
+## 2026-02-14 - Clickable Card Focus & Performance
+**Learning:**
+1. **Focus Rings:** Using `transition: all` on buttons/cards causes the focus ring (`outline`) to animate/grow, which feels sluggish and degrades perceived performance.
+   * *Fix:* Use specific transition properties (e.g., `transform`, `box-shadow`) to ensure focus rings snap instantly.
+2. **Card Focus:** When a card is fully clickable via an overlay link, the default focus state usually only highlights the inner text link. This disconnects the visual focus from the actual click target (the whole card).
+   * *Fix:* Use `:focus-within` on the card container to apply the focus ring to the entire card, and hide the inner link's default focus ring.
