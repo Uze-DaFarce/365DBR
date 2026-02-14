@@ -157,11 +157,16 @@ updateOffsets();
 const debouncedUpdateOffsets = debounce(updateOffsets, 100);
 
 // Update offsets when layout changes (e.g. reviews toggle)
-if (window.ResizeObserver) {
-  new ResizeObserver(debouncedUpdateOffsets).observe(document.body);
-} else {
-  // Fallback
-  window.addEventListener('resize', debouncedUpdateOffsets);
+// ⚡ Bolt: Use explicit event listeners instead of observing the entire body to prevent layout thrashing
+window.addEventListener('resize', debouncedUpdateOffsets);
+
+if (reviewsContainer) {
+  reviewsContainer.addEventListener('transitionend', (e) => {
+    // Only update when the height transition completes
+    if (e.propertyName === 'grid-template-rows') {
+      debouncedUpdateOffsets();
+    }
+  });
 }
 
 const backToTopBtn = document.getElementById('back-to-top');
