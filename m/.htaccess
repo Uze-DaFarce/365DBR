@@ -1,0 +1,18 @@
+<IfModule mod_headers.c>
+  # 🛡️ Sentinel: Relaxed Sub-site Policy
+  # Overrides strict root policies to support 3rd-party games and external assets (CDNs).
+  # Required for: Phaser, external APIs, and inline game logic.
+
+  # Reset CSP to be permissive for this subdirectory
+  # Allows:
+  # - Scripts/Styles/Images/Connect from ANY HTTPS source (needed for CDNs like jsdelivr)
+  # - 'unsafe-inline' and 'unsafe-eval' (common in games/legacy apps)
+  # - data: and blob: (common for game assets)
+  Header set Content-Security-Policy "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; upgrade-insecure-requests;"
+
+  # Relax X-Frame-Options to allow same-origin framing if needed
+  Header set X-Frame-Options "SAMEORIGIN"
+
+  # Standard Referrer Policy
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
