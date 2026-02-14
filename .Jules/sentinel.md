@@ -38,3 +38,8 @@
 **Vulnerability:** Hosting provider scripts can introduce unauthorized tracking and console noise.
 **Learning:** Allowing these scripts compromises the security posture and causes connection errors.
 **Prevention:** Intentionally block hosting provider scripts via strict CSP (`script-src 'self'`) to prevent unauthorized tracking and console noise.
+
+## 2026-02-14 - Sub-Site CSP Inheritance
+**Vulnerability:** Strict root CSP headers are inherited by sub-directories, breaking third-party applications (e.g., games using Phaser) that require looser policies (unsafe-eval, CDN access).
+**Learning:** Apache's configuration inheritance applies security headers downwards. Sub-sites need explicit overrides to function if they have different security requirements.
+**Prevention:** Created `SUB_SITES.md` to document the pattern of placing a relaxed `.htaccess` in sub-directories (`Header set Content-Security-Policy ...`) to override the root policy without compromising the main site.
