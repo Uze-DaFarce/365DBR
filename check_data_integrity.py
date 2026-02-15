@@ -15,6 +15,12 @@ except ImportError:
     print("Error: Could not import BIBLE_DATA or ALL_BOOKS from generate_readings.py")
     sys.exit(1)
 
+try:
+    from fetch_readings import validate_range_for_section
+except ImportError:
+    print("Error: Could not import validate_range_for_section from fetch_readings.py")
+    sys.exit(1)
+
 # API Configuration (Shared with fetch_readings logic)
 API_BASE_URL = "https://rest.api.bible/v1"
 OT_HEBREW_ID = "0b262f1ed7f084a6-01"
@@ -165,6 +171,17 @@ def verify_local_integrity(readings_path):
             errors += 1
             continue
 
+        # Validate Section Integrity (Sentinel Check)
+        section_codes = ["OT", "NT", "PSA", "PRO"]
+        for i, code in enumerate(section_codes):
+            composite_range = ranges[i]
+            for sub_range in composite_range.split(';'):
+                try:
+                    validate_range_for_section(code, sub_range)
+                except ValueError as e:
+                    print(f"❌ {day_id}: Section Integrity Error: {e}")
+                    errors += 1
+
         calc_ot = get_expected_verse_count(ranges[0])
         calc_nt = get_expected_verse_count(ranges[1])
         calc_ps = get_expected_verse_count(ranges[2])
@@ -247,14 +264,15 @@ def main():
     parser.add_argument("--local", action="store_true", help="Run local consistency check")
     parser.add_argument("--api", action="store_true", help="Run API verification")
     parser.add_argument("--days", type=int, default=1, help="Number of days to verify via API")
+    parser.add_argument("--readings", default="readings.json", help="Path to readings.json (default: readings.json)")
     args = parser.parse_args()
 
     if args.local:
-        if not verify_local_integrity("readings.json"):
+        if not verify_local_integrity(args.readings):
             sys.exit(1)
 
     if args.api:
-        verify_with_api("readings.json", args.days)
+        verify_with_api(args.readings, args.days)
 
 if __name__ == "__main__":
     main()
