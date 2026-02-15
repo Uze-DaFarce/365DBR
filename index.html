@@ -763,16 +763,44 @@ const App = () => {
   // Scroll target for restoration
   const [targetScrollVerse, setTargetScrollVerse] = useState(initialState.verseId || null);
 
-  // Persistence
+  // Persistence with Smart Debounce
+  // ⚡ Bolt Optimization: Debounce scroll updates (activeVerseId) to prevent blocking main thread with synchronous localStorage writes.
+  // Immediate saves are still performed for critical user actions (Date/Translation changes).
+  const prevDate = useRef(currentDate);
+  const prevFocal = useRef(focalTranslation);
+  const prevCompare = useRef(compareTranslation);
+
   useEffect(() => {
-      if (loading) return; // Don't save state while loading/initializing
-      const state = {
-          date: currentDate,
-          focal: focalTranslation,
-          compare: compareTranslation,
-          verseId: activeVerseId
+      if (loading) return;
+
+      const isCriticalChange = (
+          currentDate !== prevDate.current ||
+          focalTranslation !== prevFocal.current ||
+          compareTranslation !== prevCompare.current
+      );
+
+      const save = () => {
+          const state = {
+              date: currentDate,
+              focal: focalTranslation,
+              compare: compareTranslation,
+              verseId: activeVerseId
+          };
+          localStorage.setItem('biblical_reading_state', JSON.stringify(state));
+
+          // Update refs to current state
+          prevDate.current = currentDate;
+          prevFocal.current = focalTranslation;
+          prevCompare.current = compareTranslation;
       };
-      localStorage.setItem('biblical_reading_state', JSON.stringify(state));
+
+      if (isCriticalChange) {
+          save();
+      } else {
+          // Debounce scroll updates
+          const handler = setTimeout(save, 500);
+          return () => clearTimeout(handler);
+      }
   }, [currentDate, focalTranslation, compareTranslation, activeVerseId, loading]);
 
   // URL Sync
