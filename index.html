@@ -1378,9 +1378,9 @@ const App = () => {
           <span className="font-serif italic block mb-1 tracking-widest text-stone-400 max-w-xl mx-auto">{readingLabel}</span>
 
           <div className="flex justify-center gap-4 my-2 text-[9px] text-stone-400 font-mono uppercase tracking-wider select-none">
-            <span className="flex items-center gap-1"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center">←</kbd> Prev</span>
-            <span className="flex items-center gap-1"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center">→</kbd> Next</span>
-            <span className="flex items-center gap-1"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center">K</kbd> Play/Pause</span>
+            <button onClick={() => navigateDate(-1)} type="button" aria-label="Previous Day (Shortcut: Left Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">←</kbd> Prev</button>
+            <button onClick={() => navigateDate(1)} type="button" aria-label="Next Day (Shortcut: Right Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">→</kbd> Next</button>
+            <button onClick={handleToggle} type="button" aria-label="Toggle Playback (Shortcut: K)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">K</kbd> Play/Pause</button>
           </div>
 
           <p className="mb-2 text-[7px] text-stone-400">
