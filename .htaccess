@@ -18,7 +18,7 @@
   Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 
   # Permissions Policy - Disable sensitive features not used by the site
-  Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=(), autoplay=(), clipboard-read=(), clipboard-write=(self)"
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
 
   # Content Security Policy (CSP)
   # Matches index.html policy but adds 'frame-ancestors' (ignored in meta tags) for anti-framing protection.
