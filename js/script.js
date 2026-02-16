@@ -292,17 +292,23 @@ function createSVG(type) {
 }
 
 // Copy to Clipboard logic
-const copyBtn = document.querySelector('.copy-btn');
-if (copyBtn) {
+const copyBtns = document.querySelectorAll('.copy-btn');
+copyBtns.forEach(copyBtn => {
   copyBtn.addEventListener('click', () => {
-    const email = 'truth@mt-sin.ai';
-    navigator.clipboard.writeText(email)
+    const textToCopy = copyBtn.getAttribute('data-copy-text');
+    if (!textToCopy) return;
+
+    // Store original state for restoration
+    const originalLabel = copyBtn.getAttribute('aria-label');
+    const tooltip = copyBtn.querySelector('.tooltip-text');
+    const originalTooltipText = tooltip ? tooltip.textContent : '';
+
+    navigator.clipboard.writeText(textToCopy)
       .then(() => {
         const icon = copyBtn.querySelector('svg');
-        const tooltip = copyBtn.querySelector('.tooltip-text');
 
         copyBtn.classList.add('copied');
-        copyBtn.setAttribute('aria-label', 'Email copied');
+        copyBtn.setAttribute('aria-label', 'Copied!');
 
         // Update Icon
         if (icon) {
@@ -316,7 +322,10 @@ if (copyBtn) {
 
         setTimeout(() => {
           copyBtn.classList.remove('copied');
-          copyBtn.setAttribute('aria-label', 'Copy email address');
+          // Restore original label
+          if (originalLabel) {
+            copyBtn.setAttribute('aria-label', originalLabel);
+          }
 
           // Restore Icon
           const currentIcon = copyBtn.querySelector('svg');
@@ -325,9 +334,8 @@ if (copyBtn) {
           }
 
           // Restore Tooltip Text
-          const currentTooltip = copyBtn.querySelector('.tooltip-text');
-          if (currentTooltip) {
-            currentTooltip.textContent = 'Copy email';
+          if (tooltip) {
+            tooltip.textContent = originalTooltipText;
           }
         }, 2000);
       })
@@ -335,4 +343,4 @@ if (copyBtn) {
         console.error('Failed to copy: ', err);
       });
   });
-}
+});
