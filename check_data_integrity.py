@@ -8,17 +8,11 @@ import urllib.error
 import urllib.parse
 import re
 
-# Import BIBLE_DATA and ALL_BOOKS from generate_readings
+# Import validate_range_for_section and count_expected_verses from fetch_readings
 try:
-    from generate_readings import BIBLE_DATA, ALL_BOOKS
+    from fetch_readings import validate_range_for_section, count_expected_verses
 except ImportError:
-    print("Error: Could not import BIBLE_DATA or ALL_BOOKS from generate_readings.py")
-    sys.exit(1)
-
-try:
-    from fetch_readings import validate_range_for_section
-except ImportError:
-    print("Error: Could not import validate_range_for_section from fetch_readings.py")
+    print("Error: Could not import validate_range_for_section or count_expected_verses from fetch_readings.py")
     sys.exit(1)
 
 # API Configuration (Shared with fetch_readings logic)
@@ -28,112 +22,6 @@ NT_GREEK_ID = "7644de2e4c5188e5-01"
 
 def get_api_key():
     return os.environ.get("API_BIBLE_KEY")
-
-def parse_reference(ref_str):
-    """
-    Parses a reference string like 'GEN.1.1' into (Book, Chapter, Verse).
-    """
-    parts = ref_str.split('.')
-    if len(parts) < 3:
-        return None
-    return parts[0], int(parts[1]), int(parts[2])
-
-def get_expected_verse_count(range_str):
-    """
-    Calculates the expected verse count for a given range string (e.g. 'GEN.1.1-GEN.1.31')
-    using the local BIBLE_DATA source of truth.
-    Handles semicolon-separated multi-ranges and cross-book ranges correctly.
-    """
-    if ';' in range_str:
-        total = 0
-        for sub in range_str.split(';'):
-            total += get_expected_verse_count(sub)
-        return total
-
-    if '-' not in range_str:
-        return 1 # Single verse?
-
-    start_str, end_str = range_str.split('-')
-    start = parse_reference(start_str)
-    end = parse_reference(end_str)
-
-    if not start or not end:
-        print(f"Error: Invalid reference format in {range_str}")
-        return 0
-
-    s_book, s_chap, s_verse = start
-    e_book, e_chap, e_verse = end
-
-    # Validate books exist
-    if s_book not in BIBLE_DATA:
-        print(f"Error: Unknown book {s_book}")
-        return 0
-    if e_book not in BIBLE_DATA:
-        print(f"Error: Unknown book {e_book}")
-        return 0
-
-    # Same Book
-    if s_book == e_book:
-        if s_chap == e_chap:
-            return e_verse - s_verse + 1
-
-        # Same Book, Different Chapters
-        chapters = BIBLE_DATA[s_book]
-        # Rest of start chapter
-        total = (chapters[s_chap-1] - s_verse + 1)
-
-        # Full intermediate chapters
-        # range(start, end) excludes end, so range(s_chap, e_chap-1) gives chapters between s_chap and e_chap
-        # BUT chapters array is 0-indexed.
-        # Chapter N is at index N-1.
-        # We want chapters s_chap+1 to e_chap-1.
-        # s_chap+1 index is s_chap.
-        # e_chap-1 index is e_chap-2.
-        # So range(s_chap, e_chap-1) iterates indices of chapters between start and end.
-
-        for c in range(s_chap, e_chap-1):
-            total += chapters[c]
-
-        total += e_verse # Verses in end chapter
-        return total
-
-    # Cross Book
-    try:
-        s_idx = ALL_BOOKS.index(s_book)
-        e_idx = ALL_BOOKS.index(e_book)
-    except ValueError:
-        return 0
-
-    if s_idx > e_idx:
-        print(f"Error: Range {range_str} is backwards or invalid order.")
-        return 0
-
-    total = 0
-
-    # 1. Start Book
-    chapters_s = BIBLE_DATA[s_book]
-    # Remaining verses in start chapter
-    total += (chapters_s[s_chap-1] - s_verse + 1)
-    # Remaining chapters in start book (from s_chap+1 to end)
-    # Indices: s_chap to len-1
-    for c in range(s_chap, len(chapters_s)):
-        total += chapters_s[c]
-
-    # 2. Intermediate Books
-    for i in range(s_idx + 1, e_idx):
-        mid_book = ALL_BOOKS[i]
-        total += sum(BIBLE_DATA[mid_book])
-
-    # 3. End Book
-    chapters_e = BIBLE_DATA[e_book]
-    # Full chapters before end chapter (Ch 1 to e_chap-1)
-    # Indices: 0 to e_chap-2
-    for c in range(0, e_chap-1):
-        total += chapters_e[c]
-    # Verses in end chapter
-    total += e_verse
-
-    return total
 
 def verify_local_integrity(readings_path):
     print(f"🔍 Verifying local data integrity for {readings_path}...")
@@ -182,10 +70,11 @@ def verify_local_integrity(readings_path):
                     print(f"❌ {day_id}: Section Integrity Error: {e}")
                     errors += 1
 
-        calc_ot = get_expected_verse_count(ranges[0])
-        calc_nt = get_expected_verse_count(ranges[1])
-        calc_ps = get_expected_verse_count(ranges[2])
-        calc_pr = get_expected_verse_count(ranges[3])
+        # Use shared logic from fetch_readings.py
+        calc_ot = count_expected_verses(ranges[0])
+        calc_nt = count_expected_verses(ranges[1])
+        calc_ps = count_expected_verses(ranges[2])
+        calc_pr = count_expected_verses(ranges[3])
 
         if calc_ot != json_counts['OT']:
             print(f"⚠️ {day_id}: OT Count Mismatch! JSON says {json_counts['OT']}, Calc says {calc_ot}")
