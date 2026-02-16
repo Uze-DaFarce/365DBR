@@ -43,3 +43,8 @@
 **Vulnerability:** Strict root CSP headers are inherited by sub-directories, breaking third-party applications (e.g., games using Phaser) that require looser policies (unsafe-eval, CDN access).
 **Learning:** Apache's configuration inheritance applies security headers downwards. Sub-sites need explicit overrides to function if they have different security requirements.
 **Prevention:** Created `SUB_SITES.md` to document the pattern of placing a relaxed `.htaccess` in sub-directories (`Header set Content-Security-Policy ...`) to override the root policy without compromising the main site.
+
+## 2026-02-15 - Permissions Policy Hardening with Sub-Site Consideration
+**Vulnerability:** Unused browser features (like `usb`, `browsing-topics`) increase the attack surface and potential for fingerprinting/tracking.
+**Learning:** Root `.htaccess` headers propagate to sub-sites. Hardening policies like `Permissions-Policy` (e.g., disabling `publickey-credentials-get` for WebAuthn) can silently break sub-site functionality (like user login in `365DBR`) if inheritance is not managed.
+**Prevention:** Explicitly create configuration scaffolds (like `.htaccess`) for sub-sites—even if their content is external—to ensure they override strict root policies. This prevents "invisible" breakage where a sub-site inherits breaking changes from the root.
