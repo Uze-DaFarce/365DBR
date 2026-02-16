@@ -1,0 +1,23 @@
+<IfModule mod_headers.c>
+  # 🛡️ Sentinel: Relaxed Sub-site Policy for 365DBR
+  # Overrides strict root policies to support this external application.
+  # Required for: WebAuthn (login), external assets, and potentially legacy scripts.
+
+  # Reset CSP to be permissive
+  # Allows:
+  # - Scripts/Styles/Images/Connect from ANY HTTPS source
+  # - 'unsafe-inline' and 'unsafe-eval'
+  # - data: and blob:
+  Header set Content-Security-Policy "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; upgrade-insecure-requests;"
+
+  # Override Permissions Policy to ensure WebAuthn works
+  # The root policy blocks `publickey-credentials-get`. We must enable it here.
+  # Also enables other common features like geolocation if needed by the app.
+  Header set Permissions-Policy "geolocation=(self), microphone=(), camera=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), publickey-credentials-get=(self)"
+
+  # Relax X-Frame-Options to allow same-origin framing
+  Header set X-Frame-Options "SAMEORIGIN"
+
+  # Standard Referrer Policy
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

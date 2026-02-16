@@ -19,6 +19,7 @@
 
   # Permissions Policy - Disable sensitive features not used by the site
   # Added usb, interest-cohort (FLoC), browsing-topics, and publickey-credentials-get for defense in depth.
+  # Note: Sub-sites (like 365DBR) override this policy in their own .htaccess to enable required features (e.g., WebAuthn).
   Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), publickey-credentials-get=()"
 
   # Prevent Adobe Flash and PDF data leakage
