@@ -44,7 +44,7 @@
 
     <!-- Application Code -->
     <script type="text/tsx">
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 
 /** --- CONFIGURATION --- **/
@@ -753,6 +753,9 @@ const App = () => {
   const [currentDate, setCurrentDate] = useState(initialState.date);
   const [playbackStatus, setPlaybackStatus] = useState('stopped');
   const [activeVerseId, setActiveVerseId] = useState(null); // Visual position (scroll tracking)
+  const activeVerseIdRef = useRef(activeVerseId);
+  useEffect(() => { activeVerseIdRef.current = activeVerseId; }, [activeVerseId]);
+
   const [playbackVerseId, setPlaybackVerseId] = useState(null); // Where playback is at
   
   // Dynamic State for Translation Slots
@@ -1176,7 +1179,11 @@ const App = () => {
     }
 };
 
-  const handleToggle = () => {
+  const handleToggle = useCallback(() => {
+    // ⚡ Bolt Optimization: Use ref to access latest activeVerseId inside stale closures (like event listeners)
+    // to avoid recreating the listener on every scroll event.
+    const currentActive = activeVerseIdRef.current;
+
     if (playbackStatus === 'playing') { 
       synthRef.current.pause(); 
       setPlaybackStatus('paused');
@@ -1186,7 +1193,7 @@ const App = () => {
       setPlaybackStatus('playing');
       isTransitioningRef.current = true;
       // Resume from current highlighted verse (where user scrolled to while paused)
-      const resumeVerse = activeVerseId || playbackVerseId || sortedVids[0];
+      const resumeVerse = currentActive || playbackVerseId || sortedVids[0];
       if (resumeVerse && verseMap[resumeVerse]) {
         playVerse(resumeVerse);
       }
@@ -1195,11 +1202,11 @@ const App = () => {
       setPlaybackStatus('playing'); 
       isTransitioningRef.current = true; 
       // Start from current visible verse, or first verse if none visible
-      const startVerse = activeVerseId || sortedVids[0];
+      const startVerse = currentActive || sortedVids[0];
       setPlaybackVerseId(startVerse);
       playVerse(startVerse);
     }
-  };
+  }, [playbackStatus, playbackVerseId, sortedVids, verseMap]);
 
   const navigateDate = (direction) => {
     const month = parseInt(currentDate.substring(0, 2)), day = parseInt(currentDate.substring(2, 4));
