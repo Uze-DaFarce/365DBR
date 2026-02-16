@@ -37,6 +37,68 @@
         ::-webkit-scrollbar-track { background: #fdfcfb; }
         ::-webkit-scrollbar-thumb { background: #e7e5e4; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #d6d3d1; }
+
+        @media print {
+            /* Reset Layout & Colors */
+            body { background-color: white !important; color: black !important; }
+            main { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+
+            /* Hide UI Chrome */
+            .fixed, .sticky, .bottom-0, .z-50 { position: static !important; }
+
+            /* Verse Styling */
+            .verse-block {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                margin-bottom: 1rem !important;
+                opacity: 1 !important;
+            }
+
+            /* Force High Contrast for Verse Cards */
+            .verse-block > div > div {
+                background-color: transparent !important;
+                border: none !important;
+                border-bottom: 1px solid #ddd !important;
+                box-shadow: none !important;
+                color: black !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            /* Text Colors Override */
+            .text-stone-400, .text-stone-300, .text-amber-500, .text-blue-700, .text-rose-700, .text-emerald-700 {
+                color: black !important;
+            }
+
+            /* Header Specifics */
+            header {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                text-align: center !important;
+                padding-bottom: 1rem !important;
+            }
+            header h1 {
+                font-size: 24pt !important;
+                text-align: center !important;
+                width: 100% !important;
+                display: block !important;
+            }
+            /* Ensure Date Button behaves like text */
+            header h1 button {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                font-size: inherit !important;
+                font-weight: inherit !important;
+            }
+
+            /* Footer */
+            footer {
+                margin-top: 2rem !important;
+                border-top: 1px solid #000 !important;
+            }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -372,7 +434,7 @@ const CopyButton = ({ text, reference, version, ...props }) => {
             {...props}
             onClick={handleCopy}
             type="button"
-            className="ml-2 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+            className="ml-2 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 print:hidden"
             aria-label={status === 'copied' ? "Copied" : "Copy verse"}
             title={`Copy ${version}`}
         >
@@ -682,7 +744,7 @@ const ReadingProgress = React.memo(({ sectionIndex }) => {
   }, []);
 
   return (
-    <div className="absolute bottom-0 left-0 h-[3px] w-full bg-transparent pointer-events-none z-50">
+    <div className="absolute bottom-0 left-0 h-[3px] w-full bg-transparent pointer-events-none z-50 print:hidden">
       <div
         ref={barRef}
         className={`h-full w-0 transition-all duration-300 ease-out shadow-lg ${theme.bg} ${theme.shadow}`}
@@ -1220,12 +1282,12 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-stone-900 focus:text-white focus:font-bold focus:rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xl transition-all">Skip to Content</a>
-      <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-stone-900 focus:text-white focus:font-bold focus:rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xl transition-all print:hidden">Skip to Content</a>
+      <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm print:static print:border-none print:shadow-none">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 h-8 md:h-10">
           <div className="flex items-center gap-1 min-w-0 flex-1">
              <div className="flex items-center bg-stone-100 rounded-md px-0.5">
-               <button onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" title="Previous Day (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
+               <button onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" title="Previous Day (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
                <h1 className="text-[11px] md:text-sm font-black text-stone-900 uppercase whitespace-nowrap flex items-center">
                   {currentDate === todayString ? (
                       <span className="px-1 cursor-default">{formatDate(currentDate)}</span>
@@ -1237,13 +1299,13 @@ const App = () => {
                           className="px-1 hover:text-amber-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded flex items-center gap-1"
                       >
                           {formatDate(currentDate)}
-                          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" /></svg>
+                          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 print:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" /></svg>
                       </button>
                   )}
                </h1>
-               <button onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" title="Next Day (Right Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></button>
+               <button onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" title="Next Day (Right Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></button>
              </div>
-             <div className="flex items-center gap-1 min-w-0 overflow-hidden">
+             <div className="flex items-center gap-1 min-w-0 overflow-hidden print:hidden">
                 {labelParts.map((part, i) => {
                   const isActive = activeSectionIndex === i;
                   const isClickable = !isActive && playbackStatus !== 'playing';
@@ -1274,7 +1336,7 @@ const App = () => {
                 })}
              </div>
           </div>
-             <div className="flex items-center gap-2 shrink-0">
+             <div className="flex items-center gap-2 shrink-0 print:hidden">
              {/* Slot 2 Selector (Middle) */}
              {/* Only show selector if there are enough options to actually make a choice (i.e. > 2 options total, because 1 is focal) */}
              {availableTranslations.length > 2 ? (
@@ -1377,7 +1439,7 @@ const App = () => {
         <div className="max-w-4xl mx-auto text-[8px] md:text-[8px] text-stone-500 leading-relaxed text-center font-serif">
           <span className="font-serif italic block mb-1 tracking-widest text-stone-400 max-w-xl mx-auto">{readingLabel}</span>
 
-          <div className="flex justify-center gap-4 my-2 text-[9px] text-stone-400 font-mono uppercase tracking-wider select-none">
+          <div className="flex justify-center gap-4 my-2 text-[9px] text-stone-400 font-mono uppercase tracking-wider select-none print:hidden">
             <span className="flex items-center gap-1"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center">←</kbd> Prev</span>
             <span className="flex items-center gap-1"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center">→</kbd> Next</span>
             <span className="flex items-center gap-1"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center">K</kbd> Play/Pause</span>
