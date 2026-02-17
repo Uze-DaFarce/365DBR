@@ -9,3 +9,7 @@
 ## 2025-03-09 - Constant Hoisting & O(1) Lookups
 **Learning:** In hot render paths (like list item rendering), even small allocations (like array literals) and O(N) searches (like `.includes()`) add up when multiplied by hundreds of items.
 **Action:** Replaced inline array allocation `['MAT', ...].includes(book)` with global `Set` lookup `NT_BOOKS.has(book)` in `VerseGroup`. Hoisted `months` array out of `formatDate` to avoid reallocation.
+
+## 2025-03-10 - Event Handler Stabilization
+**Learning:** In a monolithic React component, event handlers (like `handleToggle`) often depend on rapidly changing state (like `activeVerseId` during scroll). This causes the handler to be recreated on every scroll tick. If this handler is passed to child components (like a Header), those children re-render unnecessarily, even if `React.memo` is used.
+**Action:** Use the "Ref Pattern": Store the volatile state in a `useRef` and keep it synced via `useEffect`. Have the event handler read from `.current` instead of the state directly. This removes the state from the handler's dependency array, stabilizing its identity and preventing child re-renders.

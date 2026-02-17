@@ -44,7 +44,7 @@
 
     <!-- Application Code -->
     <script type="text/tsx">
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 
 /** --- CONFIGURATION --- **/
@@ -770,6 +770,15 @@ const App = () => {
   const prevFocal = useRef(focalTranslation);
   const prevCompare = useRef(compareTranslation);
 
+  // ⚡ Bolt Optimization: Refs for volatile state to stabilize event handlers and prevent Header re-renders
+  const activeVerseIdRef = useRef(activeVerseId);
+  const playbackVerseIdRef = useRef(playbackVerseId);
+
+  useEffect(() => {
+    activeVerseIdRef.current = activeVerseId;
+    playbackVerseIdRef.current = playbackVerseId;
+  }, [activeVerseId, playbackVerseId]);
+
   useEffect(() => {
       if (loading) return;
 
@@ -832,7 +841,7 @@ const App = () => {
   const playbackStatusRef = useRef('stopped'); // Track playback status in ref for callbacks
 
   // Handler for Focal Translation change with auto-swap logic for Compare slot
-  const handleFocalChange = (newFocal) => {
+  const handleFocalChange = useCallback((newFocal) => {
     if (newFocal === compareTranslation) {
         // If user picks a focal that matches current compare, we must change compare.
         // Pick the first available key that is NOT the new focal.
@@ -841,7 +850,7 @@ const App = () => {
     }
     setFocalTranslation(newFocal);
     setIsFocalOpen(false);
-  };
+  }, [compareTranslation, availableTranslations]);
 
   // getSectionIndex moved outside App
 
@@ -1043,7 +1052,7 @@ const App = () => {
     return () => { isMounted = false; };
   }, [currentDate]);
 
-  const playVerse = (vid, previousVid = null) => {
+  const playVerse = useCallback((vid, previousVid = null) => {
     if (!verseMap) return;
 
     // 1. Resolve Group Logic: We always play "Groups"
@@ -1174,9 +1183,9 @@ const App = () => {
     } else {
         window.speechSynthesis.speak(mainUtterance);
     }
-};
+  }, [verseMap, groupedVids, dynamicSlots]);
 
-  const handleToggle = () => {
+  const handleToggle = useCallback(() => {
     if (playbackStatus === 'playing') { 
       synthRef.current.pause(); 
       setPlaybackStatus('paused');
@@ -1186,7 +1195,8 @@ const App = () => {
       setPlaybackStatus('playing');
       isTransitioningRef.current = true;
       // Resume from current highlighted verse (where user scrolled to while paused)
-      const resumeVerse = activeVerseId || playbackVerseId || sortedVids[0];
+      // ⚡ Bolt Optimization: Read from ref to avoid re-creating handler on scroll
+      const resumeVerse = activeVerseIdRef.current || playbackVerseIdRef.current || sortedVids[0];
       if (resumeVerse && verseMap[resumeVerse]) {
         playVerse(resumeVerse);
       }
@@ -1195,28 +1205,29 @@ const App = () => {
       setPlaybackStatus('playing'); 
       isTransitioningRef.current = true; 
       // Start from current visible verse, or first verse if none visible
-      const startVerse = activeVerseId || sortedVids[0];
+      // ⚡ Bolt Optimization: Read from ref
+      const startVerse = activeVerseIdRef.current || sortedVids[0];
       setPlaybackVerseId(startVerse);
       playVerse(startVerse);
     }
-  };
+  }, [playbackStatus, sortedVids, playVerse, verseMap]);
 
-  const navigateDate = (direction) => {
+  const navigateDate = useCallback((direction) => {
     const month = parseInt(currentDate.substring(0, 2)), day = parseInt(currentDate.substring(2, 4));
     // Use 2025 (non-leap year) to ensure Feb 28 -> Mar 1 transition matches the data generation
     const date = new Date(2025, month - 1, day); date.setDate(date.getDate() + direction);
     const nm = String(date.getMonth() + 1).padStart(2, '0'), nd = String(date.getDate()).padStart(2, '0');
     setCurrentDate(`${nm}${nd}`); window.scrollTo({ top: 0 });
-  };
+  }, [currentDate]);
 
-  const scrollToSection = (index) => {
+  const scrollToSection = useCallback((index) => {
     if (playbackStatus === 'playing' || activeSectionIndex === index) return;
     const targetVid = sortedVids.find(vid => getSectionIndex(vid) === index);
     if (targetVid) {
       const el = document.getElementById(`verse-${targetVid}`);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
+  }, [playbackStatus, activeSectionIndex, sortedVids]);
 
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
