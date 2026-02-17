@@ -293,19 +293,158 @@ def count_expected_verses(range_str):
             raw_count += chapters_e[c-1]
         raw_count += e_verse
 
-    # Subtract Omissions
-    omission_penalty = 0
+    # Note: We do NOT subtract omissions here anymore.
+    # The application expects the full count (KJV/LSV).
+    # Missing verses in the API are injected during fetching.
+    return raw_count
+
+def inject_missing_verses(data, range_str):
+    """
+    Injects placeholder objects for verses known to be missing in the Critical Text
+    but expected by the reading plan (KJV/LSV counts).
+    Modifies data in-place.
+    """
+    if 'data' not in data or 'content' not in data['data']:
+        return
+
+    content_list = data['data']['content']
+
+    # 1. Identify which omissions fall within this range
+    # We need to parse range_str start/end
+    def parse_reference(ref_str):
+        parts = ref_str.split('.')
+        return parts[0], int(parts[1]), int(parts[2])
+
+    start_str, end_str = range_str.split('-')
+    s_book, s_chap, s_verse = parse_reference(start_str)
+    e_book, e_chap, e_verse = parse_reference(end_str)
+
+    all_books = list(BIBLE_DATA.keys())
+
+    # Re-use the is_verse_in_range logic (duplicated for safety/isolation)
+    def is_verse_in_range(vid, s_b, s_c, s_v, e_b, e_c, e_v):
+        v_book, v_chap, v_verse = parse_reference(vid)
+
+        # Cross-book index check
+        try:
+            v_idx = all_books.index(v_book)
+            s_idx = all_books.index(s_b)
+            e_idx = all_books.index(e_b)
+        except ValueError:
+            return False
+
+        if not (s_idx <= v_idx <= e_idx): return False
+
+        # Book boundary checks
+        if v_book == s_b:
+            if v_chap == s_c and v_verse < s_v: return False
+            if v_chap < s_c: return False
+
+        if v_book == e_b:
+            if v_chap == e_c and v_verse > e_v: return False
+            if v_chap > e_c: return False
+
+        return True
+
+    verses_to_inject = []
     for omitted_vid in KNOWN_OMISSIONS:
         if is_verse_in_range(omitted_vid, s_book, s_chap, s_verse, e_book, e_chap, e_verse):
-            omission_penalty += 1
+            verses_to_inject.append(omitted_vid)
 
-    return raw_count - omission_penalty
+    if not verses_to_inject:
+        return
+
+    # 2. Inject them
+    # We need to insert them into the content_list in the correct order.
+    # The content_list contains objects with attrs.verseId
+    # We can iterate and insert when we pass the point.
+
+    # Helper to get sort key for a verseId
+    def get_sort_key(vid):
+        b, c, v = parse_reference(vid)
+        return (all_books.index(b), c, v)
+
+    # Convert existing content to a list of (key, item)
+    # Note: content_list items might be headers/paragraphs.
+    # We only care about items that HAVE a verseId for sorting purposes?
+    # Actually, the API structure is tricky: <p><span>verse</span>text</p>
+    # Flattening for injection is hard.
+    # However, for SBLGNT, the structure is usually flat paragraphs or lists.
+
+    # SIMPLIFICATION:
+    # If the missing verse is MAT.23.14, we look for MAT.23.13.
+    # If found, we append after it (or its parent container).
+
+    # Let's try a robust approach:
+    # Collect all existing verseIds in order.
+    # Determine where the missing one goes.
+
+    # Since modifying the complex nested HTML-like JSON structure of api.bible is risky,
+    # we will append the missing verses at the END of the content block if safe,
+    # OR (better) try to find the preceding verse.
+
+    # Actually, let's just loop through verses_to_inject.
+    for vid in verses_to_inject:
+        print(f"    [Injection] Injecting placeholder for missing verse {vid}...")
+
+        # Create the Verse Object
+        # Matches API structure for a verse span
+        verse_obj = {
+            "name": "para",
+            "type": "tag",
+            "attrs": { "style": "p" },
+            "items": [
+                {
+                    "name": "verse",
+                    "type": "tag",
+                    "attrs": { "verseId": vid, "style": "v", "data-number": vid.split('.')[2] },
+                    "items": [{ "text": vid.split('.')[2], "type": "text" }] # Verse Number
+                },
+                {
+                    "text": " [Verse omitted in Greek text] ",
+                    "type": "text"
+                }
+            ]
+        }
+
+        # Naive Injection: Just append to content.
+        # The frontend sorts/displays correctly usually?
+        # Ideally we place it correctly.
+
+        # Find preceding verse ID
+        b, c, v = parse_reference(vid)
+        preceding_vid = f"{b}.{c}.{v-1}"
+
+        inserted = False
+
+        # Walk to find preceding verse
+        # This is a deep traversal search... complex.
+        # Given the constraint of the task, appending to end might be safer than breaking structure,
+        # BUT sorting is important for reading.
+
+        # Let's try to find the index of the paragraph containing the preceding verse.
+        for i, item in enumerate(content_list):
+            # Check if item contains preceding_vid
+            # This is expensive but necessary.
+            if str(preceding_vid) in str(item):
+                # Found the container of the previous verse.
+                # Insert AFTER this container.
+                content_list.insert(i + 1, verse_obj)
+                inserted = True
+                break
+
+        if not inserted:
+            # Fallback: Append to end
+            content_list.append(verse_obj)
 
 def validate_content_integrity(data, range_str):
     """
     Validates that the fetched content has the expected number of verses
     AND that the content belongs to the expected books.
     """
+    # 0. Pre-Process: Inject Missing Verses (Fix for SBLGNT omissions)
+    inject_missing_verses(data, range_str)
+
     # 1. Calculate Expected Count
     expected = count_expected_verses(range_str)
     if expected == -1:

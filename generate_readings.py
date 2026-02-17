@@ -139,10 +139,9 @@ class BibleNavigator:
             for c_idx, v_count in enumerate(chapters):
                 c_num = c_idx + 1
                 for v in range(1, v_count + 1):
-                    # Check for Omission
-                    vid = f"{b}.{c_num}.{v}"
-                    if vid in KNOWN_OMISSIONS:
-                        continue
+                    # We do NOT exclude KNOWN_OMISSIONS here.
+                    # The reading plan must include ALL verses (e.g. KJV/LSV count).
+                    # fetch_readings.py will be responsible for filling in missing data from the API.
                     self.verses.append(BibleLocation(b, c_num, v))
         self.total_verses = len(self.verses)
         
