@@ -45,9 +45,9 @@
   ExpiresActive On
   ExpiresDefault "access plus 1 hour"
 
-  # CSS and JavaScript (1 month - balance between perf and freshness)
-  ExpiresByType text/css "access plus 1 month"
-  ExpiresByType application/javascript "access plus 1 month"
+  # CSS and JavaScript (1 hour - reduced from 1 month for safer updates on sub-sites without versioning)
+  ExpiresByType text/css "access plus 1 hour"
+  ExpiresByType application/javascript "access plus 1 hour"
 
   # Images (1 year - aggressive caching for static assets)
   ExpiresByType image/jpg "access plus 1 year"
