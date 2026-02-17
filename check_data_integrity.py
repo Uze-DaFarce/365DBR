@@ -12,6 +12,7 @@ import re
 try:
     from fetch_readings import (
         validate_range_for_section,
+        count_actual_verses,
         count_expected_verses,
         translate_range_for_bible,
         OT_HEBREW_ID,
@@ -141,6 +142,8 @@ def verify_with_api(readings_path, day_limit=1):
                             if len(content) < 50:
                                 print(f"    ⚠️ {label} ({rng}) content seems suspiciously short ({len(content)} chars).")
                             else:
+                                # We can optionally enhance this to count actual verses if desired, but
+                                # for conflict resolution we just need imports aligned.
                                 print(f"    ✅ {label} ({rng}) API fetch successful.")
                         else:
                             print(f"    ❌ {label} ({rng}) API Error {res.status}")
