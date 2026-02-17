@@ -120,3 +120,11 @@ Replaced the `title` attribute with a custom, persistently present (but visually
 Refactoring a single-use "Copy" button to a reusable pattern requires careful state management. When multiple buttons exist, relying on global selectors (like `document.querySelector`) breaks functionality for subsequent elements.
 **Action:**
 Use `querySelectorAll` and iterate with `forEach`. Store element-specific state (like `originalLabel`) within the event handler closure to ensure the correct text is restored for each specific button after the "Copied!" timeout.
+## 2026-02-15 - Visual Polish & Accessibility Micro-Fixes
+**Learning:**
+1. **Aspect Ratio Distortion:** Fixed width (e.g., `width: 90px`) on responsive images (logos) often causes distortion (squashing) when combined with `max-height` constraints.
+   * *Fix:* Use `width: auto` + `max-height` to respect the image's intrinsic aspect ratio across all viewports.
+2. **Redundant Alt Text:** Images used as logos next to text (e.g., `<img alt="Company Logo"> Company Name`) create redundant auditory clutter for screen readers.
+   * *Fix:* Set `alt=""` on the image to mark it as decorative, allowing the screen reader to focus on the semantic text content.
+3. **Decorative SVGs:** Inline SVGs in links (like social icons) can be announced as "group" or "image" by screen readers, adding noise.
+   * *Fix:* Add `aria-hidden="true"` to these decorative SVGs to ensure a clean, text-only announcement of the link's label.

@@ -38,6 +38,11 @@ For any new sub-site (e.g., a new game), create a `.htaccess` file in its folder
 
   # Standard Referrer Policy
   Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Note on Permissions Policy:
+  # The root .htaccess sets a strict Permissions-Policy (disabling usb, interest-cohort, etc).
+  # If your sub-site needs these features (e.g., WebAuthn, Geolocation), you must override it here:
+  # Header set Permissions-Policy "geolocation=(self), publickey-credentials-get=(self), ..."
 </IfModule>
 ```
 

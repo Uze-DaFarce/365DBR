@@ -42,7 +42,7 @@ header {
 }
 
 .logo-icon {
-  width: 60px;
+  width: auto;
   height: 70px;
 }
 
@@ -232,7 +232,7 @@ footer a:hover {
   }
 
   .logo-icon {
-    width: 50px;
+    width: auto;
     height: 58px;
   }
 
