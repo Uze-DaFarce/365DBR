@@ -128,3 +128,12 @@ Use `querySelectorAll` and iterate with `forEach`. Store element-specific state 
    * *Fix:* Set `alt=""` on the image to mark it as decorative, allowing the screen reader to focus on the semantic text content.
 3. **Decorative SVGs:** Inline SVGs in links (like social icons) can be announced as "group" or "image" by screen readers, adding noise.
    * *Fix:* Add `aria-hidden="true"` to these decorative SVGs to ensure a clean, text-only announcement of the link's label.
+
+## 2026-02-16 - Print Optimization
+**Learning:**
+Users often "Print to PDF" to share service details with stakeholders. Standard web pages include clutter (nav bars, buttons, dark backgrounds) that waste ink and look unprofessional on paper.
+**Action:**
+Implemented a `@media print` stylesheet to create a clean, document-like output:
+1.  **Hidden UI:** Removed navigation, footer links, and interactive buttons (`.header`, `.footer`, `.buttons`).
+2.  **Ink Saving:** Forced high-contrast text (`color: #000`) and white backgrounds, removing shadows and colorful hero sections.
+3.  **Layout:** Reset containers to 100% width and allowed natural page breaks for long content (like Reviews).
