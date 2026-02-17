@@ -27,3 +27,7 @@
 ## 2026-02-13 - Blocking RUM Scripts
 **Learning:** Blocking hosting provider RUM scripts avoids performance overhead and potential connection errors.
 **Action:** Enforce strict CSP to block these scripts, prioritizing performance and stability.
+
+## 2026-02-13 - Static Site CSS Cleanup
+**Learning:** In static sites with inline styles, unused CSS rules accumulate easily over time (e.g., from moved features). Tools like `grep` are essential for auditing class usage when no build step tree-shakes CSS.
+**Action:** Before optimizing assets, perform a usage audit of CSS classes against HTML to identify and remove dead code.

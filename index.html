@@ -110,7 +110,7 @@
     h1, h2, h3, h4, h5, h6, nav, button,
     .logo-name, .package-name, .service-link,
     .btn-primary, .btn-secondary, .btn-outline,
-    .team-name, .skip-link {
+    .team-name, .skip-link, .package-badge {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       letter-spacing: -0.02em;
     }
@@ -214,21 +214,6 @@
     }
     nav a:hover::after, nav a.active::after { width: 100%; }
 
-    .header-right-group {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-    }
-
-    .credly-badge-img {
-      width: 80px;
-      height: 80px;
-      border: none;
-      display: block;
-      transition: transform 0.3s ease;
-    }
-    .credly-badge-img:hover { transform: scale(1.1); }
 
     /* Sections */
     section {
@@ -540,7 +525,6 @@
       header { padding: 12px 0; }
       .header-container { padding: 0 16px; flex-wrap: wrap; }
       .logo { order: 1; flex: 0 0 auto; }
-      .header-right-group { order: 2; margin-left: auto; flex: 0 0 auto; }
       nav {
         display: flex !important;
         width: 100%;
@@ -560,7 +544,6 @@
       .logo-icon { width: 50px; max-height: 50px; }
       .logo-name { font-size: 18px; }
       .logo-tagline { display: none; }
-      .credly-badge-img { width: 50px !important; height: 50px !important; }
 
       section { padding: 60px 16px; scroll-margin-top: 80px; }
       .hero { padding: 100px 16px; }
@@ -688,10 +671,6 @@
           <a href="#about">About Us</a>
           <a href="#contact">Contact</a>
         </nav>
-
-        <div class="header-right-group">
-          <!-- Badges moved to Services section -->
-        </div>
       </div>
     </header>
 
@@ -806,8 +785,8 @@
           <div style="margin-top: 64px; background-color: #FFFFFF; padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <h3>Add-On Services</h3>
             <ul style="list-style: none; padding: 0; margin-top: 24px;">
-              <li style="padding: 16px 0; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 16px;"><span style="color: #F4A623; font-weight: 800; font-size: 20px;" aria-hidden="true">+</span> Setup Financial Records in QuickBooks - $500-$1,000 (includes first month of bookkeeping)</li>
-              <li style="padding: 16px 0; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 16px;"><span style="color: #F4A623; font-weight: 800; font-size: 20px;" aria-hidden="true">+</span> Cleanup Financial Records in QuickBooks - $200 per month of cleanup performed</li>
+              <li style="padding: 16px 0; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 16px;"><span style="color: #F4A623; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px;" aria-hidden="true">+</span> Setup Financial Records in QuickBooks - $500-$1,000 (includes first month of bookkeeping)</li>
+              <li style="padding: 16px 0; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 16px;"><span style="color: #F4A623; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px;" aria-hidden="true">+</span> Cleanup Financial Records in QuickBooks - $200 per month of cleanup performed</li>
             </ul>
           </div>
         </div>
