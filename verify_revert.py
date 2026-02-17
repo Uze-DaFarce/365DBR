@@ -13,7 +13,7 @@ def verify_logos_revert():
         logo_img = page.locator(".logo-icon").first
         alt_text = logo_img.get_attribute("alt")
         print(f"Index Logo Alt: '{alt_text}'")
-        assert alt_text == "Mt. Sinai LLC Logo", f"Expected 'Mt. Sinai LLC Logo', got '{alt_text}'"
+        assert alt_text == "", f"Expected '', got '{alt_text}' (Logo is decorative)"
 
         logo_img.screenshot(path="revert_index_desktop.png")
 
@@ -25,7 +25,7 @@ def verify_logos_revert():
         logo_img_404 = page_404.locator(".logo-icon").first
         alt_text_404 = logo_img_404.get_attribute("alt")
         print(f"404 Logo Alt: '{alt_text_404}'")
-        assert alt_text_404 == "Mt. Sinai LLC Logo", f"Expected 'Mt. Sinai LLC Logo', got '{alt_text_404}'"
+        assert alt_text_404 == "", f"Expected '', got '{alt_text_404}' (Logo is decorative)"
 
         logo_img_404.screenshot(path="revert_404_desktop.png")
 
