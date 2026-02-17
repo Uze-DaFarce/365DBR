@@ -31,27 +31,22 @@ OT_HEBREW_BOOK_MAP = {
     "SON": "SNG"
 }
 
+# Reverse map for validation (JOL -> JOE)
+REVERSE_HEBREW_BOOK_MAP = {v: k for k, v in OT_HEBREW_BOOK_MAP.items()}
+
 NAME_TO_CODE = {v: k for k, v in BOOK_NAMES.items()}
 
-def validate_range_for_section(section, range_str):
+def get_books_in_range(range_str):
     """
-    Validates that the books in the range string belong to the expected section.
-    OT: OT_SEQUENTIAL_BOOKS (Gen-Mal, excluding Psa/Pro)
-    NT: NT_BOOKS (Mat-Rev)
-    PSA: ['PSA']
-    PRO: ['PRO']
+    Extracts all book codes involved in a range string.
+    Handles single book ("GEN.1.1") and cross-book ("JOB.1.1-ECC.12.1").
     """
     parts = range_str.split('-')
-
     start_book = parts[0].split('.')[0]
-    books_to_check = [start_book]
+    books = [start_book]
 
     if len(parts) > 1:
         end_book = parts[1].split('.')[0]
-
-        # If range spans books, we MUST check intermediate books too.
-        # This prevents sneaking forbidden books (like PSA/PRO in OT section)
-        # via a bridge range like JOB-ECC.
         if start_book != end_book:
             if start_book not in ALL_BOOKS:
                  raise ValueError(f"[Data Integrity] Unknown start book '{start_book}'")
@@ -66,10 +61,19 @@ def validate_range_for_section(section, range_str):
 
             # Add all intermediate books + end book
             for i in range(s_idx + 1, e_idx + 1):
-                books_to_check.append(ALL_BOOKS[i])
-        else:
-             # Same book, just checking start_book is enough (already in list)
-             pass
+                books.append(ALL_BOOKS[i])
+
+    return books
+
+def validate_range_for_section(section, range_str):
+    """
+    Validates that the books in the range string belong to the expected section.
+    OT: OT_SEQUENTIAL_BOOKS (Gen-Mal, excluding Psa/Pro)
+    NT: NT_BOOKS (Mat-Rev)
+    PSA: ['PSA']
+    PRO: ['PRO']
+    """
+    books_to_check = get_books_in_range(range_str)
 
     allowed_books = []
     if section == "OT":
@@ -159,9 +163,10 @@ def validate_api_response(data, context_info=""):
 
     return True
 
-def count_actual_verses(content):
+def extract_verse_ids(content):
     """
-    Recursively counts unique verseIds in the content structure (list of objects).
+    Recursively extracts unique verseIds from the content structure.
+    Returns a set of verseId strings.
     """
     found_vids = set()
 
@@ -176,7 +181,13 @@ def count_actual_verses(content):
                     walk(item['items'])
 
     walk(content)
-    return len(found_vids)
+    return found_vids
+
+def count_actual_verses(content):
+    """
+    Recursively counts unique verseIds in the content structure (list of objects).
+    """
+    return len(extract_verse_ids(content))
 
 def count_expected_verses(range_str):
     """
@@ -240,19 +251,35 @@ def count_expected_verses(range_str):
 
 def validate_content_integrity(data, range_str):
     """
-    Validates that the fetched content has the expected number of verses.
+    Validates that the fetched content has the expected number of verses
+    AND that the content belongs to the expected books.
     """
-    # 1. Calculate Expected
+    # 1. Calculate Expected Count
     expected = count_expected_verses(range_str)
     if expected == -1:
          raise ValueError(f"[Data Integrity] Unknown book in range {range_str}. Cannot validate verses.")
 
-    # 2. Count Actual
+    # 2. Extract Actual Verse IDs
     # api.bible returns { data: { content: [...] } }
     # validate_api_response already checked structure.
-    actual = count_actual_verses(data['data']['content'])
+    actual_vids = extract_verse_ids(data['data']['content'])
+    actual = len(actual_vids)
 
-    # 3. Compare
+    # 3. Sentinel Book Verification (New Security Layer)
+    expected_books = set(get_books_in_range(range_str))
+
+    for vid in actual_vids:
+        # verseId format: BOOK.CHAPTER.VERSE (e.g. JOL.1.1)
+        book_code = vid.split('.')[0]
+
+        # Normalize: Convert API code back to Standard code if needed
+        if book_code in REVERSE_HEBREW_BOOK_MAP:
+            book_code = REVERSE_HEBREW_BOOK_MAP[book_code]
+
+        if book_code not in expected_books:
+             raise ValueError(f"[Data Integrity] Book Mismatch! Found verses from '{book_code}' (norm) in range intended for {expected_books}. Full ID: {vid}")
+
+    # 4. Compare Counts
     # Special Handling for Psalms: Title merging often reduces count by 1 per chapter involved.
     # We allow a loose tolerance for Psalms.
     is_psalm = "PSA" in range_str
