@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Browser | Interlinear</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Biblical Language & Serif Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=SBL+Hebrew&family=Gentium+Plus:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Import Map -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@19",
+        "react-dom/client": "https://esm.sh/react-dom@19/client",
+        "react/jsx-runtime": "https://esm.sh/react@19/jsx-runtime"
+      }
+    }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfcfb;
+            scroll-behavior: smooth;
+        }
+        .hebrew {
+            font-family: 'SBL Hebrew', serif;
+            direction: rtl;
+        }
+        .greek {
+            font-family: 'Gentium Plus', serif;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdfcfb; }
+        ::-webkit-scrollbar-thumb { background: #e7e5e4; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d6d3d1; }
+
+        @media print {
+            body { background-color: white !important; color: black !important; }
+            main { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .fixed, .sticky, .bottom-0, .z-50 { position: static !important; }
+            .verse-block { break-inside: avoid; page-break-inside: avoid; margin-bottom: 1rem !important; opacity: 1 !important; }
+            .verse-block > div > div { background-color: transparent !important; border: none !important; border-bottom: 1px solid #ddd !important; box-shadow: none !important; color: black !important; padding-left: 0 !important; padding-right: 0 !important; }
+            .text-stone-400, .text-stone-300, .text-amber-500, .text-blue-700, .text-rose-700, .text-emerald-700 { color: black !important; }
+            header { display: none !important; }
+            footer { margin-top: 2rem !important; border-top: 1px solid #000 !important; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="root"></div>
+
+    <script type="text/tsx">
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { createRoot } from 'react-dom/client';
+
+/** --- CONFIGURATION & CONSTANTS --- **/
+const TRANSLATION_REGISTRY = {
+  original: { source: 'original', label: (isHebrew) => `ORIGINAL ${isHebrew ? 'HEBREW' : 'GREEK'}`, isHebrewGreek: true },
+  kjv: { idPrefix: 'de4e12af', label: 'KJV - King James Version' },
+  lsv: { idPrefix: '06125ada', altIds: ['01b29f4b342acc35-01'], label: 'LSV - Literal Standard Version', attribution: { text: '©', link: '#footer', title: 'View Copyright Information' } },
+  web: { idPrefix: '9879dbb7', label: 'WEB - World English Bible' },
+  nlt: { idPrefix: 'd6e14a62', label: 'NLT - New Living Translation' }
+};
+
+const BOOK_NAMES = {
+  GEN: 'Genesis', EXO: 'Exodus', LEV: 'Leviticus', NUM: 'Numbers', DEU: 'Deuteronomy', JOS: 'Joshua', JDG: 'Judges', RUT: 'Ruth', '1SA': '1 Samuel', '2SA': '2 Samuel', '1KI': '1 Kings', '2KI': '2 Kings', '1CH': '1 Chronicles', '2CH': '2 Chronicles', EZR: 'Ezra', NEH: 'Nehemiah', EST: 'Esther', JOB: 'Job', PSA: 'Psalms', PRO: 'Proverbs', ECC: 'Ecclesiastes', SON: 'Song of Solomon', ISA: 'Isaiah', JER: 'Jeremiah', LAM: 'Lamentations', EZK: 'Ezekiel', DAN: 'Daniel', HOS: 'Hosea', JOE: 'Joel', AMO: 'Amos', OBA: 'Obadiah', JON: 'Jonah', MIC: 'Micah', NAH: 'Nahum', HAB: 'Habakkuk', ZEP: 'Zephaniah', HAG: 'Haggai', ZEC: 'Zechariah', MAL: 'Malachi',
+  MAT: 'Matthew', MRK: 'Mark', LUK: 'Luke', JHN: 'John', ACT: 'Acts', ROM: 'Romans', '1CO': '1 Corinthians', '2CO': '2 Corinthians', GAL: 'Galatians', EPH: 'Ephesians', PHP: 'Philippians', COL: 'Colossians', '1TH': '1 Thessalonians', '2TH': '2 Thessalonians', '1TI': '1 Timothy', '2TI': '2 Timothy', TIT: 'Titus', PHM: 'Philemon', HEB: 'Hebrews', JAS: 'James', '1PE': '1 Peter', '2PE': '2 Peter', '1JN': '1 John', '2JN': '2 John', '3JN': '3 John', JUD: 'Jude', REV: 'Revelation'
+};
+
+const BIBLE_BOOK_ORDER = Object.keys(BOOK_NAMES);
+const BIBLE_BOOK_ORDER_MAP = new Map(BIBLE_BOOK_ORDER.map((b, i) => [b, i]));
+const NT_BOOKS = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
+
+const SECTION_THEMES = [
+  { bg: 'bg-amber-600', shadow: 'shadow-amber-500/50', hover: 'hover:bg-amber-700', text: 'text-amber-600', ring: 'focus-visible:ring-amber-500' },
+  { bg: 'bg-blue-600', shadow: 'shadow-blue-500/50', hover: 'hover:bg-blue-700', text: 'text-blue-600', ring: 'focus-visible:ring-blue-500' },
+  { bg: 'bg-rose-600', shadow: 'shadow-rose-500/50', hover: 'hover:bg-rose-700', text: 'text-rose-600', ring: 'focus-visible:ring-rose-500' },
+  { bg: 'bg-emerald-600', shadow: 'shadow-emerald-500/50', hover: 'hover:bg-emerald-700', text: 'text-emerald-600', ring: 'focus-visible:ring-emerald-500' }
+];
+
+const FOCAL_THEMES = [
+  { bg: 'bg-amber-100', border: 'border-amber-500', ring: 'ring-amber-500/50', text: 'text-amber-700', linkHover: 'hover:text-amber-600', linkRing: 'focus-visible:ring-amber-500' },
+  { bg: 'bg-blue-100', border: 'border-blue-500', ring: 'ring-blue-500/50', text: 'text-blue-700', linkHover: 'hover:text-blue-600', linkRing: 'focus-visible:ring-blue-500' },
+  { bg: 'bg-rose-100', border: 'border-rose-500', ring: 'ring-rose-500/50', text: 'text-rose-700', linkHover: 'hover:text-rose-600', linkRing: 'focus-visible:ring-rose-500' },
+  { bg: 'bg-emerald-100', border: 'border-emerald-500', ring: 'ring-emerald-500/50', text: 'text-emerald-700', linkHover: 'hover:text-emerald-600', linkRing: 'focus-visible:ring-emerald-500' }
+];
+
+/** --- DATA UTILITIES --- **/
+const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
+  if (!items) return;
+  items.forEach((item) => {
+    let previousActiveVid = context.activeVid;
+    if (item.attrs?.verseId) {
+      let keyVid = item.attrs.verseId;
+      if (useOrgId && item.attrs.verseOrgIds && item.attrs.verseOrgIds.length > 0) keyVid = item.attrs.verseOrgIds[0];
+      context.activeVid = keyVid;
+      context.lastSeenVid = keyVid;
+      if (!map[keyVid]) map[keyVid] = {};
+      if (!map[keyVid][versionKey]) map[keyVid][versionKey] = { text: [], displayVid: item.attrs.verseId };
+      if (buffer && buffer.text.length > 0) { map[keyVid][versionKey].text.push(...buffer.text); buffer.text = []; }
+    }
+    if (item.type === 'text' && item.text) {
+        if (context.activeVid) {
+            if (map[context.activeVid] && map[context.activeVid][versionKey]) map[context.activeVid][versionKey].text.push(item.text);
+        } else if (item.text.trim().length > 0) {
+            if (context.lastSeenVid) {
+                if (map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) map[context.lastSeenVid][versionKey].text.push(item.text);
+            } else if (buffer) { buffer.text.push(item.text); }
+        }
+    }
+    if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey, useOrgId, buffer, context);
+    context.activeVid = previousActiveVid;
+  });
+};
+
+const processContent = (contentArray, map, versionKey, useOrgId = false) => {
+  if (!contentArray) return;
+  const buffer = { text: [] };
+  const context = { activeVid: null, lastSeenVid: null };
+  contentArray.forEach(section => { if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context); });
+};
+
+const loadDailyBread = async (dateFolder) => {
+  const manifestPath = `data/${dateFolder}/manifest.json`;
+  const manifestRes = await fetch(manifestPath);
+  if (!manifestRes.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
+  const manifest = await manifestRes.json();
+  const verseMap = {};
+  const availableKeys = new Set(['original']);
+
+  const results = await Promise.all(
+    manifest.files.map(async fileName => {
+        const res = await fetch(`data/${dateFolder}/${fileName}`);
+        if (!res.ok) throw new Error(`Failed to load ${fileName}`);
+        return await res.json();
+    })
+  );
+
+  results.forEach((source) => {
+    const data = source.data;
+    if (!data) return;
+    if (data.content) processContent(data.content, verseMap, 'original', false);
+    if (data.parallels) {
+      data.parallels.forEach(parallel => {
+         const matchedKey = Object.keys(TRANSLATION_REGISTRY).find(key => {
+            const config = TRANSLATION_REGISTRY[key];
+            if (!config.idPrefix) return false;
+            if (parallel.bibleId.includes(config.idPrefix)) return true;
+            if (config.altIds && config.altIds.some(id => parallel.bibleId === id)) return true;
+            return false;
+         });
+         if (matchedKey && parallel.content) {
+            processContent(parallel.content, verseMap, matchedKey, true);
+            availableKeys.add(matchedKey);
+         }
+      });
+    }
+  });
+
+  const sortedKeys = Array.from(availableKeys).filter(k => k !== 'original');
+  Object.values(verseMap).forEach(verseData => {
+      Object.keys(verseData).forEach(key => {
+          const entry = verseData[key];
+          if (entry.text && Array.isArray(entry.text)) {
+              const config = TRANSLATION_REGISTRY[key];
+              const separator = config && config.isHebrewGreek ? '' : ' ';
+              entry.text = entry.text.join(separator);
+          }
+      });
+  });
+  return { verseMap, label: manifest.label, availableTranslations: sortedKeys };
+};
+
+const getSectionIndex = (vid) => {
+    if (!vid) return -1;
+    const book = vid.substring(0, 3);
+    if (book === 'PSA') return 2;
+    if (book === 'PRO') return 3;
+    return NT_BOOKS.has(book) ? 1 : 0;
+};
+
+// --- COMPONENTS ---
+
+const CopyButton = ({ text, reference, version, ...props }) => {
+    const [status, setStatus] = useState('idle');
+    useEffect(() => { setStatus('idle'); }, [text, reference]);
+    const handleCopy = async (e) => {
+        e.stopPropagation();
+        if (!navigator.clipboard) return;
+        try {
+            setStatus('copying');
+            await navigator.clipboard.writeText(`${text}\n— ${reference} (${version})`);
+            setStatus('copied');
+            setTimeout(() => setStatus('idle'), 2000);
+        } catch (err) { setStatus('idle'); }
+    };
+    return (
+        <button {...props} onClick={handleCopy} type="button" className="ml-2 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 print:hidden" aria-label={status === 'copied' ? "Copied" : "Copy verse"}>
+            {status === 'copied' ? <svg className="h-3 w-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> : <svg className="h-3 w-3 text-stone-400 hover:text-stone-900 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>}
+        </button>
+    );
+};
+
+const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying }) => {
+    const vid = group[0];
+    const book = vid.substring(0, 3);
+    const sectionIndex = getSectionIndex(vid);
+    const focalTheme = FOCAL_THEMES[sectionIndex] || FOCAL_THEMES[0];
+    const isHebrew = !NT_BOOKS.has(book);
+
+    const handleVerseClick = () => {
+        if (isPlaying) return;
+        const selection = window.getSelection();
+        if (selection && selection.type === 'Range' && selection.toString().length > 0) return;
+        const el = document.getElementById(`verse-${vid}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    const renderedSlots = useMemo(() => {
+        const getSlotContent = (slot) => {
+            if (!slot || !slot.source) return { text: '', displayLabel: '' };
+            let fullText = '', displayLabel = '', contributing = [];
+            group.forEach((gVid) => {
+                const data = verseMap[gVid];
+                const slotData = data ? data[slot.source] : null;
+                if (slotData && slotData.text) {
+                    fullText += (fullText ? ' ' : '') + slotData.text;
+                    contributing.push(slotData.displayVid || gVid);
+                }
+            });
+            if (contributing.length > 0) {
+                const s = contributing[0].split('.').map((p,i) => i>0 ? parseInt(p) : p);
+                const e = contributing[contributing.length - 1].split('.').map((p,i) => i>0 ? parseInt(p) : p);
+                const bName = BOOK_NAMES[s[0]] || s[0];
+                if (contributing[0] === contributing[contributing.length-1]) displayLabel = `${bName} ${s[1]}:${s[2]}`;
+                else if (s[0] === e[0]) displayLabel = s[1] === e[1] ? `${bName} ${s[1]}:${s[2]}-${e[2]}` : `${bName} ${s[1]}:${s[2]}-${e[1]}:${e[2]}`;
+                else displayLabel = `${bName} ${s[1]}:${s[2]} - ${BOOK_NAMES[e[0]]||e[0]} ${e[1]}:${e[2]}`;
+            } else if (group.length > 0) {
+                const [b, c, v] = group[0].split('.');
+                displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
+            }
+            return { text: fullText, displayLabel };
+        };
+        const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
+        return {
+            top: { ...getSlotContent(dynamicSlots.top), label: getLabel(dynamicSlots.top), config: dynamicSlots.top },
+            middle: { ...getSlotContent(dynamicSlots.middle), label: getLabel(dynamicSlots.middle), config: dynamicSlots.middle },
+            bottom: { ...getSlotContent(dynamicSlots.bottom), label: getLabel(dynamicSlots.bottom), config: dynamicSlots.bottom, attribution: dynamicSlots.bottom.attribution }
+        };
+    }, [group, verseMap, dynamicSlots, isHebrew]);
+
+    return (
+        <div id={`verse-${vid}`} onClick={handleVerseClick} className={`verse-block group transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'} ${!isPlaying ? 'cursor-pointer' : ''}`}>
+            <div className="flex flex-col gap-1">
+            {/* Top Slot */}
+            <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
+                <div className="flex justify-between items-center mb-0.5">
+                    <span className={`text-[7px] md:text-[10px] uppercase font-black tracking-widest ${isActive ? 'text-amber-500' : 'text-stone-400'}`}>{renderedSlots.top.label}</span>
+                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-mono font-bold ${isActive ? 'text-amber-500' : 'text-stone-400'} uppercase`}>
+                        <span>{renderedSlots.top.displayLabel}</span>
+                        {!isPlaying && <CopyButton text={renderedSlots.top.text} reference={renderedSlots.top.displayLabel} version={isHebrew?'OH':'OG'} tabIndex={isActive?0:-1} aria-hidden={!isActive} />}
+                    </div>
+                </div>
+                <div className={`leading-tight tracking-tight break-words ${renderedSlots.top.config.isHebrewGreek ? (isHebrew ? 'hebrew text-[12px] md:text-xl text-right' : 'greek text-base md:text-lg text-left') : 'text-lg md:text-3xl font-serif italic'}`} style={{ direction: renderedSlots.top.config.isHebrewGreek && isHebrew ? 'rtl' : 'ltr' }}>
+                    <span className={isActive ? 'text-white' : 'text-stone-500'}>{renderedSlots.top.text}</span>
+                </div>
+            </div>
+            {/* Middle Slot */}
+            <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
+                <div className="flex justify-between items-center mb-0.5">
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>{renderedSlots.middle.label}</span>
+                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>
+                        <span>{renderedSlots.middle.displayLabel}</span>
+                        {!isPlaying && dynamicSlots.middle.source && <CopyButton text={renderedSlots.middle.text} reference={renderedSlots.middle.displayLabel} version={dynamicSlots.middle.source.toUpperCase()} tabIndex={isActive?0:-1} aria-hidden={!isActive} />}
+                    </div>
+                </div>
+                <div><span className={`text-lg md:text-3xl font-serif italic leading-tight tracking-tight ${isActive ? 'text-stone-900' : 'text-stone-500'}`}>{renderedSlots.middle.text}</span></div>
+            </div>
+            {/* Bottom Slot */}
+            <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? `${focalTheme.bg} shadow-xl ${focalTheme.border} ring-1 ${focalTheme.ring}` : 'bg-white/40 border-transparent opacity-80'}`}>
+                <div className="flex justify-between items-center mb-0.5">
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? focalTheme.text : 'text-stone-400'}`}>
+                        {renderedSlots.bottom.label}
+                        {renderedSlots.bottom.attribution && <a href={renderedSlots.bottom.attribution.link} className={`inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 ${focalTheme.linkHover} cursor-pointer focus:outline-none focus-visible:ring-2 ${focalTheme.linkRing} rounded-sm`} title={renderedSlots.bottom.attribution.title}>{renderedSlots.bottom.attribution.text}</a>}
+                    </span>
+                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? focalTheme.text : 'text-stone-400'}`}>
+                        <span>{renderedSlots.bottom.displayLabel}</span>
+                        {!isPlaying && <span className="opacity-100"><CopyButton text={renderedSlots.bottom.text} reference={renderedSlots.bottom.displayLabel} version={dynamicSlots.bottom.source.toUpperCase() + (dynamicSlots.bottom.source === 'lsv' ? '©' : '')} tabIndex={isActive?0:-1} aria-hidden={!isActive} /></span>}
+                    </div>
+                </div>
+                <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-500'}`}>{renderedSlots.bottom.text}</div>
+            </div>
+            </div>
+        </div>
+    );
+});
+
+const Loader = () => (
+  <div role="status" aria-live="polite" className="flex flex-col items-center justify-center py-20 md:py-32">
+    <div className="w-8 h-8 border-2 border-stone-200 border-t-stone-800 rounded-full animate-spin mb-4"></div>
+    <p className="text-stone-500 font-serif italic text-xs uppercase tracking-widest">Loading Bible Index</p>
+  </div>
+);
+
+// --- MAIN APP (Bible Browser) ---
+
+const App = () => {
+  const [index, setIndex] = useState(null); // { GEN: { 1: [days], ... }, ... }
+  const [availableBooks, setAvailableBooks] = useState([]);
+
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [selectedChapter, setSelectedChapter] = useState(null);
+
+  // Data for View
+  const [verseMap, setVerseMap] = useState(null);
+  const [sortedVids, setSortedVids] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Translation State
+  const [availableTranslations, setAvailableTranslations] = useState([]);
+  const [focalTranslation, setFocalTranslation] = useState('lsv');
+  const [compareTranslation, setCompareTranslation] = useState('kjv');
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
+  const [isFocalOpen, setIsFocalOpen] = useState(false);
+
+  // Playback
+  const [playbackStatus, setPlaybackStatus] = useState('stopped');
+  const [playbackVerseId, setPlaybackVerseId] = useState(null);
+  const [activeVerseId, setActiveVerseId] = useState(null);
+  const activeVerseIdRef = useRef(activeVerseId);
+  useEffect(() => { activeVerseIdRef.current = activeVerseId; }, [activeVerseId]);
+  const playbackStatusRef = useRef(playbackStatus);
+  useEffect(() => { playbackStatusRef.current = playbackStatus; }, [playbackStatus]);
+  const synthRef = useRef(window.speechSynthesis);
+
+  // 1. Build Index on Mount
+  useEffect(() => {
+    const initIndex = async () => {
+        try {
+            const res = await fetch('readings.json');
+            if (!res.ok) throw new Error("Failed to load readings.json");
+            const readings = await res.json();
+
+            const newIndex = {};
+            const books = new Set();
+
+            readings.forEach(day => {
+                if (!day.api_format) return;
+                const ranges = day.api_format.split(',');
+                ranges.forEach(range => {
+                    const subRanges = range.split(';');
+                    subRanges.forEach(part => {
+                        // GEN.1.1-GEN.1.31
+                        const [start, end] = part.split('-');
+                        const [sBook, sCh] = start.split('.');
+                        const [eBook, eCh] = end.split('.');
+
+                        const sBookIdx = BIBLE_BOOK_ORDER_MAP.get(sBook);
+                        const eBookIdx = BIBLE_BOOK_ORDER_MAP.get(eBook);
+
+                        if (sBookIdx === undefined || eBookIdx === undefined) return;
+
+                        // Iterate Books
+                        for (let bIdx = sBookIdx; bIdx <= eBookIdx; bIdx++) {
+                            const book = BIBLE_BOOK_ORDER[bIdx];
+                            books.add(book);
+                            if (!newIndex[book]) newIndex[book] = {};
+
+                            const isStartBook = (bIdx === sBookIdx);
+                            const isEndBook = (bIdx === eBookIdx);
+
+                            // Chapter Logic (Heuristic for sparse data)
+                            // If same book range: iterate chapters sCh to eCh
+                            if (isStartBook && isEndBook) {
+                                for (let c = parseInt(sCh); c <= parseInt(eCh); c++) {
+                                    if (!newIndex[book][c]) newIndex[book][c] = [];
+                                    if (!newIndex[book][c].includes(day.day)) newIndex[book][c].push(day.day);
+                                }
+                            } else {
+                                // Cross book: Index the known endpoints
+                                if (isStartBook) {
+                                    const c = parseInt(sCh);
+                                    if (!newIndex[book][c]) newIndex[book][c] = [];
+                                    if (!newIndex[book][c].includes(day.day)) newIndex[book][c].push(day.day);
+                                }
+                                if (isEndBook) {
+                                    const c = parseInt(eCh); // Usually ends at specific chapter
+                                    // Also index chapter 1? Usually cross-book implies full chapters in between.
+                                    // For now, strict index: only what's explicitly in range endpoints if multi-book is complex.
+                                    // But typically "DEU.33.1-JOS.1.18" -> DEU 33, JOS 1.
+                                    if (!newIndex[book][c]) newIndex[book][c] = [];
+                                    if (!newIndex[book][c].includes(day.day)) newIndex[book][c].push(day.day);
+
+                                    // Assume Chapter 1 is present if eCh > 1?
+                                    if (c > 1) {
+                                         if (!newIndex[book][1]) newIndex[book][1] = [];
+                                         if (!newIndex[book][1].includes(day.day)) newIndex[book][1].push(day.day);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+
+            setIndex(newIndex);
+            setAvailableBooks(Array.from(books).sort((a,b) => (BIBLE_BOOK_ORDER_MAP.get(a)||0) - (BIBLE_BOOK_ORDER_MAP.get(b)||0)));
+            setLoading(false);
+        } catch (e) {
+            console.error(e);
+            setError("Failed to load Bible Index.");
+            setLoading(false);
+        }
+    };
+    initIndex();
+  }, []);
+
+  // 2. Load Content when Selection Changes
+  useEffect(() => {
+    if (!selectedBook || !selectedChapter || !index) return;
+
+    const loadContent = async () => {
+        setLoading(true);
+        setError(null);
+        setVerseMap(null);
+
+        try {
+            const days = index[selectedBook][selectedChapter];
+            if (!days || days.length === 0) throw new Error("No data found for this chapter.");
+
+            // Load all relevant days
+            const dayDataList = await Promise.all(days.map(d => loadDailyBread(d)));
+
+            // Merge maps
+            const mergedMap = {};
+            const keys = new Set();
+
+            dayDataList.forEach(d => {
+                if (d.verseMap) {
+                    Object.assign(mergedMap, d.verseMap);
+                    d.availableTranslations.forEach(k => keys.add(k));
+                }
+            });
+
+            // Filter for Selected Chapter (Strict Prefix Match: "GEN.1.")
+            // Note: Use dot to avoid "GEN.11" matching "GEN.1" prefix logic if naive.
+            const prefix = `${selectedBook}.${selectedChapter}.`;
+            const filteredVids = Object.keys(mergedMap).filter(vid => vid.startsWith(prefix));
+
+            if (filteredVids.length === 0) throw new Error("Chapter content missing from data.");
+
+            // Sort
+            filteredVids.sort((a,b) => {
+               const vA = parseInt(a.split('.')[2]);
+               const vB = parseInt(b.split('.')[2]);
+               return vA - vB;
+            });
+
+            const finalMap = {};
+            filteredVids.forEach(vid => finalMap[vid] = mergedMap[vid]);
+
+            setVerseMap(finalMap);
+            setSortedVids(filteredVids);
+            setAvailableTranslations(Array.from(keys));
+
+            // Initial Translation Set
+            if (keys.size > 0) {
+               if (!focalTranslation || !keys.has(focalTranslation)) setFocalTranslation(keys.has('lsv') ? 'lsv' : Array.from(keys)[0]);
+               if (!compareTranslation || !keys.has(compareTranslation)) setCompareTranslation(keys.has('kjv') ? 'kjv' : Array.from(keys)[0]);
+            }
+
+            setLoading(false);
+        } catch (e) {
+            console.error(e);
+            setError(e.message);
+            setLoading(false);
+        }
+    };
+    loadContent();
+  }, [selectedBook, selectedChapter, index]);
+
+  // Dynamic Slots & Grouping
+  const dynamicSlots = useMemo(() => {
+    if (!focalTranslation || !compareTranslation) return { top: TRANSLATION_REGISTRY.original, middle: {}, bottom: {} };
+    const focalConfig = TRANSLATION_REGISTRY[focalTranslation];
+    const compareConfig = TRANSLATION_REGISTRY[compareTranslation];
+    return {
+        top: TRANSLATION_REGISTRY.original,
+        middle: { source: compareTranslation, label: compareConfig?.label || compareTranslation.toUpperCase(), isHebrewGreek: false },
+        bottom: { source: focalTranslation, label: focalConfig?.label || focalTranslation.toUpperCase(), isFocal: true, isHebrewGreek: false, attribution: focalConfig?.attribution }
+    };
+  }, [focalTranslation, compareTranslation]);
+
+  const groupedVids = useMemo(() => {
+      if (!sortedVids.length) return [];
+      // Simple grouping for now: Single verses unless special case needed
+      // Reusing logic from index.html if needed, but for lookup simple array is mostly fine.
+      // But let's keep consistency.
+      const groups = [];
+      let i = 0;
+      while (i < sortedVids.length) {
+          groups.push([sortedVids[i]]);
+          i++;
+      }
+      return groups;
+  }, [sortedVids]);
+
+  // Audio Playback
+  const playVerse = (vid) => {
+      // Simplified playback for browser: Just speak the focal text
+      window.speechSynthesis.cancel();
+      setPlaybackVerseId(vid);
+
+      const text = verseMap[vid]?.[dynamicSlots.bottom.source]?.text;
+      if (!text) return;
+
+      const u = new SpeechSynthesisUtterance(text.replace(/YHWH/g, 'Yaw-weigh').replace(/[\[\]]/g, ''));
+      u.onend = () => {
+          if (playbackStatusRef.current !== 'playing') return;
+          const idx = sortedVids.indexOf(vid);
+          if (idx < sortedVids.length - 1) playVerse(sortedVids[idx+1]);
+          else setPlaybackStatus('stopped');
+      };
+      window.speechSynthesis.speak(u);
+
+      const el = document.getElementById(`verse-${vid}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  const handleToggle = () => {
+      if (playbackStatus === 'playing') {
+          window.speechSynthesis.pause();
+          setPlaybackStatus('paused');
+      } else if (playbackStatus === 'paused') {
+          window.speechSynthesis.resume();
+          setPlaybackStatus('playing');
+      } else {
+          setPlaybackStatus('playing');
+          playVerse(activeVerseId || sortedVids[0]);
+      }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
+      <header className="w-full bg-white/95 border-b border-stone-200 py-2 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+                <a href="index.html" className="text-stone-400 hover:text-amber-600 transition-colors font-bold text-xs uppercase tracking-widest flex items-center gap-1">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
+                    Daily
+                </a>
+
+                {/* Book Selector */}
+                <select
+                    value={selectedBook || ''}
+                    onChange={(e) => { setSelectedBook(e.target.value); setSelectedChapter(null); }}
+                    className="bg-stone-100 border-none rounded text-xs font-black uppercase tracking-tight py-1 px-2 focus:ring-2 focus:ring-amber-500"
+                >
+                    <option value="" disabled>Select Book</option>
+                    {availableBooks.map(b => <option key={b} value={b}>{BOOK_NAMES[b]}</option>)}
+                </select>
+
+                {/* Chapter Selector */}
+                {selectedBook && index[selectedBook] && (
+                    <select
+                        value={selectedChapter || ''}
+                        onChange={(e) => setSelectedChapter(e.target.value)}
+                        className="bg-stone-100 border-none rounded text-xs font-black uppercase tracking-tight py-1 px-2 focus:ring-2 focus:ring-amber-500"
+                    >
+                        <option value="" disabled>Ch</option>
+                        {Object.keys(index[selectedBook]).sort((a,b)=>parseInt(a)-parseInt(b)).map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                )}
+            </div>
+
+            {/* Translation Settings (Reuse logic) */}
+            <div className="flex items-center gap-2">
+                 {/* Only show if we have data */}
+                 {verseMap && (
+                     <button onClick={handleToggle} className={`px-3 py-1 rounded-full font-bold text-xs uppercase ${playbackStatus==='playing'?'bg-amber-600 text-white':'bg-stone-200 text-stone-600'}`}>
+                        {playbackStatus==='playing'?'Pause':'Listen'}
+                     </button>
+                 )}
+            </div>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto py-6 px-2 space-y-6">
+        {!selectedBook ? (
+            <div className="text-center py-20 text-stone-400 font-serif italic">Select a book to begin</div>
+        ) : loading ? (
+            <Loader />
+        ) : error ? (
+            <div className="text-center text-red-500 py-10">{error}</div>
+        ) : (
+            groupedVids.map(group => (
+                <VerseGroup
+                    key={group[0]}
+                    group={group}
+                    verseMap={verseMap}
+                    dynamicSlots={dynamicSlots}
+                    isActive={playbackVerseId === group[0]}
+                    isDimmed={playbackStatus === 'playing' && playbackVerseId !== group[0]}
+                    isPlaying={playbackStatus === 'playing'}
+                />
+            ))
+        )}
+      </main>
+    </div>
+  );
+};
+
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
+    </script>
+    <script src="https://esm.sh/run" type="module"></script>
+</body>
+</html>
