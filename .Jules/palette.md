@@ -115,6 +115,11 @@ Replaced the `title` attribute with a custom, persistently present (but visually
 2. **Card Focus:** When a card is fully clickable via an overlay link, the default focus state usually only highlights the inner text link. This disconnects the visual focus from the actual click target (the whole card).
    * *Fix:* Use `:focus-within` on the card container to apply the focus ring to the entire card, and hide the inner link's default focus ring.
 
+## 2026-02-15 - Dynamic Copy Button Logic
+**Learning:**
+Refactoring a single-use "Copy" button to a reusable pattern requires careful state management. When multiple buttons exist, relying on global selectors (like `document.querySelector`) breaks functionality for subsequent elements.
+**Action:**
+Use `querySelectorAll` and iterate with `forEach`. Store element-specific state (like `originalLabel`) within the event handler closure to ensure the correct text is restored for each specific button after the "Copied!" timeout.
 ## 2026-02-15 - Visual Polish & Accessibility Micro-Fixes
 **Learning:**
 1. **Aspect Ratio Distortion:** Fixed width (e.g., `width: 90px`) on responsive images (logos) often causes distortion (squashing) when combined with `max-height` constraints.
