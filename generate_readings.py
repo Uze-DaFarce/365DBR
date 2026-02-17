@@ -81,6 +81,19 @@ NT_BOOKS = ALL_BOOKS[39:]  # MAT to REV
 # but per spec we need to exclude them from the sequential OT reading.
 OT_SEQUENTIAL_BOOKS = [b for b in OT_BOOKS if b not in ["PSA", "PRO"]]
 
+# Known Omissions in Critical Texts (SBLGNT, NA28, etc.) which API.Bible follows for Greek NT (7644de2e4c5188e5-01).
+# Note: These verses ARE present in Textus Receptus based translations (KJV, LSV),
+# but since our app drives the reading plan from the Greek text (SBLGNT), the API returns them as missing/empty.
+# To avoid "Verse Count Mismatch" errors during validation, we treat them as omitted in our plan.
+KNOWN_OMISSIONS = {
+    "MAT.17.21", "MAT.18.11", "MAT.23.14",
+    "MRK.7.16", "MRK.9.44", "MRK.9.46", "MRK.11.26", "MRK.15.28",
+    "LUK.17.36", "LUK.23.17",
+    "JHN.5.4",
+    "ACT.8.37", "ACT.15.34", "ACT.24.7", "ACT.28.29",
+    "ROM.16.24"
+}
+
 BOOK_NAMES = {
     "GEN": "Genesis", "EXO": "Exodus", "LEV": "Leviticus", "NUM": "Numbers", "DEU": "Deuteronomy",
     "JOS": "Joshua", "JDG": "Judges", "RUT": "Ruth", "1SA": "1 Samuel", "2SA": "2 Samuel",
@@ -126,6 +139,9 @@ class BibleNavigator:
             for c_idx, v_count in enumerate(chapters):
                 c_num = c_idx + 1
                 for v in range(1, v_count + 1):
+                    # We do NOT exclude KNOWN_OMISSIONS here.
+                    # The reading plan must include ALL verses (e.g. KJV/LSV count).
+                    # fetch_readings.py will be responsible for filling in missing data from the API.
                     self.verses.append(BibleLocation(b, c_num, v))
         self.total_verses = len(self.verses)
         
