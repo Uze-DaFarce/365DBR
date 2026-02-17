@@ -649,6 +649,22 @@
         transform: none !important;
       }
     }
+
+    /* 🎨 Palette: Print Styles for Offline Accessibility */
+    @media print {
+      header, footer, .hero, .skip-link, .back-to-top, .btn-primary, .btn-secondary, .btn-outline, .social-links, nav { display: none !important; }
+      body { font-size: 12pt; background: #fff; color: #000; }
+      section { padding: 0; page-break-inside: avoid; }
+      .package-card, .service-card, .review-card, .contact-info {
+        page-break-inside: avoid;
+        border: 1px solid #ddd;
+        box-shadow: none;
+        break-inside: avoid;
+        margin-bottom: 20px;
+      }
+      a[href^="http"]:not(:has(img))::after { content: " (" attr(href) ")"; font-size: 0.9em; word-wrap: break-word; }
+      h1, h2, h3, h4, p, li { color: #000 !important; }
+    }
   </style>
   <style>@view-transition { navigation: auto; }</style>
  </head>
