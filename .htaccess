@@ -45,8 +45,9 @@
 
   # 🛡️ Sentinel: Block access to sensitive source/config files
   # Prevents leakage of internal documentation, logs, and scripts
-  # Blocks: .md, .py, .log, .sh, .bak, .swp
-  RedirectMatch 403 "(?i)\.(md|py|log|sh|bak|swp)$"
+  # Blocks: .py, .log, .sh, .bak, .swp
+  # Note: .md is allowed as sub-sites (like 365DBR) may serve markdown content
+  RedirectMatch 403 "(?i)\.(py|log|sh|bak|swp)$"
 </IfModule>
 
 <IfModule mod_deflate.c>
