@@ -8,17 +8,19 @@ import urllib.error
 import urllib.parse
 import re
 
-# Import validate_range_for_section and count_expected_verses from fetch_readings
+# Import shared logic and constants from fetch_readings
 try:
-    from fetch_readings import validate_range_for_section, count_expected_verses
+    from fetch_readings import (
+        validate_range_for_section,
+        count_expected_verses,
+        translate_range_for_bible,
+        OT_HEBREW_ID,
+        NT_GREEK_ID,
+        API_BASE_URL
+    )
 except ImportError:
-    print("Error: Could not import validate_range_for_section or count_expected_verses from fetch_readings.py")
+    print("Error: Could not import necessary functions or constants from fetch_readings.py")
     sys.exit(1)
-
-# API Configuration (Shared with fetch_readings logic)
-API_BASE_URL = "https://rest.api.bible/v1"
-OT_HEBREW_ID = "0b262f1ed7f084a6-01"
-NT_GREEK_ID = "7644de2e4c5188e5-01"
 
 def get_api_key():
     return os.environ.get("API_BIBLE_KEY")
@@ -125,8 +127,7 @@ def verify_with_api(readings_path, day_limit=1):
             sub_ranges = composite_rng.split(';')
 
             for rng in sub_ranges:
-                # Need to translate range for Hebrew bible if needed (e.g. JOE -> JOL)
-                from fetch_readings import translate_range_for_bible
+                # Use shared translate function
                 api_rng = translate_range_for_bible(rng, bible_id)
 
                 url = f"{API_BASE_URL}/bibles/{bible_id}/passages/{api_rng}?include-verse-spans=true"
