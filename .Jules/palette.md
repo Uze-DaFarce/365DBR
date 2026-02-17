@@ -40,8 +40,8 @@
 
 ## 2026-02-24 - Discoverability vs Clutter
 **Learning:** While "hover-to-reveal" reduces visual clutter, users perceive it as "hidden" or "easter egg" functionality for core utilities like Copying.
-**Action:** For primary actions (like Copy), prefer persistent visibility (even if subtle) over hidden states. Use opacity/color to manage visual weight instead of  or .
-
-## 2026-02-24 - Discoverability vs Clutter
-**Learning:** While "hover-to-reveal" reduces visual clutter, users perceive it as "hidden" or "easter egg" functionality for core utilities like Copying.
 **Action:** For primary actions (like Copy), prefer persistent visibility (even if subtle) over hidden states. Use opacity/color to manage visual weight instead of `display:none` or `opacity:0`.
+
+## 2026-02-25 - Click-to-Focus for Focal Interfaces
+**Learning:** In interfaces where scrolling determines the "active" item (like a focal verse list), users instinctively click items to select or focus them. Relying solely on scroll position frustrates users who want manual control or struggle with scroll precision.
+**Action:** Implement `onClick` handlers that smoothly scroll the target item into the "focal zone" (e.g., using `scrollIntoView`), but ensure to gate it against text selection interactions (check `window.getSelection()`).
