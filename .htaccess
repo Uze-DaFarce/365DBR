@@ -1,3 +1,9 @@
+<IfModule mod_autoindex.c>
+  # 🛡️ Sentinel: Disable directory listing
+  # Prevents attackers from enumerating files in directories like /pics or /css
+  Options -Indexes
+</IfModule>
+
 <IfModule mod_headers.c>
   # 🛡️ Sentinel: Security Headers Enhancement
   # Added to enforce strict security policies at the server level (Apache)
@@ -36,6 +42,11 @@
   # Prevents leakage of sensitive config like .git, .env, or .Jules
   # Exceptions: .well-known (standard for security.txt, SSL validation)
   RedirectMatch 403 "(^|/)\.(?!well-known(?:$|/))"
+
+  # 🛡️ Sentinel: Block access to sensitive source/config files
+  # Prevents leakage of internal documentation, logs, and scripts
+  # Blocks: .md, .py, .log, .sh, .bak, .swp
+  RedirectMatch 403 "(?i)\.(md|py|log|sh|bak|swp)$"
 </IfModule>
 
 <IfModule mod_deflate.c>
