@@ -81,6 +81,16 @@ NT_BOOKS = ALL_BOOKS[39:]  # MAT to REV
 # but per spec we need to exclude them from the sequential OT reading.
 OT_SEQUENTIAL_BOOKS = [b for b in OT_BOOKS if b not in ["PSA", "PRO"]]
 
+# Known Omissions in Critical Texts (SBLGNT, etc.) which API.Bible follows for Greek NT
+KNOWN_OMISSIONS = {
+    "MAT.17.21", "MAT.18.11", "MAT.23.14",
+    "MRK.7.16", "MRK.9.44", "MRK.9.46", "MRK.11.26", "MRK.15.28",
+    "LUK.17.36", "LUK.23.17",
+    "JHN.5.4",
+    "ACT.8.37", "ACT.15.34", "ACT.24.7", "ACT.28.29",
+    "ROM.16.24"
+}
+
 BOOK_NAMES = {
     "GEN": "Genesis", "EXO": "Exodus", "LEV": "Leviticus", "NUM": "Numbers", "DEU": "Deuteronomy",
     "JOS": "Joshua", "JDG": "Judges", "RUT": "Ruth", "1SA": "1 Samuel", "2SA": "2 Samuel",
@@ -126,6 +136,10 @@ class BibleNavigator:
             for c_idx, v_count in enumerate(chapters):
                 c_num = c_idx + 1
                 for v in range(1, v_count + 1):
+                    # Check for Omission
+                    vid = f"{b}.{c_num}.{v}"
+                    if vid in KNOWN_OMISSIONS:
+                        continue
                     self.verses.append(BibleLocation(b, c_num, v))
         self.total_verses = len(self.verses)
         

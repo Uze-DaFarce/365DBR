@@ -19,9 +19,9 @@ API_BASE_URL = "https://rest.api.bible/v1"
 
 # Hebrew/Greek Verse Counts (Imported from generate_readings.py)
 try:
-    from generate_readings import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, NT_BOOKS, ALL_BOOKS
+    from generate_readings import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, NT_BOOKS, ALL_BOOKS, KNOWN_OMISSIONS
 except ImportError:
-    print("Error: Could not import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, NT_BOOKS, or ALL_BOOKS from generate_readings.py")
+    print("Error: Could not import BIBLE_DATA, BOOK_NAMES, OT_SEQUENTIAL_BOOKS, NT_BOOKS, ALL_BOOKS, or KNOWN_OMISSIONS from generate_readings.py")
     exit(1)
 
 # Map Standard Book IDs to OT Hebrew Bible Specific IDs
@@ -193,6 +193,7 @@ def count_expected_verses(range_str):
     """
     Calculates expected verse count from BIBLE_DATA for a range string.
     Handles single book and cross-book ranges.
+    Adjusts count for KNOWN_OMISSIONS.
     """
     if ';' in range_str:
         return sum(count_expected_verses(r) for r in range_str.split(';'))
@@ -207,47 +208,98 @@ def count_expected_verses(range_str):
 
     all_books = list(BIBLE_DATA.keys())
 
+    # Helper to check if a specific verse (vid) is inside the current range [start, end]
+    def is_verse_in_range(vid, s_b, s_c, s_v, e_b, e_c, e_v):
+        v_book, v_chap, v_verse = parse_reference(vid)
+
+        # 1. Check Book
+        # If range is same book:
+        if s_b == e_b:
+            if v_book != s_b: return False
+            # Same book check
+            # Case A: Same chapter range
+            if s_c == e_c:
+                if v_chap != s_c: return False
+                return s_v <= v_verse <= e_v
+            # Case B: Multi-chapter
+            # Start Chapter
+            if v_chap == s_c: return v_verse >= s_v
+            # End Chapter
+            if v_chap == e_c: return v_verse <= e_v
+            # Middle Chapter
+            return s_c < v_chap < e_c
+
+        # If range is cross-book:
+        # Check if book is within [s_b, e_b]
+        try:
+            v_idx = all_books.index(v_book)
+            s_idx = all_books.index(s_b)
+            e_idx = all_books.index(e_b)
+        except ValueError:
+            return False # Unknown book
+
+        if not (s_idx <= v_idx <= e_idx): return False
+
+        # If book is Start Book
+        if v_book == s_b:
+            if v_chap == s_c: return v_verse >= s_v
+            return v_chap > s_c
+
+        # If book is End Book
+        if v_book == e_b:
+            if v_chap == e_c: return v_verse <= e_v
+            return v_chap < e_c
+
+        # If book is strictly between
+        return True
+
+
+    # Base Count Calculation
+    raw_count = 0
+
     if s_book == e_book:
         if s_chap == e_chap:
-            return e_verse - s_verse + 1
+            raw_count = e_verse - s_verse + 1
+        else:
+            # Same book, diff chapters
+            chapters = BIBLE_DATA[s_book]
+            raw_count = (chapters[s_chap-1] - s_verse + 1)
+            for c in range(s_chap + 1, e_chap):
+                raw_count += chapters[c-1]
+            raw_count += e_verse
+    else:
+        # Cross book
+        if s_book not in all_books or e_book not in all_books:
+            print(f"  [Warning] Unknown book in range {range_str}, skipping count check.")
+            return -1
 
-        # Same book, diff chapters
-        chapters = BIBLE_DATA[s_book]
-        count = (chapters[s_chap-1] - s_verse + 1)
-        for c in range(s_chap + 1, e_chap):
-            count += chapters[c-1]
-        count += e_verse
-        return count
+        s_idx = all_books.index(s_book)
+        e_idx = all_books.index(e_book)
 
-    # Cross book
-    if s_book not in all_books or e_book not in all_books:
-        # Fallback for unknown books (shouldn't happen with valid data)
-        print(f"  [Warning] Unknown book in range {range_str}, skipping count check.")
-        return -1
+        # 1. Start Book remainder
+        chapters_s = BIBLE_DATA[s_book]
+        raw_count += (chapters_s[s_chap-1] - s_verse + 1)
+        for c in range(s_chap + 1, len(chapters_s) + 1):
+            raw_count += chapters_s[c-1]
 
-    s_idx = all_books.index(s_book)
-    e_idx = all_books.index(e_book)
+        # 2. Intermediate Books
+        for i in range(s_idx + 1, e_idx):
+            book = all_books[i]
+            raw_count += sum(BIBLE_DATA[book])
 
-    count = 0
+        # 3. End Book start
+        chapters_e = BIBLE_DATA[e_book]
+        for c in range(1, e_chap):
+            raw_count += chapters_e[c-1]
+        raw_count += e_verse
 
-    # 1. Start Book remainder
-    chapters_s = BIBLE_DATA[s_book]
-    count += (chapters_s[s_chap-1] - s_verse + 1)
-    for c in range(s_chap + 1, len(chapters_s) + 1):
-        count += chapters_s[c-1]
+    # Subtract Omissions
+    omission_penalty = 0
+    for omitted_vid in KNOWN_OMISSIONS:
+        if is_verse_in_range(omitted_vid, s_book, s_chap, s_verse, e_book, e_chap, e_verse):
+            omission_penalty += 1
 
-    # 2. Intermediate Books
-    for i in range(s_idx + 1, e_idx):
-        book = all_books[i]
-        count += sum(BIBLE_DATA[book])
-
-    # 3. End Book start
-    chapters_e = BIBLE_DATA[e_book]
-    for c in range(1, e_chap):
-        count += chapters_e[c-1]
-    count += e_verse
-
-    return count
+    return raw_count - omission_penalty
 
 def validate_content_integrity(data, range_str):
     """
