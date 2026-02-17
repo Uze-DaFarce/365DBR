@@ -81,7 +81,10 @@ NT_BOOKS = ALL_BOOKS[39:]  # MAT to REV
 # but per spec we need to exclude them from the sequential OT reading.
 OT_SEQUENTIAL_BOOKS = [b for b in OT_BOOKS if b not in ["PSA", "PRO"]]
 
-# Known Omissions in Critical Texts (SBLGNT, etc.) which API.Bible follows for Greek NT
+# Known Omissions in Critical Texts (SBLGNT, NA28, etc.) which API.Bible follows for Greek NT (7644de2e4c5188e5-01).
+# Note: These verses ARE present in Textus Receptus based translations (KJV, LSV),
+# but since our app drives the reading plan from the Greek text (SBLGNT), the API returns them as missing/empty.
+# To avoid "Verse Count Mismatch" errors during validation, we treat them as omitted in our plan.
 KNOWN_OMISSIONS = {
     "MAT.17.21", "MAT.18.11", "MAT.23.14",
     "MRK.7.16", "MRK.9.44", "MRK.9.46", "MRK.11.26", "MRK.15.28",
