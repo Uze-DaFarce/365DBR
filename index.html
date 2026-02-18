@@ -326,13 +326,26 @@ const getSectionIndex = (vid) => {
     return NT_BOOKS.has(book) ? 1 : 0;
 };
 
-const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
-    if (!verseMap) return "";
+// ⚡ Bolt Optimization: Optimized VID parser to avoid array allocation from split()
+const parseVid = (vid) => {
+    const dot1 = vid.indexOf('.');
+    const dot2 = vid.indexOf('.', dot1 + 1);
 
-    const parseVid = (vid) => {
+    // Fallback for malformed VIDs (though unlikely given strict data)
+    if (dot1 === -1 || dot2 === -1) {
         const parts = vid.split('.');
         return { book: parts[0], chapter: parseInt(parts[1]), verse: parseInt(parts[2]) };
+    }
+
+    return {
+        book: vid.substring(0, dot1),
+        chapter: parseInt(vid.substring(dot1 + 1, dot2)),
+        verse: parseInt(vid.substring(dot2 + 1))
     };
+};
+
+const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
+    if (!verseMap) return "";
 
     const getEngVid = (vid) => {
         if (!focalKey) return vid;
@@ -497,26 +510,21 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                 const first = contributing[0];
                 const last = contributing[contributing.length - 1];
 
-                const parse = (v) => {
-                    const p = v.split('.');
-                    return { b: p[0], c: parseInt(p[1]), v: parseInt(p[2]) };
-                };
-
-                const s = parse(first);
-                const e = parse(last);
-                const bName = BOOK_NAMES[s.b] || s.b;
+                const s = parseVid(first);
+                const e = parseVid(last);
+                const bName = BOOK_NAMES[s.book] || s.book;
 
                 if (first === last) {
-                    displayLabel = `${bName} ${s.c}:${s.v}`;
-                } else if (s.b === e.b) {
-                    if (s.c === e.c) {
-                        displayLabel = `${bName} ${s.c}:${s.v}-${e.v}`;
+                    displayLabel = `${bName} ${s.chapter}:${s.verse}`;
+                } else if (s.book === e.book) {
+                    if (s.chapter === e.chapter) {
+                        displayLabel = `${bName} ${s.chapter}:${s.verse}-${e.verse}`;
                     } else {
-                        displayLabel = `${bName} ${s.c}:${s.v}-${e.c}:${e.v}`;
+                        displayLabel = `${bName} ${s.chapter}:${s.verse}-${e.chapter}:${e.verse}`;
                     }
                 } else {
-                    const eName = BOOK_NAMES[e.b] || e.b;
-                    displayLabel = `${bName} ${s.c}:${s.v} - ${eName} ${e.c}:${e.v}`;
+                    const eName = BOOK_NAMES[e.book] || e.book;
+                    displayLabel = `${bName} ${s.chapter}:${s.verse} - ${eName} ${e.chapter}:${e.verse}`;
                 }
 
             } else if (group.length > 0) {
@@ -824,6 +832,9 @@ const App = () => {
   const [error, setError] = useState(null);
 
   const [currentDate, setCurrentDate] = useState(initialState.date);
+
+  // ⚡ Bolt Optimization: Memoize formatted date string to avoid parsing/formatting on every render frame
+  const formattedDate = useMemo(() => formatDate(currentDate), [currentDate]);
   const [playbackStatus, setPlaybackStatus] = useState('stopped');
   const [activeVerseId, setActiveVerseId] = useState(null); // Visual position (scroll tracking)
   const activeVerseIdRef = useRef(activeVerseId);
@@ -1308,15 +1319,15 @@ const App = () => {
                <button onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" title="Previous Day (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
                <h1 className="text-[11px] md:text-sm font-black text-stone-900 uppercase whitespace-nowrap flex items-center">
                   {currentDate === todayString ? (
-                      <span className="px-1 cursor-default">{formatDate(currentDate)}</span>
+                      <span className="px-1 cursor-default">{formattedDate}</span>
                   ) : (
                       <button
                           onClick={() => { setCurrentDate(todayString); window.scrollTo({ top: 0 }); }}
                           title="Jump to Today"
-                          aria-label={`Current reading: ${formatDate(currentDate)}. Click to jump to Today.`}
+                          aria-label={`Current reading: ${formattedDate}. Click to jump to Today.`}
                           className="px-1 hover:text-amber-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded flex items-center gap-1"
                       >
-                          {formatDate(currentDate)}
+                          {formattedDate}
                           <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 print:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" /></svg>
                       </button>
                   )}
