@@ -346,7 +346,7 @@ const App = () => {
     const initIndex = async () => {
         try {
             // Cache busting to ensure fresh data
-            const res = await fetch('readings.json?v=' + new Date().getTime());
+            const res = await fetch('data/readings.json?v=' + new Date().getTime());
             if (!res.ok) throw new Error(`Failed to load readings.json: ${res.status}`);
             const readings = await res.json();
             console.log("Loaded readings:", readings.length);

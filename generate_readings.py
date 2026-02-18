@@ -404,7 +404,8 @@ def main():
             current_day = 1
             current_month += 1
             
-    with open("readings.json", "w") as f:
+    os.makedirs("data", exist_ok=True)
+    with open("data/readings.json", "w") as f:
         json.dump(readings, f, indent=2)
         
     print("First Day:", json.dumps(readings[0], indent=2))

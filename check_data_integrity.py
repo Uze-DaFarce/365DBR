@@ -191,7 +191,7 @@ def main():
     parser.add_argument("--local", action="store_true", help="Run local consistency check")
     parser.add_argument("--api", action="store_true", help="Run API verification")
     parser.add_argument("--days", type=int, default=1, help="Number of days to verify via API")
-    parser.add_argument("--readings", default="readings.json", help="Path to readings.json (default: readings.json)")
+    parser.add_argument("--readings", default="data/readings.json", help="Path to readings.json (default: data/readings.json)")
     args = parser.parse_args()
 
     success = True
