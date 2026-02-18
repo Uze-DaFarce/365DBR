@@ -344,3 +344,43 @@ copyBtns.forEach(copyBtn => {
       });
   });
 });
+
+// 🎨 Palette: Scroll Reveal Animation
+const observerOptions = {
+  root: null,
+  rootMargin: '50px',
+  threshold: 0.1
+};
+
+const revealObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const target = entry.target;
+      target.classList.add('is-visible');
+      observer.unobserve(target);
+
+      // Clean up classes after animation to prevent conflicts with hover effects
+      target.addEventListener('transitionend', () => {
+        target.classList.remove('reveal-on-scroll', 'is-visible');
+      }, { once: true });
+    }
+  });
+}, observerOptions);
+
+// Only init animation if user prefers motion
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (!prefersReducedMotion) {
+  const revealElements = document.querySelectorAll('.service-card, .project-card, .package-card, .team-member, .review-card, .contact-info');
+
+  revealElements.forEach(el => {
+    // Only animate elements that are NOT already in the viewport
+    const rect = el.getBoundingClientRect();
+    const isAlreadyVisible = rect.top < window.innerHeight;
+
+    if (!isAlreadyVisible) {
+      el.classList.add('reveal-on-scroll');
+      revealObserver.observe(el);
+    }
+  });
+}

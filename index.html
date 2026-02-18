@@ -666,6 +666,20 @@
       a[href^="http"]:not(:has(img))::after { content: " (" attr(href) ")"; font-size: 0.9em; word-wrap: break-word; }
       h1, h2, h3, h4, p, li { color: #000 !important; }
     }
+
+    /* 🎨 Palette: Scroll Reveal Animation */
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        will-change: opacity, transform;
+      }
+      .reveal-on-scroll.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
   <style>@view-transition { navigation: auto; }</style>
  </head>
