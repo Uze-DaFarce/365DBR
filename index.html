@@ -228,8 +228,7 @@ const processContent = (contentArray, map, versionKey, useOrgId = false) => {
 };
 
 const loadDailyBread = async (dateFolder) => {
-  const ts = new Date().getTime(); // Cache busting timestamp
-  const manifestPath = `data/${dateFolder}/manifest.json?v=${ts}`;
+  const manifestPath = `data/${dateFolder}/manifest.json`;
   const manifestRes = await fetch(manifestPath);
   if (!manifestRes.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
   const manifest = await manifestRes.json();
@@ -238,7 +237,7 @@ const loadDailyBread = async (dateFolder) => {
 
   const results = await Promise.all(
     manifest.files.map(async fileName => {
-        const res = await fetch(`data/${dateFolder}/${fileName}?v=${ts}`);
+        const res = await fetch(`data/${dateFolder}/${fileName}`);
         if (!res.ok) throw new Error(`Failed to load ${fileName} (Status: ${res.status})`);
         const json = await res.json();
         // Integrity Check: Must have data.content OR data.parallels
