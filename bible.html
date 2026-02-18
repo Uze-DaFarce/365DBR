@@ -71,7 +71,10 @@ const BOOK_NAMES = {
   MAT: 'Matthew', MRK: 'Mark', LUK: 'Luke', JHN: 'John', ACT: 'Acts', ROM: 'Romans', '1CO': '1 Corinthians', '2CO': '2 Corinthians', GAL: 'Galatians', EPH: 'Ephesians', PHP: 'Philippians', COL: 'Colossians', '1TH': '1 Thessalonians', '2TH': '2 Thessalonians', '1TI': '1 Timothy', '2TI': '2 Timothy', TIT: 'Titus', PHM: 'Philemon', HEB: 'Hebrews', JAS: 'James', '1PE': '1 Peter', '2PE': '2 Peter', '1JN': '1 John', '2JN': '2 John', '3JN': '3 John', JUD: 'Jude', REV: 'Revelation'
 };
 
-const BIBLE_BOOK_ORDER = Object.keys(BOOK_NAMES);
+const BIBLE_BOOK_ORDER = [
+  "GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1SA", "2SA", "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "JOB", "PSA", "PRO", "ECC", "SON", "ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOE", "AMO", "OBA", "JON", "MIC", "NAH", "HAB", "ZEP", "HAG", "ZEC", "MAL",
+  "MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"
+];
 const BIBLE_BOOK_ORDER_MAP = new Map(BIBLE_BOOK_ORDER.map((b, i) => [b, i]));
 const NT_BOOKS = new Set(["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"]);
 
@@ -342,9 +345,11 @@ const App = () => {
   useEffect(() => {
     const initIndex = async () => {
         try {
-            const res = await fetch('readings.json');
-            if (!res.ok) throw new Error("Failed to load readings.json");
+            // Cache busting to ensure fresh data
+            const res = await fetch('readings.json?v=' + new Date().getTime());
+            if (!res.ok) throw new Error(`Failed to load readings.json: ${res.status}`);
             const readings = await res.json();
+            console.log("Loaded readings:", readings.length);
 
             const newIndex = {};
             const books = new Set();
@@ -357,13 +362,17 @@ const App = () => {
                     subRanges.forEach(part => {
                         // GEN.1.1-GEN.1.31
                         const [start, end] = part.split('-');
+                        if (!end) return; // Guard against malformed ranges
                         const [sBook, sCh] = start.split('.');
                         const [eBook, eCh] = end.split('.');
 
                         const sBookIdx = BIBLE_BOOK_ORDER_MAP.get(sBook);
                         const eBookIdx = BIBLE_BOOK_ORDER_MAP.get(eBook);
 
-                        if (sBookIdx === undefined || eBookIdx === undefined) return;
+                        if (sBookIdx === undefined || eBookIdx === undefined) {
+                            console.warn("Unknown book code:", sBook, eBook);
+                            return;
+                        }
 
                         // Iterate Books
                         for (let bIdx = sBookIdx; bIdx <= eBookIdx; bIdx++) {
@@ -409,11 +418,17 @@ const App = () => {
             });
 
             setIndex(newIndex);
-            setAvailableBooks(Array.from(books).sort((a,b) => (BIBLE_BOOK_ORDER_MAP.get(a)||0) - (BIBLE_BOOK_ORDER_MAP.get(b)||0)));
+            const bookList = Array.from(books).sort((a,b) => (BIBLE_BOOK_ORDER_MAP.get(a)||0) - (BIBLE_BOOK_ORDER_MAP.get(b)||0));
+            console.log("Books found:", bookList);
+            if (bookList.length === 0) {
+                setError("No books found in index. Please verify data.");
+            } else {
+                setAvailableBooks(bookList);
+            }
             setLoading(false);
         } catch (e) {
             console.error(e);
-            setError("Failed to load Bible Index.");
+            setError(`Failed to load Bible Index: ${e.message}`);
             setLoading(false);
         }
     };
