@@ -735,7 +735,7 @@ def main():
     parser.add_argument("--day", help="Process specific day (e.g., 0201)")
     parser.add_argument("--month", help="Process specific month (e.g., 02)")
     parser.add_argument("--all", action="store_true", help="Process all days in readings.json")
-    parser.add_argument("--readings", default="readings.json", help="Path to readings.json")
+    parser.add_argument("--readings", default="data/readings.json", help="Path to readings.json")
     parser.add_argument("--out", default="data", help="Output directory (root folder containing day folders)")
     
     args = parser.parse_args()
