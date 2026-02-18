@@ -1,0 +1,476 @@
+{
+  "data": {
+    "id": "PRO.5.11-PRO.5.12",
+    "orgId": "PRO.5.11-PRO.5.12",
+    "bibleId": "0b262f1ed7f084a6-01",
+    "bookId": "PRO",
+    "chapterIds": [
+      "PRO.5"
+    ],
+    "reference": "מִשְׁלֵי 5:11-12",
+    "content": [
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H5098"
+            },
+            "items": [
+              {
+                "text": "וְנָהַמְתָּ֥",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.11",
+                  "verseOrgIds": [
+                    "PRO.5.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.11",
+              "verseOrgIds": [
+                "PRO.5.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0319"
+            },
+            "items": [
+              {
+                "text": "בְאַחֲרִיתֶ֑ךָ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.11",
+                  "verseOrgIds": [
+                    "PRO.5.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.11",
+              "verseOrgIds": [
+                "PRO.5.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3615"
+            },
+            "items": [
+              {
+                "text": "בִּכְל֥וֹת",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.11",
+                  "verseOrgIds": [
+                    "PRO.5.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.11",
+              "verseOrgIds": [
+                "PRO.5.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1320"
+            },
+            "items": [
+              {
+                "text": "בְּ֝שָׂרְךָ֗",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.11",
+                  "verseOrgIds": [
+                    "PRO.5.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.11",
+              "verseOrgIds": [
+                "PRO.5.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7607"
+            },
+            "items": [
+              {
+                "text": "וּשְׁאֵרֶֽךָ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.11",
+                  "verseOrgIds": [
+                    "PRO.5.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.11",
+              "verseOrgIds": [
+                "PRO.5.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0559"
+            },
+            "items": [
+              {
+                "text": "וְֽאָמַרְתָּ֗",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.12",
+                  "verseOrgIds": [
+                    "PRO.5.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.12",
+              "verseOrgIds": [
+                "PRO.5.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0349"
+            },
+            "items": [
+              {
+                "text": "אֵ֭יךְ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.12",
+                  "verseOrgIds": [
+                    "PRO.5.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.12",
+              "verseOrgIds": [
+                "PRO.5.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8130"
+            },
+            "items": [
+              {
+                "text": "שָׂנֵ֣אתִי",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.12",
+                  "verseOrgIds": [
+                    "PRO.5.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.12",
+              "verseOrgIds": [
+                "PRO.5.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4148"
+            },
+            "items": [
+              {
+                "text": "מוּסָ֑ר",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.12",
+                  "verseOrgIds": [
+                    "PRO.5.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.12",
+              "verseOrgIds": [
+                "PRO.5.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8433"
+            },
+            "items": [
+              {
+                "text": "וְ֝תוֹכַ֗חַת",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.12",
+                  "verseOrgIds": [
+                    "PRO.5.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.12",
+              "verseOrgIds": [
+                "PRO.5.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H5006"
+            },
+            "items": [
+              {
+                "text": "נָאַ֥ץ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.12",
+                  "verseOrgIds": [
+                    "PRO.5.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.12",
+              "verseOrgIds": [
+                "PRO.5.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3820"
+            },
+            "items": [
+              {
+                "text": "לִבִּֽי",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.12",
+                  "verseOrgIds": [
+                    "PRO.5.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.5.12",
+              "verseOrgIds": [
+                "PRO.5.12"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "verseCount": 2,
+    "copyright": "PUBLIC DOMAIN",
+    "parallels": [
+      {
+        "id": "PRO.5.11-PRO.5.12",
+        "orgId": "PRO.5.11-PRO.5.12",
+        "bibleId": "de4e12af7f28f599-01",
+        "bookId": "PRO",
+        "chapterIds": [
+          "PRO.5"
+        ],
+        "reference": "Proverbs 5:11-12",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "And thou mourn at the last, when thy flesh and thy body are consumed, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.11",
+                  "verseOrgIds": [
+                    "PRO.5.11"
+                  ]
+                }
+              },
+              {
+                "text": "And say, How have I hated instruction, and my heart despised reproof; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.12",
+                  "verseOrgIds": [
+                    "PRO.5.12"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 2,
+        "copyright": "PUBLIC DOMAIN except in the United Kingdom, where a Crown Copyright applies to printing the KJV. See http://www.cambridge.org/about-us/who-we-are/queens-printers-patent"
+      },
+      {
+        "id": "PRO.5.11-PRO.5.12",
+        "orgId": "PRO.5.11-PRO.5.12",
+        "bibleId": "01b29f4b342acc35-01",
+        "bookId": "PRO",
+        "chapterIds": [
+          "PRO.5"
+        ],
+        "reference": "Proverbs 5:11-12",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "And you have howled in your latter end, || In the consumption of your flesh and your food, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.11",
+                  "verseOrgIds": [
+                    "PRO.5.11"
+                  ]
+                }
+              },
+              {
+                "text": "And have said, “How I have hated instruction, || And my heart has despised reproof, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.5.12",
+                  "verseOrgIds": [
+                    "PRO.5.12"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 2,
+        "copyright": "The Literal Standard Version of The Holy Bible is a registered copyright of Covenant Press and the Covenant Christian Coalition (© 2020), but has been subsequently released under the Creative Commons Attribution-ShareAlike license (CC BY-SA) per our desire to provide God’s word freely. Covenant Press requests that the text remain unaltered in the English language and that translations based on the LSV maintain the same spirit of faithfulness to the original Hebrew, Aramaic, and Greek text. Attribution of minor citations for personal or non-commercial use can be provided as simply “LSV” or “Literal Standard Version.” Citations for commercial use, or distribution of the entire LSV Bible or entire book(s) of the LSV Bible, must be fully attributed and include both “Literal Standard Version (LSV)” and the name of our organization. Covenant Press is soliciting partnerships with Bible publishers that are interested in the LSV project. For queries about partnering with us, please email the translation team at covenantpress@ccc.one. To learn more, visit lsvbible.com. The purpose behind the LSV is to provide readers with a modern, easy-to-read, literal, and accurate translation of the Bible that is free to read, distribute, and translate from. We pray that God will use the LSV to illuminate the hearts and minds of multitudes with the good news that His Son Jesus Christ came in the flesh, died for our sins as a substitutionary sacrifice, rose bodily from the dead, and is coming back again."
+      }
+    ]
+  },
+  "meta": {
+    "fumsToken": "G8UBQJwHto388lqYICzrdy0is7V3cUyVjy4kaVm4KVZzxRHfPVm6-kJn6pw-qAY-aKS9xUIraMIT3A0wCm0Q3tposkT0akvtVu_3vgL9R5qbnR-NlT1PGj1MjLZ4iaR_aeujV5ulcopITstAphhCFFB8A5dwadGBM6DjMxVLDMNwfGNkL5ElxR26bH3GqCimPXD6FMz93gO4ae3yqRkIwUkG1BR6l7pex9UHs1wfdhCXqRHH6VLSYvjsX8ivSJXTtNVYLq0ZJ2HM3-3TrnFFZ01zkntEaat3MlX0svRp5u5PbsnC"
+  }
+}
