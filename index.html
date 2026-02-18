@@ -1300,13 +1300,16 @@ const App = () => {
     setCurrentDate(`${nm}${nd}`); window.scrollTo({ top: 0 });
   };
 
-  const navigateVerse = (direction) => {
+  const navigateVerse = useCallback((direction) => {
     if (!sortedVids || sortedVids.length === 0) return;
+
+    // ⚡ Bolt Optimization: Use ref to access latest activeVerseId inside stale closures
+    const currentActive = activeVerseIdRef.current;
 
     // Find current index
     let currentIndex = -1;
-    if (activeVerseId) {
-        currentIndex = sortedVids.indexOf(activeVerseId);
+    if (currentActive) {
+        currentIndex = sortedVids.indexOf(currentActive);
     }
     // If no active verse (e.g., at very top), assume first verse is next logical step
     if (currentIndex === -1 && direction > 0) currentIndex = -1;
@@ -1326,7 +1329,7 @@ const App = () => {
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
-  };
+  }, [sortedVids]);
 
   const scrollToSection = (index) => {
     if (playbackStatus === 'playing' || activeSectionIndex === index) return;
