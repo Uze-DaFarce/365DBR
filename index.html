@@ -1220,7 +1220,7 @@ const App = () => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) || e.target.isContentEditable || e.ctrlKey || e.metaKey || e.altKey) return;
       switch(e.key) {
         case 'ArrowLeft': navigateDate(-1); break;
         case 'ArrowRight': navigateDate(1); break;
