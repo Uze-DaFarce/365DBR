@@ -777,6 +777,156 @@ const ReadingProgress = React.memo(({ sectionIndex }) => {
   );
 });
 
+const Header = React.memo(({
+  currentDate,
+  todayString,
+  formattedDate,
+  navigateDate,
+  setCurrentDate,
+  labelParts,
+  activeSectionIndex,
+  scrollToSection,
+  availableTranslations,
+  compareTranslation,
+  focalTranslation,
+  isCompareOpen,
+  setIsCompareOpen,
+  isFocalOpen,
+  setIsFocalOpen,
+  setCompareTranslation,
+  handleFocalChange,
+  playbackStatus,
+  onStopPlayback,
+  handleToggle
+}) => {
+  return (
+      <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm print:static print:border-none print:shadow-none">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 h-8 md:h-10">
+          <div className="flex items-center gap-1 min-w-0 flex-1">
+             <div className="flex items-center bg-stone-100 rounded-md px-0.5">
+               <button onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" title="Previous Day (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
+               <h1 className="text-[11px] md:text-sm font-black text-stone-900 uppercase whitespace-nowrap flex items-center">
+                  {currentDate === todayString ? (
+                      <span className="px-1 cursor-default">{formattedDate}</span>
+                  ) : (
+                      <button
+                          onClick={() => { setCurrentDate(todayString); window.scrollTo({ top: 0 }); }}
+                          title="Jump to Today"
+                          aria-label={`Current reading: ${formattedDate}. Click to jump to Today.`}
+                          className="px-1 hover:text-amber-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded flex items-center gap-1"
+                      >
+                          {formattedDate}
+                          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 print:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" /></svg>
+                      </button>
+                  )}
+               </h1>
+               <button onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" title="Next Day (Right Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></button>
+             </div>
+             <a href="bible.html" className="hidden md:flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase text-stone-400 hover:text-amber-600 transition-colors tracking-widest border border-transparent hover:border-stone-200 rounded print:hidden" title="Switch to Bible Browser">
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                Browse
+             </a>
+             <div className="flex items-center gap-1 min-w-0 overflow-hidden print:hidden">
+                {labelParts.map((part, i) => {
+                  const isActive = activeSectionIndex === i;
+                  const isClickable = !isActive && playbackStatus !== 'playing';
+                  const sectionNames = ['Old Testament', 'New Testament', 'Psalms', 'Proverbs'];
+
+                  return (
+                    <button
+                        key={i}
+                        type="button"
+                        onClick={() => scrollToSection(i)}
+                        title={isClickable ? `Jump to ${sectionNames[i]}` : ''}
+                        aria-label={isActive ? `Current section: ${sectionNames[i]}` : `Jump to ${sectionNames[i]}`}
+                        aria-current={isActive ? 'step' : undefined}
+                        aria-disabled={!isClickable && !isActive}
+                        className={`transition-all duration-500 flex items-center shrink-0 focus:outline-none focus-visible:ring-2 ${SECTION_THEMES[i]?.ring || 'focus-visible:ring-amber-500'} ${isActive
+                            ? `${SECTION_THEMES[i]?.bg || 'bg-amber-600'} px-2 py-0.5 rounded-full shadow-sm cursor-default`
+                            : isClickable
+                                ? 'px-1.5 py-0.5 rounded hover:bg-stone-200 cursor-pointer text-stone-500 hover:text-stone-800'
+                                : 'px-1.5 py-0.5 rounded cursor-default text-stone-400 opacity-50'
+                        }`}
+                    >
+                        {isActive
+                            ? <span className="text-[10px] md:text-xs font-bold text-white whitespace-nowrap">{part}</span>
+                            : <span className="text-[9px] font-black uppercase tracking-tighter">{PILL_LABELS[i]}</span>
+                        }
+                    </button>
+                  );
+                })}
+             </div>
+          </div>
+             <div className="flex items-center gap-2 shrink-0 print:hidden">
+             {/* Slot 2 Selector (Middle) */}
+             {availableTranslations.length > 2 ? (
+              <div className="relative">
+                <button onClick={() => { setIsCompareOpen(!isCompareOpen); setIsFocalOpen(false); }} aria-haspopup="true" aria-expanded={isCompareOpen} aria-label="Select Comparison Translation" className="flex items-center gap-1 text-[9px] md:text-[10px] font-bold uppercase text-stone-500 hover:text-stone-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Translation for Middle Slot">
+                  CMP: {compareTranslation ? compareTranslation.toUpperCase() : '-'}
+                  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isCompareOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                </button>
+                {isCompareOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsCompareOpen(false)}></div>
+                    <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
+                      {availableTranslations.filter(k => k !== focalTranslation).map(key => (
+                        <button key={key} onClick={() => { setCompareTranslation(key); setIsCompareOpen(false); }} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${compareTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
+                          <span>{key}</span>
+                          {compareTranslation === key && (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+             ) : (
+                availableTranslations.length > 1 && (
+                  <span className="text-[9px] md:text-[10px] font-bold uppercase text-stone-400 cursor-default" title="Middle Slot (Fixed)">
+                    CMP: {compareTranslation ? compareTranslation.toUpperCase() : '-'}
+                  </span>
+                )
+             )}
+
+             {/* Slot 3 Selector (Focal) */}
+             {availableTranslations.length > 0 && (
+              <div className="relative mr-1">
+                <button onClick={() => { setIsFocalOpen(!isFocalOpen); setIsCompareOpen(false); }} aria-haspopup="true" aria-expanded={isFocalOpen} aria-label="Select Focal Translation" className="flex items-center gap-1 text-[10px] md:text-xs font-black uppercase text-stone-600 hover:text-stone-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Focal (Audio) Translation">
+                  {focalTranslation ? focalTranslation.toUpperCase() : '-'}
+                  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isFocalOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                </button>
+                {isFocalOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsFocalOpen(false)}></div>
+                    <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
+                      {availableTranslations.map(key => (
+                        <button key={key} onClick={() => handleFocalChange(key)} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${focalTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
+                          <span>{key}</span>
+                          {focalTranslation === key && (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+             )}
+
+             {playbackStatus !== 'stopped' && <button onClick={onStopPlayback} aria-label="Stop Playback" aria-keyshortcuts="Escape" title="Stop Playback (Escape)" className="p-1.5 text-stone-300 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
+             <button onClick={handleToggle} aria-keyshortcuts="k" title="Toggle Playback (k)" className={`px-3 md:px-5 py-1 rounded-full font-black text-[12px] md:text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
+          </div>
+        </div>
+        <ReadingProgress sectionIndex={activeSectionIndex} />
+      </header>
+  );
+});
+
 const App = () => {
   // Helper to resolve initial state from URL -> LocalStorage -> Today
   const getInitialState = () => {
@@ -841,6 +991,8 @@ const App = () => {
   useEffect(() => { activeVerseIdRef.current = activeVerseId; }, [activeVerseId]);
 
   const [playbackVerseId, setPlaybackVerseId] = useState(null); // Where playback is at
+  const playbackVerseIdRef = useRef(playbackVerseId);
+  useEffect(() => { playbackVerseIdRef.current = playbackVerseId; }, [playbackVerseId]);
   
   // Dynamic State for Translation Slots
   const [availableTranslations, setAvailableTranslations] = useState([]);
@@ -919,7 +1071,7 @@ const App = () => {
   const playbackStatusRef = useRef('stopped'); // Track playback status in ref for callbacks
 
   // Handler for Focal Translation change with auto-swap logic for Compare slot
-  const handleFocalChange = (newFocal) => {
+  const handleFocalChange = useCallback((newFocal) => {
     if (newFocal === compareTranslation) {
         // If user picks a focal that matches current compare, we must change compare.
         // Pick the first available key that is NOT the new focal.
@@ -928,7 +1080,7 @@ const App = () => {
     }
     setFocalTranslation(newFocal);
     setIsFocalOpen(false);
-  };
+  }, [compareTranslation, availableTranslations]);
 
   // getSectionIndex moved outside App
 
@@ -1269,6 +1421,7 @@ const App = () => {
     // ⚡ Bolt Optimization: Use ref to access latest activeVerseId inside stale closures (like event listeners)
     // to avoid recreating the listener on every scroll event.
     const currentActive = activeVerseIdRef.current;
+    const currentPlayback = playbackVerseIdRef.current;
 
     if (playbackStatus === 'playing') { 
       synthRef.current.pause(); 
@@ -1279,7 +1432,7 @@ const App = () => {
       setPlaybackStatus('playing');
       isTransitioningRef.current = true;
       // Resume from current highlighted verse (where user scrolled to while paused)
-      const resumeVerse = currentActive || playbackVerseId || sortedVids[0];
+      const resumeVerse = currentActive || currentPlayback || sortedVids[0];
       if (resumeVerse && verseMap[resumeVerse]) {
         playVerse(resumeVerse);
       }
@@ -1292,15 +1445,15 @@ const App = () => {
       setPlaybackVerseId(startVerse);
       playVerse(startVerse);
     }
-  }, [playbackStatus, playbackVerseId, sortedVids, verseMap]);
+  }, [playbackStatus, sortedVids, verseMap]);
 
-  const navigateDate = (direction) => {
+  const navigateDate = useCallback((direction) => {
     const month = parseInt(currentDate.substring(0, 2)), day = parseInt(currentDate.substring(2, 4));
     // Use 2025 (non-leap year) to ensure Feb 28 -> Mar 1 transition matches the data generation
     const date = new Date(2025, month - 1, day); date.setDate(date.getDate() + direction);
     const nm = String(date.getMonth() + 1).padStart(2, '0'), nd = String(date.getDate()).padStart(2, '0');
     setCurrentDate(`${nm}${nd}`); window.scrollTo({ top: 0 });
-  };
+  }, [currentDate]);
 
   const navigateVerse = (direction) => {
     if (!sortedVids || sortedVids.length === 0) return;
@@ -1337,144 +1490,45 @@ const App = () => {
     }
   };
 
-  const scrollToSection = (index) => {
+  const scrollToSection = useCallback((index) => {
     if (playbackStatus === 'playing' || activeSectionIndex === index) return;
     const targetVid = sortedVids.find(vid => getSectionIndex(vid) === index);
     if (targetVid) {
       const el = document.getElementById(`verse-${targetVid}`);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
+  }, [playbackStatus, activeSectionIndex, sortedVids]);
+
+  const onStopPlayback = useCallback(() => {
+    synthRef.current.cancel();
+    setPlaybackStatus('stopped');
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-stone-900 focus:text-white focus:font-bold focus:rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xl transition-all print:hidden">Skip to Content</a>
-      <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm print:static print:border-none print:shadow-none">
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 h-8 md:h-10">
-          <div className="flex items-center gap-1 min-w-0 flex-1">
-             <div className="flex items-center bg-stone-100 rounded-md px-0.5">
-               <button onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" title="Previous Day (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
-               <h1 className="text-[11px] md:text-sm font-black text-stone-900 uppercase whitespace-nowrap flex items-center">
-                  {currentDate === todayString ? (
-                      <span className="px-1 cursor-default">{formattedDate}</span>
-                  ) : (
-                      <button
-                          onClick={() => { setCurrentDate(todayString); window.scrollTo({ top: 0 }); }}
-                          title="Jump to Today"
-                          aria-label={`Current reading: ${formattedDate}. Click to jump to Today.`}
-                          className="px-1 hover:text-amber-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded flex items-center gap-1"
-                      >
-                          {formattedDate}
-                          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 print:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" /></svg>
-                      </button>
-                  )}
-               </h1>
-               <button onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" title="Next Day (Right Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></button>
-             </div>
-             <a href="bible.html" className="hidden md:flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase text-stone-400 hover:text-amber-600 transition-colors tracking-widest border border-transparent hover:border-stone-200 rounded print:hidden" title="Switch to Bible Browser">
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                Browse
-             </a>
-             <div className="flex items-center gap-1 min-w-0 overflow-hidden print:hidden">
-                {labelParts.map((part, i) => {
-                  const isActive = activeSectionIndex === i;
-                  const isClickable = !isActive && playbackStatus !== 'playing';
-                  const sectionNames = ['Old Testament', 'New Testament', 'Psalms', 'Proverbs'];
-
-                  return (
-                    <button
-                        key={i}
-                        type="button"
-                        onClick={() => scrollToSection(i)}
-                        title={isClickable ? `Jump to ${sectionNames[i]}` : ''}
-                        aria-label={isActive ? `Current section: ${sectionNames[i]}` : `Jump to ${sectionNames[i]}`}
-                        aria-current={isActive ? 'step' : undefined}
-                        aria-disabled={!isClickable && !isActive}
-                        className={`transition-all duration-500 flex items-center shrink-0 focus:outline-none focus-visible:ring-2 ${SECTION_THEMES[i]?.ring || 'focus-visible:ring-amber-500'} ${isActive
-                            ? `${SECTION_THEMES[i]?.bg || 'bg-amber-600'} px-2 py-0.5 rounded-full shadow-sm cursor-default`
-                            : isClickable
-                                ? 'px-1.5 py-0.5 rounded hover:bg-stone-200 cursor-pointer text-stone-500 hover:text-stone-800'
-                                : 'px-1.5 py-0.5 rounded cursor-default text-stone-400 opacity-50'
-                        }`}
-                    >
-                        {isActive
-                            ? <span className="text-[10px] md:text-xs font-bold text-white whitespace-nowrap">{part}</span>
-                            : <span className="text-[9px] font-black uppercase tracking-tighter">{PILL_LABELS[i]}</span>
-                        }
-                    </button>
-                  );
-                })}
-             </div>
-          </div>
-             <div className="flex items-center gap-2 shrink-0 print:hidden">
-             {/* Slot 2 Selector (Middle) */}
-             {/* Only show selector if there are enough options to actually make a choice (i.e. > 2 options total, because 1 is focal) */}
-             {availableTranslations.length > 2 ? (
-              <div className="relative">
-                <button onClick={() => { setIsCompareOpen(!isCompareOpen); setIsFocalOpen(false); }} aria-haspopup="true" aria-expanded={isCompareOpen} aria-label="Select Comparison Translation" className="flex items-center gap-1 text-[9px] md:text-[10px] font-bold uppercase text-stone-500 hover:text-stone-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Translation for Middle Slot">
-                  CMP: {compareTranslation ? compareTranslation.toUpperCase() : '-'}
-                  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isCompareOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                </button>
-                {isCompareOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsCompareOpen(false)}></div>
-                    <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
-                      {availableTranslations.filter(k => k !== focalTranslation).map(key => (
-                        <button key={key} onClick={() => { setCompareTranslation(key); setIsCompareOpen(false); }} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${compareTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
-                          <span>{key}</span>
-                          {compareTranslation === key && (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-             ) : (
-                /* Static Label if only 2 options exist (since the other MUST be the compare version) */
-                availableTranslations.length > 1 && (
-                  <span className="text-[9px] md:text-[10px] font-bold uppercase text-stone-400 cursor-default" title="Middle Slot (Fixed)">
-                    CMP: {compareTranslation ? compareTranslation.toUpperCase() : '-'}
-                  </span>
-                )
-             )}
-
-             {/* Slot 3 Selector (Focal) */}
-             {availableTranslations.length > 0 && (
-              <div className="relative mr-1">
-                <button onClick={() => { setIsFocalOpen(!isFocalOpen); setIsCompareOpen(false); }} aria-haspopup="true" aria-expanded={isFocalOpen} aria-label="Select Focal Translation" className="flex items-center gap-1 text-[10px] md:text-xs font-black uppercase text-stone-600 hover:text-stone-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Focal (Audio) Translation">
-                  {focalTranslation ? focalTranslation.toUpperCase() : '-'}
-                  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isFocalOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                </button>
-                {isFocalOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsFocalOpen(false)}></div>
-                    <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
-                      {availableTranslations.map(key => (
-                        <button key={key} onClick={() => handleFocalChange(key)} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${focalTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
-                          <span>{key}</span>
-                          {focalTranslation === key && (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-             )}
-
-             {playbackStatus !== 'stopped' && <button onClick={() => { synthRef.current.cancel(); setPlaybackStatus('stopped'); }} aria-label="Stop Playback" aria-keyshortcuts="Escape" title="Stop Playback (Escape)" className="p-1.5 text-stone-300 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
-             <button onClick={handleToggle} aria-keyshortcuts="k" title="Toggle Playback (k)" className={`px-3 md:px-5 py-1 rounded-full font-black text-[12px] md:text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
-          </div>
-        </div>
-        <ReadingProgress sectionIndex={activeSectionIndex} />
-      </header>
+      <Header
+        currentDate={currentDate}
+        todayString={todayString}
+        formattedDate={formattedDate}
+        navigateDate={navigateDate}
+        setCurrentDate={setCurrentDate}
+        labelParts={labelParts}
+        activeSectionIndex={activeSectionIndex}
+        scrollToSection={scrollToSection}
+        availableTranslations={availableTranslations}
+        compareTranslation={compareTranslation}
+        focalTranslation={focalTranslation}
+        isCompareOpen={isCompareOpen}
+        setIsCompareOpen={setIsCompareOpen}
+        isFocalOpen={isFocalOpen}
+        setIsFocalOpen={setIsFocalOpen}
+        setCompareTranslation={setCompareTranslation}
+        handleFocalChange={handleFocalChange}
+        playbackStatus={playbackStatus}
+        onStopPlayback={onStopPlayback}
+        handleToggle={handleToggle}
+      />
 
       <main id="main-content" tabIndex={-1} className="max-w-4xl mx-auto py-3 md:py-6 px-2 pb-32 md:pb-40 space-y-6 md:space-y-10 outline-none">
         {loading ? (
