@@ -137,3 +137,9 @@ Implemented a `@media print` stylesheet to create a clean, document-like output:
 1.  **Hidden UI:** Removed navigation, footer links, and interactive buttons (`.header`, `.footer`, `.buttons`).
 2.  **Ink Saving:** Forced high-contrast text (`color: #000`) and white backgrounds, removing shadows and colorful hero sections.
 3.  **Layout:** Reset containers to 100% width and allowed natural page breaks for long content (like Reviews).
+
+## 2026-02-16 - Context Maintenance on Collapse
+**Learning:**
+When collapsible sections (like "Read More" reviews) are closed from the bottom, the page height shrinks upwards, leaving the user's viewport stranded in empty space or unrelated content (like the footer). This causes disorientation and loss of context.
+**Action:**
+Implemented a smooth scroll behavior that returns the user to the top of the section immediately upon triggering the collapse. This ensures the user is grounded in the original context (the start of the list) rather than being left behind by the shrinking layout.

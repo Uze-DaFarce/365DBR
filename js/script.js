@@ -105,6 +105,12 @@ if (toggleBtn && reviewsContainer) {
       toggleBtn.setAttribute('aria-expanded', 'true');
     } else {
       // COLLAPSE
+      // Scroll back to the top of the reviews section to maintain context
+      const reviewsSection = document.getElementById('reviews');
+      if (reviewsSection) {
+        reviewsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+
       reviewsContainer.classList.remove('reviews-expanded');
       toggleBtn.textContent = 'Read More Client Stories';
       toggleBtn.setAttribute('aria-expanded', 'false');
