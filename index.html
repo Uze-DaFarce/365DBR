@@ -1299,18 +1299,15 @@ const App = () => {
     const nm = String(date.getMonth() + 1).padStart(2, '0'), nd = String(date.getDate()).padStart(2, '0');
     setCurrentDate(`${nm}${nd}`); window.scrollTo({ top: 0 });
   };
-  const navigateVerse = useCallback((direction) => {
+
+  const navigateVerse = (direction) => {
     if (!sortedVids || sortedVids.length === 0) return;
-    
-    // FIX: Use ref to access latest activeVerseId inside stale closures
-    const currentActive = activeVerseIdRef.current;
-    
+
     // Find current index
     let currentIndex = -1;
-    if (currentActive) {
-        currentIndex = sortedVids.indexOf(currentActive);
+    if (activeVerseId) {
+        currentIndex = sortedVids.indexOf(activeVerseId);
     }
-    
     // If no active verse (e.g., at very top), assume first verse is next logical step
     if (currentIndex === -1 && direction > 0) currentIndex = -1;
     else if (currentIndex === -1 && direction < 0) currentIndex = 0;
