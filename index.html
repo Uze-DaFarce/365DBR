@@ -1072,6 +1072,8 @@ const App = () => {
       switch(e.key) {
         case 'ArrowLeft': navigateDate(-1); break;
         case 'ArrowRight': navigateDate(1); break;
+        case 'ArrowUp': e.preventDefault(); navigateVerse(-1); break;
+        case 'ArrowDown': e.preventDefault(); navigateVerse(1); break;
         case 'k': case 'K': handleToggle(); break;
         case 'Escape':
           if (isCompareOpen || isFocalOpen) { setIsCompareOpen(false); setIsFocalOpen(false); }
@@ -1081,7 +1083,7 @@ const App = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentDate, playbackStatus, isCompareOpen, isFocalOpen]);
+  }, [currentDate, playbackStatus, isCompareOpen, isFocalOpen, sortedVids, verseMap]);
 
   useEffect(() => {
     let isMounted = true;
@@ -1305,8 +1307,8 @@ const App = () => {
 
     // Find current index
     let currentIndex = -1;
-    if (activeVerseId) {
-        currentIndex = sortedVids.indexOf(activeVerseId);
+    if (activeVerseIdRef.current) {
+        currentIndex = sortedVids.indexOf(activeVerseIdRef.current);
     }
     // If no active verse (e.g., at very top), assume first verse is next logical step
     if (currentIndex === -1 && direction > 0) currentIndex = -1;
@@ -1320,10 +1322,17 @@ const App = () => {
 
     if (nextIndex !== currentIndex) {
         const nextVid = sortedVids[nextIndex];
+        // ⚡ Bolt Optimization: Update state immediately so subsequent key presses have correct reference context
+        // and the UI highlights the target verse even if smooth scrolling lands outside the observer rootMargin.
+        setActiveVerseId(nextVid);
+
         const el = document.getElementById(`verse-${nextVid}`);
         if (el) {
-            // "Scroll perfectly as we read" -> Center alignment keeps context
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Align with Reading Zone (approx 125px from top) to trigger IntersectionObserver correctly
+            const rect = el.getBoundingClientRect();
+            const absoluteTop = window.scrollY + rect.top;
+            const targetY = absoluteTop - 125;
+            window.scrollTo({ top: targetY, behavior: 'smooth' });
         }
     }
   };
