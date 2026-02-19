@@ -43,6 +43,11 @@ For any new sub-site (e.g., a new game), create a `.htaccess` file in its folder
   # The root .htaccess sets a strict Permissions-Policy (disabling usb, interest-cohort, etc).
   # If your sub-site needs these features (e.g., WebAuthn, Geolocation), you must override it here:
   # Header set Permissions-Policy "geolocation=(self), publickey-credentials-get=(self), ..."
+
+  # Note on Cross-Origin-Opener-Policy (COOP):
+  # The root .htaccess sets COOP to "same-origin" for process isolation.
+  # This is generally safe for games, but if you need cross-window interactions, you can disable it:
+  # Header set Cross-Origin-Opener-Policy "unsafe-none"
 </IfModule>
 ```
 
