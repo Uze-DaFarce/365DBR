@@ -19,6 +19,7 @@ except ImportError:
 try:
     from fetch_readings import (
         validate_range_for_section,
+        validate_content_integrity,
         count_actual_verses,
         count_expected_verses,
         translate_range_for_bible,
@@ -161,24 +162,16 @@ def verify_with_api(readings_path, day_limit=1):
                                 print(f"    ⚠️ {label} ({rng}) content seems suspiciously short ({len(str(content))} chars).")
                                 # Not necessarily an error, but warning.
 
-                            # 2. Check Verse Count Integrity
-                            expected = count_expected_verses(rng)
-                            actual = count_actual_verses(content)
-
-                            is_psalm = "PSA" in rng
-
-                            if is_psalm:
-                                if abs(expected - actual) > 2:
-                                    print(f"    ❌ {label} ({rng}) Verse Count Mismatch! Expected ~{expected}, Got {actual}")
-                                    errors_found = True
-                                else:
-                                    print(f"    ✅ {label} ({rng}) API fetch successful. Count: {actual} (Exp: ~{expected})")
-                            else:
-                                if expected != actual:
-                                    print(f"    ❌ {label} ({rng}) Verse Count Mismatch! Expected {expected}, Got {actual}")
-                                    errors_found = True
-                                else:
-                                    print(f"    ✅ {label} ({rng}) API fetch successful. Count: {actual}")
+                            # 2. Check Verse Count Integrity (Shared Logic)
+                            # This handles missing verse injection and strict counting logic
+                            try:
+                                validate_content_integrity(data, rng)
+                                # Recalculate actual for display purposes (optional, since validation passed)
+                                actual = count_actual_verses(content)
+                                print(f"    ✅ {label} ({rng}) API fetch successful. Count: {actual}")
+                            except ValueError as ve:
+                                print(f"    ❌ {label} ({rng}) Integrity Failure: {ve}")
+                                errors_found = True
 
                         else:
                             print(f"    ❌ {label} ({rng}) API Error {res.status}")

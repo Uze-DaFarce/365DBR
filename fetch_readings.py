@@ -477,12 +477,17 @@ def validate_content_integrity(data, range_str):
 
     if is_psalm:
         # Allow +/- 1 per chapter in range?
-        # Simplest: Allow +/- 2 total variance.
-        if abs(expected - actual) > 2:
-             raise ValueError(f"[Data Integrity] Verse Count Mismatch for {range_str} (Psalms). Expected ~{expected}, Got {actual}")
+        # Simplest: Allow +/- 1 total variance (strict).
+        # This catches "2 verses missing" in small Psalms while allowing for 1 title/verse merge difference.
+        if abs(expected - actual) > 1:
+             raise ValueError(f"[Data Integrity] Verse Count Mismatch for {range_str} (Psalms). Expected ~{expected}, Got {actual} (Tolerance 1)")
     else:
         if expected != actual:
              raise ValueError(f"[Data Integrity] Verse Count Mismatch for {range_str}. Expected {expected}, Got {actual}")
+
+    # Additional Sentinel Check: Zero Verses
+    if expected > 0 and actual == 0:
+         raise ValueError(f"[Data Integrity] Zero verses returned for {range_str}. Expected {expected}.")
 
     return True
 
