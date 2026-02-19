@@ -8,28 +8,19 @@ import urllib.error
 import urllib.parse
 import re
 
-# Import BIBLE_DATA and ALL_BOOKS from generate_readings
-try:
-    from generate_readings import BIBLE_DATA, ALL_BOOKS
-except ImportError:
-    print("Error: Could not import BIBLE_DATA or ALL_BOOKS from generate_readings.py")
-    sys.exit(1)
-
-# Import shared logic and constants from fetch_readings
-try:
-    from fetch_readings import (
-        validate_range_for_section,
-        validate_content_integrity,
-        count_actual_verses,
-        count_expected_verses,
-        translate_range_for_bible,
-        OT_HEBREW_ID,
-        NT_GREEK_ID,
-        API_BASE_URL
-    )
-except ImportError:
-    print("Error: Could not import necessary functions or constants from fetch_readings.py")
-    sys.exit(1)
+from bible_common import (
+    BIBLE_DATA,
+    ALL_BOOKS,
+    validate_range_for_section,
+    validate_content_integrity,
+    count_actual_verses,
+    count_expected_verses,
+    translate_range_for_bible,
+    validate_api_response,
+    OT_HEBREW_ID,
+    NT_GREEK_ID,
+    API_BASE_URL
+)
 
 def get_api_key():
     return os.environ.get("API_BIBLE_KEY")
@@ -157,10 +148,13 @@ def verify_with_api(readings_path, day_limit=1):
                             data = json.loads(res.read().decode('utf-8'))
                             content = data['data']['content']
 
-                            # 1. Check content existence
-                            if len(str(content)) < 50:
-                                print(f"    ⚠️ {label} ({rng}) content seems suspiciously short ({len(str(content))} chars).")
-                                # Not necessarily an error, but warning.
+                            # 1. Check content existence using shared validator (Structural check)
+                            try:
+                                validate_api_response(data, context_info=f"{label} ({rng})")
+                            except ValueError as ve:
+                                print(f"    ❌ {label} ({rng}) Structure Error: {ve}")
+                                errors_found = True
+                                continue
 
                             # 2. Check Verse Count Integrity (Shared Logic)
                             # This handles missing verse injection and strict counting logic
