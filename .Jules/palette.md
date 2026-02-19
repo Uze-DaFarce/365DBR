@@ -45,3 +45,7 @@
 ## 2026-02-25 - Click-to-Focus for Focal Interfaces
 **Learning:** In interfaces where scrolling determines the "active" item (like a focal verse list), users instinctively click items to select or focus them. Relying solely on scroll position frustrates users who want manual control or struggle with scroll precision.
 **Action:** Implement `onClick` handlers that smoothly scroll the target item into the "focal zone" (e.g., using `scrollIntoView`), but ensure to gate it against text selection interactions (check `window.getSelection()`).
+
+## 2026-02-26 - Mobile Feature Parity
+**Learning:** Hiding core navigation (like "Browse" mode) on mobile devices to save space creates a second-class experience for mobile users, effectively locking them out of major features.
+**Action:** Use responsive utility classes to adapt the *presentation* of the link (e.g., hiding the text label but keeping the icon) rather than hiding the entire element. This preserves functionality while respecting mobile constraints.
