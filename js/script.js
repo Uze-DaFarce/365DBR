@@ -1,3 +1,9 @@
+// ⚡ Bolt: Activate Google Fonts CSS (avoids render blocking + CSP issues with inline onload)
+const fontLink = document.getElementById('google-fonts');
+if (fontLink) {
+  fontLink.rel = 'stylesheet';
+}
+
 // Simple success overlay for forms
 // Security enhancement: Use stricter selector to prevent matching malicious links (e.g. evil.com?ref=docs.google.com) and limit to forms only
 document.querySelectorAll('a[href^="https://docs.google.com/forms/"]').forEach(trigger => {
@@ -152,6 +158,11 @@ function updateOffsets() {
 
 // Initial cache
 updateOffsets();
+
+// ⚡ Bolt: Recalculate offsets after fonts load to ensure accuracy (prevents scroll spy issues from FOUT)
+if (document.fonts) {
+  document.fonts.ready.then(updateOffsets);
+}
 
 // ⚡ Bolt: Debounce resize handler to prevent layout thrashing
 const debouncedUpdateOffsets = debounce(updateOffsets, 100);
