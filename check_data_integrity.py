@@ -44,8 +44,16 @@ def verify_local_integrity(readings_path):
         readings = json.load(f)
 
     errors = 0
+    seen_days = set()
+
     for day in readings:
         day_id = day['day']
+
+        # Validate Day ID Uniqueness
+        if day_id in seen_days:
+            print(f"❌ {day_id}: Duplicate Day ID found!")
+            errors += 1
+        seen_days.add(day_id)
 
         # Validate Day ID format
         if not re.match(r'^(\d{4}|\d{4}-\d{4})$', day_id):
@@ -64,8 +72,8 @@ def verify_local_integrity(readings_path):
 
         # Ranges: OT, NT, PSA, PRO
         ranges = api_format.split(',')
-        if len(ranges) < 4:
-            print(f"❌ {day_id}: Malformed api_format (less than 4 ranges)")
+        if len(ranges) != 4:
+            print(f"❌ {day_id}: Malformed api_format (expected 4 ranges, got {len(ranges)})")
             errors += 1
             continue
 
