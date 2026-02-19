@@ -1072,6 +1072,8 @@ const App = () => {
       switch(e.key) {
         case 'ArrowLeft': navigateDate(-1); break;
         case 'ArrowRight': navigateDate(1); break;
+        case 'ArrowUp': e.preventDefault(); navigateVerse(-1); break;
+        case 'ArrowDown': e.preventDefault(); navigateVerse(1); break;
         case 'k': case 'K': handleToggle(); break;
         case 'Escape':
           if (isCompareOpen || isFocalOpen) { setIsCompareOpen(false); setIsFocalOpen(false); }
@@ -1081,7 +1083,7 @@ const App = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentDate, playbackStatus, isCompareOpen, isFocalOpen]);
+  }, [currentDate, playbackStatus, isCompareOpen, isFocalOpen, navigateVerse]);
 
   useEffect(() => {
     let isMounted = true;
