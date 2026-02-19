@@ -1353,7 +1353,7 @@ const App = () => {
                           onClick={() => { setCurrentDate(todayString); window.scrollTo({ top: 0 }); }}
                           title="Jump to Today"
                           aria-label={`Current reading: ${formattedDate}. Click to jump to Today.`}
-                          className="px-1 hover:text-amber-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded flex items-center gap-1"
+                          className="px-1 hover:text-amber-600 uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded flex items-center gap-1"
                       >
                           {formattedDate}
                           <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 print:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" /></svg>
