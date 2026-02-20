@@ -93,7 +93,7 @@ const FOCAL_THEMES = [
 ];
 
 /** --- DATA UTILITIES --- **/
-const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
+function walkItems(items, map, versionKey, useOrgId, buffer, context) {
   if (!items) return;
   for (const item of items) {
     let previousActiveVid = context.activeVid;
@@ -118,16 +118,16 @@ const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
     if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey, useOrgId, buffer, context);
     context.activeVid = previousActiveVid;
   }
-};
+}
 
-const processContent = (contentArray, map, versionKey, useOrgId = false) => {
+function processContent(contentArray, map, versionKey, useOrgId = false) {
   if (!contentArray) return;
   const buffer = { text: [] };
   const context = { activeVid: null, lastSeenVid: null };
   for (const section of contentArray) { if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context); }
-};
+}
 
-const loadDailyBread = async (dateFolder) => {
+async function loadDailyBread(dateFolder) {
   const manifestPath = `data/${dateFolder}/manifest.json`;
   const manifestRes = await fetch(manifestPath);
   if (!manifestRes.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
@@ -176,19 +176,19 @@ const loadDailyBread = async (dateFolder) => {
       });
   });
   return { verseMap, label: manifest.label, availableTranslations: sortedKeys };
-};
+}
 
-const getSectionIndex = (vid) => {
+function getSectionIndex(vid) {
     if (!vid) return -1;
     const book = vid.substring(0, 3);
     if (book === 'PSA') return 2;
     if (book === 'PRO') return 3;
     return NT_BOOKS.has(book) ? 1 : 0;
-};
+}
 
 // --- COMPONENTS ---
 
-const CopyButton = ({ text, reference, version, ...props }) => {
+function CopyButton({ text, reference, version, ...props }) {
     const [status, setStatus] = useState('idle');
     useEffect(() => { setStatus('idle'); }, [text, reference]);
     const handleCopy = async (e) => {
@@ -206,9 +206,9 @@ const CopyButton = ({ text, reference, version, ...props }) => {
             {status === 'copied' ? <svg className="h-3 w-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> : <svg className="h-3 w-3 text-stone-400 hover:text-stone-900 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>}
         </button>
     );
-};
+}
 
-const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying }) => {
+const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying }) {
     const vid = group[0];
     const book = vid.substring(0, 3);
     const sectionIndex = getSectionIndex(vid);
@@ -302,16 +302,18 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
     );
 });
 
-const Loader = () => (
+function Loader() {
+  return (
   <div role="status" aria-live="polite" className="flex flex-col items-center justify-center py-20 md:py-32">
     <div className="w-8 h-8 border-2 border-stone-200 border-t-stone-800 rounded-full animate-spin mb-4"></div>
     <p className="text-stone-500 font-serif italic text-xs uppercase tracking-widest">Loading Bible Index</p>
   </div>
-);
+  );
+}
 
 // --- MAIN APP (Bible Browser) ---
 
-const App = () => {
+function App() {
   const [index, setIndex] = useState(null); // { GEN: { 1: [days], ... }, ... }
   const [availableBooks, setAvailableBooks] = useState([]);
 
@@ -501,26 +503,6 @@ const App = () => {
       }
   }, [loading, targetScrollVerse, verseMap, sortedVids]);
 
-  // Observer for Scroll Tracking
-  useEffect(() => {
-    if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0) return;
-    const observer = new IntersectionObserver((entries) => {
-      const intersecting = entries.filter(e => e.isIntersecting);
-      if (intersecting.length > 0) {
-        // Sort by distance to "reading line" (approx 120px from top)
-        const bestEntry = intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top - 120) - Math.abs(b.boundingClientRect.top - 120))[0];
-        setActiveVerseId(bestEntry.target.id.replace('verse-', ''));
-      }
-    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
-
-    groupedVids.forEach((group) => {
-      const vid = group[0];
-      const el = document.getElementById(`verse-${vid}`);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, [playbackStatus, loading, verseMap, groupedVids]);
-
   // 2. Load Content when Selection Changes
   useEffect(() => {
     if (!selectedBook || !selectedChapter || !index) return;
@@ -610,6 +592,26 @@ const App = () => {
       }
       return groups;
   }, [sortedVids]);
+
+  // Observer for Scroll Tracking
+  useEffect(() => {
+    if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0) return;
+    const observer = new IntersectionObserver((entries) => {
+      const intersecting = entries.filter(e => e.isIntersecting);
+      if (intersecting.length > 0) {
+        // Sort by distance to "reading line" (approx 120px from top)
+        const bestEntry = intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top - 120) - Math.abs(b.boundingClientRect.top - 120))[0];
+        setActiveVerseId(bestEntry.target.id.replace('verse-', ''));
+      }
+    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+
+    groupedVids.forEach((group) => {
+      const vid = group[0];
+      const el = document.getElementById(`verse-${vid}`);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [playbackStatus, loading, verseMap, groupedVids]);
 
   // Audio Playback
   const playVerse = (vid) => {
