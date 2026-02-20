@@ -48,3 +48,8 @@
 **Vulnerability:** Unused browser features (like `usb`, `browsing-topics`) increase the attack surface and potential for fingerprinting/tracking.
 **Learning:** Root `.htaccess` headers propagate to sub-sites. Hardening policies like `Permissions-Policy` (e.g., disabling `publickey-credentials-get` for WebAuthn) can silently break sub-site functionality (like user login in `365DBR`) if inheritance is not managed.
 **Prevention:** Explicitly create configuration scaffolds (like `.htaccess`) for sub-sites—even if their content is external—to ensure they override strict root policies. This prevents "invisible" breakage where a sub-site inherits breaking changes from the root.
+
+## 2026-02-20 - Protocol-Agnostic Link Interception
+**Vulnerability:** Users clicking on insecure (http) links to Google Forms bypass the security overlay warning, potentially reducing awareness of leaving the site.
+**Learning:** Protocol-specific selectors (like `href^="https://"`) are fragile and can be bypassed by simple protocol changes or typos, even if the destination eventually redirects to HTTPS.
+**Prevention:** Use protocol-agnostic selectors or explicitly include both `http` and `https` variants to ensure consistent behavior regardless of the link format.

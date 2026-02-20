@@ -6,7 +6,8 @@ if (fontLink) {
 
 // Simple success overlay for forms
 // Security enhancement: Use stricter selector to prevent matching malicious links (e.g. evil.com?ref=docs.google.com) and limit to forms only
-document.querySelectorAll('a[href^="https://docs.google.com/forms/"]').forEach(trigger => {
+// Sentinel: Added support for http protocol to prevent bypassing the overlay with insecure links
+document.querySelectorAll('a[href^="https://docs.google.com/forms/"], a[href^="http://docs.google.com/forms/"]').forEach(trigger => {
   trigger.addEventListener('click', () => {
     const o = document.createElement('div');
     // Added accessibility roles and tabindex for focus management
