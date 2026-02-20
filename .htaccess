@@ -31,6 +31,11 @@
   # Prevent Adobe Flash and PDF data leakage
   Header set X-Permitted-Cross-Domain-Policies "none"
 
+  # 🛡️ Sentinel: Process Isolation
+  # Ensures that the page is isolated in its own browsing context, preventing cross-origin attacks (Spectre)
+  # and interactions from other windows (e.g. malicious popups).
+  Header set Cross-Origin-Opener-Policy "same-origin"
+
   # Content Security Policy (CSP)
   # Matches index.html policy but adds 'frame-ancestors' (ignored in meta tags) for anti-framing protection.
   # Note: 404.html has a stricter meta-tag CSP which will take precedence for that page where directives overlap.
