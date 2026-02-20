@@ -315,22 +315,22 @@ def main():
     #   If we stick to "Hebrew Counts", we should interpret this as Hebrew 18:43.
     # PRO 4:10 (Hebrew) = PRO 4:10 (KJV).
     
-    ot_idx = ot_nav.find_index("GEN.1.1")
-    nt_idx = nt_nav.find_index("MAT.1.1")
-    ps_idx = ps_nav.find_index("PSA.1.1")
-    pr_idx = pr_nav.find_index("PRO.1.1")
+    ot_idx = ot_nav.find_index("EXO.7.1")
+    nt_idx = nt_nav.find_index("MAT.22.39")
+    ps_idx = ps_nav.find_index("PSA.18.43")
+    pr_idx = pr_nav.find_index("PRO.4.10")
     
-    if ot_idx == -1: print("Error finding start GEN.1.1")
-    if nt_idx == -1: print("Error finding start MAT.1.1")
-    if ps_idx == -1: print("Error finding start PSA.1.1")
-    if pr_idx == -1: print("Error finding start PRO.1.1")
+    if ot_idx == -1: print("Error finding start EXO.7.1")
+    if nt_idx == -1: print("Error finding start MAT.22.39")
+    if ps_idx == -1: print("Error finding start PSA.18.43")
+    if pr_idx == -1: print("Error finding start PRO.4.10")
 
     # Calculate Base Rates
-    TOTAL_DAYS = 365
+    TOTAL_DAYS = 334
     
     readings = []
     
-    current_month = 1
+    current_month = 2
     current_day = 1
     days_in_month = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
     
