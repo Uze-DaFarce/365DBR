@@ -151,7 +151,7 @@ const TRANSLATION_REGISTRY = {
 // Recursive walker with active verse context to safely handle nested structures and orphans
 const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
   if (!items) return;
-  items.forEach((item) => {
+  for (const item of items) {
     let previousActiveVid = context.activeVid; // Store stack for backtracking
 
     // 1. Enter Verse Scope?
@@ -213,7 +213,7 @@ const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
 
     // 4. Exit Scope
     context.activeVid = previousActiveVid;
-  });
+  }
 };
 
 const processContent = (contentArray, map, versionKey, useOrgId = false) => {
@@ -222,9 +222,9 @@ const processContent = (contentArray, map, versionKey, useOrgId = false) => {
   const buffer = { text: [] }; 
   // Context MUST be shared across the entire section to track lastSeenVid linearly
   const context = { activeVid: null, lastSeenVid: null };
-  contentArray.forEach(section => { 
+  for (const section of contentArray) {
       if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context); 
-  });
+  }
 };
 
 const loadDailyBread = async (dateFolder) => {

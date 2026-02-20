@@ -95,7 +95,7 @@ const FOCAL_THEMES = [
 /** --- DATA UTILITIES --- **/
 const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
   if (!items) return;
-  items.forEach((item) => {
+  for (const item of items) {
     let previousActiveVid = context.activeVid;
     if (item.attrs?.verseId) {
       let keyVid = item.attrs.verseId;
@@ -117,14 +117,14 @@ const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
     }
     if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey, useOrgId, buffer, context);
     context.activeVid = previousActiveVid;
-  });
+  }
 };
 
 const processContent = (contentArray, map, versionKey, useOrgId = false) => {
   if (!contentArray) return;
   const buffer = { text: [] };
   const context = { activeVid: null, lastSeenVid: null };
-  contentArray.forEach(section => { if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context); });
+  for (const section of contentArray) { if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context); }
 };
 
 const loadDailyBread = async (dateFolder) => {
