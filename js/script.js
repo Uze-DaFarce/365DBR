@@ -252,6 +252,15 @@ function updateScrollState(scrollY) {
       isBackToTopVisible = shouldBeVisible;
     }
   }
+
+  // 3. Scroll Progress Bar
+  const winHeight = document.documentElement.clientHeight;
+  const docHeight = document.documentElement.scrollHeight - winHeight;
+  const scrollPercent = (scrollY / docHeight) * 100;
+  const progressBar = document.getElementById('scroll-progress');
+  if (progressBar) {
+    progressBar.style.width = scrollPercent + '%';
+  }
 }
 
 window.addEventListener('scroll', onScroll, { passive: true });
