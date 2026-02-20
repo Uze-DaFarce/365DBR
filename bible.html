@@ -573,7 +573,14 @@ const App = () => {
                 {/* Book Selector */}
                 <select
                     value={selectedBook || ''}
-                    onChange={(e) => { setSelectedBook(e.target.value); setSelectedChapter(null); }}
+                    onChange={(e) => {
+                        const newBook = e.target.value;
+                        setSelectedBook(newBook);
+                        // Palette UX: Auto-select only chapter if only one exists
+                        const chapters = index[newBook] ? Object.keys(index[newBook]) : [];
+                        if (chapters.length === 1) setSelectedChapter(chapters[0]);
+                        else setSelectedChapter(null);
+                    }}
                     className="bg-stone-100 border-none rounded text-xs font-black uppercase tracking-tight py-1 px-2 focus:ring-2 focus:ring-amber-500"
                 >
                     <option value="" disabled>Select Book</option>
