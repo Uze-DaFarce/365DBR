@@ -258,7 +258,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
     return (
         <div id={`verse-${vid}`} onClick={handleVerseClick} className={`verse-block group transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'} ${!isPlaying ? 'cursor-pointer' : ''}`}>
-            <div className="flex flex-col gap-1">
+            <div className={`flex flex-col gap-1 transition-all duration-500 ${isActive ? 'scale-[1.01]' : 'scale-100'}`}>
             {/* Top Slot */}
             <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
                 <div className="flex justify-between items-center mb-0.5">
@@ -340,6 +340,9 @@ const App = () => {
   const playbackStatusRef = useRef(playbackStatus);
   useEffect(() => { playbackStatusRef.current = playbackStatus; }, [playbackStatus]);
   const synthRef = useRef(window.speechSynthesis);
+
+  // Persistence: Scroll Target
+  const [targetScrollVerse, setTargetScrollVerse] = useState(null);
 
   // 1. Build Index on Mount
   useEffect(() => {
@@ -424,6 +427,30 @@ const App = () => {
                 setError("No books found in index. Please verify data.");
             } else {
                 setAvailableBooks(bookList);
+
+                // Initialize State from URL or LocalStorage
+                const params = new URLSearchParams(window.location.search);
+                const urlBook = params.get('book');
+                const urlChapter = params.get('chapter');
+                const urlVerse = params.get('verse');
+
+                if (urlBook && urlChapter && newIndex[urlBook] && newIndex[urlBook][urlChapter]) {
+                    setSelectedBook(urlBook);
+                    setSelectedChapter(urlChapter);
+                    if (urlVerse) setTargetScrollVerse(`${urlBook}.${urlChapter}.${urlVerse}`);
+                } else {
+                    try {
+                        const saved = localStorage.getItem('bible_browser_state');
+                        if (saved) {
+                            const state = JSON.parse(saved);
+                            if (state.book && state.chapter && newIndex[state.book] && newIndex[state.book][state.chapter]) {
+                                setSelectedBook(state.book);
+                                setSelectedChapter(state.chapter);
+                                if (state.verseId) setTargetScrollVerse(state.verseId);
+                            }
+                        }
+                    } catch (e) { console.warn("Failed to load state", e); }
+                }
             }
             setLoading(false);
         } catch (e) {
@@ -434,6 +461,65 @@ const App = () => {
     };
     initIndex();
   }, []);
+
+  // Persistence & URL Sync
+  useEffect(() => {
+      if (loading || !selectedBook || !selectedChapter) return;
+
+      const save = () => {
+          const state = { book: selectedBook, chapter: selectedChapter, verseId: activeVerseId };
+          localStorage.setItem('bible_browser_state', JSON.stringify(state));
+
+          const url = new URL(window.location);
+          url.searchParams.set('book', selectedBook);
+          url.searchParams.set('chapter', selectedChapter);
+
+          if (activeVerseId) {
+              const parts = activeVerseId.split('.');
+              if (parts.length === 3) url.searchParams.set('verse', parts[2]);
+          } else {
+              url.searchParams.delete('verse');
+          }
+          window.history.replaceState({}, '', url);
+      };
+
+      // Debounce saves
+      const handler = setTimeout(save, 500);
+      return () => clearTimeout(handler);
+  }, [selectedBook, selectedChapter, activeVerseId, loading]);
+
+  // Scroll Restoration
+  useEffect(() => {
+      if (!loading && targetScrollVerse && verseMap && sortedVids.includes(targetScrollVerse)) {
+          const el = document.getElementById(`verse-${targetScrollVerse}`);
+          if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              // Also set active immediately to ensure visual highlight
+              setActiveVerseId(targetScrollVerse);
+              setTargetScrollVerse(null);
+          }
+      }
+  }, [loading, targetScrollVerse, verseMap, sortedVids]);
+
+  // Observer for Scroll Tracking
+  useEffect(() => {
+    if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0) return;
+    const observer = new IntersectionObserver((entries) => {
+      const intersecting = entries.filter(e => e.isIntersecting);
+      if (intersecting.length > 0) {
+        // Sort by distance to "reading line" (approx 120px from top)
+        const bestEntry = intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top - 120) - Math.abs(b.boundingClientRect.top - 120))[0];
+        setActiveVerseId(bestEntry.target.id.replace('verse-', ''));
+      }
+    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+
+    groupedVids.forEach((group) => {
+      const vid = group[0];
+      const el = document.getElementById(`verse-${vid}`);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [playbackStatus, loading, verseMap, groupedVids]);
 
   // 2. Load Content when Selection Changes
   useEffect(() => {
@@ -626,7 +712,7 @@ const App = () => {
                     group={group}
                     verseMap={verseMap}
                     dynamicSlots={dynamicSlots}
-                    isActive={playbackVerseId === group[0]}
+                    isActive={(playbackStatus === 'playing' && playbackVerseId === group[0]) || (playbackStatus !== 'playing' && activeVerseId === group[0])}
                     isDimmed={playbackStatus === 'playing' && playbackVerseId !== group[0]}
                     isPlaying={playbackStatus === 'playing'}
                 />
