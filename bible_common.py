@@ -1,4 +1,5 @@
 import json
+import os
 
 # =============================================================================
 # CONSTANTS (From generate_readings.py)
@@ -114,6 +115,33 @@ BOOK_NAMES = {
 }
 
 NAME_TO_CODE = {v: k for k, v in BOOK_NAMES.items()}
+
+# =============================================================================
+# UTILITIES
+# =============================================================================
+
+def atomic_write_json(filepath, data, indent=2, ensure_ascii=True):
+    """
+    Writes JSON data to a file atomically using a temporary file and os.replace.
+    Ensures that a crash during write does not leave a corrupted file.
+    Defaults ensure_ascii=True to maintain compatibility with standard JSON tools and avoid diff noise.
+    """
+    dir_name = os.path.dirname(filepath)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+
+    tmp_filepath = f"{filepath}.tmp"
+
+    try:
+        with open(tmp_filepath, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=indent, ensure_ascii=ensure_ascii)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_filepath, filepath)
+    except Exception as e:
+        if os.path.exists(tmp_filepath):
+            os.remove(tmp_filepath)
+        raise IOError(f"Failed to write {filepath} atomically: {str(e)}") from e
 
 # =============================================================================
 # CONSTANTS (From fetch_readings.py)

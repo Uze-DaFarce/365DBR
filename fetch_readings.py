@@ -21,7 +21,8 @@ from bible_common import (
     validate_content_integrity,
     KNOWN_OMISSIONS,
     REVERSE_HEBREW_BOOK_MAP,
-    OT_HEBREW_BOOK_MAP
+    OT_HEBREW_BOOK_MAP,
+    atomic_write_json
 )
 
 def get_api_key():
@@ -616,8 +617,7 @@ def process_day(day_entry, api_key, output_dir):
     # All parts fetched successfully. Commit to disk.
     print(f"  [Atomic Write] Writing {len(pending_writes)} files for Day {day_id}...")
     for fpath, content in pending_writes:
-        with open(fpath, 'w', encoding='utf-8') as f:
-            json.dump(content, f, indent=2, ensure_ascii=False)
+        atomic_write_json(fpath, content, ensure_ascii=False)
 
     # Create Manifest
     manifest = {
@@ -625,8 +625,7 @@ def process_day(day_entry, api_key, output_dir):
         "files": files_list
     }
     manifest_path = os.path.join(day_dir, "manifest.json")
-    with open(manifest_path, 'w', encoding='utf-8') as f:
-        json.dump(manifest, f, indent=2, ensure_ascii=False)
+    atomic_write_json(manifest_path, manifest, ensure_ascii=False)
     
     print(f"  Day {day_id} complete.")
 

@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from generate_readings import BIBLE_DATA, ALL_BOOKS, BibleNavigator, format_friendly_range, get_ranges_handling_gaps
+from bible_common import atomic_write_json
 
 def main():
     print("Regenerating January Reading Schedule (Hardcoded Fix)...")
@@ -210,8 +211,7 @@ def main():
     print(f"Total days in new plan: {len(final_readings)}")
 
     # Write Back
-    with open(readings_path, 'w') as f:
-        json.dump(final_readings, f, indent=2)
+    atomic_write_json(readings_path, final_readings)
 
     print(f"Successfully updated {readings_path} with regenerated January schedule.")
 

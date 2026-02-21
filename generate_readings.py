@@ -8,7 +8,8 @@ from bible_common import (
     OT_BOOKS,
     NT_BOOKS,
     OT_SEQUENTIAL_BOOKS,
-    BOOK_NAMES
+    BOOK_NAMES,
+    atomic_write_json
 )
 
 class BibleLocation:
@@ -303,9 +304,8 @@ def main():
             current_day = 1
             current_month += 1
             
-    os.makedirs("data", exist_ok=True)
-    with open("data/readings.json", "w") as f:
-        json.dump(readings, f, indent=2)
+    # Atomic Write: Use shared utility to prevent corruption
+    atomic_write_json("data/readings.json", readings)
         
     print("First Day:", json.dumps(readings[0], indent=2))
     print("Last Day:", json.dumps(readings[-1], indent=2))
