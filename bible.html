@@ -316,6 +316,34 @@ function Loader() {
 
 // --- MAIN APP (Bible Browser) ---
 
+function ScrollToTop() {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShow(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <button
+      onClick={scrollToTop}
+      aria-label="Scroll to top"
+      className={`fixed bottom-20 right-4 z-40 p-2 rounded-full bg-stone-900/80 text-white shadow-xl transition-all duration-300 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 print:hidden ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      </svg>
+    </button>
+  );
+}
+
 function App() {
   const [index, setIndex] = useState(null); // { GEN: { 1: [days], ... }, ... }
   const [availableBooks, setAvailableBooks] = useState([]);
@@ -654,7 +682,7 @@ function App() {
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
       <header className="w-full bg-white/95 border-b border-stone-200 py-2 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm">
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
                 <a href="index.html" className="text-stone-400 hover:text-amber-600 transition-colors font-bold text-xs uppercase tracking-widest flex items-center gap-1">
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
@@ -703,7 +731,7 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto py-6 px-2 space-y-6">
+      <main className="max-w-7xl mx-auto py-6 px-2 space-y-6">
         {!selectedBook ? (
             <div className="text-center py-20 text-stone-400 font-serif italic">Select a book to begin</div>
         ) : loading ? (
@@ -724,6 +752,7 @@ function App() {
             ))
         )}
       </main>
+      <ScrollToTop />
     </div>
   );
 };
