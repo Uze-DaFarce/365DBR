@@ -781,15 +781,6 @@ const ReadingProgress = React.memo(({ sectionIndex }) => {
     </div>
   );
 });
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={0}
-        aria-label={`Reading Progress (Current Section: ${['Old Testament', 'New Testament', 'Psalms', 'Proverbs'][sectionIndex] || 'Unknown'})`}
-      />
-    </div>
-  );
-});
 
 const Header = React.memo(({
   currentDate,
