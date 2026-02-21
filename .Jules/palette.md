@@ -143,3 +143,12 @@ Implemented a `@media print` stylesheet to create a clean, document-like output:
 When collapsible sections (like "Read More" reviews) are closed from the bottom, the page height shrinks upwards, leaving the user's viewport stranded in empty space or unrelated content (like the footer). This causes disorientation and loss of context.
 **Action:**
 Implemented a smooth scroll behavior that returns the user to the top of the section immediately upon triggering the collapse. This ensures the user is grounded in the original context (the start of the list) rather than being left behind by the shrinking layout.
+
+## 2026-02-18 - Scroll Progress Indicator
+**Learning:**
+On long landing pages, users benefit from a visual indicator of their progress, especially when the header is sticky.
+**Action:**
+Implemented a lightweight Scroll Progress Bar:
+1.  **Structure:** Added `.scroll-progress-container` absolute positioned at the bottom of the sticky `<header>`.
+2.  **Logic:** Calculated scroll percentage `(scrollY / (scrollHeight - clientHeight))` in the existing `requestAnimationFrame` loop to avoid performance overhead.
+3.  **Visuals:** Used the brand's secondary color (Gold) for high contrast against the primary header color (Purple).
