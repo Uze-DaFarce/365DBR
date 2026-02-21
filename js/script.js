@@ -1,9 +1,3 @@
-// ⚡ Bolt: Activate Google Fonts CSS (avoids render blocking + CSP issues with inline onload)
-const fontLink = document.getElementById('google-fonts');
-if (fontLink) {
-  fontLink.rel = 'stylesheet';
-}
-
 // Simple success overlay for forms
 // Security enhancement: Use stricter selector to prevent matching malicious links (e.g. evil.com?ref=docs.google.com) and limit to forms only
 // Sentinel: Added support for http protocol to prevent bypassing the overlay with insecure links
