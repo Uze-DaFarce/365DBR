@@ -594,7 +594,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                         )}
                     </div>
                     </div>
-                    <div><span className={`text-lg md:text-3xl font-serif italic leading-tight tracking-tight ${isActive ? 'text-stone-900' : 'text-stone-500'}`}>{text}</span></div>
+                    <div><span className={`text-base md:text-xl font-serif font-bold italic leading-tight tracking-tighter ${isActive ? 'text-stone-900' : 'text-stone-500'}`}>{text}</span></div>
                 </div>
                 );
             })()}
@@ -763,10 +763,21 @@ const ReadingProgress = React.memo(({ sectionIndex }) => {
   }, []);
 
   return (
-    <div className="absolute bottom-0 left-0 h-[3px] w-full bg-transparent pointer-events-none z-50 print:hidden">
-      <div
-        ref={barRef}
-        className={`h-full w-0 transition-all duration-300 ease-out shadow-lg ${theme.bg} ${theme.shadow}`}
+    <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-transparent pointer-events-none z-50 print:hidden flex justify-center">
+      <div className="w-full max-w-7xl h-full relative">
+        <div
+            ref={barRef}
+            className={`h-full w-0 transition-all duration-300 ease-out shadow-lg ${theme.bg} ${theme.shadow}`}
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={0}
+            aria-label={`Reading Progress (Current Section: ${['Old Testament', 'New Testament', 'Psalms', 'Proverbs'][sectionIndex] || 'Unknown'})`}
+        />
+      </div>
+    </div>
+  );
+});
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
@@ -801,7 +812,7 @@ const Header = React.memo(({
 }) => {
   return (
       <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm print:static print:border-none print:shadow-none">
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 h-8 md:h-10">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 h-8 md:h-10">
           <div className="flex items-center gap-1 min-w-0 flex-1">
              <div className="flex items-center bg-stone-100 rounded-md px-0.5">
                <button onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" title="Previous Day (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
@@ -860,9 +871,9 @@ const Header = React.memo(({
              <div className="flex items-center gap-2 shrink-0 print:hidden">
              {/* Slot 2 Selector (Middle) */}
              {availableTranslations.length > 2 ? (
-              <div className="relative">
+              <div className="relative hidden md:block">
                 <button onClick={() => { setIsCompareOpen(!isCompareOpen); setIsFocalOpen(false); }} aria-haspopup="true" aria-expanded={isCompareOpen} aria-label="Select Comparison Translation" className="flex items-center gap-1 text-[9px] md:text-[10px] font-bold uppercase text-stone-500 hover:text-stone-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Translation for Middle Slot">
-                  CMP: {compareTranslation ? compareTranslation.toUpperCase() : '-'}
+                  {compareTranslation ? compareTranslation.toUpperCase() : '-'}
                   <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isCompareOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                 </button>
                 {isCompareOpen && (
@@ -885,8 +896,8 @@ const Header = React.memo(({
               </div>
              ) : (
                 availableTranslations.length > 1 && (
-                  <span className="text-[9px] md:text-[10px] font-bold uppercase text-stone-400 cursor-default" title="Middle Slot (Fixed)">
-                    CMP: {compareTranslation ? compareTranslation.toUpperCase() : '-'}
+                  <span className="hidden md:inline text-[9px] md:text-[10px] font-bold uppercase text-stone-400 cursor-default" title="Middle Slot (Fixed)">
+                    {compareTranslation ? compareTranslation.toUpperCase() : '-'}
                   </span>
                 )
              )}
@@ -1558,7 +1569,7 @@ const App = () => {
         handleToggle={handleToggle}
       />
 
-      <main id="main-content" tabIndex={-1} className="max-w-4xl mx-auto py-3 md:py-6 px-2 pb-32 md:pb-40 space-y-6 md:space-y-10 outline-none">
+      <main id="main-content" tabIndex={-1} className="max-w-7xl mx-auto py-3 md:py-6 px-2 pb-32 md:pb-40 space-y-6 md:space-y-10 outline-none">
         {loading ? (
           <Loader />
         ) : error ? (
@@ -1588,10 +1599,10 @@ const App = () => {
       </main>
       <footer id="footer" className="fixed bottom-0 left-0 right-0 z-50 w-full bg-stone-100/95 backdrop-blur border-t border-stone-200 py-1 px-1 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] print:static print:shadow-none">
         
-        <div className="max-w-4xl mx-auto text-[8px] md:text-[8px] text-stone-500 leading-tight text-center font-serif">
+        <div className="max-w-7xl mx-auto text-[8px] md:text-[8px] text-stone-500 leading-tight text-center font-serif">
           <span className="font-serif italic block mb-0.5 tracking-widest text-stone-400 max-w-xl mx-auto">{readingLabel}</span>
 
-          <div className="flex justify-center gap-3 md:gap-4 my-1 text-[9px] text-stone-400 font-mono uppercase tracking-wider select-none print:hidden flex-wrap">
+          <div className="hidden md:flex justify-center gap-3 md:gap-4 my-1 text-[9px] text-stone-400 font-mono uppercase tracking-wider select-none print:hidden flex-wrap">
             <button onClick={() => navigateDate(-1)} type="button" aria-label="Previous Day (Shortcut: Left Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">←</kbd> Day</button>
             <button onClick={() => navigateDate(1)} type="button" aria-label="Next Day (Shortcut: Right Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">→</kbd> Day</button>
             <button onClick={() => navigateVerse(-1)} type="button" aria-label="Previous Verse (Shortcut: Up Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">↑</kbd> Verse</button>
@@ -1599,25 +1610,28 @@ const App = () => {
             <button onClick={handleToggle} type="button" aria-label="Toggle Playback (Shortcut: K)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">K</kbd> Play</button>
           </div>
 
-          <p className="mb-1 text-[7px] text-stone-400">
-            <span id="orig-note">* OH = Original Hebrew / OG = Original Greek versification.</span>
-          </p>
-          
           <div className="hidden md:block">
-            <p className="mb-1">
+            <p className="mb-1 text-[9px] text-stone-500">
                 The <strong>Literal Standard Version (LSV)</strong> is © Covenant Press (CC BY-SA 4.0).
                 The <strong>King James Version (KJV)</strong> and <strong>WEB</strong> are public domain.
             </p>
-            <div className="pt-1 border-t border-stone-200 text-stone-400">
-                &copy; 2025-2026 <a href="https://mt-sin.ai" target="_blank" rel="noopener noreferrer" className="text-stone-400 underline">Mt. Sinai LLC</a>.
+            <div className="pt-1 border-t border-stone-200 text-stone-400 flex justify-center gap-2">
+                <span>{readingLabel}</span>
+                <span>·</span>
+                <span>* OH = Original Hebrew / OG = Original Greek versification.</span>
+                <span>·</span>
+                <span>&copy; 2025-2026 <a href="https://mt-sin.ai" target="_blank" rel="noopener noreferrer" className="text-stone-400 underline">Mt. Sinai LLC</a>.</span>
             </div>
           </div>
 
           {/* Mobile Simplified Footer */}
-          <div className="md:hidden flex justify-center gap-2 text-[7px] text-stone-400">
-             <span>&copy; Mt. Sinai LLC</span>
-             <span>•</span>
-             <span>LSV © Covenant Press</span>
+          <div className="md:hidden flex flex-col items-center gap-1 text-[8px] text-stone-400">
+             <div>
+                LSV © Covenant Press · <a href="https://mt-sin.ai" target="_blank" rel="noopener noreferrer" className="text-stone-400 underline">&copy; Mt. Sinai LLC</a>
+             </div>
+             <div className="text-[7px] opacity-75">
+                * OH = Orig. Hebrew / OG = Orig. Greek
+             </div>
           </div>
         </div>
       </footer>
