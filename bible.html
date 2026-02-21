@@ -205,7 +205,7 @@ function CopyButton({ text, reference, version, ...props }) {
         } catch (err) { setStatus('idle'); }
     };
     return (
-        <button {...props} onClick={handleCopy} type="button" className="ml-2 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 print:hidden" aria-label={status === 'copied' ? "Copied" : "Copy verse"}>
+        <button {...props} onClick={handleCopy} type="button" className="ml-2 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 print:hidden" aria-label={status === 'copied' ? "Copied" : "Copy verse"} title={status === 'copied' ? "Copied!" : `Copy ${version}`}>
             {status === 'copied' ? <svg className="h-3 w-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> : <svg className="h-3 w-3 text-stone-400 hover:text-stone-900 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>}
         </button>
     );
@@ -335,6 +335,7 @@ function ScrollToTop() {
     <button
       onClick={scrollToTop}
       aria-label="Scroll to top"
+      title="Scroll to top"
       className={`fixed bottom-20 right-4 z-40 p-2 rounded-full bg-stone-900/80 text-white shadow-xl transition-all duration-300 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 print:hidden ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
     >
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
