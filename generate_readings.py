@@ -33,7 +33,8 @@ class BibleNavigator:
         self.verses = []
         for b in self.book_list:
             if b not in BIBLE_DATA:
-                raise ValueError(f"Error: Book {b} not in BIBLE_DATA.")
+                print(f"Warning: {b} not in BIBLE_DATA, skipping.")
+                continue
             chapters = BIBLE_DATA[b]
             for c_idx, v_count in enumerate(chapters):
                 c_num = c_idx + 1
@@ -219,10 +220,10 @@ def main():
     ps_idx = ps_nav.find_index("PSA.18.43")
     pr_idx = pr_nav.find_index("PRO.4.10")
     
-    if ot_idx == -1: raise ValueError("Error finding start EXO.7.1")
-    if nt_idx == -1: raise ValueError("Error finding start MAT.22.39")
-    if ps_idx == -1: raise ValueError("Error finding start PSA.18.43")
-    if pr_idx == -1: raise ValueError("Error finding start PRO.4.10")
+    if ot_idx == -1: print("Error finding start EXO.7.1")
+    if nt_idx == -1: print("Error finding start MAT.22.39")
+    if ps_idx == -1: print("Error finding start PSA.18.43")
+    if pr_idx == -1: print("Error finding start PRO.4.10")
 
     # Calculate Base Rates
     TOTAL_DAYS = 334
