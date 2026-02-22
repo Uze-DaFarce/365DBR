@@ -1010,7 +1010,6 @@ const App = () => {
   }, []);
 
   const [verseMap, setVerseMap] = useState(null);
-  const [readingLabel, setReadingLabel] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -1155,6 +1154,12 @@ const App = () => {
     });
   }, [verseMap]);
 
+  // ⚡ Bolt Optimization: Calculate reading label during render to avoid extra commit/render cycle.
+  // This ensures the label is ready on first paint after data load.
+  const readingLabel = useMemo(() =>
+      generateSmartLabel(verseMap, sortedVids, focalTranslation),
+  [verseMap, sortedVids, focalTranslation]);
+
   const labelParts = useMemo(() => readingLabel.split(',').map(s => s.trim()), [readingLabel]);
   const activeSectionIndex = useMemo(() => getSectionIndex(playbackStatus === 'playing' ? playbackVerseId || sortedVids[0] : activeVerseId || sortedVids[0]), [playbackStatus, playbackVerseId, activeVerseId, sortedVids]);
 
@@ -1241,15 +1246,6 @@ const App = () => {
   useEffect(() => {
     playbackStatusRef.current = playbackStatus;
   }, [playbackStatus]);
-
-  // Update Reading Label when verseMap or focalTranslation changes
-  useEffect(() => {
-      if (!verseMap) return;
-      // Use focalTranslation if available, else first English (if available), else null
-      // Note: availableTranslations logic is in local state, but usually matches what was loaded
-      const label = generateSmartLabel(verseMap, sortedVids, focalTranslation);
-      setReadingLabel(label);
-  }, [verseMap, sortedVids, focalTranslation]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

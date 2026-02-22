@@ -9,3 +9,7 @@
 ## 2025-03-09 - Constant Hoisting & O(1) Lookups
 **Learning:** In hot render paths (like list item rendering), even small allocations (like array literals) and O(N) searches (like `.includes()`) add up when multiplied by hundreds of items.
 **Action:** Replaced inline array allocation `['MAT', ...].includes(book)` with global `Set` lookup `NT_BOOKS.has(book)` in `VerseGroup`. Hoisted `months` array out of `formatDate` to avoid reallocation.
+
+## 2026-02-21 - State to Memo Conversion
+**Learning:** In React components without a build step (using `esm.sh`), hoisting derived state from `useState` + `useEffect` to `useMemo` significantly reduces render cycles. However, strict attention must be paid to variable definition order (TDZ) within the function body, as `useMemo` executes immediately during render, unlike `useEffect` which runs after.
+**Action:** When converting Effects to Memos, always ensure the new Memo is defined *before* any other Memos or variables that depend on it.
