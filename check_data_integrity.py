@@ -106,6 +106,91 @@ def verify_local_integrity(readings_path):
         print(f"❌ Found {errors} integrity issues.")
         return False
 
+def verify_local_content(readings_path):
+    print(f"🔍 Verifying local content integrity for {readings_path}...")
+
+    if not os.path.exists(readings_path):
+        print(f"❌ Error: {readings_path} not found.")
+        return False
+
+    with open(readings_path, 'r', encoding='utf-8') as f:
+        readings = json.load(f)
+
+    data_dir = os.path.dirname(readings_path)
+    errors = 0
+    checked_files = 0
+
+    for day in readings:
+        day_id = day['day']
+        day_dir = os.path.join(data_dir, day_id)
+        manifest_path = os.path.join(day_dir, "manifest.json")
+
+        if not os.path.exists(manifest_path):
+            # If the day directory doesn't exist, maybe it hasn't been generated yet.
+            # We only error if the directory exists but manifest is missing,
+            # OR if we want to enforce all days must exist (but that might be too strict if incremental).
+            if os.path.exists(day_dir):
+                 print(f"❌ {day_id}: Day directory exists but manifest is missing!")
+                 errors += 1
+            continue
+
+        try:
+            with open(manifest_path, 'r', encoding='utf-8') as f:
+                manifest = json.load(f)
+        except json.JSONDecodeError:
+            print(f"❌ {day_id}: Manifest is corrupt JSON!")
+            errors += 1
+            continue
+
+        files = manifest.get('files', [])
+        if not files:
+            print(f"⚠️ {day_id}: Manifest lists no files.")
+            continue
+
+        for filename in files:
+            filepath = os.path.join(day_dir, filename)
+            if not os.path.exists(filepath):
+                print(f"❌ {day_id}: Missing file listed in manifest: {filename}")
+                errors += 1
+                continue
+
+            # Infer range from filename (e.g. "GEN.1.1-GEN.1.5.json")
+            range_str = filename.replace('.json', '')
+
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                # Validate Structure
+                validate_api_response(data, context_info=f"{day_id}/{filename}")
+
+                # Validate Content (NO INJECTION)
+                # We expect the file to ALREADY contain any necessary injections.
+                # So we count exact verses.
+                validate_content_integrity(data, range_str, inject_missing=False)
+
+                checked_files += 1
+
+            except json.JSONDecodeError:
+                 print(f"❌ {day_id}/{filename}: Corrupt JSON!")
+                 errors += 1
+            except ValueError as e:
+                 print(f"❌ {day_id}/{filename}: Content Error: {e}")
+                 errors += 1
+            except Exception as e:
+                 print(f"❌ {day_id}/{filename}: Unexpected Error: {e}")
+                 errors += 1
+
+    if errors == 0:
+        if checked_files == 0:
+            print("⚠️ No content files found to verify.")
+        else:
+            print(f"✅ Local content verification passed ({checked_files} files checked).")
+        return True
+    else:
+        print(f"❌ Found {errors} content integrity issues.")
+        return False
+
 def verify_with_api(readings_path, day_limit=1):
     api_key = get_api_key()
     if not api_key:
@@ -184,6 +269,7 @@ def verify_with_api(readings_path, day_limit=1):
 def main():
     parser = argparse.ArgumentParser(description="Sentinel Data Integrity Checker")
     parser.add_argument("--local", action="store_true", help="Run local consistency check")
+    parser.add_argument("--content", action="store_true", help="Verify local file content integrity")
     parser.add_argument("--api", action="store_true", help="Run API verification")
     parser.add_argument("--days", type=int, default=1, help="Number of days to verify via API")
     parser.add_argument("--readings", default="data/readings.json", help="Path to readings.json (default: data/readings.json)")
@@ -193,6 +279,10 @@ def main():
 
     if args.local:
         if not verify_local_integrity(args.readings):
+            success = False
+
+    if args.content:
+        if not verify_local_content(args.readings):
             success = False
 
     if args.api:
