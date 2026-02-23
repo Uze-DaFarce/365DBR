@@ -320,8 +320,15 @@ function ScrollToTop() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setShow(window.scrollY > 400);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setShow(window.scrollY > 400);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -667,6 +674,23 @@ function App() {
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
+  const navigateVerse = (direction) => {
+      if (!sortedVids || sortedVids.length === 0) return;
+      let currentIndex = -1;
+      if (activeVerseIdRef.current) currentIndex = sortedVids.indexOf(activeVerseIdRef.current);
+      if (currentIndex === -1 && direction > 0) currentIndex = -1;
+      else if (currentIndex === -1 && direction < 0) currentIndex = 0;
+      let nextIndex = currentIndex + direction;
+      if (nextIndex < 0) nextIndex = 0;
+      if (nextIndex >= sortedVids.length) nextIndex = sortedVids.length - 1;
+      if (nextIndex !== currentIndex) {
+          const nextVid = sortedVids[nextIndex];
+          setActiveVerseId(nextVid);
+          const el = document.getElementById(`verse-${nextVid}`);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+  };
+
   const handleToggle = () => {
       if (playbackStatus === 'playing') {
           window.speechSynthesis.pause();
@@ -676,12 +700,26 @@ function App() {
           setPlaybackStatus('playing');
       } else {
           setPlaybackStatus('playing');
-          playVerse(activeVerseId || sortedVids[0]);
+          playVerse(activeVerseIdRef.current || sortedVids[0]);
       }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
+      switch(e.key) {
+        case 'ArrowUp': e.preventDefault(); navigateVerse(-1); break;
+        case 'ArrowDown': e.preventDefault(); navigateVerse(1); break;
+        case 'k': case 'K': handleToggle(); break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [sortedVids, playbackStatus]);
+
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-stone-900 focus:text-white focus:font-bold focus:rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xl transition-all print:hidden">Skip to Content</a>
       <header className="w-full bg-white/95 border-b border-stone-200 py-2 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
@@ -692,6 +730,7 @@ function App() {
 
                 {/* Book Selector */}
                 <select
+                    aria-label="Select Book"
                     value={selectedBook || ''}
                     onChange={(e) => {
                         const newBook = e.target.value;
@@ -710,6 +749,7 @@ function App() {
                 {/* Chapter Selector */}
                 {selectedBook && index[selectedBook] && (
                     <select
+                        aria-label="Select Chapter"
                         value={selectedChapter || ''}
                         onChange={(e) => setSelectedChapter(e.target.value)}
                         className="bg-stone-100 border-none rounded text-xs font-black uppercase tracking-tight py-1 px-2 focus:ring-2 focus:ring-amber-500"
@@ -724,15 +764,15 @@ function App() {
             <div className="flex items-center gap-2">
                  {/* Only show if we have data */}
                  {verseMap && (
-                     <button onClick={handleToggle} className={`px-3 py-1 rounded-full font-bold text-xs uppercase ${playbackStatus==='playing'?'bg-amber-600 text-white':'bg-stone-200 text-stone-600'}`}>
-                        {playbackStatus==='playing'?'Pause':'Listen'}
+                     <button onClick={handleToggle} aria-keyshortcuts="k" className={`px-3 py-1 rounded-full font-bold text-xs uppercase ${playbackStatus==='playing'?'bg-amber-600 text-white':'bg-stone-200 text-stone-600'}`}>
+                        {playbackStatus==='playing'?'Pause':(playbackStatus==='paused'?'Resume':'Listen')}
                      </button>
                  )}
             </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-6 px-2 space-y-6">
+      <main id="main-content" tabIndex={-1} className="max-w-7xl mx-auto py-6 px-2 space-y-6 outline-none">
         {!selectedBook ? (
             <div className="text-center py-20 text-stone-400 font-serif italic">Select a book to begin</div>
         ) : loading ? (

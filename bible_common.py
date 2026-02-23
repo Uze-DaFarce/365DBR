@@ -491,13 +491,14 @@ def inject_missing_verses(data, range_str):
         if not inserted:
             content_list.append(verse_obj)
 
-def validate_content_integrity(data, range_str):
+def validate_content_integrity(data, range_str, inject_missing=True):
     """
     Validates that the fetched content has the expected number of verses
     AND that the content belongs to the expected books.
     """
     # 0. Pre-Process: Inject Missing Verses (Fix for SBLGNT omissions)
-    inject_missing_verses(data, range_str)
+    if inject_missing:
+        inject_missing_verses(data, range_str)
 
     # 1. Calculate Expected Count
     expected = count_expected_verses(range_str)
