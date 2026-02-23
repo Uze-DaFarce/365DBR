@@ -1,0 +1,45 @@
+127.0.0.1 - - [22/Feb/2026 17:23:49] "GET /bible.html HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:24:20] "GET /bible.html HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:24:21] "GET /data/readings.json?v=1771781061044 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:24:21] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:24:21] "GET /data/0101/manifest.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:25:14] "GET /bible.html HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:25:15] "GET /data/readings.json?v=1771781115463 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:25:15] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:25:15] "GET /data/0125/manifest.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:25:15] "GET /data/0126/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:25:15] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:25:15] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:25:15] "GET /data/0126/PSA.18.1-PSA.18.7.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:25:15] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:25:15] "GET /data/0126/GEN.45.3-GEN.46.28.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:25:15] "GET /data/0126/MAT.19.17-MAT.20.8.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:25:15] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:25:15] "GET /data/0126/PRO.3.28-PRO.3.30.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:26:07] "GET /bible.html HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/readings.json?v=1771781168337 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0126/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0127/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:26:08] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0127/MAT.20.9-MAT.20.30.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:26:08] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0126/MAT.19.17-MAT.20.8.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0126/GEN.45.3-GEN.46.28.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0126/PSA.18.1-PSA.18.7.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0127/GEN.46.29-GEN.48.17.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0126/PRO.3.28-PRO.3.30.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0127/PSA.18.8-PSA.18.14.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:26:08] code 404, message File not found
+127.0.0.1 - - [22/Feb/2026 17:26:08] "GET /data/0127/PRO.3.31-PRO.3.33.json HTTP/1.1" 404 -
+127.0.0.1 - - [22/Feb/2026 17:27:08] "GET /bible.html HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:27:08] "GET /data/readings.json?v=1771781228789 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:27:08] "GET /data/0202/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:27:08] "GET /data/0202/EXO.9.1-EXO.10.29.json HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:27:09] "GET /data/0202/PRO.4.12-PRO.4.13.json HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:27:09] "GET /data/0202/PSA.19.1-PSA.19.7.json HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 17:27:09] "GET /data/0202/MAT.23.15-MAT.23.39.json HTTP/1.1" 200 -

@@ -49,3 +49,7 @@
 ## 2026-02-26 - Mobile Feature Parity
 **Learning:** Hiding core navigation (like "Browse" mode) on mobile devices to save space creates a second-class experience for mobile users, effectively locking them out of major features.
 **Action:** Use responsive utility classes to adapt the *presentation* of the link (e.g., hiding the text label but keeping the icon) rather than hiding the entire element. This preserves functionality while respecting mobile constraints.
+
+## 2026-02-27 - Unified Keyboard Shortcuts
+**Learning:** Users expect consistent keyboard shortcuts across all modes of an application (e.g., Daily Reader vs. Bible Browser), even if the modes serve different purposes. Inconsistency here breaks muscle memory.
+**Action:** Centralize keyboard shortcut logic or ensure parity (e.g., Arrow keys for navigation, 'k' for playback) across all distinct views/pages.
