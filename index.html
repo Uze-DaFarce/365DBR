@@ -1068,7 +1068,7 @@ const App = () => {
   // ⚡ Bolt Optimization: Memoize formatted date string to avoid parsing/formatting on every render frame
   const formattedDate = useMemo(() => formatDate(currentDate), [currentDate]);
   const [playbackStatus, setPlaybackStatus] = useState('stopped');
-  const [activeVerseId, setActiveVerseId] = useState(null); // Visual position (scroll tracking)
+  const [activeVerseId, setActiveVerseId] = useState(initialState.verseId || null); // Visual position (scroll tracking)
   const activeVerseIdRef = useRef(activeVerseId);
   useEffect(() => { activeVerseIdRef.current = activeVerseId; }, [activeVerseId]);
 
@@ -1105,7 +1105,7 @@ const App = () => {
               date: currentDate,
               focal: focalTranslation,
               compare: compareTranslation,
-              verseId: activeVerseId
+              verseId: activeVerseId || targetScrollVerse
           };
           localStorage.setItem('biblical_reading_state', JSON.stringify(state));
 
