@@ -146,15 +146,6 @@ let sectionOffsets = [];
 let cachedDocHeight = 0;
 let cachedWinHeight = 0;
 
-// ⚡ Bolt: Cache document dimensions to prevent layout thrashing
-let cachedWinHeight = 0;
-let cachedDocHeight = 0;
-
-function updateDimensions() {
-  cachedWinHeight = document.documentElement.clientHeight;
-  cachedDocHeight = document.documentElement.scrollHeight - cachedWinHeight;
-}
-
 // ⚡ Bolt: Debounce function to limit execution frequency
 function debounce(func, wait) {
   let timeout;
