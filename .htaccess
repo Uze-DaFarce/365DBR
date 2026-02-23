@@ -25,7 +25,7 @@
 
   # Permissions Policy - Disable sensitive features not used by the site
   # Added defense-in-depth restrictions for sensors, MIDI, sync-xhr, and more.
-  # Note: Sub-sites (like 365DBR) override this policy in their own .htaccess to enable required features (e.g., WebAuthn).
+  # Note: Sub-sites (like 365DBR, HeIsRisen, m) override this policy in their own .htaccess to enable required features.
   Header set Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), interest-cohort=(), sync-xhr=(), serial=(), xr-spatial-tracking=(), browsing-topics=(), publickey-credentials-get=()"
 
   # Prevent Adobe Flash and PDF data leakage
