@@ -700,8 +700,10 @@
     .scroll-progress-bar {
       height: 100%;
       background: #F4A623;
-      width: 0%;
-      transition: width 0.1s linear;
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: 0 50%;
+      will-change: transform;
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>

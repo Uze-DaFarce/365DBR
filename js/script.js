@@ -142,6 +142,9 @@ const navTargets = Array.from(navLinks).map(link => {
 
 // ⚡ Bolt: Cache offsets to prevent reflow during scroll
 let sectionOffsets = [];
+// ⚡ Bolt: Cache document dimensions to avoid layout thrashing on scroll
+let cachedDocHeight = 0;
+let cachedWinHeight = 0;
 
 // ⚡ Bolt: Cache document dimensions to prevent layout thrashing
 let cachedWinHeight = 0;
@@ -162,34 +165,36 @@ function debounce(func, wait) {
   };
 }
 
-function updateOffsets() {
+function updateDimensions() {
   sectionOffsets = navTargets.map(item => ({
     link: item.link,
     offset: item.target.offsetTop
   }));
-  updateDimensions();
+  cachedWinHeight = document.documentElement.clientHeight;
+  // Calculate the total scrollable height
+  cachedDocHeight = document.documentElement.scrollHeight - cachedWinHeight;
 }
 
 // Initial cache
-updateOffsets();
+updateDimensions();
 
 // ⚡ Bolt: Recalculate offsets after fonts load to ensure accuracy (prevents scroll spy issues from FOUT)
 if (document.fonts) {
-  document.fonts.ready.then(updateOffsets);
+  document.fonts.ready.then(updateDimensions);
 }
 
 // ⚡ Bolt: Debounce resize handler to prevent layout thrashing
-const debouncedUpdateOffsets = debounce(updateOffsets, 100);
+const debouncedUpdateDimensions = debounce(updateDimensions, 100);
 
 // Update offsets when layout changes (e.g. reviews toggle)
 // ⚡ Bolt: Use explicit event listeners instead of observing the entire body to prevent layout thrashing
-window.addEventListener('resize', debouncedUpdateOffsets);
+window.addEventListener('resize', debouncedUpdateDimensions);
 
 if (reviewsContainer) {
   reviewsContainer.addEventListener('transitionend', (e) => {
     // Only update when the height transition completes
     if (e.propertyName === 'grid-template-rows') {
-      debouncedUpdateOffsets();
+      debouncedUpdateDimensions();
     }
   });
 }
@@ -262,10 +267,16 @@ function updateScrollState(scrollY) {
   }
 
   // 3. Scroll Progress Bar
-  const scrollPercent = (scrollY / cachedDocHeight) * 100;
+  // ⚡ Bolt: Use cached dimensions and transform instead of width to prevent layout thrashing
   const progressBar = document.getElementById('scroll-progress');
   if (progressBar) {
-    progressBar.style.width = scrollPercent + '%';
+    let scaleX = 0;
+    if (cachedDocHeight > 0) {
+      scaleX = scrollY / cachedDocHeight;
+      // Clamp between 0 and 1
+      scaleX = Math.max(0, Math.min(1, scaleX));
+    }
+    progressBar.style.transform = `scaleX(${scaleX})`;
   }
 }
 

@@ -1,5 +1,6 @@
 from playwright.sync_api import sync_playwright
 import time
+import re
 
 def verify_scroll_progress():
     with sync_playwright() as p:
@@ -21,7 +22,6 @@ def verify_scroll_progress():
         print("Progress bar element found.")
 
         # Initial check
-        # JS runs on load, so it should be near 0%
         page.wait_for_timeout(100)
         initial_style = progress_bar.get_attribute("style") or ""
         print(f"Initial style: '{initial_style}'")
@@ -29,24 +29,29 @@ def verify_scroll_progress():
         # Scroll down
         print("Scrolling down...")
         page.evaluate("window.scrollTo(0, document.body.scrollHeight / 2)")
-        page.wait_for_timeout(500) # Wait for throttle and CSS transition
+        page.wait_for_timeout(500) # Wait for throttle
 
         mid_style = progress_bar.get_attribute("style")
         print(f"Mid scroll style: '{mid_style}'")
 
-        if not mid_style or "width" not in mid_style:
-             print("FAIL: Width style not set on progress bar after scroll.")
+        if not mid_style or "transform" not in mid_style:
+             print("FAIL: Transform style not set on progress bar after scroll.")
              browser.close()
              exit(1)
 
-        # Extract width value
-        # Style format might be "width: 50.123%;"
-        width_str = mid_style.split("width:")[1].split("%")[0].strip()
-        width_val = float(width_str)
-        print(f"Mid width value: {width_val}%")
+        # Extract scaleX value
+        # Style format might be "transform: scaleX(0.50123);"
+        match = re.search(r"scaleX\(([\d\.]+)\)", mid_style)
+        if not match:
+             print("FAIL: scaleX value not found in style.")
+             browser.close()
+             exit(1)
 
-        if not (10 < width_val < 90):
-             print(f"FAIL: Expected width between 10% and 90%, got {width_val}%")
+        scale_val = float(match.group(1))
+        print(f"Mid scale value: {scale_val}")
+
+        if not (0.1 < scale_val < 0.9):
+             print(f"FAIL: Expected scale between 0.1 and 0.9, got {scale_val}")
              browser.close()
              exit(1)
 
@@ -54,22 +59,27 @@ def verify_scroll_progress():
         print("Scrolling to bottom...")
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         page.wait_for_timeout(500)
-        # Scroll again in case lazy loaded images expanded the height
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         page.wait_for_timeout(500)
 
         end_style = progress_bar.get_attribute("style")
         print(f"End scroll style: '{end_style}'")
-        width_str_end = end_style.split("width:")[1].split("%")[0].strip()
-        width_val_end = float(width_str_end)
-        print(f"End width value: {width_val_end}%")
 
-        if width_val_end < 90:
-             print(f"FAIL: Expected end width > 90%, got {width_val_end}%")
+        match_end = re.search(r"scaleX\(([\d\.]+)\)", end_style)
+        if not match_end:
+             print("FAIL: End scaleX value not found.")
              browser.close()
              exit(1)
 
-        print("SUCCESS: Scroll progress bar works as expected.")
+        scale_val_end = float(match_end.group(1))
+        print(f"End scale value: {scale_val_end}")
+
+        if scale_val_end < 0.9:
+             print(f"FAIL: Expected end scale > 0.9, got {scale_val_end}")
+             browser.close()
+             exit(1)
+
+        print("SUCCESS: Scroll progress bar works as expected (optimized).")
         browser.close()
 
 if __name__ == "__main__":
