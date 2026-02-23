@@ -1,3 +1,6 @@
+127.0.0.1 - - [23/Feb/2026 16:07:04] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [23/Feb/2026 16:07:06] code 404, message File not found
+127.0.0.1 - - [23/Feb/2026 16:07:06] "GET /data/0223/manifest.json HTTP/1.1" 404 -
 127.0.0.1 - - [22/Feb/2026 17:23:49] "GET /bible.html HTTP/1.1" 200 -
 127.0.0.1 - - [22/Feb/2026 17:24:20] "GET /bible.html HTTP/1.1" 200 -
 127.0.0.1 - - [22/Feb/2026 17:24:21] "GET /data/readings.json?v=1771781061044 HTTP/1.1" 200 -
