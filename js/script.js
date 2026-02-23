@@ -104,13 +104,16 @@ if (toggleBtn && reviewsContainer) {
       }, 10);
       toggleBtn.textContent = 'Show Less Client Stories';
       toggleBtn.setAttribute('aria-expanded', 'true');
+
+      // 🎨 Palette: Move focus to new content for screen readers
+      reviewsContainer.setAttribute('tabindex', '-1');
+      reviewsContainer.style.outline = 'none';
+      reviewsContainer.focus();
     } else {
       // COLLAPSE
-      // Scroll back to the top of the reviews section to maintain context
-      const reviewsSection = document.getElementById('reviews');
-      if (reviewsSection) {
-        reviewsSection.scrollIntoView({ behavior: 'smooth' });
-      }
+      // 🎨 Palette: Scroll back to the toggle button to maintain context
+      // This prevents the user from being stranded in empty space when content shrinks
+      toggleBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       reviewsContainer.classList.remove('reviews-expanded');
       toggleBtn.textContent = 'Read More Client Stories';

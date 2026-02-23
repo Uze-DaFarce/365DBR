@@ -153,6 +153,12 @@ Implemented a lightweight Scroll Progress Bar:
 2.  **Logic:** Calculated scroll percentage `(scrollY / (scrollHeight - clientHeight))` in the existing `requestAnimationFrame` loop to avoid performance overhead.
 3.  **Visuals:** Used the brand's secondary color (Gold) for high contrast against the primary header color (Purple).
 
+## 2026-02-18 - Focus Management & Context Preservation
+**Learning:**
+1.  **Expanded Content Visibility:** When expanding content (like "Read More" reviews), screen reader users often miss the new content if it appears visually *before* the trigger button.
+    *   *Fix:* Programmatically move focus to the expanded container (`tabindex="-1"`) immediately upon expansion.
+2.  **Collapsed Context Loss:** When collapsing a large section from the bottom, the page shrinks, potentially leaving the viewport stranded in empty space below the content. Scrolling to the *top* of the section can also be disorienting as it forces the user to re-read content.
+    *   *Fix:* Scroll the viewport to center the **toggle button** itself. This keeps the user grounded at their current "decision point" in the flow, ready to proceed.
 ## 2026-02-18 - Focus Lift & Reduced Motion
 **Learning:**
 1. **Focus Parity:** Keyboard users often miss out on the "delight" of interaction (like card lifts on hover). Adding `:focus-within` triggers to the same transform properties ensures parity.
