@@ -292,7 +292,11 @@ def count_expected_verses(range_str):
         parts = ref_str.split('.')
         return parts[0], int(parts[1]), int(parts[2])
 
-    start_str, end_str = range_str.split('-')
+    if '-' in range_str:
+        start_str, end_str = range_str.split('-')
+    else:
+        start_str = range_str
+        end_str = range_str
     s_book, s_chap, s_verse = parse_reference(start_str)
     e_book, e_chap, e_verse = parse_reference(end_str)
 
@@ -405,7 +409,11 @@ def inject_missing_verses(data, range_str):
         parts = ref_str.split('.')
         return parts[0], int(parts[1]), int(parts[2])
 
-    start_str, end_str = range_str.split('-')
+    if '-' in range_str:
+        start_str, end_str = range_str.split('-')
+    else:
+        start_str = range_str
+        end_str = range_str
     s_book, s_chap, s_verse = parse_reference(start_str)
     e_book, e_chap, e_verse = parse_reference(end_str)
 
@@ -539,8 +547,13 @@ def validate_content_integrity(data, range_str, inject_missing=True):
     # 5. Strict Boundary Check
     # Ensure start verse and end verse of the range are present.
     # This catches "shifted" ranges where count matches but content is wrong (e.g. MAT.15.14-38 returned for MAT.15.7-31).
-    if '-' in range_str and ';' not in range_str:
-        start_vid, end_vid = range_str.split('-')
+    # Also handles single-verse ranges (no hyphen).
+    if ';' not in range_str:
+        if '-' in range_str:
+            start_vid, end_vid = range_str.split('-')
+        else:
+            start_vid = range_str
+            end_vid = range_str
 
         # Normalize actual VIDs for lookup
         normalized_actual_vids = set()
