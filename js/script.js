@@ -104,13 +104,16 @@ if (toggleBtn && reviewsContainer) {
       }, 10);
       toggleBtn.textContent = 'Show Less Client Stories';
       toggleBtn.setAttribute('aria-expanded', 'true');
+
+      // 🎨 Palette: Move focus to new content for screen readers
+      reviewsContainer.setAttribute('tabindex', '-1');
+      reviewsContainer.style.outline = 'none';
+      reviewsContainer.focus();
     } else {
       // COLLAPSE
-      // Scroll back to the top of the reviews section to maintain context
-      const reviewsSection = document.getElementById('reviews');
-      if (reviewsSection) {
-        reviewsSection.scrollIntoView({ behavior: 'smooth' });
-      }
+      // 🎨 Palette: Scroll back to the toggle button to maintain context
+      // This prevents the user from being stranded in empty space when content shrinks
+      toggleBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       reviewsContainer.classList.remove('reviews-expanded');
       toggleBtn.textContent = 'Read More Client Stories';
@@ -142,6 +145,15 @@ let sectionOffsets = [];
 // ⚡ Bolt: Cache document dimensions to avoid layout thrashing on scroll
 let cachedDocHeight = 0;
 let cachedWinHeight = 0;
+
+// ⚡ Bolt: Cache document dimensions to prevent layout thrashing
+let cachedWinHeight = 0;
+let cachedDocHeight = 0;
+
+function updateDimensions() {
+  cachedWinHeight = document.documentElement.clientHeight;
+  cachedDocHeight = document.documentElement.scrollHeight - cachedWinHeight;
+}
 
 // ⚡ Bolt: Debounce function to limit execution frequency
 function debounce(func, wait) {
