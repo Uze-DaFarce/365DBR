@@ -152,3 +152,11 @@ Implemented a lightweight Scroll Progress Bar:
 1.  **Structure:** Added `.scroll-progress-container` absolute positioned at the bottom of the sticky `<header>`.
 2.  **Logic:** Calculated scroll percentage `(scrollY / (scrollHeight - clientHeight))` in the existing `requestAnimationFrame` loop to avoid performance overhead.
 3.  **Visuals:** Used the brand's secondary color (Gold) for high contrast against the primary header color (Purple).
+
+## 2026-02-18 - Focus Lift & Reduced Motion
+**Learning:**
+1. **Focus Parity:** Keyboard users often miss out on the "delight" of interaction (like card lifts on hover). Adding `:focus-within` triggers to the same transform properties ensures parity.
+2. **Motion Sensitivity:** Applying transforms on hover/focus can cause motion sickness for some users. It is critical to wrap these effects in `@media (prefers-reduced-motion: reduce)` to disable them.
+**Action:**
+1. Added `.service-card:focus-within` and `.project-card:focus-within` to match hover states.
+2. Implemented a consolidated `@media (prefers-reduced-motion: reduce)` block to force `transform: none` and `transition: none` on all interactive elements (`.service-card`, `.project-card`, `.team-member`, `.btn-primary`, `.back-to-top`).
