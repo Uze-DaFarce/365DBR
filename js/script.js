@@ -191,6 +191,8 @@ if (reviewsContainer) {
 }
 
 const backToTopBtn = document.getElementById('back-to-top');
+// ⚡ Bolt: Cache progress bar to avoid repeated DOM lookups
+const progressBar = document.getElementById('scroll-progress');
 
 // ⚡ Bolt: Optimize Scroll Handling
 // Throttling scroll events with requestAnimationFrame to reduce main thread blocking
@@ -259,7 +261,6 @@ function updateScrollState(scrollY) {
 
   // 3. Scroll Progress Bar
   // ⚡ Bolt: Use cached dimensions and transform instead of width to prevent layout thrashing
-  const progressBar = document.getElementById('scroll-progress');
   if (progressBar) {
     let scaleX = 0;
     if (cachedDocHeight > 0) {
