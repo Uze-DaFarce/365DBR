@@ -405,3 +405,10 @@ if (!prefersReducedMotion) {
     }
   });
 }
+
+// 🛡️ Sentinel: Security Enhancement - Prevent Reverse Tabnabbing
+// Automatically add rel="noopener noreferrer" to any external links that open in a new tab.
+// This provides defense-in-depth against future content updates that might miss this attribute.
+document.querySelectorAll('a[target="_blank"]:not([rel~="noopener"])').forEach(link => {
+  link.rel = (link.rel + ' noopener noreferrer').trim();
+});

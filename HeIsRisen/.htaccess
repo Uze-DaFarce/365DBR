@@ -15,7 +15,4 @@
 
   # Standard Referrer Policy
   Header set Referrer-Policy "strict-origin-when-cross-origin"
-
-  # Protect HeIsRisen game from root policy hardening (sensors, midi, etc. remain allowed)
-  Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), publickey-credentials-get=()"
 </IfModule>
