@@ -143,6 +143,15 @@ const navTargets = Array.from(navLinks).map(link => {
 // ⚡ Bolt: Cache offsets to prevent reflow during scroll
 let sectionOffsets = [];
 
+// ⚡ Bolt: Cache document dimensions to prevent layout thrashing
+let cachedWinHeight = 0;
+let cachedDocHeight = 0;
+
+function updateDimensions() {
+  cachedWinHeight = document.documentElement.clientHeight;
+  cachedDocHeight = document.documentElement.scrollHeight - cachedWinHeight;
+}
+
 // ⚡ Bolt: Debounce function to limit execution frequency
 function debounce(func, wait) {
   let timeout;
@@ -158,6 +167,7 @@ function updateOffsets() {
     link: item.link,
     offset: item.target.offsetTop
   }));
+  updateDimensions();
 }
 
 // Initial cache
@@ -252,9 +262,7 @@ function updateScrollState(scrollY) {
   }
 
   // 3. Scroll Progress Bar
-  const winHeight = document.documentElement.clientHeight;
-  const docHeight = document.documentElement.scrollHeight - winHeight;
-  const scrollPercent = (scrollY / docHeight) * 100;
+  const scrollPercent = (scrollY / cachedDocHeight) * 100;
   const progressBar = document.getElementById('scroll-progress');
   if (progressBar) {
     progressBar.style.width = scrollPercent + '%';
