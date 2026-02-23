@@ -13,3 +13,7 @@
 ## 2026-02-21 - State to Memo Conversion
 **Learning:** In React components without a build step (using `esm.sh`), hoisting derived state from `useState` + `useEffect` to `useMemo` significantly reduces render cycles. However, strict attention must be paid to variable definition order (TDZ) within the function body, as `useMemo` executes immediately during render, unlike `useEffect` which runs after.
 **Action:** When converting Effects to Memos, always ensure the new Memo is defined *before* any other Memos or variables that depend on it.
+
+## 2026-05-19 - Inline JSX Performance Trap
+**Learning:** In a single-file React app, it's easy to keep components like `Footer` inline within the main `App` for convenience. However, this causes the entire footer (and its diffing cost) to run on every `App` re-render (e.g., during scrolling).
+**Action:** Extracted `Footer` to a `React.memo` component and memoized its callbacks (`navigateVerse`). This isolates the footer from scroll-driven state updates, reducing main thread work during the critical scroll interaction.
