@@ -483,13 +483,14 @@ def inject_missing_verses(data, range_str):
         if not inserted:
             content_list.append(verse_obj)
 
-def validate_content_integrity(data, range_str):
+def validate_content_integrity(data, range_str, inject_missing=True):
     """
     Validates that the fetched content has the expected number of verses
     AND that the content belongs to the expected books.
     """
     # 0. Pre-Process: Inject Missing Verses (Fix for SBLGNT omissions)
-    inject_missing_verses(data, range_str)
+    if inject_missing:
+        inject_missing_verses(data, range_str)
 
     # 1. Calculate Expected Count
     expected = count_expected_verses(range_str)
@@ -534,6 +535,33 @@ def validate_content_integrity(data, range_str):
     # Additional Sentinel Check: Zero Verses
     if expected > 0 and actual == 0:
          raise ValueError(f"[Data Integrity] Zero verses returned for {range_str}. Expected {expected}.")
+
+    # 5. Strict Boundary Check
+    # Ensure start verse and end verse of the range are present.
+    # This catches "shifted" ranges where count matches but content is wrong (e.g. MAT.15.14-38 returned for MAT.15.7-31).
+    if '-' in range_str and ';' not in range_str:
+        start_vid, end_vid = range_str.split('-')
+
+        # Normalize actual VIDs for lookup
+        normalized_actual_vids = set()
+        for vid in actual_vids:
+            b, c, v = vid.split('.')
+            if b in REVERSE_HEBREW_BOOK_MAP:
+                b = REVERSE_HEBREW_BOOK_MAP[b]
+            normalized_actual_vids.add(f"{b}.{c}.{v}")
+
+        # Check Start
+        # Note: We must handle cases where the start verse itself is a KNOWN_OMISSION (rare but possible)
+        if start_vid not in normalized_actual_vids and start_vid not in KNOWN_OMISSIONS:
+             # Check if it's a Psalm Title issue?
+             # If Psalm 18:43 is requested, but API returns 18:44 due to title...
+             # But we use Hebrew IDs, so it should match.
+             # If it's just missing, it's an error.
+             raise ValueError(f"[Data Integrity] Start Verse {start_vid} MISSING in response for {range_str}. Possible range shift or truncation.")
+
+        # Check End
+        if end_vid not in normalized_actual_vids and end_vid not in KNOWN_OMISSIONS:
+             raise ValueError(f"[Data Integrity] End Verse {end_vid} MISSING in response for {range_str}. Possible range shift or truncation.")
 
     return True
 
