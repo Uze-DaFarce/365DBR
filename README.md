@@ -37,6 +37,16 @@ This website is a static site built with HTML, CSS, and vanilla JavaScript.
     *   `js/`: JavaScript logic (`script.js`).
     *   `pics/`: Images and assets.
 
+## Production Architecture & 365DBR
+
+⚠️ **CRITICAL: The directory structure here is a simplified view of production.**
+
+In the live environment (`html_public` on GoDaddy), **365DBR** (our most critical application) exists as a fully populated subdirectory at `mt-sin.ai/365DBR/`.
+
+*   **DO NOT** assume `365DBR` is empty or a typo because the folder is sparse in this repo.
+*   **DO NOT** modify the root `.htaccess` without verifying `365DBR/.htaccess` overrides any strict policies (like `Permissions-Policy` or CSP).
+*   Changes to the root configuration propagate to sub-sites (`365DBR`, `HeIsRisen`, `m`) via Apache inheritance. Always ensure sub-sites are explicitly protected from breaking changes.
+
 ## Contact
 
 *   **Email**: [truth@mt-sin.ai](mailto:truth@mt-sin.ai)
