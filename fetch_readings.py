@@ -22,7 +22,8 @@ from bible_common import (
     KNOWN_OMISSIONS,
     REVERSE_HEBREW_BOOK_MAP,
     OT_HEBREW_BOOK_MAP,
-    atomic_write_json
+    atomic_write_json,
+    ALL_BOOKS
 )
 
 def get_api_key():
