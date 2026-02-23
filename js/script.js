@@ -329,8 +329,16 @@ function createSVG(type) {
 const copyBtns = document.querySelectorAll('.copy-btn');
 copyBtns.forEach(copyBtn => {
   copyBtn.addEventListener('click', () => {
+    // 🎨 Palette: Prevent rapid re-clicks to avoid race conditions
+    if (copyBtn.classList.contains('copied')) return;
+
     const textToCopy = copyBtn.getAttribute('data-copy-text');
     if (!textToCopy) return;
+
+    // 🎨 Palette: Add haptic feedback for mobile delight
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
 
     // Store original state for restoration
     const originalLabel = copyBtn.getAttribute('aria-label');
@@ -375,6 +383,16 @@ copyBtns.forEach(copyBtn => {
       })
       .catch(err => {
         console.error('Failed to copy: ', err);
+        // 🎨 Palette: Provide visual feedback on failure
+        if (tooltip) {
+            const oldText = tooltip.textContent;
+            tooltip.textContent = 'Failed';
+            copyBtn.classList.add('error');
+            setTimeout(() => {
+                tooltip.textContent = oldText;
+                copyBtn.classList.remove('error');
+            }, 2000);
+        }
       });
   });
 });
