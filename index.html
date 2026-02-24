@@ -1013,41 +1013,44 @@ const ScrollToTop = () => {
 const App = () => {
   // Helper to resolve initial state from URL -> LocalStorage -> Today
   const getInitialState = () => {
-    // 1. URL Parameter (High Priority)
+    // 1. Load Saved Session First (to get preferences & history)
+    let savedState = {};
+    try {
+        const saved = localStorage.getItem('biblical_reading_state');
+        if (saved) savedState = JSON.parse(saved);
+    } catch (e) { console.warn("Failed to load saved state", e); }
+
+    // 2. Determine Date (URL > Saved > Today)
+    let initialDate = savedState.date;
+
     const params = new URLSearchParams(window.location.search);
     const urlDate = params.get('startDate');
     if (urlDate && /^\d{4}$/.test(urlDate)) {
-        // Try to load extra settings from storage even if URL overrides date
-        try {
-            const saved = localStorage.getItem('biblical_reading_state');
-            if (saved) {
-                const state = JSON.parse(saved);
-                // If the stored date matches the URL date, we can restore the exact position!
-                // If not, we still restore translation preferences.
-                return { ...state, date: urlDate, verseId: (state.date === urlDate ? state.verseId : null) };
-            }
-        } catch (e) {}
-        return { date: urlDate };
+        initialDate = urlDate;
     }
 
-    // 2. Saved Session
-    try {
-        const saved = localStorage.getItem('biblical_reading_state');
-        if (saved) {
-            const state = JSON.parse(saved);
-            if (state.date && /^\d{4}$/.test(state.date)) {
-                return state;
-            }
-        }
-    } catch (e) {
-        console.warn("Failed to load saved state", e);
+    if (!initialDate || !/^\d{4}$/.test(initialDate)) {
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        initialDate = `${month}${day}`;
     }
 
-    // 3. Today (Fallback)
-    const now = new Date();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return { date: `${month}${day}` };
+    // 3. Resolve Verse ID from History
+    // Check if we have a saved spot for this SPECIFIC date in history
+    let initialVerseId = null;
+    if (savedState.history && savedState.history[initialDate]) {
+        initialVerseId = savedState.history[initialDate];
+    } else if (savedState.date === initialDate && savedState.verseId) {
+        // Fallback to legacy single-verseId if history missing but date matches
+        initialVerseId = savedState.verseId;
+    }
+
+    return {
+        ...savedState,
+        date: initialDate,
+        verseId: initialVerseId
+    };
   };
 
   const initialState = useMemo(() => getInitialState(), []);
@@ -1092,7 +1095,7 @@ const App = () => {
   const prevCompare = useRef(compareTranslation);
 
   useEffect(() => {
-      // console.log("Save Effect Triggered", { loading, currentDate });
+      console.log("Save Effect Triggered", { loading, currentDate, isFuture: (currentDate > "0225") }); // Debug
       if (loading) return;
 
       const isCriticalChange = (
@@ -1196,6 +1199,12 @@ const App = () => {
               // We are in the past/present -> Update Reading Progress
               newState.date = currentDate;
               newState.verseId = activeVerseId || targetScrollVerse;
+
+              // Update History
+              if (!newState.history) newState.history = {};
+              if (newState.verseId) {
+                  newState.history[currentDate] = newState.verseId;
+              }
           }
 
           localStorage.setItem('biblical_reading_state', JSON.stringify(newState));
@@ -1222,6 +1231,23 @@ const App = () => {
           url.searchParams.set('startDate', currentDate);
           window.history.pushState({}, '', url);
       }
+
+      // Reset or Restore Active Verse State on Date Change
+      // This is critical to prevent stale state from previous day being saved to new day.
+      // We check if we have a history entry for the NEW date.
+      let historyVerse = null;
+      try {
+          const s = JSON.parse(localStorage.getItem('biblical_reading_state') || '{}');
+          if (s.history && s.history[currentDate]) {
+              historyVerse = s.history[currentDate];
+          }
+      } catch (e) {}
+
+      // If we have history, we set it (so it highlights/saves correctly).
+      // If not, we set null (so we start fresh at top).
+      // Note: targetScrollVerse handles the initial scroll, but activeVerseId needs to be in sync for state saving.
+      setActiveVerseId(historyVerse);
+
   }, [currentDate]);
 
   // Scroll Restoration
