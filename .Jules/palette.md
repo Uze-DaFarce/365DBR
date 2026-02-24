@@ -20,7 +20,7 @@
 
 ## 2026-02-08 - Contextual Actions on Active State
 **Learning:** In a long list of items (verses), placing action buttons (like Copy) on every item creates visual clutter and tab-order fatigue.
-**Action:** Only reveal contextual actions on the "active" or "focused" item. This keeps the UI clean while ensuring the feature is available when the user's attention is on that specific content. Use conditional rendering (e.g., `{isActive && <Button />}`) to manage focus order efficiently.
+**Action:** Only reveal contextual actions on the "active" or "focused" item. This keeps the UI clean while ensuring the feature is available when the user is in control. Use conditional rendering (e.g., `{isActive && <Button />}`) to manage focus order efficiently.
 
 ## 2026-02-08 - Mode-Dependent Interactions
 **Learning:** During passive consumption modes (like auto-scrolling playback), "lean-in" interactive elements (like Copy buttons) become moving targets that create visual noise and user frustration.
@@ -53,3 +53,7 @@
 ## 2026-02-27 - Unified Keyboard Shortcuts
 **Learning:** Users expect consistent keyboard shortcuts across all modes of an application (e.g., Daily Reader vs. Bible Browser), even if the modes serve different purposes. Inconsistency here breaks muscle memory.
 **Action:** Centralize keyboard shortcut logic or ensure parity (e.g., Arrow keys for navigation, 'k' for playback) across all distinct views/pages.
+
+## 2026-02-24 - Time Investment Transparency
+**Learning:** In daily habit apps (like Bible reading), users often hesitate to start a session if they are unsure of the length. Providing a time estimate reduces friction and encourages engagement ("It's only 5 mins").
+**Action:** Calculate and display estimated reading time (e.g., '5 min read') based on content length (approx. 200-250 wpm) near the primary content label or footer to set clear expectations.

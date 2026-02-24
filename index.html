@@ -299,7 +299,19 @@ const loadDailyBread = async (dateFolder) => {
       });
   });
 
-  return { verseMap, label: manifest.label, availableTranslations: sortedKeys };
+  // Calculate Reading Time (Standard 200 wpm)
+  let wordCount = 0;
+  Object.values(verseMap).forEach(verseData => {
+      // Prioritize English if available
+      const t = verseData.lsv || verseData.kjv || verseData.web || verseData.nlt || verseData.original;
+      if (t && t.text) {
+          // Text is already joined by space above
+          wordCount += (t.text.trim() === '' ? 0 : t.text.trim().split(/\s+/).length);
+      }
+  });
+  const readingTime = Math.ceil(wordCount / 200);
+
+  return { verseMap, label: manifest.label, availableTranslations: sortedKeys, readingTime };
 };
 
 /** --- APP COMPONENT --- **/
@@ -932,11 +944,14 @@ const Header = React.memo(({
   );
 });
 
-const Footer = React.memo(({ readingLabel, navigateDate, navigateVerse, handleToggle }) => {
+const Footer = React.memo(({ readingLabel, readingTime, navigateDate, navigateVerse, handleToggle }) => {
   return (
     <footer id="footer" className="fixed bottom-0 left-0 right-0 z-50 w-full bg-stone-100/95 backdrop-blur border-t border-stone-200 py-1 px-1 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] print:static print:shadow-none">
       <div className="max-w-7xl mx-auto text-[8px] md:text-[8px] text-stone-500 leading-tight text-center font-serif">
-        <span className="font-serif italic block mb-0.5 tracking-widest text-stone-400 max-w-xl mx-auto">{readingLabel}</span>
+        <span className="font-serif italic block mb-0.5 tracking-widest text-stone-400 max-w-xl mx-auto">
+            {readingLabel}
+            {readingTime > 0 && <span className="opacity-75"> · {readingTime} min read</span>}
+        </span>
 
         <div className="hidden md:flex justify-center gap-3 md:gap-4 my-1 text-[9px] text-stone-400 font-mono uppercase tracking-wider select-none print:hidden flex-wrap">
           <button onClick={() => navigateDate(-1)} type="button" aria-label="Previous Day (Shortcut: Left Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">←</kbd> Day</button>
@@ -1063,6 +1078,7 @@ const App = () => {
   }, []);
 
   const [verseMap, setVerseMap] = useState(null);
+  const [readingTime, setReadingTime] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -1425,6 +1441,7 @@ const App = () => {
         const data = await loadDailyBread(currentDate);
         if (!isMounted) return;
         setVerseMap(data.verseMap);
+        setReadingTime(data.readingTime || 0);
         // setReadingLabel(data.label); // REMOVED: Now handled by useEffect
         setAvailableTranslations(data.availableTranslations);
 
@@ -1748,6 +1765,7 @@ const App = () => {
       </main>
       <Footer
         readingLabel={readingLabel}
+        readingTime={readingTime}
         navigateDate={navigateDate}
         navigateVerse={navigateVerse}
         handleToggle={handleToggle}

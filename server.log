@@ -1,3 +1,19 @@
-127.0.0.1 - - [23/Feb/2026 23:14:12] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [23/Feb/2026 23:14:14] code 404, message File not found
-127.0.0.1 - - [23/Feb/2026 23:14:14] "GET /data/0223/manifest.json HTTP/1.1" 404 -
+127.0.0.1 - - [24/Feb/2026 17:25:04] "HEAD /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:26:03] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:26:06] code 404, message File not found
+127.0.0.1 - - [24/Feb/2026 17:26:06] "GET /data/0224/manifest.json HTTP/1.1" 404 -
+127.0.0.1 - - [24/Feb/2026 17:26:23] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:26:24] code 404, message File not found
+127.0.0.1 - - [24/Feb/2026 17:26:24] "GET /data/0224/manifest.json HTTP/1.1" 404 -
+127.0.0.1 - - [24/Feb/2026 17:27:03] "GET /index.html?startDate=0222 HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:06] "GET /data/0222/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:06] "GET /data/0222/PRO.6.5-PRO.6.6.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:06] "GET /data/0222/LEV.6.1-LEV.7.38.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:06] "GET /data/0222/PSA.29.1-PSA.29.7.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:06] "GET /data/0222/MRK.5.1-MRK.5.22.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:22] "GET /index.html?startDate=0222 HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:24] "GET /data/0222/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:24] "GET /data/0222/PRO.6.5-PRO.6.6.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:24] "GET /data/0222/LEV.6.1-LEV.7.38.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:24] "GET /data/0222/PSA.29.1-PSA.29.7.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 17:27:24] "GET /data/0222/MRK.5.1-MRK.5.22.json HTTP/1.1" 200 -

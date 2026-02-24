@@ -4,7 +4,7 @@ def verify_footer():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
-        page.goto("http://localhost:8000/index.html")
+        page.goto("http://localhost:3000/index.html?startDate=0222")
 
         # Wait for data to load
         page.wait_for_selector("text=Literal Standard Version", timeout=10000)
