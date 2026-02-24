@@ -1092,6 +1092,7 @@ const App = () => {
   const prevCompare = useRef(compareTranslation);
 
   useEffect(() => {
+      // console.log("Save Effect Triggered", { loading, currentDate });
       if (loading) return;
 
       const isCriticalChange = (
@@ -1108,40 +1109,32 @@ const App = () => {
           // Reset time to ensure we compare just dates
           today.setHours(0, 0, 0, 0);
 
+          // Smart Bookmark: Use dynamic year to compare dates correctly
+          const currentYear = today.getFullYear();
           const currentMonth = parseInt(currentDate.substring(0, 2)) - 1;
           const currentDay = parseInt(currentDate.substring(2, 4));
-          // Use current year (or next year if Jan is viewed in Dec context, though simplistic 2025 logic used elsewhere)
-          // Consistent with navigateDate logic: use 2025.
-          const viewDate = new Date(2025, currentMonth, currentDay);
 
-          // Allow saving if viewDate is <= Today (ignoring year for recurring reading plan logic safety?
-          // Actually, let's just use MMDD string comparison for simplicity and robustness since years rotate)
-          const tomorrow = new Date(today);
-          tomorrow.setDate(today.getDate() + 1);
+          // Construct View Date using current year
+          const viewDate = new Date(currentYear, currentMonth, currentDay);
 
-          // Format Tomorrow as MMDD
-          const tomorrowMMDD = String(tomorrow.getMonth() + 1).padStart(2, '0') + String(tomorrow.getDate()).padStart(2, '0');
-
-          // Simple string comparison works for MMDD (e.g. "0101" < "1231")
-          // Logic: Save verseId ONLY if currentDate <= tomorrowMMDD.
-          // This allows users to read 1 day ahead without losing their place, but prevents accidental "far future" jumps.
-          // Note: This simplistic string compare fails for Dec 31 -> Jan 01 wrap-around if year isn't considered.
-          // However, since currentDate is just MMDD, we can't truly know the year.
-          // BUT, for the purpose of "isFuture", if today is Dec 31 (1231) and we view Jan 01 (0101),
-          // 0101 < 1231, so it is NOT considered future by string compare (which is wrong).
-          // 0101 IS future relative to 1231.
-
-          // Robust Logic:
-          // Since we use 2025 as the base year for navigation, let's stick to Date object comparison.
-          // `viewDate` is already constructed with year 2025.
-          // Let's construct `maxAllowedDate` based on 2025 too.
-
-          const maxAllowedDate = new Date(2025, today.getMonth(), today.getDate() + 1);
-          // Handle year wrap for Dec 31 -> Jan 1
-          if (today.getMonth() === 11 && today.getDate() === 31) {
-              // If today is Dec 31, max allowed is Jan 1 of NEXT year (2026).
-              maxAllowedDate.setFullYear(2026);
+          // Handle Year Wrap for View Date (e.g. Viewing Jan 01 when Today is Dec 31)
+          // If Today is Dec and View is Jan, View is clearly Next Year
+          if (today.getMonth() === 11 && currentMonth === 0) {
+              viewDate.setFullYear(currentYear + 1);
           }
+          // If Today is Jan and View is Dec, View is clearly Last Year (Past)
+          else if (today.getMonth() === 0 && currentMonth === 11) {
+              viewDate.setFullYear(currentYear - 1);
+          }
+
+          // Construct Max Allowed Date (Today + 1 Day)
+          const maxAllowedDate = new Date(today);
+          maxAllowedDate.setDate(today.getDate() + 1);
+
+          // Logic: Save verseId ONLY if viewDate <= maxAllowedDate
+          const isFuture = viewDate > maxAllowedDate;
+
+          // console.log("[SmartBookmark] Checking...", currentDate, isFuture);
 
           // We also need to handle if `viewDate` (e.g. Jan 1) is meant to be NEXT year relative to Dec 31.
           // The `viewDate` logic above uses `2025` hardcoded.
@@ -1625,11 +1618,24 @@ const App = () => {
   }, [playbackStatus, sortedVids, verseMap]);
 
   const navigateDate = useCallback((direction) => {
-    const month = parseInt(currentDate.substring(0, 2)), day = parseInt(currentDate.substring(2, 4));
-    // Use 2025 (non-leap year) to ensure Feb 28 -> Mar 1 transition matches the data generation
-    const date = new Date(2025, month - 1, day); date.setDate(date.getDate() + direction);
-    const nm = String(date.getMonth() + 1).padStart(2, '0'), nd = String(date.getDate()).padStart(2, '0');
-    setCurrentDate(`${nm}${nd}`); window.scrollTo({ top: 0 });
+    const month = parseInt(currentDate.substring(0, 2)) - 1; // 0-based month
+    const day = parseInt(currentDate.substring(2, 4));
+
+    // Use current year for navigation to handle year boundaries correctly
+    const currentYear = new Date().getFullYear();
+    const date = new Date(currentYear, month, day);
+
+    date.setDate(date.getDate() + direction);
+
+    // Leap Year Handling: If we land on Feb 29, skip it (Project uses 365-day schedule)
+    if (date.getMonth() === 1 && date.getDate() === 29) {
+        date.setDate(date.getDate() + (direction > 0 ? 1 : -1));
+    }
+
+    const nm = String(date.getMonth() + 1).padStart(2, '0');
+    const nd = String(date.getDate()).padStart(2, '0');
+    setCurrentDate(`${nm}${nd}`);
+    window.scrollTo({ top: 0 });
   }, [currentDate]);
 
   const navigateVerse = useCallback((direction) => {
