@@ -10,6 +10,11 @@
   # - data: and blob: (common for game assets)
   Header set Content-Security-Policy "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; upgrade-insecure-requests;"
 
+  # Override Permissions Policy to ensure game features work
+  # The root policy blocks `publickey-credentials-get` and `geolocation`. We enable them here.
+  # This prevents strict root policies from breaking the game.
+  Header set Permissions-Policy "geolocation=(self), microphone=(), camera=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), publickey-credentials-get=(self)"
+
   # Relax X-Frame-Options to allow same-origin framing if needed
   Header set X-Frame-Options "SAMEORIGIN"
 
