@@ -1101,13 +1101,72 @@ const App = () => {
       );
 
       const save = () => {
+          // Smart Bookmark: Only save progress if reading today or in the past.
+          // This prevents "looking ahead" (e.g., previewing tomorrow) from overwriting your actual spot.
+          // Translation preferences (focal/compare) are always saved.
+          const today = new Date();
+          // Reset time to ensure we compare just dates
+          today.setHours(0, 0, 0, 0);
+
+          const currentMonth = parseInt(currentDate.substring(0, 2)) - 1;
+          const currentDay = parseInt(currentDate.substring(2, 4));
+          // Use current year (or next year if Jan is viewed in Dec context, though simplistic 2025 logic used elsewhere)
+          // Consistent with navigateDate logic: use 2025.
+          const viewDate = new Date(2025, currentMonth, currentDay);
+
+          // Allow saving if viewDate is <= Today (ignoring year for recurring reading plan logic safety?
+          // Actually, let's just use MMDD string comparison for simplicity and robustness since years rotate)
+          const todayMMDD = String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
+
+          // Simple string comparison works for MMDD (e.g. "0101" < "1231")
+          // Logic: Save verseId ONLY if currentDate <= todayString (calculated in App)
+          const isFuture = currentDate > todayString;
+
           const state = {
               date: currentDate,
               focal: focalTranslation,
               compare: compareTranslation,
-              verseId: activeVerseId || targetScrollVerse
+              // If viewing future, preserve the LAST SAVED verseId (from initial load or previous save)
+              // rather than overwriting it with the future date's scroll position.
+              // However, we only have 'activeVerseId' or 'targetScrollVerse' here.
+              // We need to know what the *persisted* verseId was if we want to "not save" the new one.
+              // Actually, simply NOT updating the 'verseId' field in the new state object would delete it if we overwrite.
+              // So we should read the OLD state to preserve it?
+              // No, simpler: If future, just save the preferences, BUT keep the date synced?
+              // User requirement: "If they look ahead... they will have to remember where they were."
+              // Wait, the user said: "I am trying to keep track of where they are in their reading, not in their looking ahead."
+              // This implies we should NOT update the 'date' and 'verseId' in localStorage if they are just peeking.
+              // BUT, if we don't save 'date', when they reload, they will be back at the old date.
+              // This might be what they want? "Smart Bookmark" usually implies "save my place in the book", not "save which page I'm looking at right now".
+
+              // Let's interpret "Smart Bookmark" strictly:
+              // 1. Always save TRANSLATION preferences (focal/compare).
+              // 2. If Date <= Today: Save Date + VerseID.
+              // 3. If Date > Today: Do NOT save Date + VerseID (keep the old ones in localStorage).
+
+              // Implementation: Read existing state to merge? Or just conditional update?
+              // LocalStorage is a key-value store. We overwrite the whole JSON.
           };
-          localStorage.setItem('biblical_reading_state', JSON.stringify(state));
+
+          // We need to fetch the PREVIOUSLY SAVED state to preserve it if we are "looking ahead".
+          let previousState = {};
+          try {
+              previousState = JSON.parse(localStorage.getItem('biblical_reading_state') || '{}');
+          } catch (e) {}
+
+          const newState = {
+              ...previousState, // Keep old date/verse if we don't overwrite them
+              focal: focalTranslation,
+              compare: compareTranslation
+          };
+
+          if (!isFuture) {
+              // We are in the past/present -> Update Reading Progress
+              newState.date = currentDate;
+              newState.verseId = activeVerseId || targetScrollVerse;
+          }
+
+          localStorage.setItem('biblical_reading_state', JSON.stringify(newState));
 
           // Update refs to current state
           prevDate.current = currentDate;
