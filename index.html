@@ -1116,11 +1116,50 @@ const App = () => {
 
           // Allow saving if viewDate is <= Today (ignoring year for recurring reading plan logic safety?
           // Actually, let's just use MMDD string comparison for simplicity and robustness since years rotate)
-          const todayMMDD = String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
+          const tomorrow = new Date(today);
+          tomorrow.setDate(today.getDate() + 1);
+
+          // Format Tomorrow as MMDD
+          const tomorrowMMDD = String(tomorrow.getMonth() + 1).padStart(2, '0') + String(tomorrow.getDate()).padStart(2, '0');
 
           // Simple string comparison works for MMDD (e.g. "0101" < "1231")
-          // Logic: Save verseId ONLY if currentDate <= todayString (calculated in App)
-          const isFuture = currentDate > todayString;
+          // Logic: Save verseId ONLY if currentDate <= tomorrowMMDD.
+          // This allows users to read 1 day ahead without losing their place, but prevents accidental "far future" jumps.
+          // Note: This simplistic string compare fails for Dec 31 -> Jan 01 wrap-around if year isn't considered.
+          // However, since currentDate is just MMDD, we can't truly know the year.
+          // BUT, for the purpose of "isFuture", if today is Dec 31 (1231) and we view Jan 01 (0101),
+          // 0101 < 1231, so it is NOT considered future by string compare (which is wrong).
+          // 0101 IS future relative to 1231.
+
+          // Robust Logic:
+          // Since we use 2025 as the base year for navigation, let's stick to Date object comparison.
+          // `viewDate` is already constructed with year 2025.
+          // Let's construct `maxAllowedDate` based on 2025 too.
+
+          const maxAllowedDate = new Date(2025, today.getMonth(), today.getDate() + 1);
+          // Handle year wrap for Dec 31 -> Jan 1
+          if (today.getMonth() === 11 && today.getDate() === 31) {
+              // If today is Dec 31, max allowed is Jan 1 of NEXT year (2026).
+              maxAllowedDate.setFullYear(2026);
+          }
+
+          // We also need to handle if `viewDate` (e.g. Jan 1) is meant to be NEXT year relative to Dec 31.
+          // The `viewDate` logic above uses `2025` hardcoded.
+          // If today is Dec 31 2025, and we view Jan 1, `viewDate` becomes Jan 1 2025 (past).
+          // This is a known limitation of the MMDD format.
+          // HOWEVER, for the specific request "Save if <= Tomorrow", we can approximate:
+
+          // If today is Dec 31, we allow 1231 and 0101.
+          let isFuture = false;
+          if (todayString === "1231") {
+               isFuture = (currentDate !== "1231" && currentDate !== "0101");
+          } else {
+               // Normal case: just compare strings? No, "0201" > "0131".
+               // But "0201" > "0132" (invalid).
+               // String compare usually works for MMDD within same year.
+               // We need `currentDate > tomorrowMMDD`.
+               isFuture = currentDate > tomorrowMMDD;
+          }
 
           const state = {
               date: currentDate,
