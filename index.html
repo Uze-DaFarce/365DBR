@@ -1234,7 +1234,10 @@ const App = () => {
       if (!loading && targetScrollVerse && verseMap) {
           const el = document.getElementById(`verse-${targetScrollVerse}`);
           if (el) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              // Align to 'start' (top) instead of 'center' to match IntersectionObserver's active zone.
+              // 'center' often puts the verse below the observer's threshold (top 15-30%),
+              // causing it to "drift" back to the previous verse on every load.
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
               setTargetScrollVerse(null);
           }
       }
