@@ -130,8 +130,17 @@ function processContent(contentArray, map, versionKey, useOrgId = false) {
   for (const section of contentArray) { if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context); }
 }
 
+function getBasePath() {
+    // If serving from /GEN/1/ -> Go up two levels
+    if (window.location.pathname.match(/\/([A-Z0-9]{3})\/(\d+)(\/|\/index\.html)?$/)) {
+        return '../../';
+    }
+    return '';
+}
+
 async function loadDailyBread(dateFolder) {
-  const manifestPath = `data/${dateFolder}/manifest.json`;
+  const basePath = getBasePath();
+  const manifestPath = `${basePath}data/${dateFolder}/manifest.json`;
   const manifestRes = await fetch(manifestPath);
   if (!manifestRes.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
   const manifest = await manifestRes.json();
@@ -140,7 +149,7 @@ async function loadDailyBread(dateFolder) {
 
   const results = await Promise.all(
     manifest.files.map(async fileName => {
-        const res = await fetch(`data/${dateFolder}/${fileName}`);
+        const res = await fetch(`${basePath}data/${dateFolder}/${fileName}`);
         if (!res.ok) throw new Error(`Failed to load ${fileName}`);
         return await res.json();
     })
@@ -390,7 +399,8 @@ function App() {
     const initIndex = async () => {
         try {
             // Cache busting to ensure fresh data
-            const res = await fetch('data/readings.json?v=' + new Date().getTime());
+            const basePath = getBasePath();
+            const res = await fetch(`${basePath}data/readings.json?v=` + new Date().getTime());
             if (!res.ok) throw new Error(`Failed to load readings.json: ${res.status}`);
             const readings = await res.json();
             console.log("Loaded readings:", readings.length);
@@ -471,9 +481,17 @@ function App() {
 
                 // Initialize State from URL or LocalStorage
                 const params = new URLSearchParams(window.location.search);
-                const urlBook = params.get('book');
-                const urlChapter = params.get('chapter');
+                let urlBook = params.get('book');
+                let urlChapter = params.get('chapter');
                 const urlVerse = params.get('verse');
+
+                // Support Path-based routing (Static Site Generation)
+                // Format: .../GEN/1/...
+                const pathMatch = window.location.pathname.match(/\/([A-Z0-9]{3})\/(\d+)(\/|\/index\.html)?$/);
+                if (pathMatch) {
+                    urlBook = pathMatch[1];
+                    urlChapter = pathMatch[2];
+                }
 
                 if (urlBook && urlChapter && newIndex[urlBook] && newIndex[urlBook][urlChapter]) {
                     setSelectedBook(urlBook);
