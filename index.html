@@ -230,8 +230,17 @@ const processContent = (contentArray, map, versionKey, useOrgId = false) => {
   }
 };
 
+const getBasePath = () => {
+    // If we are serving from a subdirectory (e.g. /0225/), we need to go up one level to access data/
+    if (window.location.pathname.match(/\/(\d{4})(\/|\/index\.html)?$/)) {
+        return '../';
+    }
+    return '';
+};
+
 const loadDailyBread = async (dateFolder) => {
-  const manifestPath = `data/${dateFolder}/manifest.json`;
+  const basePath = getBasePath();
+  const manifestPath = `${basePath}data/${dateFolder}/manifest.json`;
   const manifestRes = await fetch(manifestPath);
   if (!manifestRes.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
   const manifest = await manifestRes.json();
@@ -240,7 +249,7 @@ const loadDailyBread = async (dateFolder) => {
 
   const results = await Promise.all(
     manifest.files.map(async fileName => {
-        const res = await fetch(`data/${dateFolder}/${fileName}`);
+        const res = await fetch(`${basePath}data/${dateFolder}/${fileName}`);
         if (!res.ok) throw new Error(`Failed to load ${fileName} (Status: ${res.status})`);
         const json = await res.json();
         // Integrity Check: Must have data.content OR data.parallels
@@ -1027,6 +1036,13 @@ const App = () => {
     const urlDate = params.get('startDate');
     if (urlDate && /^\d{4}$/.test(urlDate)) {
         initialDate = urlDate;
+    }
+
+    // Support Path-based routing (Static Site Generation)
+    // Format: /365DBR/0224/ or /0224/
+    const pathMatch = window.location.pathname.match(/\/(\d{4})(\/|\/index\.html)?$/);
+    if (pathMatch) {
+        initialDate = pathMatch[1];
     }
 
     if (!initialDate || !/^\d{4}$/.test(initialDate)) {
