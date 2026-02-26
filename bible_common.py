@@ -143,6 +143,58 @@ def atomic_write_json(filepath, data, indent=2, ensure_ascii=True):
             os.remove(tmp_filepath)
         raise IOError(f"Failed to write {filepath} atomically: {str(e)}") from e
 
+def parse_reference(ref_str):
+    parts = ref_str.split('.')
+    return parts[0], int(parts[1]), int(parts[2])
+
+def is_verse_in_range(vid, start_book, start_chap, start_verse, end_book, end_chap, end_verse):
+    """
+    Checks if a verse ID (vid) is strictly within the range defined by start and end coordinates.
+    Handles single-book and cross-book ranges.
+    """
+    v_book, v_chap, v_verse = parse_reference(vid)
+
+    # 1. Check Book
+    # If range is same book:
+    if start_book == end_book:
+        if v_book != start_book: return False
+        # Same book check
+        # Case A: Same chapter range
+        if start_chap == end_chap:
+            if v_chap != start_chap: return False
+            return start_verse <= v_verse <= end_verse
+        # Case B: Multi-chapter
+        # Start Chapter
+        if v_chap == start_chap: return v_verse >= start_verse
+        # End Chapter
+        if v_chap == end_chap: return v_verse <= end_verse
+        # Middle Chapter
+        return start_chap < v_chap < end_chap
+
+    # If range is cross-book:
+    # Check if book is within [s_b, e_b]
+    try:
+        v_idx = ALL_BOOKS.index(v_book)
+        s_idx = ALL_BOOKS.index(start_book)
+        e_idx = ALL_BOOKS.index(end_book)
+    except ValueError:
+        return False # Unknown book
+
+    if not (s_idx <= v_idx <= e_idx): return False
+
+    # If book is Start Book
+    if v_book == start_book:
+        if v_chap == start_chap: return v_verse >= start_verse
+        return v_chap > start_chap
+
+    # If book is End Book
+    if v_book == end_book:
+        if v_chap == end_chap: return v_verse <= end_verse
+        return v_chap < end_chap
+
+    # If book is strictly between
+    return True
+
 # =============================================================================
 # CONSTANTS (From fetch_readings.py)
 # =============================================================================
@@ -288,10 +340,6 @@ def count_expected_verses(range_str):
     if ';' in range_str:
         return sum(count_expected_verses(r) for r in range_str.split(';'))
 
-    def parse_reference(ref_str):
-        parts = ref_str.split('.')
-        return parts[0], int(parts[1]), int(parts[2])
-
     if '-' in range_str:
         start_str, end_str = range_str.split('-')
     else:
@@ -299,54 +347,6 @@ def count_expected_verses(range_str):
         end_str = range_str
     s_book, s_chap, s_verse = parse_reference(start_str)
     e_book, e_chap, e_verse = parse_reference(end_str)
-
-    all_books = list(BIBLE_DATA.keys())
-
-    # Helper to check if a specific verse (vid) is inside the current range [start, end]
-    def is_verse_in_range(vid, s_b, s_c, s_v, e_b, e_c, e_v):
-        v_book, v_chap, v_verse = parse_reference(vid)
-
-        # 1. Check Book
-        # If range is same book:
-        if s_b == e_b:
-            if v_book != s_b: return False
-            # Same book check
-            # Case A: Same chapter range
-            if s_c == e_c:
-                if v_chap != s_c: return False
-                return s_v <= v_verse <= e_v
-            # Case B: Multi-chapter
-            # Start Chapter
-            if v_chap == s_c: return v_verse >= s_v
-            # End Chapter
-            if v_chap == e_c: return v_verse <= e_v
-            # Middle Chapter
-            return s_c < v_chap < e_c
-
-        # If range is cross-book:
-        # Check if book is within [s_b, e_b]
-        try:
-            v_idx = all_books.index(v_book)
-            s_idx = all_books.index(s_b)
-            e_idx = all_books.index(e_b)
-        except ValueError:
-            return False # Unknown book
-
-        if not (s_idx <= v_idx <= e_idx): return False
-
-        # If book is Start Book
-        if v_book == s_b:
-            if v_chap == s_c: return v_verse >= s_v
-            return v_chap > s_c
-
-        # If book is End Book
-        if v_book == e_b:
-            if v_chap == e_c: return v_verse <= e_v
-            return v_chap < e_c
-
-        # If book is strictly between
-        return True
-
 
     # Base Count Calculation
     raw_count = 0
@@ -363,12 +363,12 @@ def count_expected_verses(range_str):
             raw_count += e_verse
     else:
         # Cross book
-        if s_book not in all_books or e_book not in all_books:
+        if s_book not in ALL_BOOKS or e_book not in ALL_BOOKS:
             print(f"  [Warning] Unknown book in range {range_str}, skipping count check.")
             return -1
 
-        s_idx = all_books.index(s_book)
-        e_idx = all_books.index(e_book)
+        s_idx = ALL_BOOKS.index(s_book)
+        e_idx = ALL_BOOKS.index(e_book)
 
         # 1. Start Book remainder
         chapters_s = BIBLE_DATA[s_book]
@@ -378,7 +378,7 @@ def count_expected_verses(range_str):
 
         # 2. Intermediate Books
         for i in range(s_idx + 1, e_idx):
-            book = all_books[i]
+            book = ALL_BOOKS[i]
             raw_count += sum(BIBLE_DATA[book])
 
         # 3. End Book start
@@ -403,12 +403,6 @@ def inject_missing_verses(data, range_str):
 
     content_list = data['data']['content']
 
-    # 1. Identify which omissions fall within this range
-    # We need to parse range_str start/end
-    def parse_reference(ref_str):
-        parts = ref_str.split('.')
-        return parts[0], int(parts[1]), int(parts[2])
-
     if '-' in range_str:
         start_str, end_str = range_str.split('-')
     else:
@@ -416,33 +410,6 @@ def inject_missing_verses(data, range_str):
         end_str = range_str
     s_book, s_chap, s_verse = parse_reference(start_str)
     e_book, e_chap, e_verse = parse_reference(end_str)
-
-    all_books = list(BIBLE_DATA.keys())
-
-    # Re-use the is_verse_in_range logic (duplicated for safety/isolation)
-    def is_verse_in_range(vid, s_b, s_c, s_v, e_b, e_c, e_v):
-        v_book, v_chap, v_verse = parse_reference(vid)
-
-        # Cross-book index check
-        try:
-            v_idx = all_books.index(v_book)
-            s_idx = all_books.index(s_b)
-            e_idx = all_books.index(e_b)
-        except ValueError:
-            return False
-
-        if not (s_idx <= v_idx <= e_idx): return False
-
-        # Book boundary checks
-        if v_book == s_b:
-            if v_chap == s_c and v_verse < s_v: return False
-            if v_chap < s_c: return False
-
-        if v_book == e_b:
-            if v_chap == e_c and v_verse > e_v: return False
-            if v_chap > e_c: return False
-
-        return True
 
     verses_to_inject = []
     for omitted_vid in KNOWN_OMISSIONS:
@@ -514,16 +481,46 @@ def validate_content_integrity(data, range_str, inject_missing=True):
     # 3. Sentinel Book Verification (New Security Layer)
     expected_books = set(get_books_in_range(range_str))
 
+    # Parse range components for strict validation
+    if '-' in range_str:
+        start_str, end_str = range_str.split('-')
+    else:
+        start_str = range_str
+        end_str = range_str
+
+    s_book, s_chap, s_verse = parse_reference(start_str)
+    e_book, e_chap, e_verse = parse_reference(end_str)
+
     for vid in actual_vids:
         # verseId format: BOOK.CHAPTER.VERSE (e.g. JOL.1.1)
         book_code = vid.split('.')[0]
 
         # Normalize: Convert API code back to Standard code if needed
+        # (Needed for book verification)
+        norm_book_code = book_code
         if book_code in REVERSE_HEBREW_BOOK_MAP:
-            book_code = REVERSE_HEBREW_BOOK_MAP[book_code]
+            norm_book_code = REVERSE_HEBREW_BOOK_MAP[book_code]
 
-        if book_code not in expected_books:
-             raise ValueError(f"[Data Integrity] Book Mismatch! Found verses from '{book_code}' (norm) in range intended for {expected_books}. Full ID: {vid}")
+        if norm_book_code not in expected_books:
+             raise ValueError(f"[Data Integrity] Book Mismatch! Found verses from '{norm_book_code}' (norm) in range intended for {expected_books}. Full ID: {vid}")
+
+        # 3.5. Sentinel Strict Range Containment Check (Enhanced Security)
+        # Verify that the verse is strictly within the requested start/end range.
+        # This prevents "gaps" or "out of order" injections (e.g. GEN.2.1 appearing in GEN.1.1-GEN.1.5).
+        # We pass the raw 'book_code' from the VID (e.g. JOL) and we must ensure
+        # is_verse_in_range handles it or we normalize it first.
+        # count_expected_verses uses parse_reference which splits.
+        # is_verse_in_range calls parse_reference(vid) -> returns (JOL, 1, 1).
+        # But 's_book' comes from range_str which is standard (JOE).
+        # So we should NORMALIZE the VID before passing to is_verse_in_range to match the range_str standard.
+
+        normalized_vid = vid
+        if book_code != norm_book_code:
+            normalized_vid = vid.replace(book_code, norm_book_code)
+
+        if not is_verse_in_range(normalized_vid, s_book, s_chap, s_verse, e_book, e_chap, e_verse):
+             raise ValueError(f"[Data Integrity] Corruption Detected! Verse {vid} (normalized: {normalized_vid}) is NOT in range {range_str}.")
+
 
     # 4. Compare Counts
     # Special Handling for Psalms: Title merging often reduces count by 1 per chapter involved.
@@ -549,11 +546,8 @@ def validate_content_integrity(data, range_str, inject_missing=True):
     # This catches "shifted" ranges where count matches but content is wrong (e.g. MAT.15.14-38 returned for MAT.15.7-31).
     # Also handles single-verse ranges (no hyphen).
     if ';' not in range_str:
-        if '-' in range_str:
-            start_vid, end_vid = range_str.split('-')
-        else:
-            start_vid = range_str
-            end_vid = range_str
+        start_vid = start_str
+        end_vid = end_str
 
         # Normalize actual VIDs for lookup
         normalized_actual_vids = set()
