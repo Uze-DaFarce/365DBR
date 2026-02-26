@@ -239,23 +239,90 @@ const getBasePath = () => {
 };
 
 const loadDailyBread = async (dateFolder) => {
+  // Check for preloaded data (SSR/Static Site Generation)
+  const preloadedScript = document.getElementById('preloaded-data');
+  if (preloadedScript && preloadedScript.textContent) {
+      try {
+          const preloaded = JSON.parse(preloadedScript.textContent);
+          // Only use preloaded data if it matches the requested dateFolder?
+          // The preloaded data is injected for a specific page generation.
+          // If we navigated via SPA logic, we might be on a different date.
+          // However, for SSG, we usually load the page for that date.
+          // Let's assume if preloaded data exists, it's relevant for the *initial* load.
+          // But if the user clicks "Next Day", we need to fetch.
+          // We can check if the current dateFolder matches the page context?
+          // Simpler: If we are hydrating the initial load (which matches URL), use it.
+          // If we navigated, preloaded data is stale.
+          // We can check if the manifest inside preloaded data matches?
+          // Let's implement a simple check: if we just loaded the page, use it.
+          // But how do we know?
+          // Actually, we can check if the preloaded data contains the day we are looking for?
+          // The manifest structure I designed has 'manifest' key.
+          // 'manifest' usually has a 'label' or 'day' field?
+          // Let's assume for now if it exists, use it, but clear it after use?
+          // Or better: Check if the preloaded data *has* the files we need?
+
+          // Let's rely on the fact that preloaded data is only injected for the current page URL.
+          // If the user navigates, React re-runs this function.
+          // We need a way to know if this is the *first* load or a subsequent one.
+          // Or simply: check if the 'preloaded-data' matches the requested date?
+          // The injected JSON doesn't explicitly store the day ID at the top level, but manifest usually implies it.
+          // Let's proceed with using it if found, but ensuring we don't reuse it for the wrong day.
+
+          // Actually, for static pages, `dateFolder` is usually derived from URL.
+          // If we navigate, URL changes.
+          // If we are strictly static/offline, navigation might reload the page (if links are <a> tags).
+          // But our app uses `setCurrentDate` which is SPA navigation.
+          // If we do SPA navigation to another day, `preloaded-data` will still be in DOM but it will be WRONG (for the old day).
+
+          // CRITICAL: We must verify the preloaded data belongs to `dateFolder`.
+          // We can check the URL? Or check if the manifest filename matches?
+          // The manifest object itself doesn't always have the day ID.
+          // BUT, we can check if the `manifest.files` logic works.
+
+          // Let's just use it ONCE and then remove the element so subsequent navigations don't use it?
+          if (preloadedScript.dataset.used !== 'true') {
+             // Mark as used immediately to prevent reuse on navigation
+             preloadedScript.dataset.used = 'true';
+
+             const manifest = preloaded.manifest;
+             const filesMap = preloaded.files || {};
+
+             // Construct results array from the map
+             const results = [];
+             // We need to match the logic below: manifest.files iteration
+             if (manifest && manifest.files) {
+                 manifest.files.forEach(fileName => {
+                     if (filesMap[fileName]) {
+                         results.push(filesMap[fileName]);
+                     }
+                 });
+             }
+
+             if (results.length > 0) {
+                 // Process Data
+                 const verseMap = {};
+                 const availableKeys = new Set(['original']);
+                 processResults(results, verseMap, availableKeys);
+                 return buildFinalData(verseMap, manifest, availableKeys);
+             }
+          }
+      } catch (e) {
+          console.warn("Failed to parse preloaded data", e);
+      }
+  }
+
   const basePath = getBasePath();
   const manifestPath = `${basePath}data/${dateFolder}/manifest.json`;
   const manifestRes = await fetch(manifestPath);
   if (!manifestRes.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
   const manifest = await manifestRes.json();
-  const verseMap = {};
-  const availableKeys = new Set(['original']); // Track what we found
 
   const results = await Promise.all(
     manifest.files.map(async fileName => {
         const res = await fetch(`${basePath}data/${dateFolder}/${fileName}`);
         if (!res.ok) throw new Error(`Failed to load ${fileName} (Status: ${res.status})`);
         const json = await res.json();
-        // Integrity Check: Must have data.content OR data.parallels
-        // Our API response wrapper usually has { data: { content: ... } } or { data: { parallels: ... } }
-        // But api.bible returns { data: { content: ... } }
-        // Let's check for 'data' property
         if (!json || !json.data) {
              throw new Error(`Invalid data structure in ${fileName}`);
         }
@@ -263,6 +330,13 @@ const loadDailyBread = async (dateFolder) => {
     })
   );
 
+  const verseMap = {};
+  const availableKeys = new Set(['original']);
+  processResults(results, verseMap, availableKeys);
+  return buildFinalData(verseMap, manifest, availableKeys);
+};
+
+const processResults = (results, verseMap, availableKeys) => {
   results.forEach((source) => {
     const data = source.data;
     if (!data) return;
@@ -291,7 +365,9 @@ const loadDailyBread = async (dateFolder) => {
       });
     }
   });
-  
+};
+
+const buildFinalData = (verseMap, manifest, availableKeys) => {
   // Sort keys to ensure consistent order (e.g. KJV, LSV, etc.)
   const sortedKeys = Array.from(availableKeys).filter(k => k !== 'original');
 
