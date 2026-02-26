@@ -54,6 +54,14 @@ The project aims to provide a complete Bible reading plan that finishes exactly 
     export API_BIBLE_KEY="your_32_char_api_key"
     ```
 
+4.  **Install Dependencies**:
+    The site compilation tool requires Playwright.
+
+    ```bash
+    pip install -r requirements.txt
+    playwright install
+    ```
+
 ## Usage
 
 1.  **Generate Plan** (Optional, `data/readings.json` is already included):
@@ -65,5 +73,10 @@ The project aims to provide a complete Bible reading plan that finishes exactly 
     *   Single Day: `python fetch_readings.py --day 0201`
     *   Month: `python fetch_readings.py --month 02`
     *   Full Year: `python fetch_readings.py --all`
+
+3.  **Compile Site** (Generates static HTML in `dist/`):
+    ```bash
+    python compile_site.py
+    ```
 
 Data will be saved to the `./data` directory (or directory specified by `--out`).
