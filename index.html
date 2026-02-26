@@ -244,53 +244,14 @@ const loadDailyBread = async (dateFolder) => {
   if (preloadedScript && preloadedScript.textContent) {
       try {
           const preloaded = JSON.parse(preloadedScript.textContent);
-          // Only use preloaded data if it matches the requested dateFolder?
-          // The preloaded data is injected for a specific page generation.
-          // If we navigated via SPA logic, we might be on a different date.
-          // However, for SSG, we usually load the page for that date.
-          // Let's assume if preloaded data exists, it's relevant for the *initial* load.
-          // But if the user clicks "Next Day", we need to fetch.
-          // We can check if the current dateFolder matches the page context?
-          // Simpler: If we are hydrating the initial load (which matches URL), use it.
-          // If we navigated, preloaded data is stale.
-          // We can check if the manifest inside preloaded data matches?
-          // Let's implement a simple check: if we just loaded the page, use it.
-          // But how do we know?
-          // Actually, we can check if the preloaded data contains the day we are looking for?
-          // The manifest structure I designed has 'manifest' key.
-          // 'manifest' usually has a 'label' or 'day' field?
-          // Let's assume for now if it exists, use it, but clear it after use?
-          // Or better: Check if the preloaded data *has* the files we need?
-
-          // Let's rely on the fact that preloaded data is only injected for the current page URL.
-          // If the user navigates, React re-runs this function.
-          // We need a way to know if this is the *first* load or a subsequent one.
-          // Or simply: check if the 'preloaded-data' matches the requested date?
-          // The injected JSON doesn't explicitly store the day ID at the top level, but manifest usually implies it.
-          // Let's proceed with using it if found, but ensuring we don't reuse it for the wrong day.
-
-          // Actually, for static pages, `dateFolder` is usually derived from URL.
-          // If we navigate, URL changes.
-          // If we are strictly static/offline, navigation might reload the page (if links are <a> tags).
-          // But our app uses `setCurrentDate` which is SPA navigation.
-          // If we do SPA navigation to another day, `preloaded-data` will still be in DOM but it will be WRONG (for the old day).
-
-          // CRITICAL: We must verify the preloaded data belongs to `dateFolder`.
-          // We can check the URL? Or check if the manifest filename matches?
-          // The manifest object itself doesn't always have the day ID.
-          // BUT, we can check if the `manifest.files` logic works.
-
-          // Let's just use it ONCE and then remove the element so subsequent navigations don't use it?
+          // Check if we already used this data to hydrate the initial load
           if (preloadedScript.dataset.used !== 'true') {
-             // Mark as used immediately to prevent reuse on navigation
              preloadedScript.dataset.used = 'true';
 
              const manifest = preloaded.manifest;
              const filesMap = preloaded.files || {};
 
-             // Construct results array from the map
              const results = [];
-             // We need to match the logic below: manifest.files iteration
              if (manifest && manifest.files) {
                  manifest.files.forEach(fileName => {
                      if (filesMap[fileName]) {
@@ -300,7 +261,6 @@ const loadDailyBread = async (dateFolder) => {
              }
 
              if (results.length > 0) {
-                 // Process Data
                  const verseMap = {};
                  const availableKeys = new Set(['original']);
                  processResults(results, verseMap, availableKeys);
@@ -400,6 +360,39 @@ const buildFinalData = (verseMap, manifest, availableKeys) => {
   const readingTime = Math.ceil(wordCount / 200);
 
   return { verseMap, label: manifest.label, availableTranslations: sortedKeys, readingTime };
+};
+
+/** --- UTILS --- **/
+const calculateDate = (currentDate, direction) => {
+    const month = parseInt(currentDate.substring(0, 2)) - 1; // 0-based month
+    const day = parseInt(currentDate.substring(2, 4));
+    const currentYear = new Date().getFullYear();
+    const date = new Date(currentYear, month, day);
+    date.setDate(date.getDate() + direction);
+    if (date.getMonth() === 1 && date.getDate() === 29) {
+        date.setDate(date.getDate() + (direction > 0 ? 1 : -1));
+    }
+    const nm = String(date.getMonth() + 1).padStart(2, '0');
+    const nd = String(date.getDate()).padStart(2, '0');
+    return `${nm}${nd}`;
+};
+
+const LinkOrButton = ({ isStatic, currentDate, direction, children, onClick, ...props }) => {
+    // If static, render an <a> tag for standard navigation
+    if (isStatic) {
+        const nextDate = calculateDate(currentDate, direction);
+        return (
+            <a href={`../${nextDate}/index.html`} {...props} onClick={undefined} title={props['aria-label']}>
+                {children}
+            </a>
+        );
+    }
+    // Else render button for SPA navigation
+    return (
+        <button onClick={onClick} type="button" {...props}>
+            {children}
+        </button>
+    );
 };
 
 /** --- APP COMPONENT --- **/
@@ -883,6 +876,7 @@ const ReadingProgress = React.memo(({ sectionIndex }) => {
 });
 
 const Header = React.memo(({
+  isStatic,
   currentDate,
   todayString,
   formattedDate,
@@ -909,7 +903,7 @@ const Header = React.memo(({
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 h-8 md:h-10">
           <div className="flex items-center gap-1 min-w-0 flex-1">
              <div className="flex items-center bg-stone-100 rounded-md px-0.5 relative group">
-               <button onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" title="Previous Day (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></button>
+               <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={-1} onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></LinkOrButton>
                <h1 className="text-[11px] md:text-sm font-black text-stone-900 uppercase whitespace-nowrap flex items-center">
                   {currentDate === todayString ? (
                       <span className="px-1 cursor-default">{formattedDate}</span>
@@ -925,7 +919,7 @@ const Header = React.memo(({
                       </button>
                   )}
                </h1>
-               <button onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" title="Next Day (Right Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></button>
+               <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={1} onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></LinkOrButton>
              </div>
              <a href="bible.html" className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase text-stone-400 hover:text-amber-600 transition-colors tracking-widest border border-transparent hover:border-stone-200 rounded print:hidden" aria-label="Switch to Bible Browser" title="Switch to Bible Browser">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
@@ -1032,7 +1026,7 @@ const Header = React.memo(({
   );
 });
 
-const Footer = React.memo(({ readingLabel, readingTime, navigateDate, navigateVerse, handleToggle }) => {
+const Footer = React.memo(({ isStatic, currentDate, readingLabel, readingTime, navigateDate, navigateVerse, handleToggle }) => {
   return (
     <footer id="footer" className="fixed bottom-0 left-0 right-0 z-50 w-full bg-stone-100/95 backdrop-blur border-t border-stone-200 py-1 px-1 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] print:static print:shadow-none">
       <div className="max-w-7xl mx-auto text-[8px] md:text-[8px] text-stone-500 leading-tight text-center font-serif">
@@ -1042,8 +1036,8 @@ const Footer = React.memo(({ readingLabel, readingTime, navigateDate, navigateVe
         </span>
 
         <div className="hidden md:flex justify-center gap-3 md:gap-4 my-1 text-[9px] text-stone-400 font-mono uppercase tracking-wider select-none print:hidden flex-wrap">
-          <button onClick={() => navigateDate(-1)} type="button" aria-label="Previous Day (Shortcut: Left Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">←</kbd> Day</button>
-          <button onClick={() => navigateDate(1)} type="button" aria-label="Next Day (Shortcut: Right Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">→</kbd> Day</button>
+          <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={-1} onClick={() => navigateDate(-1)} aria-label="Previous Day (Shortcut: Left Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">←</kbd> Day</LinkOrButton>
+          <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={1} onClick={() => navigateDate(1)} aria-label="Next Day (Shortcut: Right Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">→</kbd> Day</LinkOrButton>
           <button onClick={() => navigateVerse(-1)} type="button" aria-label="Previous Verse (Shortcut: Up Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">↑</kbd> Verse</button>
           <button onClick={() => navigateVerse(1)} type="button" aria-label="Next Verse (Shortcut: Down Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">↓</kbd> Verse</button>
           <button onClick={handleToggle} type="button" aria-label="Toggle Playback (Shortcut: K)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">K</kbd> Play</button>
@@ -1197,6 +1191,10 @@ const App = () => {
 
   // Scroll target for restoration
   const [targetScrollVerse, setTargetScrollVerse] = useState(initialState.verseId || null);
+
+  // Check if running in Static Mode (preloaded data present)
+  // We use a ref to track if we *started* with preloaded data, but strictly checking DOM is fine.
+  const isStatic = !!document.getElementById('preloaded-data') || new URLSearchParams(window.location.search).get('static') === 'true';
 
   // Persistence with Smart Debounce
   // ⚡ Bolt Optimization: Debounce scroll updates (activeVerseId) to prevent blocking main thread with synchronous localStorage writes.
@@ -1735,23 +1733,15 @@ const App = () => {
   }, [playbackStatus, sortedVids, verseMap]);
 
   const navigateDate = useCallback((direction) => {
-    const month = parseInt(currentDate.substring(0, 2)) - 1; // 0-based month
-    const day = parseInt(currentDate.substring(2, 4));
+    // If static mode, navigation is handled by LinkOrButton hrefs unless we intercept here.
+    // Since we want full page reload for static, we let default happen?
+    // Actually LinkOrButton handles rendering. If we click a button (SPA), we run this.
+    // If we click a link (Static), we run this IF onClick is attached.
+    // In LinkOrButton, we pass `undefined` for onClick if static. So this won't run.
 
-    // Use current year for navigation to handle year boundaries correctly
-    const currentYear = new Date().getFullYear();
-    const date = new Date(currentYear, month, day);
-
-    date.setDate(date.getDate() + direction);
-
-    // Leap Year Handling: If we land on Feb 29, skip it (Project uses 365-day schedule)
-    if (date.getMonth() === 1 && date.getDate() === 29) {
-        date.setDate(date.getDate() + (direction > 0 ? 1 : -1));
-    }
-
-    const nm = String(date.getMonth() + 1).padStart(2, '0');
-    const nd = String(date.getDate()).padStart(2, '0');
-    setCurrentDate(`${nm}${nd}`);
+    // Legacy logic for SPA mode:
+    const nextDate = calculateDate(currentDate, direction);
+    setCurrentDate(nextDate);
     window.scrollTo({ top: 0 });
   }, [currentDate]);
 
@@ -1808,6 +1798,7 @@ const App = () => {
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-stone-900 focus:text-white focus:font-bold focus:rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xl transition-all print:hidden">Skip to Content</a>
       <Header
+        isStatic={isStatic}
         currentDate={currentDate}
         todayString={todayString}
         formattedDate={formattedDate}
@@ -1859,6 +1850,8 @@ const App = () => {
         
       </main>
       <Footer
+        isStatic={isStatic}
+        currentDate={currentDate}
         readingLabel={readingLabel}
         readingTime={readingTime}
         navigateDate={navigateDate}

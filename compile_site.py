@@ -105,7 +105,7 @@ def compile_readings(page, readings, base_url, limit=None):
 
         output_file = os.path.join(day_dir, "index.html")
 
-        url = f"{base_url}/index.html?startDate={mmdd}"
+        url = f"{base_url}/index.html?startDate={mmdd}&static=true"
         print(f"[{i+1}/{total}] Processing {mmdd}...", end="\r")
 
         try:
