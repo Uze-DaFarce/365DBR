@@ -177,16 +177,19 @@ async function loadDailyBread(dateFolder) {
   });
 
   const sortedKeys = Array.from(availableKeys).filter(k => k !== 'original');
-  Object.values(verseMap).forEach(verseData => {
-      Object.keys(verseData).forEach(key => {
+  // ⚡ Bolt Optimization: Use for...in loops to avoid allocating intermediate arrays (Object.keys/values)
+  // during critical data loading phase. Reduces GC pressure on mobile devices.
+  for (const vid in verseMap) {
+      const verseData = verseMap[vid];
+      for (const key in verseData) {
           const entry = verseData[key];
           if (entry.text && Array.isArray(entry.text)) {
               const config = TRANSLATION_REGISTRY[key];
               const separator = config && config.isHebrewGreek ? '' : ' ';
               entry.text = entry.text.join(separator);
           }
-      });
-  });
+      }
+  }
   return { verseMap, label: manifest.label, availableTranslations: sortedKeys };
 }
 
