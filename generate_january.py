@@ -83,11 +83,18 @@ def main():
     ps_nav = BibleNavigator(["PSA"])
     pr_nav = BibleNavigator(["PRO"])
 
+    # Helper to safely find index or raise Error
+    def find_safe(nav, loc_str, context):
+        idx = nav.find_index(loc_str)
+        if idx == -1:
+            raise ValueError(f"Verse not found: {loc_str} (Context: {context})")
+        return idx
+
     # Start points (Jan 1 start)
-    ot_idx = ot_nav.find_index("GEN.1.1")
-    nt_idx = nt_nav.find_index("MAT.1.1")
-    ps_idx = ps_nav.find_index("PSA.1.1")
-    pr_idx = pr_nav.find_index("PRO.1.1")
+    ot_idx = find_safe(ot_nav, "GEN.1.1", "Start of Plan")
+    nt_idx = find_safe(nt_nav, "MAT.1.1", "Start of Plan")
+    ps_idx = find_safe(ps_nav, "PSA.1.1", "Start of Plan")
+    pr_idx = find_safe(pr_nav, "PRO.1.1", "Start of Plan")
 
     new_readings = []
 
@@ -99,10 +106,10 @@ def main():
         if day in targets:
             # Yes, strict target
             t = targets[day]
-            ot_end_limit = ot_nav.find_index(t["OT"])
-            nt_end_limit = nt_nav.find_index(t["NT"])
-            ps_end_limit = ps_nav.find_index(t["PSA"])
-            pr_end_limit = pr_nav.find_index(t["PRO"])
+            ot_end_limit = find_safe(ot_nav, t["OT"], f"Day {day} OT Target")
+            nt_end_limit = find_safe(nt_nav, t["NT"], f"Day {day} NT Target")
+            ps_end_limit = find_safe(ps_nav, t["PSA"], f"Day {day} PSA Target")
+            pr_end_limit = find_safe(pr_nav, t["PRO"], f"Day {day} PRO Target")
 
             # For strict targets, the reading IS from current ot_idx to ot_end_limit
             ot_end_idx = ot_end_limit
@@ -123,10 +130,10 @@ def main():
                 sys.exit(1)
 
             t_next = targets[next_day]
-            ot_target_limit = ot_nav.find_index(t_next["OT"])
-            nt_target_limit = nt_nav.find_index(t_next["NT"])
-            ps_target_limit = ps_nav.find_index(t_next["PSA"])
-            pr_target_limit = pr_nav.find_index(t_next["PRO"])
+            ot_target_limit = find_safe(ot_nav, t_next["OT"], f"Day {day} Gap Target (Next: {next_day}) OT")
+            nt_target_limit = find_safe(nt_nav, t_next["NT"], f"Day {day} Gap Target (Next: {next_day}) NT")
+            ps_target_limit = find_safe(ps_nav, t_next["PSA"], f"Day {day} Gap Target (Next: {next_day}) PSA")
+            pr_target_limit = find_safe(pr_nav, t_next["PRO"], f"Day {day} Gap Target (Next: {next_day}) PRO")
 
             # Simple interpolation: split remaining verses by remaining days (which should be 2: today and next_day)
             days_remaining = next_day - day + 1 # e.g. 11 -> 12 is 2 days

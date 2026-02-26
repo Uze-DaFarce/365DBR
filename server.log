@@ -17,3 +17,29 @@
 127.0.0.1 - - [24/Feb/2026 17:27:24] "GET /data/0222/LEV.6.1-LEV.7.38.json HTTP/1.1" 200 -
 127.0.0.1 - - [24/Feb/2026 17:27:24] "GET /data/0222/PSA.29.1-PSA.29.7.json HTTP/1.1" 200 -
 127.0.0.1 - - [24/Feb/2026 17:27:24] "GET /data/0222/MRK.5.1-MRK.5.22.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:19:41] "GET /index.html?startDate=0126 HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:19:44] "GET /data/0126/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:19:44] code 404, message File not found
+127.0.0.1 - - [24/Feb/2026 16:19:44] "GET /data/0126/PRO.3.28-PRO.3.30.json HTTP/1.1" 404 -
+127.0.0.1 - - [24/Feb/2026 16:19:44] code 404, message File not found
+127.0.0.1 - - [24/Feb/2026 16:19:44] "GET /data/0126/MAT.19.17-MAT.20.8.json HTTP/1.1" 404 -
+127.0.0.1 - - [24/Feb/2026 16:19:44] code 404, message File not found
+127.0.0.1 - - [24/Feb/2026 16:19:44] "GET /data/0126/GEN.45.3-GEN.46.28.json HTTP/1.1" 404 -
+127.0.0.1 - - [24/Feb/2026 16:19:44] code 404, message File not found
+127.0.0.1 - - [24/Feb/2026 16:19:44] "GET /data/0126/PSA.18.1-PSA.18.7.json HTTP/1.1" 404 -
+127.0.0.1 - - [24/Feb/2026 16:20:33] "GET /index.html?startDate=0202 HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:20:34] "GET /data/0202/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:20:34] "GET /data/0202/PSA.19.1-PSA.19.7.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:20:34] "GET /data/0202/PRO.4.12-PRO.4.13.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:20:34] "GET /data/0202/EXO.9.1-EXO.10.29.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:20:34] "GET /data/0202/MAT.23.15-MAT.23.39.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:20:34] "GET /bible.html?book=EXO&chapter=9 HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:20:35] "GET /data/readings.json?v=1771950035207 HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:22:02] "GET /index.html?startDate=0202 HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:22:03] "GET /data/0202/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:22:03] "GET /data/0202/EXO.9.1-EXO.10.29.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:22:03] "GET /data/0202/PRO.4.12-PRO.4.13.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:22:03] "GET /data/0202/PSA.19.1-PSA.19.7.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:22:03] "GET /data/0202/MAT.23.15-MAT.23.39.json HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:22:04] "GET /bible.html?book=EXO&chapter=9 HTTP/1.1" 200 -
+127.0.0.1 - - [24/Feb/2026 16:22:04] "GET /data/readings.json?v=1771950124893 HTTP/1.1" 200 -
