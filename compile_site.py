@@ -82,11 +82,22 @@ def compile_readings(page, readings, base_url, limit=None):
                 continue
 
             # Get HTML
-            content = page.content()
+            # Strip out script tags to ensure the page remains static and doesn't try to re-hydrate/fetch data
+            # which fails in offline/file protocol scenarios and is unnecessary for crawlers.
+            content = page.evaluate("""() => {
+                // Remove all script tags
+                document.querySelectorAll('script').forEach(el => el.remove());
+                // Also remove the importmap if separate
+                document.querySelectorAll('link[rel="modulepreload"]').forEach(el => el.remove());
+                return document.documentElement.outerHTML;
+            }""")
+
+            # Add DOCTYPE back since evaluate returns the element
+            full_html = f"<!DOCTYPE html>\n{content}"
 
             # Save to dist
             with open(output_file, "w", encoding="utf-8") as f:
-                f.write(content)
+                f.write(full_html)
 
         except Exception as e:
             print(f"\nError processing {mmdd}: {e}")
