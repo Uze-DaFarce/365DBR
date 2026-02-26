@@ -12,7 +12,6 @@ import requests
 from playwright.sync_api import sync_playwright
 
 # Use port 0 to let OS choose a free port
-DIST_DIR = "dist"
 DATA_DIR = "data"
 PRODUCTION_DATA_URL = "https://mt-sin.ai/365DBR/data"
 
@@ -96,15 +95,11 @@ def compile_readings(page, readings, base_url, limit=None):
         readings = readings[:limit]
         total = limit
 
-    # Create dist/reading directory structure
-    if not os.path.exists(DIST_DIR):
-        os.makedirs(DIST_DIR)
-
     for i, day in enumerate(readings):
         mmdd = day['day'] # e.g. "0225"
 
-        # Determine output path: dist/0225/index.html
-        day_dir = os.path.join(DIST_DIR, mmdd)
+        # Determine output path: data/0225/index.html
+        day_dir = os.path.join(DATA_DIR, mmdd)
         if not os.path.exists(day_dir):
             os.makedirs(day_dir)
 
@@ -124,30 +119,69 @@ def compile_readings(page, readings, base_url, limit=None):
                 continue
 
             # Wait for content to load (verse blocks)
-            # If data is missing (both local and prod), this will timeout.
             try:
-                page.wait_for_selector(".verse-block", timeout=5000) # Reduced timeout for faster failure on missing data
+                page.wait_for_selector(".verse-block", timeout=5000)
             except Exception as e:
                 print(f"\nTimeout waiting for content on {mmdd}. (Data likely missing in both Local and Production)")
                 continue
 
-            # Get HTML
-            # Strip out script tags to ensure the page remains static and doesn't try to re-hydrate/fetch data
-            # which fails in offline/file protocol scenarios and is unnecessary for crawlers.
-            content = page.evaluate("""() => {
-                // Remove all script tags
-                document.querySelectorAll('script').forEach(el => el.remove());
-                // Also remove the importmap if separate
-                document.querySelectorAll('link[rel="modulepreload"]').forEach(el => el.remove());
-                return document.documentElement.outerHTML;
-            }""")
+            # --- Data Embedding Logic ---
 
-            # Add DOCTYPE back since evaluate returns the element
-            full_html = f"<!DOCTYPE html>\n{content}"
+            # Step 1: Get Manifest
+            manifest_path = os.path.join(DATA_DIR, mmdd, "manifest.json")
+            manifest_content = None
 
-            # Save to dist
+            # Try Local Manifest
+            if os.path.exists(manifest_path):
+                 with open(manifest_path, 'r', encoding='utf-8') as f:
+                     manifest_content = json.load(f)
+            else:
+                # Try Prod Manifest
+                try:
+                    r = requests.get(f"{PRODUCTION_DATA_URL}/{mmdd}/manifest.json")
+                    if r.status_code == 200:
+                        manifest_content = r.json()
+                except:
+                    pass
+
+            full_data_payload = {}
+            if manifest_content:
+                full_data_payload['manifest'] = manifest_content
+                full_data_payload['files'] = {}
+                for fname in manifest_content.get('files', []):
+                    fpath = os.path.join(DATA_DIR, mmdd, fname)
+                    # Try Local File
+                    if os.path.exists(fpath):
+                        with open(fpath, 'r', encoding='utf-8') as f:
+                            full_data_payload['files'][fname] = json.load(f)
+                    else:
+                        # Try Prod File
+                        try:
+                            r = requests.get(f"{PRODUCTION_DATA_URL}/{mmdd}/{fname}")
+                            if r.status_code == 200:
+                                full_data_payload['files'][fname] = r.json()
+                        except:
+                            pass
+
+            # Serialize Data
+            json_str = json.dumps(full_data_payload, ensure_ascii=False)
+
+            # Inject Script into Head
+            page.evaluate(f"""(data) => {{
+                const script = document.createElement('script');
+                script.id = 'preloaded-data';
+                script.type = 'application/json';
+                script.textContent = data;
+                document.head.appendChild(script);
+            }}""", json_str)
+
+            # Get full HTML (with injected script + React scripts)
+            # We do NOT strip scripts anymore, so interactivity works.
+            content = page.content()
+
+            # Save to data directory
             with open(output_file, "w", encoding="utf-8") as f:
-                f.write(full_html)
+                f.write(content)
 
         except Exception as e:
             print(f"\nError processing {mmdd}: {e}")
@@ -158,12 +192,10 @@ def validate_args(args):
     """
     Validates command line arguments to prevent injection or misuse.
     """
-    # Validate Day Format (MMDD or MMDD-MMDD)
     if args.day:
         if not re.match(r'^(\d{4}|\d{4}-\d{4})$', args.day):
              raise ValueError(f"[Input Error] Invalid day format: '{args.day}'. Expected MMDD or MMDD-MMDD.")
 
-    # Validate Month Format (MM or MM-MM)
     if args.month:
         if not re.match(r'^(\d{2}|\d{2}-\d{2})$', args.month):
              raise ValueError(f"[Input Error] Invalid month format: '{args.month}'. Expected MM or MM-MM.")
@@ -181,33 +213,6 @@ def main():
     except ValueError as e:
         print(e)
         return
-
-    # 1. Prepare Dist
-    # Only clean dist if compiling ALL or if dist doesn't exist.
-    # If compiling specific days, we want to update them in place without nuking everything else.
-    is_partial_update = args.day or args.month or args.limit
-
-    if not os.path.exists(DIST_DIR):
-        print(f"Creating {DIST_DIR}...")
-        os.makedirs(DIST_DIR)
-        print("Copying assets...")
-        shutil.copytree(DATA_DIR, os.path.join(DIST_DIR, DATA_DIR))
-    elif not is_partial_update:
-        print(f"Cleaning {DIST_DIR}...")
-        shutil.rmtree(DIST_DIR)
-        os.makedirs(DIST_DIR)
-        print("Copying assets...")
-        shutil.copytree(DATA_DIR, os.path.join(DIST_DIR, DATA_DIR))
-    else:
-        print(f"Updating existing {DIST_DIR}...")
-        # Optional: Sync assets even on partial update?
-        # shutil.copytree(DATA_DIR, os.path.join(DIST_DIR, DATA_DIR), dirs_exist_ok=True)
-
-    # Always ensure root HTMLs are present
-    shutil.copy("index.html", os.path.join(DIST_DIR, "index.html"))
-    shutil.copy("bible.html", os.path.join(DIST_DIR, "bible.html"))
-    if os.path.exists(".htaccess"):
-        shutil.copy(".htaccess", os.path.join(DIST_DIR, ".htaccess"))
 
     # 3. Start Server
     server_ready = threading.Event()
@@ -228,7 +233,7 @@ def main():
         with open("data/readings.json", "r") as f:
             all_readings = json.load(f)
 
-        # Filter Readings based on args
+        # Filter Readings
         targets = []
         if args.day:
             if '-' in args.day:
@@ -251,7 +256,7 @@ def main():
         elif args.all:
             targets = all_readings
         elif args.limit:
-            targets = all_readings # Will be limited in compile_readings
+            targets = all_readings
         else:
             print("Please specify --day, --month, --all, or --limit")
             sys.exit(0)
@@ -277,7 +282,7 @@ def main():
         print(f"Compilation failed: {e}")
         sys.exit(1)
 
-    print(f"Compilation finished! Output in '{DIST_DIR}'.")
+    print(f"Compilation finished! Output in '{DATA_DIR}/<day>/index.html'.")
 
 if __name__ == "__main__":
     main()
