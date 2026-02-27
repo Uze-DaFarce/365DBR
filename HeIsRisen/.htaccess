@@ -1,23 +1,28 @@
 <IfModule mod_headers.c>
-  # 🛡️ Sentinel: Relaxed Sub-site Policy
-  # Overrides strict root policies to support 3rd-party games and external assets (CDNs).
-  # Required for: Phaser, external APIs, and inline game logic.
+  # 🛡️ Sentinel: Strict Security Headers
+  # Enforces strict Content Security Policy matching the application's meta tags.
+  # Blocks unsafe-eval and restricts scripts to self and approved CDNs.
 
-  # Reset CSP to be permissive for this subdirectory
-  # Allows:
-  # - Scripts/Styles/Images/Connect from ANY HTTPS source (needed for CDNs like jsdelivr)
-  # - 'unsafe-inline' and 'unsafe-eval' (common in games/legacy apps)
-  # - data: and blob: (common for game assets)
-  Header set Content-Security-Policy "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; upgrade-insecure-requests;"
+  # Strict CSP
+  # - script-src: 'self' + jsdelivr (for Phaser)
+  # - style-src: 'self' + unsafe-inline (required for Phaser canvas)
+  # - img-src: 'self' + data: + blob: (Phaser assets)
+  # - connect-src: 'self' (JSON data)
+  # - worker-src: 'self' + blob: (Web Workers)
+  # - object-src: 'none' (Block plugins)
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests;"
+
+  # Prevent clickjacking
+  Header set X-Frame-Options "SAMEORIGIN"
+
+  # Prevent MIME sniffing
+  Header set X-Content-Type-Options "nosniff"
 
   # Override Permissions Policy to ensure game features work
   # The root policy blocks `publickey-credentials-get` and `geolocation`. We enable them here.
   # This prevents strict root policies from breaking the game.
   Header set Permissions-Policy "geolocation=(self), microphone=(), camera=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), publickey-credentials-get=(self)"
 
-  # Relax X-Frame-Options to allow same-origin framing if needed
-  Header set X-Frame-Options "SAMEORIGIN"
-
-  # Standard Referrer Policy
+  # Referrer Policy
   Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
