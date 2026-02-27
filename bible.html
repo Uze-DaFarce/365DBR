@@ -712,6 +712,39 @@ function App() {
       }
   };
 
+  const navigateChapter = (direction) => {
+      if (!selectedBook || !selectedChapter || !index) return;
+
+      const currentCh = parseInt(selectedChapter);
+      const chapters = Object.keys(index[selectedBook]).map(Number).sort((a,b) => a-b);
+      const chIdx = chapters.indexOf(currentCh);
+
+      // 1. Same Book Navigation
+      if (chIdx !== -1) {
+          const nextIdx = chIdx + direction;
+          if (nextIdx >= 0 && nextIdx < chapters.length) {
+              setSelectedChapter(String(chapters[nextIdx]));
+              return;
+          }
+      }
+
+      // 2. Cross-Book Navigation
+      const bookIdx = availableBooks.indexOf(selectedBook);
+      if (bookIdx !== -1) {
+          const nextBookIdx = bookIdx + direction;
+          if (nextBookIdx >= 0 && nextBookIdx < availableBooks.length) {
+              const nextBook = availableBooks[nextBookIdx];
+              const nextBookChapters = Object.keys(index[nextBook]).map(Number).sort((a,b) => a-b);
+              if (nextBookChapters.length > 0) {
+                  setSelectedBook(nextBook);
+                  // If going forward (direction 1), go to first chapter.
+                  // If going backward (direction -1), go to last chapter.
+                  setSelectedChapter(String(direction > 0 ? nextBookChapters[0] : nextBookChapters[nextBookChapters.length - 1]));
+              }
+          }
+      }
+  };
+
   const handleToggle = () => {
       if (playbackStatus === 'playing') {
           window.speechSynthesis.pause();
@@ -731,12 +764,14 @@ function App() {
       switch(e.key) {
         case 'ArrowUp': e.preventDefault(); navigateVerse(-1); break;
         case 'ArrowDown': e.preventDefault(); navigateVerse(1); break;
+        case 'ArrowLeft': navigateChapter(-1); break;
+        case 'ArrowRight': navigateChapter(1); break;
         case 'k': case 'K': handleToggle(); break;
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sortedVids, playbackStatus]);
+  }, [sortedVids, playbackStatus, selectedBook, selectedChapter, availableBooks]);
 
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
@@ -744,41 +779,47 @@ function App() {
       <header className="w-full bg-white/95 border-b border-stone-200 py-2 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-                <a href="index.html" className="text-stone-400 hover:text-amber-600 transition-colors font-bold text-xs uppercase tracking-widest flex items-center gap-1">
+                <a href="index.html" className="text-stone-400 hover:text-amber-600 transition-colors font-bold text-xs uppercase tracking-widest flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded p-1">
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
                     Daily
                 </a>
 
-                {/* Book Selector */}
-                <select
-                    aria-label="Select Book"
-                    value={selectedBook || ''}
-                    onChange={(e) => {
-                        const newBook = e.target.value;
-                        setSelectedBook(newBook);
-                        // Palette UX: Auto-select only chapter if only one exists
-                        const chapters = index[newBook] ? Object.keys(index[newBook]) : [];
-                        if (chapters.length === 1) setSelectedChapter(chapters[0]);
-                        else setSelectedChapter(null);
-                    }}
-                    className="bg-stone-100 border-none rounded text-xs font-black uppercase tracking-tight py-1 px-2 focus:ring-2 focus:ring-amber-500"
-                >
-                    <option value="" disabled>Select Book</option>
-                    {availableBooks.map(b => <option key={b} value={b}>{BOOK_NAMES[b]}</option>)}
-                </select>
+                <div className="flex items-center bg-stone-100 rounded-md p-0.5">
+                    <button onClick={() => navigateChapter(-1)} aria-label="Previous Chapter (Left Arrow)" title="Previous Chapter (Left Arrow)" className="p-1 text-stone-500 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
 
-                {/* Chapter Selector */}
-                {selectedBook && index[selectedBook] && (
+                    {/* Book Selector */}
                     <select
-                        aria-label="Select Chapter"
-                        value={selectedChapter || ''}
-                        onChange={(e) => setSelectedChapter(e.target.value)}
-                        className="bg-stone-100 border-none rounded text-xs font-black uppercase tracking-tight py-1 px-2 focus:ring-2 focus:ring-amber-500"
+                        aria-label="Select Book"
+                        value={selectedBook || ''}
+                        onChange={(e) => {
+                            const newBook = e.target.value;
+                            setSelectedBook(newBook);
+                            // Palette UX: Auto-select only chapter if only one exists
+                            const chapters = index[newBook] ? Object.keys(index[newBook]) : [];
+                            if (chapters.length === 1) setSelectedChapter(chapters[0]);
+                            else setSelectedChapter(null);
+                        }}
+                        className="bg-transparent border-none text-xs font-black uppercase tracking-tight py-1 px-1 focus:ring-2 focus:ring-amber-500 rounded cursor-pointer"
                     >
-                        <option value="" disabled>Ch</option>
-                        {Object.keys(index[selectedBook]).sort((a,b)=>parseInt(a)-parseInt(b)).map(c => <option key={c} value={c}>{c}</option>)}
+                        <option value="" disabled>Book</option>
+                        {availableBooks.map(b => <option key={b} value={b}>{BOOK_NAMES[b]}</option>)}
                     </select>
-                )}
+
+                    {/* Chapter Selector */}
+                    {selectedBook && index[selectedBook] && (
+                        <select
+                            aria-label="Select Chapter"
+                            value={selectedChapter || ''}
+                            onChange={(e) => setSelectedChapter(e.target.value)}
+                            className="bg-transparent border-none text-xs font-black uppercase tracking-tight py-1 px-1 focus:ring-2 focus:ring-amber-500 rounded cursor-pointer"
+                        >
+                            <option value="" disabled>Ch</option>
+                            {Object.keys(index[selectedBook]).sort((a,b)=>parseInt(a)-parseInt(b)).map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    )}
+
+                    <button onClick={() => navigateChapter(1)} aria-label="Next Chapter (Right Arrow)" title="Next Chapter (Right Arrow)" className="p-1 text-stone-500 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"><svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
+                </div>
             </div>
 
             {/* Translation Settings (Reuse logic) */}
