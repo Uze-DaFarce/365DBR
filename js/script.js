@@ -202,17 +202,17 @@ let lastActiveLink = null;
 let isBackToTopVisible = false;
 
 function onScroll() {
-  const currentScrollY = window.scrollY;
   if (!isTicking) {
     window.requestAnimationFrame(() => {
-      updateScrollState(currentScrollY);
+      updateScrollState();
       isTicking = false;
     });
     isTicking = true;
   }
 }
 
-function updateScrollState(scrollY) {
+function updateScrollState() {
+  const scrollY = window.scrollY;
   // 1. Active Nav State
   const offset = 120; // Header height + buffer
   let activeLink = null;
@@ -275,7 +275,7 @@ function updateScrollState(scrollY) {
 window.addEventListener('scroll', onScroll, { passive: true });
 
 // Initial check on load
-updateScrollState(window.scrollY);
+updateScrollState();
 
 if (backToTopBtn) {
   backToTopBtn.addEventListener('click', () => {
