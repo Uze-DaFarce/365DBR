@@ -230,6 +230,24 @@ const processContent = (contentArray, map, versionKey, useOrgId = false) => {
   }
 };
 
+// ⚡ Bolt Optimization: Zero-allocation word counter
+// Avoids splitting large strings into arrays just to count length.
+const countWords = (s) => {
+    let count = 0;
+    let isSpace = true;
+    for (let i = 0; i < s.length; i++) {
+        const c = s.charCodeAt(i);
+        // Check for whitespace (space, tab, newline, carriage return)
+        if (c === 32 || c === 9 || c === 10 || c === 13) {
+            isSpace = true;
+        } else {
+            if (isSpace) count++;
+            isSpace = false;
+        }
+    }
+    return count;
+};
+
 const getBasePath = () => {
     // If we are serving from a subdirectory (e.g. /0225/), we need to go up one level to access data/
     if (window.location.pathname.match(/\/(\d{4})(\/|\/index\.html)?$/)) {
@@ -353,8 +371,8 @@ const buildFinalData = (verseMap, manifest, availableKeys) => {
       // Prioritize English if available
       const t = verseData.lsv || verseData.kjv || verseData.web || verseData.nlt || verseData.original;
       if (t && t.text) {
-          // Text is already joined by space above
-          wordCount += (t.text.trim() === '' ? 0 : t.text.trim().split(/\s+/).length);
+          // ⚡ Bolt Optimization: Use zero-allocation counter
+          wordCount += countWords(t.text);
       }
   });
   const readingTime = Math.ceil(wordCount / 200);
