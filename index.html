@@ -705,6 +705,17 @@
       transform-origin: 0 50%;
       will-change: transform;
     }
+
+    /* 🎨 Palette: Highlight target card */
+    .service-card:target {
+      scroll-margin-top: 150px; /* Account for sticky header */
+      animation: highlight-card 2s ease-out;
+    }
+
+    @keyframes highlight-card {
+      0% { background-color: #fff9e6; transform: scale(1.02); }
+      100% { background-color: #FFFFFF; transform: scale(1); }
+    }
   </style>
   <style>@view-transition { navigation: auto; }</style>
  </head>
@@ -758,19 +769,19 @@
               <p>Professional financial management with packages tailored to your business needs, from basic bookkeeping to comprehensive financial oversight.</p>
               <a href="#bookkeeping" class="service-link" aria-label="View Bookkeeping Service Packages">View Packages →</a>
             </div>
-            <div class="service-card">
+            <div class="service-card" id="web-design">
               <div class="service-icon" aria-hidden="true">🌐</div>
               <h3>Web Design</h3>
               <p>Custom website solutions that reflect your brand values and engage your audience with modern, responsive design.</p>
               <a href="https://docs.google.com/forms/d/e/1FAIpQLSeO2Bm7g8rttvcxCDFpac8d0UBpqBtvIx4VD3WsVMSRsULsyw/viewform" class="service-link" target="_blank" rel="noopener noreferrer" aria-label="Get Started with Web Design (opens in new tab)">Get Started →</a>
             </div>
-            <div class="service-card">
+            <div class="service-card" id="ai-workflows">
               <div class="service-icon" aria-hidden="true">🤖</div>
               <h3>AI Workflows</h3>
               <p>Ethical AI implementation that enhances human dignity. Custom agent workflows and automated solutions for your business processes.</p>
               <a href="https://docs.google.com/forms/d/e/1FAIpQLSeO2Bm7g8rttvcxCDFpac8d0UBpqBtvIx4VD3WsVMSRsULsyw/viewform" class="service-link" target="_blank" rel="noopener noreferrer" aria-label="Learn More about AI Workflows (opens in new tab)">Learn More →</a>
             </div>
-            <div class="service-card">
+            <div class="service-card" id="app-implementations">
               <div class="service-icon" aria-hidden="true">⚙️</div>
               <h3>Application Implementations</h3>
               <p>Expert setup and customization of DocuSign, Salesforce, and other business applications to streamline your operations.</p>
@@ -1085,9 +1096,9 @@
         <div class="footer-section">
           <h4>Services</h4>
           <a href="#bookkeeping">Bookkeeping</a>
-          <a href="#services">Web Design</a>
-          <a href="#services">AI Workflows</a>
-          <a href="#services">Application Implementations</a>
+          <a href="#web-design">Web Design</a>
+          <a href="#ai-workflows">AI Workflows</a>
+          <a href="#app-implementations">Application Implementations</a>
         </div>
         <div class="footer-section">
           <h4>Projects</h4>
