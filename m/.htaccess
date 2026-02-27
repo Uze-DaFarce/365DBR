@@ -20,4 +20,8 @@
 
   # Standard Referrer Policy
   Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Override Permissions Policy to ensure mobile/game features work
+  # Enables common features like geolocation, accelerometer, etc. that root might block.
+  Header set Permissions-Policy "geolocation=(self), microphone=(), camera=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), publickey-credentials-get=(self), fullscreen=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self)"
 </IfModule>
