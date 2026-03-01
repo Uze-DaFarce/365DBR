@@ -798,9 +798,13 @@ function App() {
                                 setSelectedBook(state.book);
                                 setSelectedChapter(state.chapter);
                                 if (state.verseId) setTargetScrollVerse(state.verseId);
+                            } else {
+                                setIsBrowseOpen(true);
                             }
+                        } else {
+                            setIsBrowseOpen(true);
                         }
-                    } catch (e) { console.warn("Failed to load state", e); }
+                    } catch (e) { console.warn("Failed to load state", e); setIsBrowseOpen(true); }
                 }
             }
             setLoading(false);
@@ -812,6 +816,14 @@ function App() {
     };
     initIndex();
   }, []);
+
+  // Auto-open Dialog if no book is selected
+  useEffect(() => {
+      if (!loading && !selectedBook) {
+          setIsBrowseOpen(true);
+      }
+  }, [loading, selectedBook]);
+
 
   // Persistence & URL Sync
   useEffect(() => {
