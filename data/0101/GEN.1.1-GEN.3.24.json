@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Page Not Found - Mt. Sinai LLC</title>
+  <meta name="description" content="The page you're looking for couldn't be found, but we're here to help. Return to Mt. Sinai LLC and discover our faith-centered business services.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://mt-sin.ai/">
+  <meta name="theme-color" content="#401b51">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="/pics/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/pics/favicon.svg" />
+  <link rel="shortcut icon" href="/pics/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/pics/apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Sans+Pro:wght@400;600&amp;display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Source Sans Pro', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #343A40;
+      background-color: #FFFFFF;
+    }
+
+    h1, h2, h3, h4, h5, h6, nav, button {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Header Navigation */
+    header {
+      background-color: #401b51;
+      padding: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      align-items: center;
+      display: flex;
+      gap: 12px;
+      color: #FFFFFF;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 60px;
+      height: 70px;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .logo-tagline {
+      font-size: 11px;
+      color: #F4A623;
+      font-weight: 500;
+    }
+
+    /* 404 Content */
+    .error-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 120px 24px;
+      text-align: center;
+      min-height: calc(100vh - 300px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .error-code {
+      font-size: 120px;
+      font-weight: 700;
+      color: #401b51;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .error-title {
+      font-size: 36px;
+      font-weight: 700;
+      color: #401b51;
+      margin-bottom: 16px;
+    }
+
+    .error-message {
+      font-size: 18px;
+      color: #343A40;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .error-subtext {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 48px;
+      font-style: italic;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 64px;
+    }
+
+    .btn-primary {
+      background-color: #F4A623;
+      color: #401b51;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #d89420;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(244, 166, 35, 0.3);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: #401b51;
+      padding: 14px 32px;
+      border: 2px solid #401b51;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: #401b51;
+      color: #FFFFFF;
+    }
+
+    .suggestion-box {
+      background-color: #F8F9FA;
+      border-left: 4px solid #F4A623;
+      padding: 24px;
+      border-radius: 6px;
+      text-align: left;
+      margin-bottom: 48px;
+    }
+
+    .suggestion-box h3 {
+      font-size: 18px;
+      color: #401b51;
+      margin-bottom: 12px;
+    }
+
+    .suggestion-box ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .suggestion-box li {
+      padding: 8px 0;
+      color: #343A40;
+    }
+
+    .suggestion-box a {
+      color: #F4A623;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .suggestion-box a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #401b51;
+      color: #F8F9FA;
+      padding: 24px;
+      text-align: center;
+      font-size: 14px;
+      border-top: 1px solid rgba(248, 249, 250, 0.2);
+    }
+
+    footer a {
+      color: #F4A623;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .error-code {
+        font-size: 80px;
+        margin-bottom: 12px;
+      }
+
+      .error-title {
+        font-size: 28px;
+      }
+
+      .error-message {
+        font-size: 16px;
+      }
+
+      .cta-buttons {
+        flex-direction: column;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+      }
+
+      .logo-icon {
+        width: 50px;
+        height: 58px;
+      }
+
+      .logo-name {
+        font-size: 16px;
+      }
+    }
+  </style>
+ </head>
+ <body>
+  <header>
+    <div class="header-container">
+      <a href="/" class="logo">
+        <img src="/pics/logo.png" width="60" height="70" alt="Mt. Sinai LLC Logo" class="logo-icon">
+        <div class="logo-text">
+          <span class="logo-name">Mt. Sinai LLC</span>
+          <span class="logo-tagline">mt-sin.ai</span>
+        </div>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="error-container">
+      <div class="error-code">404</div>
+      <h1 class="error-title">Page Not Found</h1>
+
+      <p class="error-message">
+        The page you're looking for seems to have wandered off the path. It happens to the best of us.
+      </p>
+
+      <p class="error-subtext">
+        "In my distress I called upon the Lord..." — Psalm 120:1
+      </p>
+
+      <div class="cta-buttons">
+        <a href="/" class="btn-primary">Return to Home</a>
+        <a href="/#services" class="btn-secondary">View Services</a>
+      </div>
+
+      <div class="suggestion-box">
+        <h3>Looking for something specific?</h3>
+        <ul>
+          <li>📊 <a href="/#bookkeeping">Bookkeeping Packages</a> — Professional financial management tailored to your needs</li>
+          <li>🌐 <a href="/#services">Web Design Services</a> — Custom websites that reflect your brand values</li>
+          <li>🤖 <a href="/#services">AI Workflows</a> — Ethical automation for your business</li>
+          <li>⚙️ <a href="/#services">Application Implementations</a> — Expert setup and customization</li>
+          <li>👥 <a href="/#about">About Us</a> — Meet our team and learn our story</li>
+          <li>💬 <a href="/#contact">Contact Us</a> — Let's talk about your business</li>
+        </ul>
+      </div>
+
+      <p style="color: #666; font-size: 14px;">
+        If you believe this is an error, please <a href="mailto:truth@mt-sin.ai" style="color: #F4A623; font-weight: 600;">contact us</a>.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Mt. Sinai LLC. All rights reserved. | Serving God through excellence in business.</p>
+  </footer>
+ </body>
+</html>
