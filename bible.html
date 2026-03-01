@@ -846,16 +846,52 @@ function App() {
 
   // Scroll Restoration
   useEffect(() => {
-      if (!loading && targetScrollVerse && verseMap && sortedVids.includes(targetScrollVerse)) {
-          const el = document.getElementById(`verse-${targetScrollVerse}`);
-          if (el) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              // Also set active immediately to ensure visual highlight
-              setActiveVerseId(targetScrollVerse);
-              setTargetScrollVerse(null);
+      if (!loading && targetScrollVerse && verseMap && sortedVids.length > 0) {
+          let resolvedVid = null;
+
+          // First try exact match (in case it IS an original vid or URL match)
+          if (sortedVids.includes(targetScrollVerse)) {
+              resolvedVid = targetScrollVerse;
+          } else {
+              // Otherwise, targetScrollVerse might be requested based on KJV/LSV.
+              // We search verseMap to see if the focalTranslation (or any translation) has a matching displayVid.
+              // e.g. targetScrollVerse = "PSA.51.1"
+              for (const vid of sortedVids) {
+                  const translations = verseMap[vid];
+                  if (!translations) continue;
+
+                  // Check focal first
+                  if (focalTranslation && translations[focalTranslation]?.displayVid === targetScrollVerse) {
+                      resolvedVid = vid;
+                      break;
+                  }
+
+                  // Fallback to checking any translation
+                  for (const key in translations) {
+                      if (translations[key]?.displayVid === targetScrollVerse) {
+                          resolvedVid = vid;
+                          break;
+                      }
+                  }
+                  if (resolvedVid) break;
+              }
+          }
+
+          if (resolvedVid) {
+              const el = document.getElementById(`verse-${resolvedVid}`);
+              if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  // Also set active immediately to ensure visual highlight
+                  setActiveVerseId(resolvedVid);
+                  setTargetScrollVerse(null);
+              }
+          } else {
+             // If we can't find it, clear it so we don't infinitely loop
+             // (e.g., they requested a verse that doesn't exist in this chapter block)
+             setTargetScrollVerse(null);
           }
       }
-  }, [loading, targetScrollVerse, verseMap, sortedVids]);
+  }, [loading, targetScrollVerse, verseMap, sortedVids, focalTranslation]);
 
   // 2. Load Content when Selection Changes
   useEffect(() => {
