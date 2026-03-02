@@ -1,0 +1,2115 @@
+{
+  "data": {
+    "id": "PSA.96.11-PSA.97.4",
+    "orgId": "PSA.96.11-PSA.97.4",
+    "bibleId": "0b262f1ed7f084a6-01",
+    "bookId": "PSA",
+    "chapterIds": [
+      "PSA.96",
+      "PSA.97"
+    ],
+    "reference": "תהילים 96:11-97:4",
+    "content": [
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8055"
+            },
+            "items": [
+              {
+                "text": "יִשְׂמְח֣וּ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.11",
+                  "verseOrgIds": [
+                    "PSA.96.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.11",
+              "verseOrgIds": [
+                "PSA.96.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8064"
+            },
+            "items": [
+              {
+                "text": "הַ֭שָּׁמַיִם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.11",
+                  "verseOrgIds": [
+                    "PSA.96.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.11",
+              "verseOrgIds": [
+                "PSA.96.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1523"
+            },
+            "items": [
+              {
+                "text": "וְתָגֵ֣ל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.11",
+                  "verseOrgIds": [
+                    "PSA.96.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.11",
+              "verseOrgIds": [
+                "PSA.96.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0776"
+            },
+            "items": [
+              {
+                "text": "הָאָ֑רֶץ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.11",
+                  "verseOrgIds": [
+                    "PSA.96.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.11",
+              "verseOrgIds": [
+                "PSA.96.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7481"
+            },
+            "items": [
+              {
+                "text": "יִֽרְעַ֥ם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.11",
+                  "verseOrgIds": [
+                    "PSA.96.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.11",
+              "verseOrgIds": [
+                "PSA.96.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3220"
+            },
+            "items": [
+              {
+                "text": "הַ֝יָּ֗ם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.11",
+                  "verseOrgIds": [
+                    "PSA.96.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.11",
+              "verseOrgIds": [
+                "PSA.96.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4393"
+            },
+            "items": [
+              {
+                "text": "וּמְלֹאֽוֹ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.11",
+                  "verseOrgIds": [
+                    "PSA.96.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.11",
+              "verseOrgIds": [
+                "PSA.96.11"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H5937"
+            },
+            "items": [
+              {
+                "text": "יַעֲלֹ֣ז",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.12",
+              "verseOrgIds": [
+                "PSA.96.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7704"
+            },
+            "items": [
+              {
+                "text": "שָׂ֭דַי",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.12",
+              "verseOrgIds": [
+                "PSA.96.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3605"
+            },
+            "items": [
+              {
+                "text": "וְכָל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "־",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.12",
+              "verseOrgIds": [
+                "PSA.96.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0834"
+            },
+            "items": [
+              {
+                "text": "אֲשֶׁר",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "־בּ֑וֹ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.12",
+              "verseOrgIds": [
+                "PSA.96.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0227"
+            },
+            "items": [
+              {
+                "text": "אָ֥ז",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.12",
+              "verseOrgIds": [
+                "PSA.96.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7442"
+            },
+            "items": [
+              {
+                "text": "יְ֝רַנְּנ֗וּ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.12",
+              "verseOrgIds": [
+                "PSA.96.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3605"
+            },
+            "items": [
+              {
+                "text": "כָּל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "־",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.12",
+              "verseOrgIds": [
+                "PSA.96.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6086"
+            },
+            "items": [
+              {
+                "text": "עֲצֵי",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "־",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.12",
+              "verseOrgIds": [
+                "PSA.96.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3293"
+            },
+            "items": [
+              {
+                "text": "יָֽעַר",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.12",
+              "verseOrgIds": [
+                "PSA.96.12"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6440"
+            },
+            "items": [
+              {
+                "text": "לִפְנֵ֤י",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3068"
+            },
+            "items": [
+              {
+                "text": "יְהוָ֨ה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ׀ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3588"
+            },
+            "items": [
+              {
+                "text": "כִּ֬י",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0935"
+            },
+            "items": [
+              {
+                "text": "בָ֗א",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3588"
+            },
+            "items": [
+              {
+                "text": "כִּ֥י",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0935"
+            },
+            "items": [
+              {
+                "text": "בָא֮",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8199"
+            },
+            "items": [
+              {
+                "text": "לִשְׁפֹּ֪ט",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0776"
+            },
+            "items": [
+              {
+                "text": "הָ֫אָ֥רֶץ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8199"
+            },
+            "items": [
+              {
+                "text": "יִשְׁפֹּֽט",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "־",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8398"
+            },
+            "items": [
+              {
+                "text": "תֵּבֵ֥ל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6664"
+            },
+            "items": [
+              {
+                "text": "בְּצֶ֑דֶק",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H5971"
+            },
+            "items": [
+              {
+                "text": "וְ֝עַמִּ֗ים",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0530"
+            },
+            "items": [
+              {
+                "text": "בֶּאֱמוּנָתֽוֹ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.96.13",
+              "verseOrgIds": [
+                "PSA.96.13"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3068"
+            },
+            "items": [
+              {
+                "text": "יְהוָ֣ה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.1",
+              "verseOrgIds": [
+                "PSA.97.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4427"
+            },
+            "items": [
+              {
+                "text": "מָ֭לָךְ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.1",
+              "verseOrgIds": [
+                "PSA.97.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1523"
+            },
+            "items": [
+              {
+                "text": "תָּגֵ֣ל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.1",
+              "verseOrgIds": [
+                "PSA.97.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0776"
+            },
+            "items": [
+              {
+                "text": "הָאָ֑רֶץ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.1",
+              "verseOrgIds": [
+                "PSA.97.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8055"
+            },
+            "items": [
+              {
+                "text": "יִ֝שְׂמְח֗וּ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.1",
+              "verseOrgIds": [
+                "PSA.97.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0339"
+            },
+            "items": [
+              {
+                "text": "אִיִּ֥ים",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.1",
+              "verseOrgIds": [
+                "PSA.97.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7227"
+            },
+            "items": [
+              {
+                "text": "רַבִּֽים",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.1",
+              "verseOrgIds": [
+                "PSA.97.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6051"
+            },
+            "items": [
+              {
+                "text": "עָנָ֣ן",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.2",
+              "verseOrgIds": [
+                "PSA.97.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6205"
+            },
+            "items": [
+              {
+                "text": "וַעֲרָפֶ֣ל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.2",
+              "verseOrgIds": [
+                "PSA.97.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H5439"
+            },
+            "items": [
+              {
+                "text": "סְבִיבָ֑יו",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.2",
+              "verseOrgIds": [
+                "PSA.97.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6664"
+            },
+            "items": [
+              {
+                "text": "צֶ֥דֶק",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.2",
+              "verseOrgIds": [
+                "PSA.97.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4941"
+            },
+            "items": [
+              {
+                "text": "וּ֝מִשְׁפָּ֗ט",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.2",
+              "verseOrgIds": [
+                "PSA.97.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4349"
+            },
+            "items": [
+              {
+                "text": "מְכ֣וֹן",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.2",
+              "verseOrgIds": [
+                "PSA.97.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3678"
+            },
+            "items": [
+              {
+                "text": "כִּסְאֽוֹ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.2",
+              "verseOrgIds": [
+                "PSA.97.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0784"
+            },
+            "items": [
+              {
+                "text": "אֵ֭שׁ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.3",
+                  "verseOrgIds": [
+                    "PSA.97.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.3",
+              "verseOrgIds": [
+                "PSA.97.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6440"
+            },
+            "items": [
+              {
+                "text": "לְפָנָ֣יו",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.3",
+                  "verseOrgIds": [
+                    "PSA.97.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.3",
+              "verseOrgIds": [
+                "PSA.97.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3212"
+            },
+            "items": [
+              {
+                "text": "תֵּלֵ֑ךְ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.3",
+                  "verseOrgIds": [
+                    "PSA.97.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.3",
+              "verseOrgIds": [
+                "PSA.97.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3857"
+            },
+            "items": [
+              {
+                "text": "וּתְלַהֵ֖ט",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.3",
+                  "verseOrgIds": [
+                    "PSA.97.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.3",
+              "verseOrgIds": [
+                "PSA.97.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H5439"
+            },
+            "items": [
+              {
+                "text": "סָבִ֣יב",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.3",
+                  "verseOrgIds": [
+                    "PSA.97.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.3",
+              "verseOrgIds": [
+                "PSA.97.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6862"
+            },
+            "items": [
+              {
+                "text": "צָרָֽיו",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.3",
+                  "verseOrgIds": [
+                    "PSA.97.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.3",
+              "verseOrgIds": [
+                "PSA.97.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0215"
+            },
+            "items": [
+              {
+                "text": "הֵאִ֣ירוּ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.4",
+                  "verseOrgIds": [
+                    "PSA.97.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.4",
+              "verseOrgIds": [
+                "PSA.97.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1300"
+            },
+            "items": [
+              {
+                "text": "בְרָקָ֣יו",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.4",
+                  "verseOrgIds": [
+                    "PSA.97.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.4",
+              "verseOrgIds": [
+                "PSA.97.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8398"
+            },
+            "items": [
+              {
+                "text": "תֵּבֵ֑ל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.4",
+                  "verseOrgIds": [
+                    "PSA.97.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.4",
+              "verseOrgIds": [
+                "PSA.97.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7200"
+            },
+            "items": [
+              {
+                "text": "רָאֲתָ֖ה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.4",
+                  "verseOrgIds": [
+                    "PSA.97.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.4",
+              "verseOrgIds": [
+                "PSA.97.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H2342"
+            },
+            "items": [
+              {
+                "text": "וַתָּחֵ֣ל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.4",
+                  "verseOrgIds": [
+                    "PSA.97.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.4",
+              "verseOrgIds": [
+                "PSA.97.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0776"
+            },
+            "items": [
+              {
+                "text": "הָאָֽרֶץ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.4",
+                  "verseOrgIds": [
+                    "PSA.97.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PSA.97.4",
+              "verseOrgIds": [
+                "PSA.97.4"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "verseCount": 7,
+    "copyright": "PUBLIC DOMAIN",
+    "parallels": [
+      {
+        "id": "PSA.96.11-PSA.97.4",
+        "orgId": "PSA.96.11-PSA.97.4",
+        "bibleId": "de4e12af7f28f599-01",
+        "bookId": "PSA",
+        "chapterIds": [
+          "PSA.96",
+          "PSA.97"
+        ],
+        "reference": "Psalms 96:11-97:4",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "q1"
+            },
+            "items": [
+              {
+                "text": "Let the heavens rejoice, and let the earth be glad; let the sea roar, and the fulness thereof.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.11",
+                  "verseOrgIds": [
+                    "PSA.96.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "q1"
+            },
+            "items": [
+              {
+                "text": "Let the field be joyful, and all that ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "PSA.96.12",
+                      "verseOrgIds": [
+                        "PSA.96.12"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " therein: then shall all the trees of the wood rejoice",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "q1"
+            },
+            "items": [
+              {
+                "text": "Before the ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "nd"
+                },
+                "items": [
+                  {
+                    "text": "LORD",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "PSA.96.13",
+                      "verseOrgIds": [
+                        "PSA.96.13"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": ": for he cometh, for he cometh to judge the earth: he shall judge the world with righteousness, and the people with his truth.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "q1"
+            },
+            "items": [
+              {
+                "text": "The ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "nd"
+                },
+                "items": [
+                  {
+                    "text": "LORD",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "PSA.97.1",
+                      "verseOrgIds": [
+                        "PSA.97.1"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " reigneth; let the earth rejoice; let the multitude of isles be glad ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "thereof",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "PSA.97.1",
+                      "verseOrgIds": [
+                        "PSA.97.1"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": ".",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "q1"
+            },
+            "items": [
+              {
+                "text": "Clouds and darkness ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "are",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "PSA.97.2",
+                      "verseOrgIds": [
+                        "PSA.97.2"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " round about him: righteousness and judgment ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "are",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "PSA.97.2",
+                      "verseOrgIds": [
+                        "PSA.97.2"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " the habitation of his throne.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "q1"
+            },
+            "items": [
+              {
+                "text": "A fire goeth before him, and burneth up his enemies round about.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.3",
+                  "verseOrgIds": [
+                    "PSA.97.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "q1"
+            },
+            "items": [
+              {
+                "text": "His lightnings enlightened the world: the earth saw, and trembled.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.4",
+                  "verseOrgIds": [
+                    "PSA.97.4"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 7,
+        "copyright": "PUBLIC DOMAIN except in the United Kingdom, where a Crown Copyright applies to printing the KJV. See http://www.cambridge.org/about-us/who-we-are/queens-printers-patent"
+      },
+      {
+        "id": "PSA.96.11-PSA.97.4",
+        "orgId": "PSA.96.11-PSA.97.4",
+        "bibleId": "01b29f4b342acc35-01",
+        "bookId": "PSA",
+        "chapterIds": [
+          "PSA.96",
+          "PSA.97"
+        ],
+        "reference": "Psalms 96:11-97:4",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "The heavens rejoice, and the earth is joyful, || The sea and its fullness roar. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.11",
+                  "verseOrgIds": [
+                    "PSA.96.11"
+                  ]
+                }
+              },
+              {
+                "text": "The field exults, and all that [is] in it, || Then all trees of the forest sing, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.12",
+                  "verseOrgIds": [
+                    "PSA.96.12"
+                  ]
+                }
+              },
+              {
+                "text": "Before YHWH, for He has come, || For He has come to judge the earth. He judges the world in righteousness, || And the peoples in His faithfulness!",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.96.13",
+                  "verseOrgIds": [
+                    "PSA.96.13"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "YHWH has reigned, || The earth is joyful, many islands rejoice. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.1",
+                  "verseOrgIds": [
+                    "PSA.97.1"
+                  ]
+                }
+              },
+              {
+                "text": "Cloud and darkness [are] around Him, || Righteousness and judgment the basis of His throne. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.2",
+                  "verseOrgIds": [
+                    "PSA.97.2"
+                  ]
+                }
+              },
+              {
+                "text": "Fire goes before Him, || And burns around His adversaries. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.3",
+                  "verseOrgIds": [
+                    "PSA.97.3"
+                  ]
+                }
+              },
+              {
+                "text": "His lightnings have lightened the world, || The earth has seen, and is pained. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PSA.97.4",
+                  "verseOrgIds": [
+                    "PSA.97.4"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 7,
+        "copyright": "The Literal Standard Version of The Holy Bible is a registered copyright of Covenant Press and the Covenant Christian Coalition (© 2020), but has been subsequently released under the Creative Commons Attribution-ShareAlike license (CC BY-SA) per our desire to provide God’s word freely. Covenant Press requests that the text remain unaltered in the English language and that translations based on the LSV maintain the same spirit of faithfulness to the original Hebrew, Aramaic, and Greek text. Attribution of minor citations for personal or non-commercial use can be provided as simply “LSV” or “Literal Standard Version.” Citations for commercial use, or distribution of the entire LSV Bible or entire book(s) of the LSV Bible, must be fully attributed and include both “Literal Standard Version (LSV)” and the name of our organization. Covenant Press is soliciting partnerships with Bible publishers that are interested in the LSV project. For queries about partnering with us, please email the translation team at covenantpress@ccc.one. To learn more, visit lsvbible.com. The purpose behind the LSV is to provide readers with a modern, easy-to-read, literal, and accurate translation of the Bible that is free to read, distribute, and translate from. We pray that God will use the LSV to illuminate the hearts and minds of multitudes with the good news that His Son Jesus Christ came in the flesh, died for our sins as a substitutionary sacrifice, rose bodily from the dead, and is coming back again."
+      }
+    ]
+  },
+  "meta": {
+    "fumsToken": "G8gBYBwHbqxlyoOgvZ4v7mfKP11I07KbnNuBuqnCzzEnS1df6Ky3-lDrLwqVmYmih2I2m0lKVppXQdHEBmqbCknY0twb5Ym_eH-5A-yHs9hcvloanFjctrJQCT1pcvaTxFd7ONuZmoxzerFsAqASBxMpND_gFwVn-wWkBUx1pLTdADH6GxMnTawpnFNqLjWKJlO5AFy_diy-v2wAp9rl3WNAhKfesDbID_N3d9tdNsfYri1sjrtk4SKxVsvVwz_FV3KDq4ThA_c5fbQ0kPf713EswpG4brpwyDp48rqHNLR2KXEtV4k6Yw"
+  }
+}

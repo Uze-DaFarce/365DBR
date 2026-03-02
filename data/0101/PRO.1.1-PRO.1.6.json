@@ -1,0 +1,1355 @@
+{
+  "data": {
+    "id": "PRO.1.1-PRO.1.6",
+    "orgId": "PRO.1.1-PRO.1.6",
+    "bibleId": "0b262f1ed7f084a6-01",
+    "bookId": "PRO",
+    "chapterIds": [
+      "PRO.1"
+    ],
+    "reference": "מִשְׁלֵי 1:1-6",
+    "content": [
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4912"
+            },
+            "items": [
+              {
+                "text": "מִ֭שְׁלֵי",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.1",
+                  "verseOrgIds": [
+                    "PRO.1.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.1",
+              "verseOrgIds": [
+                "PRO.1.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8010"
+            },
+            "items": [
+              {
+                "text": "שְׁלֹמֹ֣ה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.1",
+                  "verseOrgIds": [
+                    "PRO.1.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.1",
+              "verseOrgIds": [
+                "PRO.1.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1121"
+            },
+            "items": [
+              {
+                "text": "בֶן",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.1",
+                  "verseOrgIds": [
+                    "PRO.1.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "־",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.1",
+              "verseOrgIds": [
+                "PRO.1.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1732"
+            },
+            "items": [
+              {
+                "text": "דָּוִ֑ד",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.1",
+                  "verseOrgIds": [
+                    "PRO.1.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.1",
+              "verseOrgIds": [
+                "PRO.1.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4428"
+            },
+            "items": [
+              {
+                "text": "מֶ֝֗לֶךְ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.1",
+                  "verseOrgIds": [
+                    "PRO.1.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.1",
+              "verseOrgIds": [
+                "PRO.1.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3478"
+            },
+            "items": [
+              {
+                "text": "יִשְׂרָאֵֽל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.1",
+                  "verseOrgIds": [
+                    "PRO.1.1"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.1",
+              "verseOrgIds": [
+                "PRO.1.1"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3045"
+            },
+            "items": [
+              {
+                "text": "לָדַ֣עַת",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.2",
+                  "verseOrgIds": [
+                    "PRO.1.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.2",
+              "verseOrgIds": [
+                "PRO.1.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H2451"
+            },
+            "items": [
+              {
+                "text": "חָכְמָ֣ה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.2",
+                  "verseOrgIds": [
+                    "PRO.1.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.2",
+              "verseOrgIds": [
+                "PRO.1.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4148"
+            },
+            "items": [
+              {
+                "text": "וּמוּסָ֑ר",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.2",
+                  "verseOrgIds": [
+                    "PRO.1.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.2",
+              "verseOrgIds": [
+                "PRO.1.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0995"
+            },
+            "items": [
+              {
+                "text": "לְ֝הָבִ֗ין",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.2",
+                  "verseOrgIds": [
+                    "PRO.1.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.2",
+              "verseOrgIds": [
+                "PRO.1.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0561"
+            },
+            "items": [
+              {
+                "text": "אִמְרֵ֥י",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.2",
+                  "verseOrgIds": [
+                    "PRO.1.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.2",
+              "verseOrgIds": [
+                "PRO.1.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0998"
+            },
+            "items": [
+              {
+                "text": "בִינָֽה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.2",
+                  "verseOrgIds": [
+                    "PRO.1.2"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.2",
+              "verseOrgIds": [
+                "PRO.1.2"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3947"
+            },
+            "items": [
+              {
+                "text": "לָ֭קַחַת",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.3",
+                  "verseOrgIds": [
+                    "PRO.1.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.3",
+              "verseOrgIds": [
+                "PRO.1.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4148"
+            },
+            "items": [
+              {
+                "text": "מוּסַ֣ר",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.3",
+                  "verseOrgIds": [
+                    "PRO.1.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.3",
+              "verseOrgIds": [
+                "PRO.1.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7919"
+            },
+            "items": [
+              {
+                "text": "הַשְׂכֵּ֑ל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.3",
+                  "verseOrgIds": [
+                    "PRO.1.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.3",
+              "verseOrgIds": [
+                "PRO.1.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6664"
+            },
+            "items": [
+              {
+                "text": "צֶ֥דֶק",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.3",
+                  "verseOrgIds": [
+                    "PRO.1.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.3",
+              "verseOrgIds": [
+                "PRO.1.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4941"
+            },
+            "items": [
+              {
+                "text": "וּ֝מִשְׁפָּ֗ט",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.3",
+                  "verseOrgIds": [
+                    "PRO.1.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.3",
+              "verseOrgIds": [
+                "PRO.1.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4339"
+            },
+            "items": [
+              {
+                "text": "וּמֵישָׁרִֽים",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.3",
+                  "verseOrgIds": [
+                    "PRO.1.3"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.3",
+              "verseOrgIds": [
+                "PRO.1.3"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H5414"
+            },
+            "items": [
+              {
+                "text": "לָתֵ֣ת",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.4",
+                  "verseOrgIds": [
+                    "PRO.1.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.4",
+              "verseOrgIds": [
+                "PRO.1.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6612"
+            },
+            "items": [
+              {
+                "text": "לִפְתָאיִ֣ם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.4",
+                  "verseOrgIds": [
+                    "PRO.1.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.4",
+              "verseOrgIds": [
+                "PRO.1.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6195"
+            },
+            "items": [
+              {
+                "text": "עָרְמָ֑ה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.4",
+                  "verseOrgIds": [
+                    "PRO.1.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.4",
+              "verseOrgIds": [
+                "PRO.1.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H5288"
+            },
+            "items": [
+              {
+                "text": "לְ֝נַ֗עַר",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.4",
+                  "verseOrgIds": [
+                    "PRO.1.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.4",
+              "verseOrgIds": [
+                "PRO.1.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1847"
+            },
+            "items": [
+              {
+                "text": "דַּ֣עַת",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.4",
+                  "verseOrgIds": [
+                    "PRO.1.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.4",
+              "verseOrgIds": [
+                "PRO.1.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4209"
+            },
+            "items": [
+              {
+                "text": "וּמְזִמָּֽה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.4",
+                  "verseOrgIds": [
+                    "PRO.1.4"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.4",
+              "verseOrgIds": [
+                "PRO.1.4"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8085"
+            },
+            "items": [
+              {
+                "text": "יִשְׁמַ֣ע",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.5",
+              "verseOrgIds": [
+                "PRO.1.5"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H2450"
+            },
+            "items": [
+              {
+                "text": "חָ֭כָם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.5",
+              "verseOrgIds": [
+                "PRO.1.5"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3254"
+            },
+            "items": [
+              {
+                "text": "וְי֣וֹסֶף",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.5",
+              "verseOrgIds": [
+                "PRO.1.5"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3948"
+            },
+            "items": [
+              {
+                "text": "לֶ֑קַח",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.5",
+              "verseOrgIds": [
+                "PRO.1.5"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0995"
+            },
+            "items": [
+              {
+                "text": "וְ֝נָב֗וֹן",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.5",
+              "verseOrgIds": [
+                "PRO.1.5"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8458"
+            },
+            "items": [
+              {
+                "text": "תַּחְבֻּל֥וֹת",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.5",
+              "verseOrgIds": [
+                "PRO.1.5"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7069"
+            },
+            "items": [
+              {
+                "text": "יִקְנֶֽה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.5",
+              "verseOrgIds": [
+                "PRO.1.5"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0995"
+            },
+            "items": [
+              {
+                "text": "לְהָבִ֣ין",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.6",
+                  "verseOrgIds": [
+                    "PRO.1.6"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.6",
+              "verseOrgIds": [
+                "PRO.1.6"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4912"
+            },
+            "items": [
+              {
+                "text": "מָ֭שָׁל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.6",
+                  "verseOrgIds": [
+                    "PRO.1.6"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.6",
+              "verseOrgIds": [
+                "PRO.1.6"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4426"
+            },
+            "items": [
+              {
+                "text": "וּמְלִיצָ֑ה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.6",
+                  "verseOrgIds": [
+                    "PRO.1.6"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.6",
+              "verseOrgIds": [
+                "PRO.1.6"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1697"
+            },
+            "items": [
+              {
+                "text": "דִּבְרֵ֥י",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.6",
+                  "verseOrgIds": [
+                    "PRO.1.6"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.6",
+              "verseOrgIds": [
+                "PRO.1.6"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H2450"
+            },
+            "items": [
+              {
+                "text": "חֲ֝כָמִ֗ים",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.6",
+                  "verseOrgIds": [
+                    "PRO.1.6"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.6",
+              "verseOrgIds": [
+                "PRO.1.6"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H2420"
+            },
+            "items": [
+              {
+                "text": "וְחִידֹתָֽם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.6",
+                  "verseOrgIds": [
+                    "PRO.1.6"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.1.6",
+              "verseOrgIds": [
+                "PRO.1.6"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "verseCount": 6,
+    "copyright": "PUBLIC DOMAIN",
+    "parallels": [
+      {
+        "id": "PRO.1.1-PRO.1.6",
+        "orgId": "PRO.1.1-PRO.1.6",
+        "bibleId": "de4e12af7f28f599-01",
+        "bookId": "PRO",
+        "chapterIds": [
+          "PRO.1"
+        ],
+        "reference": "Proverbs 1:1-6",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "The proverbs of Solomon the son of David, king of Israel; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.1",
+                  "verseOrgIds": [
+                    "PRO.1.1"
+                  ]
+                }
+              },
+              {
+                "text": "To know wisdom and instruction; to perceive the words of understanding; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.2",
+                  "verseOrgIds": [
+                    "PRO.1.2"
+                  ]
+                }
+              },
+              {
+                "text": "To receive the instruction of wisdom, justice, and judgment, and equity;",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.3",
+                  "verseOrgIds": [
+                    "PRO.1.3"
+                  ]
+                }
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.3",
+                  "verseOrgIds": [
+                    "PRO.1.3"
+                  ]
+                }
+              },
+              {
+                "text": "To give subtilty to the simple, to the young man knowledge and discretion.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.4",
+                  "verseOrgIds": [
+                    "PRO.1.4"
+                  ]
+                }
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.4",
+                  "verseOrgIds": [
+                    "PRO.1.4"
+                  ]
+                }
+              },
+              {
+                "text": "A wise ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "man",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "PRO.1.5",
+                      "verseOrgIds": [
+                        "PRO.1.5"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " will hear, and will increase learning; and a man of understanding shall attain unto wise counsels: ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              },
+              {
+                "text": "To understand a proverb, and the interpretation; the words of the wise, and their dark sayings.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.6",
+                  "verseOrgIds": [
+                    "PRO.1.6"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 6,
+        "copyright": "PUBLIC DOMAIN except in the United Kingdom, where a Crown Copyright applies to printing the KJV. See http://www.cambridge.org/about-us/who-we-are/queens-printers-patent"
+      },
+      {
+        "id": "PRO.1.1-PRO.1.6",
+        "orgId": "PRO.1.1-PRO.1.6",
+        "bibleId": "01b29f4b342acc35-01",
+        "bookId": "PRO",
+        "chapterIds": [
+          "PRO.1"
+        ],
+        "reference": "Proverbs 1:1-6",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "Proverbs of Solomon, son of David, king of Israel: ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.1",
+                  "verseOrgIds": [
+                    "PRO.1.1"
+                  ]
+                }
+              },
+              {
+                "text": "For knowing wisdom and instruction, || For understanding sayings of intelligence, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.2",
+                  "verseOrgIds": [
+                    "PRO.1.2"
+                  ]
+                }
+              },
+              {
+                "text": "For receiving the instruction of wisdom, || Righteousness, judgment, and uprightness, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.3",
+                  "verseOrgIds": [
+                    "PRO.1.3"
+                  ]
+                }
+              },
+              {
+                "text": "For giving to simple ones—prudence, || To a youth—knowledge and discretion. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.4",
+                  "verseOrgIds": [
+                    "PRO.1.4"
+                  ]
+                }
+              },
+              {
+                "text": "(The wise hear and increase learning, || And the intelligent obtain counsels.) ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.5",
+                  "verseOrgIds": [
+                    "PRO.1.5"
+                  ]
+                }
+              },
+              {
+                "text": "For understanding a proverb and its sweetness, || Words of the wise and their acute sayings. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.1.6",
+                  "verseOrgIds": [
+                    "PRO.1.6"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 6,
+        "copyright": "The Literal Standard Version of The Holy Bible is a registered copyright of Covenant Press and the Covenant Christian Coalition (© 2020), but has been subsequently released under the Creative Commons Attribution-ShareAlike license (CC BY-SA) per our desire to provide God’s word freely. Covenant Press requests that the text remain unaltered in the English language and that translations based on the LSV maintain the same spirit of faithfulness to the original Hebrew, Aramaic, and Greek text. Attribution of minor citations for personal or non-commercial use can be provided as simply “LSV” or “Literal Standard Version.” Citations for commercial use, or distribution of the entire LSV Bible or entire book(s) of the LSV Bible, must be fully attributed and include both “Literal Standard Version (LSV)” and the name of our organization. Covenant Press is soliciting partnerships with Bible publishers that are interested in the LSV project. For queries about partnering with us, please email the translation team at covenantpress@ccc.one. To learn more, visit lsvbible.com. The purpose behind the LSV is to provide readers with a modern, easy-to-read, literal, and accurate translation of the Bible that is free to read, distribute, and translate from. We pray that God will use the LSV to illuminate the hearts and minds of multitudes with the good news that His Son Jesus Christ came in the flesh, died for our sins as a substitutionary sacrifice, rose bodily from the dead, and is coming back again."
+      }
+    ]
+  },
+  "meta": {
+    "fumsToken": "G78BAIzTFfOihHXPxP185U8_SNKycFOsNlUcf4Rm0enqO3hThwPUgwM912a39HxLOMECvOjpNhUU8TF6alGuw1-8v9wQ5g-emXPzdaYsVjq36jp5nexIPL_Tyeu82iwnnngsZwFIKRKiAc236BeAe4uKkBwQZFXrkAcGo8LfGY50jXlHJlKImianwh5wfm2Xf39piDWjHb5-cDBMTNoIzZC9lb7d2i0XB6_VphtL6pqI7yYEbQJs_m36lThL6DorLakUZSQe9Pf7q30LnkuuXEfdaxs12zSGGmQkG6qeQ2WlFhw"
+  }
+}

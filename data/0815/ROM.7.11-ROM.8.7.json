@@ -1,0 +1,1169 @@
+{
+  "data": {
+    "id": "ROM.7.11-ROM.8.7",
+    "orgId": "ROM.7.11-ROM.8.7",
+    "bibleId": "7644de2e4c5188e5-01",
+    "bookId": "ROM",
+    "chapterIds": [
+      "ROM.7",
+      "ROM.8"
+    ],
+    "reference": "ΠΡΟΣ ΡΩΜΑΙΟΥΣ 7:11-8:7",
+    "content": [
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "text": "ἡ γὰρ ἁμαρτία ἀφορμὴν λαβοῦσα διὰ τῆς ἐντολῆς ἐξηπάτησέ με, καὶ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.11",
+              "verseOrgIds": [
+                "ROM.7.11"
+              ]
+            }
+          },
+          {
+            "text": "δι᾽ αὐτῆς ἀπέκτεινεν. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.11",
+              "verseOrgIds": [
+                "ROM.7.11"
+              ]
+            }
+          },
+          {
+            "text": "Ὥστε ὁ μὲν νόμος ἅγιος, καὶ ἡ ἐντολὴ ἁγία καὶ δικαία καὶ ἀγαθή.",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.12",
+              "verseOrgIds": [
+                "ROM.7.12"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "text": "Τὸ οὖν ἀγαθὸν ἐμοὶ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.13",
+              "verseOrgIds": [
+                "ROM.7.13"
+              ]
+            }
+          },
+          {
+            "text": "γέγονε θάνατος; Μὴ γένοιτο. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.13",
+              "verseOrgIds": [
+                "ROM.7.13"
+              ]
+            }
+          },
+          {
+            "text": "Ἀλλὰ ἡ ἁμαρτία, ἵνα φανῇ ἁμαρτία, διὰ τοῦ ἀγαθοῦ μοι κατεργαζομένη θάνατον—ἵνα γένηται καθ᾽ ὑπερβολὴν ἁμαρτωλὸς ἡ ἁμαρτία διὰ τῆς ἐντολῆς. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.13",
+              "verseOrgIds": [
+                "ROM.7.13"
+              ]
+            }
+          },
+          {
+            "text": "Οἴδαμεν γὰρ ὅτι ὁ νόμος πνευματικός ἐστιν· ἐγὼ δὲ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.14",
+              "verseOrgIds": [
+                "ROM.7.14"
+              ]
+            }
+          },
+          {
+            "text": "σαρκικός εἰμι, πεπραμένος ὑπὸ τὴν ἁμαρτίαν. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.14",
+              "verseOrgIds": [
+                "ROM.7.14"
+              ]
+            }
+          },
+          {
+            "text": "Ὃ γὰρ κατεργάζομαι, οὐ γινώσκω· οὐ γὰρ ὃ θέλω, τοῦτο πράσσω· ἀλλ᾽ ὃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.15",
+              "verseOrgIds": [
+                "ROM.7.15"
+              ]
+            }
+          },
+          {
+            "text": "μισῶ, τοῦτο ποιῶ. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.15",
+              "verseOrgIds": [
+                "ROM.7.15"
+              ]
+            }
+          },
+          {
+            "text": "Εἰ δὲ ὃ οὐ θέλω, τοῦτο ποιῶ, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.16",
+              "verseOrgIds": [
+                "ROM.7.16"
+              ]
+            }
+          },
+          {
+            "text": "σύμφημι τῷ νόμῳ ὅτι καλός. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.16",
+              "verseOrgIds": [
+                "ROM.7.16"
+              ]
+            }
+          },
+          {
+            "text": "Νυνὶ δὲ οὐκέτι ἐγὼ κατεργάζομαι αὐτό, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.17",
+              "verseOrgIds": [
+                "ROM.7.17"
+              ]
+            }
+          },
+          {
+            "text": "ἀλλ᾽ ἡ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.17",
+              "verseOrgIds": [
+                "ROM.7.17"
+              ]
+            }
+          },
+          {
+            "text": "οἰκοῦσα ἐν ἐμοὶ ἁμαρτία. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.17",
+              "verseOrgIds": [
+                "ROM.7.17"
+              ]
+            }
+          },
+          {
+            "text": "Οἶδα γὰρ ὅτι οὐκ οἰκεῖ ἐν ἐμοί, τοῦτ᾽ ἔστιν ἐν τῇ σαρκί μου, ἀγαθόν· τὸ γὰρ θέλειν παράκειταί μοι, τὸ δὲ κατεργάζεσθαι τὸ καλὸν ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.18",
+              "verseOrgIds": [
+                "ROM.7.18"
+              ]
+            }
+          },
+          {
+            "text": "οὐχ εὑρίσκω. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.18",
+              "verseOrgIds": [
+                "ROM.7.18"
+              ]
+            }
+          },
+          {
+            "text": "Οὐ γὰρ ὃ θέλω, ποιῶ ἀγαθόν· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.19",
+              "verseOrgIds": [
+                "ROM.7.19"
+              ]
+            }
+          },
+          {
+            "text": "ἀλλ᾽ ὃ οὐ θέλω κακόν, τοῦτο πράσσω. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.19",
+              "verseOrgIds": [
+                "ROM.7.19"
+              ]
+            }
+          },
+          {
+            "text": "Εἰ δὲ ὃ οὐ θέλω ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.20",
+              "verseOrgIds": [
+                "ROM.7.20"
+              ]
+            }
+          },
+          {
+            "text": "ἐγώ, τοῦτο ποιῶ, οὐκέτι ἐγὼ κατεργάζομαι αὐτό, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.20",
+              "verseOrgIds": [
+                "ROM.7.20"
+              ]
+            }
+          },
+          {
+            "text": "ἀλλ᾽ ἡ οἰκοῦσα ἐν ἐμοὶ ἁμαρτία.",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.20",
+              "verseOrgIds": [
+                "ROM.7.20"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "text": "Εὑρίσκω ἄρα τὸν νόμον τῷ θέλοντι ἐμοὶ ποιεῖν τὸ καλόν, ὅτι ἐμοὶ τὸ κακὸν παράκειται. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.21",
+              "verseOrgIds": [
+                "ROM.7.21"
+              ]
+            }
+          },
+          {
+            "text": "Συνήδομαι γὰρ τῷ νόμῳ τοῦ Θεοῦ κατὰ τὸν ἔσω ἄνθρωπον· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.22",
+              "verseOrgIds": [
+                "ROM.7.22"
+              ]
+            }
+          },
+          {
+            "text": "βλέπω δὲ ἕτερον νόμον ἐν τοῖς μέλεσί μου ἀντιστρατευόμενον τῷ νόμῳ τοῦ νοός μου, καὶ αἰχμαλωτίζοντά με ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.23",
+              "verseOrgIds": [
+                "ROM.7.23"
+              ]
+            }
+          },
+          {
+            "text": "ἐν τῷ νόμῳ τῆς ἁμαρτίας τῷ ὄντι ἐν τοῖς μέλεσί μου. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.23",
+              "verseOrgIds": [
+                "ROM.7.23"
+              ]
+            }
+          },
+          {
+            "text": "Ταλαίπωρος ἐγὼ ἄνθρωπος· τίς με ῥύσεται ἐκ τοῦ σώματος τοῦ θανάτου τούτου; ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.24",
+              "verseOrgIds": [
+                "ROM.7.24"
+              ]
+            }
+          },
+          {
+            "text": "Εὐχαριστῶ τῷ Θεῷ διὰ Ἰησοῦ Χριστοῦ τοῦ Κυρίου ἡμῶν. Ἄρα οὖν αὐτὸς ἐγὼ τῷ μὲν νοῒ δουλεύω νόμῳ Θεοῦ, τῇ δὲ σαρκὶ νόμῳ ἁμαρτίας.",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.7.25",
+              "verseOrgIds": [
+                "ROM.7.25"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "s"
+        },
+        "items": [
+          {
+            "text": "Life in the Spirit",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "text": "Οὐδὲν ἄρα νῦν κατάκριμα τοῖς ἐν Χριστῷ Ἰησοῦ, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.1",
+              "verseOrgIds": [
+                "ROM.8.1"
+              ]
+            }
+          },
+          {
+            "text": "μὴ κατὰ σάρκα περιπατοῦσιν, ἀλλὰ κατὰ πνεῦμα. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.1",
+              "verseOrgIds": [
+                "ROM.8.1"
+              ]
+            }
+          },
+          {
+            "text": "Ὁ γὰρ νόμος τοῦ πνεύματος τῆς ζωῆς ἐν Χριστῷ Ἰησοῦ ἠλευθέρωσέ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.2",
+              "verseOrgIds": [
+                "ROM.8.2"
+              ]
+            }
+          },
+          {
+            "text": "με ἀπὸ τοῦ νόμου τῆς ἁμαρτίας καὶ τοῦ θανάτου. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.2",
+              "verseOrgIds": [
+                "ROM.8.2"
+              ]
+            }
+          },
+          {
+            "text": "Τὸ γὰρ ἀδύνατον τοῦ νόμου, ἐν ᾧ ἠσθένει διὰ τῆς σαρκός, ὁ Θεὸς τὸν ἑαυτοῦ υἱὸν πέμψας ἐν ὁμοιώματι σαρκὸς ἁμαρτίας καὶ περὶ ἁμαρτίας κατέκρινε τὴν ἁμαρτίαν ἐν τῇ σαρκί· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.3",
+              "verseOrgIds": [
+                "ROM.8.3"
+              ]
+            }
+          },
+          {
+            "text": "ἵνα τὸ δικαίωμα τοῦ νόμου πληρωθῇ ἐν ἡμῖν, τοῖς μὴ κατὰ σάρκα περιπατοῦσιν, ἀλλὰ κατὰ πνεῦμα. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.4",
+              "verseOrgIds": [
+                "ROM.8.4"
+              ]
+            }
+          },
+          {
+            "text": "Οἱ γὰρ κατὰ σάρκα ὄντες τὰ τῆς σαρκὸς φρονοῦσιν· οἱ δὲ κατὰ πνεῦμα τὰ τοῦ πνεύματος. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.5",
+              "verseOrgIds": [
+                "ROM.8.5"
+              ]
+            }
+          },
+          {
+            "text": "Τὸ γὰρ φρόνημα τῆς σαρκὸς θάνατος· τὸ δὲ φρόνημα τοῦ πνεύματος ζωὴ καὶ εἰρήνη· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.6",
+              "verseOrgIds": [
+                "ROM.8.6"
+              ]
+            }
+          },
+          {
+            "text": "διότι τὸ φρόνημα τῆς σαρκὸς ἔχθρα εἰς Θεόν, τῷ γὰρ νόμῳ τοῦ Θεοῦ οὐχ ὑποτάσσεται, οὐδὲ γὰρ δύναται· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.7",
+              "verseOrgIds": [
+                "ROM.8.7"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "verseCount": 22,
+    "copyright": "Public Domain",
+    "parallels": [
+      {
+        "id": "ROM.7.11-ROM.8.7",
+        "orgId": "ROM.7.11-ROM.8.7",
+        "bibleId": "de4e12af7f28f599-01",
+        "bookId": "ROM",
+        "chapterIds": [
+          "ROM.7",
+          "ROM.8"
+        ],
+        "reference": "Romans 7:11-8:7",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "For sin, taking occasion by the commandment, deceived me, and by it slew ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.11",
+                  "verseOrgIds": [
+                    "ROM.7.11"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "me",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.7.11",
+                      "verseOrgIds": [
+                        "ROM.7.11"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": ". ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.11",
+                  "verseOrgIds": [
+                    "ROM.7.11"
+                  ]
+                }
+              },
+              {
+                "text": "Wherefore the law ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.12",
+                  "verseOrgIds": [
+                    "ROM.7.12"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.7.12",
+                      "verseOrgIds": [
+                        "ROM.7.12"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " holy, and the commandment holy, and just, and good. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.12",
+                  "verseOrgIds": [
+                    "ROM.7.12"
+                  ]
+                }
+              },
+              {
+                "text": "Was then that which is good made death unto me? God forbid. But sin, that it might appear sin, working death in me by that which is good; that sin by the commandment might become exceeding sinful. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.13",
+                  "verseOrgIds": [
+                    "ROM.7.13"
+                  ]
+                }
+              },
+              {
+                "text": "For we know that the law is spiritual: but I am carnal, sold under sin. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.14",
+                  "verseOrgIds": [
+                    "ROM.7.14"
+                  ]
+                }
+              },
+              {
+                "text": "For that which I do I allow not: for what I would, that do I not; but what I hate, that do I. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.15",
+                  "verseOrgIds": [
+                    "ROM.7.15"
+                  ]
+                }
+              },
+              {
+                "text": "If then I do that which I would not, I consent unto the law that ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.16",
+                  "verseOrgIds": [
+                    "ROM.7.16"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "it is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.7.16",
+                      "verseOrgIds": [
+                        "ROM.7.16"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " good. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.16",
+                  "verseOrgIds": [
+                    "ROM.7.16"
+                  ]
+                }
+              },
+              {
+                "text": "Now then it is no more I that do it, but sin that dwelleth in me. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.17",
+                  "verseOrgIds": [
+                    "ROM.7.17"
+                  ]
+                }
+              },
+              {
+                "text": "For I know that in me (that is, in my flesh,) dwelleth no good thing: for to will is present with me; but ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.18",
+                  "verseOrgIds": [
+                    "ROM.7.18"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "how",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.7.18",
+                      "verseOrgIds": [
+                        "ROM.7.18"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " to perform that which is good I find not. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.18",
+                  "verseOrgIds": [
+                    "ROM.7.18"
+                  ]
+                }
+              },
+              {
+                "text": "For the good that I would I do not: but the evil which I would not, that I do. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.19",
+                  "verseOrgIds": [
+                    "ROM.7.19"
+                  ]
+                }
+              },
+              {
+                "text": "Now if I do that I would not, it is no more I that do it, but sin that dwelleth in me. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.20",
+                  "verseOrgIds": [
+                    "ROM.7.20"
+                  ]
+                }
+              },
+              {
+                "text": "I find then a law, that, when I would do good, evil is present with me. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.21",
+                  "verseOrgIds": [
+                    "ROM.7.21"
+                  ]
+                }
+              },
+              {
+                "text": "For I delight in the law of God after the inward man: ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.22",
+                  "verseOrgIds": [
+                    "ROM.7.22"
+                  ]
+                }
+              },
+              {
+                "text": "But I see another law in my members, warring against the law of my mind, and bringing me into captivity to the law of sin which is in my members. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.23",
+                  "verseOrgIds": [
+                    "ROM.7.23"
+                  ]
+                }
+              },
+              {
+                "text": "O wretched man that I am! who shall deliver me from the body of this death? ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.24",
+                  "verseOrgIds": [
+                    "ROM.7.24"
+                  ]
+                }
+              },
+              {
+                "text": "I thank God through Jesus Christ our Lord. So then with the mind I myself serve the law of God; but with the flesh the law of sin.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.25",
+                  "verseOrgIds": [
+                    "ROM.7.25"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "There is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.1",
+                      "verseOrgIds": [
+                        "ROM.8.1"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " therefore now no condemnation to them which are in Christ Jesus, who walk not after the flesh, but after the Spirit. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.1",
+                  "verseOrgIds": [
+                    "ROM.8.1"
+                  ]
+                }
+              },
+              {
+                "text": "For the law of the Spirit of life in Christ Jesus hath made me free from the law of sin and death. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.2",
+                  "verseOrgIds": [
+                    "ROM.8.2"
+                  ]
+                }
+              },
+              {
+                "text": "For what the law could not do, in that it was weak through the flesh, God sending his own Son in the likeness of sinful flesh, and for sin, condemned sin in the flesh: ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.3",
+                  "verseOrgIds": [
+                    "ROM.8.3"
+                  ]
+                }
+              },
+              {
+                "text": "That the righteousness of the law might be fulfilled in us, who walk not after the flesh, but after the Spirit. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.4",
+                  "verseOrgIds": [
+                    "ROM.8.4"
+                  ]
+                }
+              },
+              {
+                "text": "For they that are after the flesh do mind the things of the flesh; but they that are after the Spirit the things of the Spirit. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.5",
+                  "verseOrgIds": [
+                    "ROM.8.5"
+                  ]
+                }
+              },
+              {
+                "text": "For to be carnally minded ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.6",
+                  "verseOrgIds": [
+                    "ROM.8.6"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.6",
+                      "verseOrgIds": [
+                        "ROM.8.6"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " death; but to be spiritually minded ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.6",
+                  "verseOrgIds": [
+                    "ROM.8.6"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.6",
+                      "verseOrgIds": [
+                        "ROM.8.6"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " life and peace. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.6",
+                  "verseOrgIds": [
+                    "ROM.8.6"
+                  ]
+                }
+              },
+              {
+                "text": "Because the carnal mind ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.7",
+                  "verseOrgIds": [
+                    "ROM.8.7"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.7",
+                      "verseOrgIds": [
+                        "ROM.8.7"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " enmity against God: for it is not subject to the law of God, neither indeed can be. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.7",
+                  "verseOrgIds": [
+                    "ROM.8.7"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 22,
+        "copyright": "PUBLIC DOMAIN except in the United Kingdom, where a Crown Copyright applies to printing the KJV. See http://www.cambridge.org/about-us/who-we-are/queens-printers-patent"
+      },
+      {
+        "id": "ROM.7.11-ROM.8.7",
+        "orgId": "ROM.7.11-ROM.8.7",
+        "bibleId": "01b29f4b342acc35-01",
+        "bookId": "ROM",
+        "chapterIds": [
+          "ROM.7",
+          "ROM.8"
+        ],
+        "reference": "Romans 7:11-8:7",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "for sin, having received an opportunity, through the command, deceived me, and through it, slew [me], ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.11",
+                  "verseOrgIds": [
+                    "ROM.7.11"
+                  ]
+                }
+              },
+              {
+                "text": "so that the Law, indeed, [is] holy, and the command holy, and righteous, and good. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.12",
+                  "verseOrgIds": [
+                    "ROM.7.12"
+                  ]
+                }
+              },
+              {
+                "text": "That which is good then, has it become death to me? Let it not be! But sin, that it might appear sin, through the good, working death to me, that sin might become exceedingly sinful through the command. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.13",
+                  "verseOrgIds": [
+                    "ROM.7.13"
+                  ]
+                }
+              },
+              {
+                "text": "For we have known that the Law is spiritual, and I am fleshly, sold by sin; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.14",
+                  "verseOrgIds": [
+                    "ROM.7.14"
+                  ]
+                }
+              },
+              {
+                "text": "for that which I work, I do not acknowledge; for not what I will, this I practice, but what I hate, this I do. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.15",
+                  "verseOrgIds": [
+                    "ROM.7.15"
+                  ]
+                }
+              },
+              {
+                "text": "And if what I do not will, this I do, I consent to the Law that [it is] good, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.16",
+                  "verseOrgIds": [
+                    "ROM.7.16"
+                  ]
+                }
+              },
+              {
+                "text": "and now it is no longer I that work it, but sin dwelling in me, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.17",
+                  "verseOrgIds": [
+                    "ROM.7.17"
+                  ]
+                }
+              },
+              {
+                "text": "for I have known that there does not dwell in me, that is, in my flesh, good: for to will is present with me, and I do not find to work that which is right, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.18",
+                  "verseOrgIds": [
+                    "ROM.7.18"
+                  ]
+                }
+              },
+              {
+                "text": "for the good that I will, I do not do; but the evil that I do not will, this I practice. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.19",
+                  "verseOrgIds": [
+                    "ROM.7.19"
+                  ]
+                }
+              },
+              {
+                "text": "And if what I do not will, this I do, it is no longer I that work it, but sin that is dwelling in me. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.20",
+                  "verseOrgIds": [
+                    "ROM.7.20"
+                  ]
+                }
+              },
+              {
+                "text": "I find, then, the law, that when I desire to do what is right, the evil is present with me, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.21",
+                  "verseOrgIds": [
+                    "ROM.7.21"
+                  ]
+                }
+              },
+              {
+                "text": "for I delight in the Law of God according to the inward man, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.22",
+                  "verseOrgIds": [
+                    "ROM.7.22"
+                  ]
+                }
+              },
+              {
+                "text": "and I behold another law in my members, warring against the law of my mind, and bringing me into captivity to the law of sin that [is] in my members. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.23",
+                  "verseOrgIds": [
+                    "ROM.7.23"
+                  ]
+                }
+              },
+              {
+                "text": "A wretched man I [am]! Who will deliver me out of the body of this death? ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.24",
+                  "verseOrgIds": [
+                    "ROM.7.24"
+                  ]
+                }
+              },
+              {
+                "text": "I thank God—through Jesus Christ our Lord; so then, I myself indeed serve the Law of God with the mind, and with the flesh, the law of sin.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.7.25",
+                  "verseOrgIds": [
+                    "ROM.7.25"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "There is, then, now no condemnation to those in Christ Jesus, who walk not according to the flesh, but according to the Spirit; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.1",
+                  "verseOrgIds": [
+                    "ROM.8.1"
+                  ]
+                }
+              },
+              {
+                "text": "for the law of the Spirit of life in Christ Jesus set me free from the law of sin and of death; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.2",
+                  "verseOrgIds": [
+                    "ROM.8.2"
+                  ]
+                }
+              },
+              {
+                "text": "for what the Law was not able to do, in that it was weak through the flesh, God, His own Son having sent in the likeness of sinful flesh, and for sin, condemned sin in the flesh, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.3",
+                  "verseOrgIds": [
+                    "ROM.8.3"
+                  ]
+                }
+              },
+              {
+                "text": "that the righteousness of the Law may be fulfilled in us, who do not walk according to the flesh, but according to the Spirit. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.4",
+                  "verseOrgIds": [
+                    "ROM.8.4"
+                  ]
+                }
+              },
+              {
+                "text": "For those who are according to the flesh, mind the things of the flesh; and those according to the Spirit, the things of the Spirit; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.5",
+                  "verseOrgIds": [
+                    "ROM.8.5"
+                  ]
+                }
+              },
+              {
+                "text": "for the mind of the flesh [is] death, and the mind of the Spirit—life and peace; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.6",
+                  "verseOrgIds": [
+                    "ROM.8.6"
+                  ]
+                }
+              },
+              {
+                "text": "because the mind of the flesh [is] enmity to God, for to the Law of God it does not subject itself, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.7",
+                  "verseOrgIds": [
+                    "ROM.8.7"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 22,
+        "copyright": "The Literal Standard Version of The Holy Bible is a registered copyright of Covenant Press and the Covenant Christian Coalition (© 2020), but has been subsequently released under the Creative Commons Attribution-ShareAlike license (CC BY-SA) per our desire to provide God’s word freely. Covenant Press requests that the text remain unaltered in the English language and that translations based on the LSV maintain the same spirit of faithfulness to the original Hebrew, Aramaic, and Greek text. Attribution of minor citations for personal or non-commercial use can be provided as simply “LSV” or “Literal Standard Version.” Citations for commercial use, or distribution of the entire LSV Bible or entire book(s) of the LSV Bible, must be fully attributed and include both “Literal Standard Version (LSV)” and the name of our organization. Covenant Press is soliciting partnerships with Bible publishers that are interested in the LSV project. For queries about partnering with us, please email the translation team at covenantpress@ccc.one. To learn more, visit lsvbible.com. The purpose behind the LSV is to provide readers with a modern, easy-to-read, literal, and accurate translation of the Bible that is free to read, distribute, and translate from. We pray that God will use the LSV to illuminate the hearts and minds of multitudes with the good news that His Son Jesus Christ came in the flesh, died for our sins as a substitutionary sacrifice, rose bodily from the dead, and is coming back again."
+      }
+    ]
+  },
+  "meta": {
+    "fumsToken": "G8UBAJwFdnNyK4wGXte_0aYWkdnau7mm8tFQ4Bfu7W5qrpAOwa1ZdLr6VtPT4Dmd4QC0AuRVdgugaLrwxYLuhX71dvfLOYnUUl-H931dIOpnFHNuvlWK3g-x4nswOUsgbdQ77b3VJk5sDKXM6gFQVSitEaqfQoe4tQ5I-EAjq-p7eDiMEn9oi7QdIL_VcTGnOrB1dgcc3wXLvy-BeNPb6QtzMMxNI5zOoOzF4stFLjGZXw7xYmydado8QylSi7D62_W7Ns2W6ZvztvbugpTH_F7f9tGVJHWEQKNUT77WQE1mpZjDqHqqEK0IHA"
+  }
+}

@@ -1,0 +1,1448 @@
+{
+  "data": {
+    "id": "ROM.8.8-ROM.8.29",
+    "orgId": "ROM.8.8-ROM.8.29",
+    "bibleId": "7644de2e4c5188e5-01",
+    "bookId": "ROM",
+    "chapterIds": [
+      "ROM.8"
+    ],
+    "reference": "ΠΡΟΣ ΡΩΜΑΙΟΥΣ 8:8-29",
+    "content": [
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "text": "οἱ δὲ ἐν σαρκὶ ὄντες Θεῷ ἀρέσαι οὐ δύνανται.",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.8",
+              "verseOrgIds": [
+                "ROM.8.8"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "text": "Ὑμεῖς δὲ οὐκ ἐστὲ ἐν σαρκί, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.9",
+              "verseOrgIds": [
+                "ROM.8.9"
+              ]
+            }
+          },
+          {
+            "text": "ἀλλ᾽ ἐν πνεύματι, εἴπερ πνεῦμα Θεοῦ οἰκεῖ ἐν ὑμῖν. Εἰ δέ τις πνεῦμα Χριστοῦ οὐκ ἔχει, οὗτος οὐκ ἔστιν αὐτοῦ. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.9",
+              "verseOrgIds": [
+                "ROM.8.9"
+              ]
+            }
+          },
+          {
+            "text": "Εἰ δὲ Χριστὸς ἐν ὑμῖν, τὸ μὲν σῶμα νεκρὸν ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.10",
+              "verseOrgIds": [
+                "ROM.8.10"
+              ]
+            }
+          },
+          {
+            "text": " δι᾽ ἁμαρτίαν, τὸ δὲ πνεῦμα ζωὴ διὰ δικαιοσύνην. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.10",
+              "verseOrgIds": [
+                "ROM.8.10"
+              ]
+            }
+          },
+          {
+            "text": "Εἰ δὲ τὸ πνεῦμα τοῦ ἐγείραντος ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.11",
+              "verseOrgIds": [
+                "ROM.8.11"
+              ]
+            }
+          },
+          {
+            "text": "Ἰησοῦν ἐκ νεκρῶν οἰκεῖ ἐν ὑμῖν, ὁ ἐγείρας ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.11",
+              "verseOrgIds": [
+                "ROM.8.11"
+              ]
+            }
+          },
+          {
+            "text": "τὸν Χριστὸν ἐκ νεκρῶν ζῳοποιήσει καὶ τὰ θνητὰ σώματα ὑμῶν, διὰ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.11",
+              "verseOrgIds": [
+                "ROM.8.11"
+              ]
+            }
+          },
+          {
+            "text": "τὸ ἐνοικοῦν αὐτοῦ πνεῦμα ἐν ὑμῖν.",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.11",
+              "verseOrgIds": [
+                "ROM.8.11"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "text": "Ἄρα οὖν, ἀδελφοί, ὀφειλέται ἐσμέν, οὐ τῇ σαρκί, τοῦ κατὰ σάρκα ζῇν· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.12",
+              "verseOrgIds": [
+                "ROM.8.12"
+              ]
+            }
+          },
+          {
+            "text": "εἰ γὰρ κατὰ σάρκα ζῆτε, μέλλετε ἀποθνῄσκειν· εἰ δὲ πνεύματι τὰς πράξεις τοῦ σώματος θανατοῦτε, ζήσεσθε. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.13",
+              "verseOrgIds": [
+                "ROM.8.13"
+              ]
+            }
+          },
+          {
+            "text": "Ὅσοι γὰρ πνεύματι Θεοῦ ἄγονται, οὗτοί ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.14",
+              "verseOrgIds": [
+                "ROM.8.14"
+              ]
+            }
+          },
+          {
+            "text": "εἰσιν υἱοὶ Θεοῦ. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.14",
+              "verseOrgIds": [
+                "ROM.8.14"
+              ]
+            }
+          },
+          {
+            "text": "Οὐ γὰρ ἐλάβετε πνεῦμα δουλείας πάλιν εἰς φόβον, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.15",
+              "verseOrgIds": [
+                "ROM.8.15"
+              ]
+            }
+          },
+          {
+            "text": "ἀλλ᾽ ἐλάβετε πνεῦμα υἱοθεσίας, ἐν ᾧ κράζομεν, Ἀββᾶ, ὁ πατήρ. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.15",
+              "verseOrgIds": [
+                "ROM.8.15"
+              ]
+            }
+          },
+          {
+            "text": "Αὐτὸ τὸ πνεῦμα ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.16",
+              "verseOrgIds": [
+                "ROM.8.16"
+              ]
+            }
+          },
+          {
+            "text": "συμμαρτυρεῖ τῷ πνεύματι ἡμῶν, ὅτι ἐσμὲν τέκνα Θεοῦ· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.16",
+              "verseOrgIds": [
+                "ROM.8.16"
+              ]
+            }
+          },
+          {
+            "text": "εἰ δὲ τέκνα, καὶ κληρονόμοι· κληρονόμοι μὲν Θεοῦ, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.17",
+              "verseOrgIds": [
+                "ROM.8.17"
+              ]
+            }
+          },
+          {
+            "text": "συγκληρονόμοι δὲ Χριστοῦ· εἴπερ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.17",
+              "verseOrgIds": [
+                "ROM.8.17"
+              ]
+            }
+          },
+          {
+            "text": "συμπάσχομεν, ἵνα καὶ συνδοξασθῶμεν.",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.17",
+              "verseOrgIds": [
+                "ROM.8.17"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "s"
+        },
+        "items": [
+          {
+            "text": "Future Glory",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "text": "Λογίζομαι γὰρ ὅτι οὐκ ἄξια τὰ παθήματα τοῦ νῦν καιροῦ πρὸς τὴν μέλλουσαν δόξαν ἀποκαλυφθῆναι εἰς ἡμᾶς. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.18",
+              "verseOrgIds": [
+                "ROM.8.18"
+              ]
+            }
+          },
+          {
+            "text": "Ἡ γὰρ ἀποκαραδοκία τῆς κτίσεως τὴν ἀποκάλυψιν τῶν υἱῶν τοῦ Θεοῦ ἀπεκδέχεται. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.19",
+              "verseOrgIds": [
+                "ROM.8.19"
+              ]
+            }
+          },
+          {
+            "text": "Τῇ γὰρ ματαιότητι ἡ κτίσις ὑπετάγη, οὐχ ἑκοῦσα, ἀλλὰ διὰ τὸν ὑποτάξαντα, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.20",
+              "verseOrgIds": [
+                "ROM.8.20"
+              ]
+            }
+          },
+          {
+            "text": "ἐπ᾽ ἐλπίδι· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.20",
+              "verseOrgIds": [
+                "ROM.8.20"
+              ]
+            }
+          },
+          {
+            "text": "ὅτι καὶ αὐτὴ ἡ κτίσις ἐλευθερωθήσεται ἀπὸ τῆς δουλείας τῆς φθορᾶς εἰς τὴν ἐλευθερίαν τῆς δόξης τῶν τέκνων τοῦ Θεοῦ. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.21",
+              "verseOrgIds": [
+                "ROM.8.21"
+              ]
+            }
+          },
+          {
+            "text": "Οἴδαμεν γὰρ ὅτι πᾶσα ἡ κτίσις ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.22",
+              "verseOrgIds": [
+                "ROM.8.22"
+              ]
+            }
+          },
+          {
+            "text": "συστενάζει καὶ συνωδίνει ἄχρι τοῦ νῦν. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.22",
+              "verseOrgIds": [
+                "ROM.8.22"
+              ]
+            }
+          },
+          {
+            "text": "Οὐ μόνον δέ, ἀλλὰ καὶ αὐτοὶ τὴν ἀπαρχὴν τοῦ πνεύματος ἔχοντες, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.23",
+              "verseOrgIds": [
+                "ROM.8.23"
+              ]
+            }
+          },
+          {
+            "text": "καὶ ἡμεῖς αὐτοὶ ἐν ἑαυτοῖς στενάζομεν, υἱοθεσίαν ἀπεκδεχόμενοι, τὴν ἀπολύτρωσιν τοῦ σώματος ἡμῶν. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.23",
+              "verseOrgIds": [
+                "ROM.8.23"
+              ]
+            }
+          },
+          {
+            "text": "Τῇ γὰρ ἐλπίδι ἐσώθημεν· ἐλπὶς δὲ βλεπομένη οὐκ ἔστιν ἐλπίς· ὃ γὰρ βλέπει ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.24",
+              "verseOrgIds": [
+                "ROM.8.24"
+              ]
+            }
+          },
+          {
+            "text": "τις, τί καὶ ἐλπίζει; ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.24",
+              "verseOrgIds": [
+                "ROM.8.24"
+              ]
+            }
+          },
+          {
+            "text": "Εἰ δὲ ὃ οὐ βλέπομεν ἐλπίζομεν, δι᾽ ὑπομονῆς ἀπεκδεχόμεθα.",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.25",
+              "verseOrgIds": [
+                "ROM.8.25"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "text": "Ὡσαύτως δὲ καὶ τὸ πνεῦμα συναντιλαμβάνεται ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.26",
+              "verseOrgIds": [
+                "ROM.8.26"
+              ]
+            }
+          },
+          {
+            "text": "ταῖς ἀσθενείαις ἡμῶν· τὸ γὰρ τί ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.26",
+              "verseOrgIds": [
+                "ROM.8.26"
+              ]
+            }
+          },
+          {
+            "text": "προσευξόμεθα καθὸ δεῖ, οὐκ οἴδαμεν, ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.26",
+              "verseOrgIds": [
+                "ROM.8.26"
+              ]
+            }
+          },
+          {
+            "text": "ἀλλ᾽ αὐτὸ τὸ πνεῦμα ὑπερεντυγχάνει ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.26",
+              "verseOrgIds": [
+                "ROM.8.26"
+              ]
+            }
+          },
+          {
+            "text": "ὑπὲρ ἡμῶν στεναγμοῖς ἀλαλήτοις· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.26",
+              "verseOrgIds": [
+                "ROM.8.26"
+              ]
+            }
+          },
+          {
+            "text": "ὁ δὲ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.27",
+              "verseOrgIds": [
+                "ROM.8.27"
+              ]
+            }
+          },
+          {
+            "text": "ἐρευνῶν τὰς καρδίας οἶδε τί τὸ φρόνημα τοῦ πνεύματος, ὅτι κατὰ Θεὸν ἐντυγχάνει ὑπὲρ ἁγίων. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.27",
+              "verseOrgIds": [
+                "ROM.8.27"
+              ]
+            }
+          },
+          {
+            "text": "Οἴδαμεν δὲ ὅτι τοῖς ἀγαπῶσι τὸν Θεὸν πάντα ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.28",
+              "verseOrgIds": [
+                "ROM.8.28"
+              ]
+            }
+          },
+          {
+            "text": "συνεργεῖ εἰς ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.28",
+              "verseOrgIds": [
+                "ROM.8.28"
+              ]
+            }
+          },
+          {
+            "text": "ἀγαθόν, τοῖς κατὰ πρόθεσιν κλητοῖς οὖσιν. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.28",
+              "verseOrgIds": [
+                "ROM.8.28"
+              ]
+            }
+          },
+          {
+            "text": "Ὅτι οὓς προέγνω, καὶ προώρισε συμμόρφους τῆς εἰκόνος τοῦ υἱοῦ αὐτοῦ, εἰς τὸ εἶναι αὐτὸν πρωτότοκον ἐν πολλοῖς ἀδελφοῖς· ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ROM.8.29",
+              "verseOrgIds": [
+                "ROM.8.29"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "verseCount": 22,
+    "copyright": "Public Domain",
+    "parallels": [
+      {
+        "id": "ROM.8.8-ROM.8.29",
+        "orgId": "ROM.8.8-ROM.8.29",
+        "bibleId": "de4e12af7f28f599-01",
+        "bookId": "ROM",
+        "chapterIds": [
+          "ROM.8"
+        ],
+        "reference": "Romans 8:8-29",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "So then they that are in the flesh cannot please God. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.8",
+                  "verseOrgIds": [
+                    "ROM.8.8"
+                  ]
+                }
+              },
+              {
+                "text": "But ye are not in the flesh, but in the Spirit, if so be that the Spirit of God dwell in you. Now if any man have not the Spirit of Christ, he is none of his. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.9",
+                  "verseOrgIds": [
+                    "ROM.8.9"
+                  ]
+                }
+              },
+              {
+                "text": "And if Christ ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.10",
+                  "verseOrgIds": [
+                    "ROM.8.10"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "be",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.10",
+                      "verseOrgIds": [
+                        "ROM.8.10"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " in you, the body ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.10",
+                  "verseOrgIds": [
+                    "ROM.8.10"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.10",
+                      "verseOrgIds": [
+                        "ROM.8.10"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " dead because of sin; but the Spirit ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.10",
+                  "verseOrgIds": [
+                    "ROM.8.10"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.10",
+                      "verseOrgIds": [
+                        "ROM.8.10"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " life because of righteousness. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.10",
+                  "verseOrgIds": [
+                    "ROM.8.10"
+                  ]
+                }
+              },
+              {
+                "text": "But if the Spirit of him that raised up Jesus from the dead dwell in you, he that raised up Christ from the dead shall also quicken your mortal bodies by his Spirit that dwelleth in you.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.11",
+                  "verseOrgIds": [
+                    "ROM.8.11"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "Therefore, brethren, we are debtors, not to the flesh, to live after the flesh. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.12",
+                  "verseOrgIds": [
+                    "ROM.8.12"
+                  ]
+                }
+              },
+              {
+                "text": "For if ye live after the flesh, ye shall die: but if ye through the Spirit do mortify the deeds of the body, ye shall live. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.13",
+                  "verseOrgIds": [
+                    "ROM.8.13"
+                  ]
+                }
+              },
+              {
+                "text": "For as many as are led by the Spirit of God, they are the sons of God. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.14",
+                  "verseOrgIds": [
+                    "ROM.8.14"
+                  ]
+                }
+              },
+              {
+                "text": "For ye have not received the spirit of bondage again to fear; but ye have received the Spirit of adoption, whereby we cry, Abba, Father. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.15",
+                  "verseOrgIds": [
+                    "ROM.8.15"
+                  ]
+                }
+              },
+              {
+                "text": "The Spirit itself beareth witness with our spirit, that we are the children of God: ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.16",
+                  "verseOrgIds": [
+                    "ROM.8.16"
+                  ]
+                }
+              },
+              {
+                "text": "And if children, then heirs; heirs of God, and joint-heirs with Christ; if so be that we suffer with ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.17",
+                  "verseOrgIds": [
+                    "ROM.8.17"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "him",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.17",
+                      "verseOrgIds": [
+                        "ROM.8.17"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": ", that we may be also glorified together.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.17",
+                  "verseOrgIds": [
+                    "ROM.8.17"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "For I reckon that the sufferings of this present time ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.18",
+                  "verseOrgIds": [
+                    "ROM.8.18"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "are",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.18",
+                      "verseOrgIds": [
+                        "ROM.8.18"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " not worthy ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.18",
+                  "verseOrgIds": [
+                    "ROM.8.18"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "to be compared",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.18",
+                      "verseOrgIds": [
+                        "ROM.8.18"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " with the glory which shall be revealed in us. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.18",
+                  "verseOrgIds": [
+                    "ROM.8.18"
+                  ]
+                }
+              },
+              {
+                "text": "For the earnest expectation of the creature waiteth for the manifestation of the sons of God. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.19",
+                  "verseOrgIds": [
+                    "ROM.8.19"
+                  ]
+                }
+              },
+              {
+                "text": "For the creature was made subject to vanity, not willingly, but by reason of him who hath subjected ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.20",
+                  "verseOrgIds": [
+                    "ROM.8.20"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "the same",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.20",
+                      "verseOrgIds": [
+                        "ROM.8.20"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " in hope, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.20",
+                  "verseOrgIds": [
+                    "ROM.8.20"
+                  ]
+                }
+              },
+              {
+                "text": "Because the creature itself also shall be delivered from the bondage of corruption into the glorious liberty of the children of God. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.21",
+                  "verseOrgIds": [
+                    "ROM.8.21"
+                  ]
+                }
+              },
+              {
+                "text": "For we know that the whole creation groaneth and travaileth in pain together until now. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.22",
+                  "verseOrgIds": [
+                    "ROM.8.22"
+                  ]
+                }
+              },
+              {
+                "text": "And not only ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.23",
+                  "verseOrgIds": [
+                    "ROM.8.23"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "they",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.23",
+                      "verseOrgIds": [
+                        "ROM.8.23"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": ", but ourselves also, which have the firstfruits of the Spirit, even we ourselves groan within ourselves, waiting for the adoption, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.23",
+                  "verseOrgIds": [
+                    "ROM.8.23"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "to wit",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.23",
+                      "verseOrgIds": [
+                        "ROM.8.23"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": ", the redemption of our body. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.23",
+                  "verseOrgIds": [
+                    "ROM.8.23"
+                  ]
+                }
+              },
+              {
+                "text": "For we are saved by hope: but hope that is seen is not hope: for what a man seeth, why doth he yet hope for? ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.24",
+                  "verseOrgIds": [
+                    "ROM.8.24"
+                  ]
+                }
+              },
+              {
+                "text": "But if we hope for that we see not, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.25",
+                  "verseOrgIds": [
+                    "ROM.8.25"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "then",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.25",
+                      "verseOrgIds": [
+                        "ROM.8.25"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " do we with patience wait for ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.25",
+                  "verseOrgIds": [
+                    "ROM.8.25"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "it",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.25",
+                      "verseOrgIds": [
+                        "ROM.8.25"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": ". ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.25",
+                  "verseOrgIds": [
+                    "ROM.8.25"
+                  ]
+                }
+              },
+              {
+                "text": "Likewise the Spirit also helpeth our infirmities: for we know not what we should pray for as we ought: but the Spirit itself maketh intercession for us with groanings which cannot be uttered. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.26",
+                  "verseOrgIds": [
+                    "ROM.8.26"
+                  ]
+                }
+              },
+              {
+                "text": "And he that searcheth the hearts knoweth what ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.27",
+                  "verseOrgIds": [
+                    "ROM.8.27"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.27",
+                      "verseOrgIds": [
+                        "ROM.8.27"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " the mind of the Spirit, because he maketh intercession for the saints according to ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.27",
+                  "verseOrgIds": [
+                    "ROM.8.27"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "the will of",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.27",
+                      "verseOrgIds": [
+                        "ROM.8.27"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " God. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.27",
+                  "verseOrgIds": [
+                    "ROM.8.27"
+                  ]
+                }
+              },
+              {
+                "text": "And we know that all things work together for good to them that love God, to them who are the called according to ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.28",
+                  "verseOrgIds": [
+                    "ROM.8.28"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "his",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.28",
+                      "verseOrgIds": [
+                        "ROM.8.28"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " purpose. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.28",
+                  "verseOrgIds": [
+                    "ROM.8.28"
+                  ]
+                }
+              },
+              {
+                "text": "For whom he did foreknow, he also did predestinate ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.29",
+                  "verseOrgIds": [
+                    "ROM.8.29"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "to be",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "ROM.8.29",
+                      "verseOrgIds": [
+                        "ROM.8.29"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " conformed to the image of his Son, that he might be the firstborn among many brethren. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.29",
+                  "verseOrgIds": [
+                    "ROM.8.29"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 22,
+        "copyright": "PUBLIC DOMAIN except in the United Kingdom, where a Crown Copyright applies to printing the KJV. See http://www.cambridge.org/about-us/who-we-are/queens-printers-patent"
+      },
+      {
+        "id": "ROM.8.8-ROM.8.29",
+        "orgId": "ROM.8.8-ROM.8.29",
+        "bibleId": "01b29f4b342acc35-01",
+        "bookId": "ROM",
+        "chapterIds": [
+          "ROM.8"
+        ],
+        "reference": "Romans 8:8-29",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "for neither is it able; and those who are in the flesh are not able to please God. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.8",
+                  "verseOrgIds": [
+                    "ROM.8.8"
+                  ]
+                }
+              },
+              {
+                "text": "And you are not in the flesh, but in the Spirit, if indeed the Spirit of God dwells in you; and if anyone does not have the Spirit of Christ—this one is not His; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.9",
+                  "verseOrgIds": [
+                    "ROM.8.9"
+                  ]
+                }
+              },
+              {
+                "text": "and if Christ [is] in you, the body, indeed, [is] dead because of sin, and the Spirit [is] life because of righteousness, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.10",
+                  "verseOrgIds": [
+                    "ROM.8.10"
+                  ]
+                }
+              },
+              {
+                "text": "and if the Spirit of Him who raised up Jesus out of the dead dwells in you, He who raised up the Christ out of the dead will also quicken your dying bodies, through His Spirit dwelling in you. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.11",
+                  "verseOrgIds": [
+                    "ROM.8.11"
+                  ]
+                }
+              },
+              {
+                "text": "So, then, brothers, we are debtors, not to the flesh, to live according to the flesh; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.12",
+                  "verseOrgIds": [
+                    "ROM.8.12"
+                  ]
+                }
+              },
+              {
+                "text": "for if according to the flesh you live, you are about to die; and if, by the Spirit, the deeds of the body you put to death, you will live; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.13",
+                  "verseOrgIds": [
+                    "ROM.8.13"
+                  ]
+                }
+              },
+              {
+                "text": "for as many as are led by the Spirit of God, these are the sons of God; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.14",
+                  "verseOrgIds": [
+                    "ROM.8.14"
+                  ]
+                }
+              },
+              {
+                "text": "for you did not receive a spirit of bondage again for fear, but you received [the] Spirit of adoption in which we cry, “Abba! Father!” ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.15",
+                  "verseOrgIds": [
+                    "ROM.8.15"
+                  ]
+                }
+              },
+              {
+                "text": "[This] One—the Spirit—testifies with our spirit, that we are children of God; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.16",
+                  "verseOrgIds": [
+                    "ROM.8.16"
+                  ]
+                }
+              },
+              {
+                "text": "and if children, also heirs, heirs, indeed, of God, and heirs together of Christ—if, indeed, we suffer together, that we may also be glorified together. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.17",
+                  "verseOrgIds": [
+                    "ROM.8.17"
+                  ]
+                }
+              },
+              {
+                "text": "For I reckon that the sufferings of the present time [are] not worthy [to be compared] with the glory about to be revealed in us; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.18",
+                  "verseOrgIds": [
+                    "ROM.8.18"
+                  ]
+                }
+              },
+              {
+                "text": "for the earnest looking out of the creation expects the revelation of the sons of God; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.19",
+                  "verseOrgIds": [
+                    "ROM.8.19"
+                  ]
+                }
+              },
+              {
+                "text": "for to vanity was the creation made subject—not of its will, but because of Him who subjected [it]—in hope, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.20",
+                  "verseOrgIds": [
+                    "ROM.8.20"
+                  ]
+                }
+              },
+              {
+                "text": "that also the creation itself will be set free from the servitude of the corruption to the liberty of the glory of the children of God; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.21",
+                  "verseOrgIds": [
+                    "ROM.8.21"
+                  ]
+                }
+              },
+              {
+                "text": "for we have known that all the creation groans together, and travails in pain together until now. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.22",
+                  "verseOrgIds": [
+                    "ROM.8.22"
+                  ]
+                }
+              },
+              {
+                "text": "And not only [so], but also we ourselves, having the first-fruit of the Spirit, we also ourselves groan in ourselves, expecting adoption—the redemption of our body; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.23",
+                  "verseOrgIds": [
+                    "ROM.8.23"
+                  ]
+                }
+              },
+              {
+                "text": "for in hope we were saved, and hope beheld is not hope; for what anyone beholds, why does he also hope for [it]? ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.24",
+                  "verseOrgIds": [
+                    "ROM.8.24"
+                  ]
+                }
+              },
+              {
+                "text": "And if what we do not behold we hope for, through continuance we expect [it]. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.25",
+                  "verseOrgIds": [
+                    "ROM.8.25"
+                  ]
+                }
+              },
+              {
+                "text": "And in like manner also, the Spirit helps our weaknesses; for what we may pray for, as it is necessary, we have not known, but [this] One—the Spirit—makes intercession for us with unutterable groanings, ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.26",
+                  "verseOrgIds": [
+                    "ROM.8.26"
+                  ]
+                }
+              },
+              {
+                "text": "and He who is searching the hearts has known what [is] the mind of the Spirit, because according to God He intercedes for holy ones. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.27",
+                  "verseOrgIds": [
+                    "ROM.8.27"
+                  ]
+                }
+              },
+              {
+                "text": "And we have known that to those loving God all things work together for good, to those who are called according to purpose; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.28",
+                  "verseOrgIds": [
+                    "ROM.8.28"
+                  ]
+                }
+              },
+              {
+                "text": "because whom He foreknew, He also foreordained, conformed to the image of His Son, that He might be firstborn among many brothers; ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "ROM.8.29",
+                  "verseOrgIds": [
+                    "ROM.8.29"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 22,
+        "copyright": "The Literal Standard Version of The Holy Bible is a registered copyright of Covenant Press and the Covenant Christian Coalition (© 2020), but has been subsequently released under the Creative Commons Attribution-ShareAlike license (CC BY-SA) per our desire to provide God’s word freely. Covenant Press requests that the text remain unaltered in the English language and that translations based on the LSV maintain the same spirit of faithfulness to the original Hebrew, Aramaic, and Greek text. Attribution of minor citations for personal or non-commercial use can be provided as simply “LSV” or “Literal Standard Version.” Citations for commercial use, or distribution of the entire LSV Bible or entire book(s) of the LSV Bible, must be fully attributed and include both “Literal Standard Version (LSV)” and the name of our organization. Covenant Press is soliciting partnerships with Bible publishers that are interested in the LSV project. For queries about partnering with us, please email the translation team at covenantpress@ccc.one. To learn more, visit lsvbible.com. The purpose behind the LSV is to provide readers with a modern, easy-to-read, literal, and accurate translation of the Bible that is free to read, distribute, and translate from. We pray that God will use the LSV to illuminate the hearts and minds of multitudes with the good news that His Son Jesus Christ came in the flesh, died for our sins as a substitutionary sacrifice, rose bodily from the dead, and is coming back again."
+      }
+    ]
+  },
+  "meta": {
+    "fumsToken": "G8UBAJwFdnNyK4wGXte_0aYWkdna-3JoyqMzgJApXG2vqi6za7_7ZtHp6ltNT4M3dYYD0IMDedfKisLzKeEEG-UPPfV2_O5cidRSX6f3e18h9o8sc25-bAwiY_KU7iml6TWSfafMx24zySTdSs4AVB0KUUH1I3SIR5sBCQ04WdXe7eEwSvyhmUYeINlhKJTFaETcHjh9Clb83hPizWinb8zAMDfp5HSC4ov563VeYzG7HFMmcV1xcVo-Z2lF2P3b9TtS47ykOeHau_NSHet3--in0frwFINm51CLG6hzHVHTwDbRIJJMFQ4"
+  }
+}
