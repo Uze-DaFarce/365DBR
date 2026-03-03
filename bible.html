@@ -377,17 +377,12 @@ function ScrollToTop() {
 
 // --- BIBLE BROWSE DIALOG ---
 function BibleBrowseDialog({ isOpen, onClose, index, availableBooks, onSelect }) {
-    // Pages/Steps: 'testament', 'book', 'chapter', 'verse'
     const [step, setStep] = useState('testament');
+    const [testament, setTestament] = useState(null);
     const [book, setBook] = useState(null);
     const [chapter, setChapter] = useState(null);
     const [sortDesc, setSortDesc] = useState(false);
-
-    // Chunking state
-    const [chapterGroupIndex, setChapterGroupIndex] = useState(0);
-    const [verseGroupIndex, setVerseGroupIndex] = useState(0);
-
-    const [testament, setTestament] = useState(null); // 'OT' or 'NT'
+    const [chunkIndex, setChunkIndex] = useState(0);
 
     // Reset when opened
     useEffect(() => {
@@ -397,46 +392,29 @@ function BibleBrowseDialog({ isOpen, onClose, index, availableBooks, onSelect })
             setBook(null);
             setChapter(null);
             setSortDesc(false);
-            setChapterGroupIndex(0);
-            setVerseGroupIndex(0);
+            setChunkIndex(0);
         }
     }, [isOpen]);
 
     if (!isOpen) return null;
 
-    const handleBookSelect = (b) => {
-        setBook(b);
-        setChapterGroupIndex(0);
-        setStep('chapter');
-    };
-
-    const handleChapterSelect = (c) => {
-        setChapter(c);
-        setVerseGroupIndex(0);
-
-        setStep('verse');
-    };
-
-    const handleVerseSelect = (v) => {
-        onSelect(book, chapter, v);
-        onClose();
-    };
+    const CHUNK_SIZE = 50;
 
     const handleBack = () => {
-        if (step === 'verse') setStep('chapter');
-        else if (step === 'chapter') setStep('book');
+        if (step === 'verse') { setStep('chapter'); setChunkIndex(0); }
+        else if (step === 'chapter') { setStep('book'); setChunkIndex(0); }
         else if (step === 'book') setStep('testament');
     };
 
-    const OT_BOOKS = availableBooks.slice(0, 39);
-    const NT_BOOKS = availableBooks.slice(39);
+    const handleTestamentSelect = (t) => { setTestament(t); setStep('book'); setSortDesc(false); };
+    const handleBookSelect = (b) => { setBook(b); setStep('chapter'); setChunkIndex(0); };
+    const handleChapterSelect = (c) => { setChapter(c); setStep('verse'); setChunkIndex(0); };
+    const handleVerseSelect = (v) => { onSelect(book, chapter, v); onClose(); };
 
-    const handleTestamentSelect = (t) => {
-        setTestament(t);
-        setStep('book');
-    };
+    // Data Preparation
+    const OT_BOOKS = BIBLE_BOOK_ORDER.slice(0, 39);
+    const NT_BOOKS = BIBLE_BOOK_ORDER.slice(39);
 
-    // Prepare data for current view
     let displayBooks = [];
     if (step === 'book') {
         displayBooks = testament === 'OT' ? OT_BOOKS : NT_BOOKS;
@@ -445,225 +423,124 @@ function BibleBrowseDialog({ isOpen, onClose, index, availableBooks, onSelect })
         }
     }
 
-    let chapterChunks = [];
-    let currentChapterChunk = [];
-    const CHUNK_SIZE = 70; // 35 per page
+    let chunks = [];
+    let currentItems = [];
 
-    if (step === 'chapter' && index && index[book]) {
-        let chapters = Object.keys(index[book]).map(Number);
-        chapters.sort((a,b) => a - b);
-
+    if (step === 'chapter' && book) {
+        // Independent of reading plan, use VERSE_COUNTS length for chapter count
+        const totalChapters = VERSE_COUNTS[book] ? VERSE_COUNTS[book].length : 1;
+        const chapters = Array.from({ length: totalChapters }, (_, i) => i + 1);
         for (let i = 0; i < chapters.length; i += CHUNK_SIZE) {
-            chapterChunks.push(chapters.slice(i, i + CHUNK_SIZE));
+            chunks.push(chapters.slice(i, i + CHUNK_SIZE));
         }
-        currentChapterChunk = chapterChunks[chapterGroupIndex] || [];
+        currentItems = chunks[chunkIndex] || [];
     }
 
-    let verseChunks = [];
-    let currentVerseChunk = [];
-    if (step === 'verse' && VERSE_COUNTS[book] && chapter) {
-        const totalVerses = VERSE_COUNTS[book][chapter - 1] || 1;
-        let verses = Array.from({ length: totalVerses }, (_, i) => i + 1);
-
+    if (step === 'verse' && book && chapter) {
+        // Source of truth for verses
+        const totalVerses = (VERSE_COUNTS[book] && VERSE_COUNTS[book][chapter - 1]) || 1;
+        const verses = Array.from({ length: totalVerses }, (_, i) => i + 1);
         for (let i = 0; i < verses.length; i += CHUNK_SIZE) {
-            verseChunks.push(verses.slice(i, i + CHUNK_SIZE));
+            chunks.push(verses.slice(i, i + CHUNK_SIZE));
         }
-        currentVerseChunk = verseChunks[verseGroupIndex] || [];
+        currentItems = chunks[chunkIndex] || [];
     }
-
-    // Layout logic
-    const isSplitLayout = true; // Always two pages
-
-    // Helper to split a chunk into two columns (Left Page / Right Page)
-    const splitArray = (arr) => {
-        const mid = Math.ceil(arr.length / 2);
-        return [arr.slice(0, mid), arr.slice(mid)];
-    };
-
-    const [leftBooks, rightBooks] = step === 'book' ? splitArray(displayBooks) : [[], []];
-    const [leftChapters, rightChapters] = step === 'chapter' ? splitArray(currentChapterChunk) : [[], []];
-    const [leftVerses, rightVerses] = step === 'verse' ? splitArray(currentVerseChunk) : [[], []];
-
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-10 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div className={`bg-stone-50 w-full ${step === 'testament' ? 'max-w-3xl' : 'max-w-5xl'} h-[90vh] md:h-[80vh] rounded-2xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative border border-stone-200 transition-all duration-300`}>
+        <div className="fixed inset-0 z-[100] bg-stone-50 flex flex-col md:items-center md:justify-center md:bg-black/60 md:backdrop-blur-sm md:p-4 transition-opacity">
+            <div className="flex-1 w-full bg-stone-50 flex flex-col md:max-w-2xl md:h-[85vh] md:rounded-xl md:shadow-2xl overflow-hidden border border-stone-200">
 
-                {/* Header / Controls */}
-                <div className="absolute top-0 inset-x-0 h-16 md:h-20 bg-gradient-to-b from-stone-200/80 to-transparent flex items-center justify-between px-4 md:px-8 z-20 pointer-events-none">
-                    <div className="flex-1 pointer-events-auto flex items-center gap-2">
-                        {step !== 'testament' && (
-                            <button onClick={handleBack} className="hidden md:flex items-center gap-1 text-stone-500 hover:text-amber-700 font-bold text-xs uppercase tracking-wider bg-white/50 hover:bg-white px-3 py-1.5 rounded-full transition-all border border-stone-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                                Back
+                {/* Ultra-Dense Header */}
+                <div className="flex-none bg-white border-b border-stone-300 shadow-sm z-20 sticky top-0">
+                    <div className="flex items-center justify-between px-2 py-1.5 h-12">
+                        {/* Left: Back & Breadcrumb */}
+                        <div className="flex items-center gap-2 overflow-hidden flex-1">
+                            {step !== 'testament' && (
+                                <button onClick={handleBack} className="p-1.5 text-stone-600 hover:bg-stone-100 rounded focus:outline-none focus:ring-2 focus:ring-amber-500 shrink-0" aria-label="Back">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+                                </button>
+                            )}
+                            <div className="font-serif font-black uppercase text-stone-800 tracking-tight truncate text-sm sm:text-base leading-none">
+                                {step === 'testament' && "Browse Bible"}
+                                {step === 'book' && `${testament === 'OT' ? 'Old' : 'New'} Testament`}
+                                {step === 'chapter' && `${BOOK_NAMES[book]}`}
+                                {step === 'verse' && `${BOOK_NAMES[book]} ${chapter}`}
+                            </div>
+                        </div>
+
+                        {/* Right: Controls */}
+                        <div className="flex items-center gap-1 shrink-0">
+                            {step === 'book' && (
+                                <button onClick={() => setSortDesc(!sortDesc)} className="flex items-center gap-1 text-stone-600 font-bold text-[10px] uppercase bg-stone-100 hover:bg-stone-200 px-2 py-1.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 mr-1 border border-stone-200">
+                                    {sortDesc ? 'A-Z' : '#'}
+                                    {sortDesc ? (
+                                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
+                                    ) : (
+                                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg>
+                                    )}
+                                </button>
+                            )}
+                            <button onClick={onClose} className="p-1.5 text-stone-500 hover:text-stone-800 hover:bg-stone-100 rounded focus:outline-none focus:ring-2 focus:ring-amber-500" aria-label="Close dialog">
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
-                        )}
+                        </div>
                     </div>
 
-                    <div className="flex-1 flex justify-center pointer-events-auto items-center gap-4">
-                        {/* Book Name in Header for Chapter/Verse Views */}
-                        {(step === 'chapter' || step === 'verse') && book && (
-                            <h2 className="hidden md:flex text-xl md:text-2xl font-serif font-black uppercase tracking-tight text-stone-800 bg-white/60 px-4 py-1.5 rounded-xl shadow-sm border border-stone-200 backdrop-blur-md">
-                                {BOOK_NAMES[book]}
-                                {step === 'verse' && <span className="text-stone-500 ml-2 font-sans text-lg self-center">{chapter}</span>}
-                            </h2>
-                        )}
-
-                        {step === 'book' && (
-                            <button onClick={() => setSortDesc(!sortDesc)} className="flex items-center gap-1 text-stone-600 hover:text-amber-700 font-bold text-[10px] md:text-xs uppercase tracking-wider bg-white/80 hover:bg-white px-3 py-1.5 rounded-full transition-all border border-stone-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                {sortDesc ? (<> <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg> A-Z </>) : (<> <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg> # </>)}
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="flex-1 flex justify-end pointer-events-auto">
-                        <button onClick={onClose} className="p-2 text-stone-400 hover:text-stone-700 bg-white/50 hover:bg-white rounded-full transition-all border border-transparent hover:border-stone-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500" aria-label="Close dialog">
-                            <svg className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                    </div>
+                    {/* Tight Chunk Selectors (Only if needed) */}
+                    {(step === 'chapter' || step === 'verse') && chunks.length > 1 && (
+                        <div className="flex flex-nowrap overflow-x-auto gap-1 px-2 pb-1.5 no-scrollbar bg-stone-50 border-t border-stone-200 pt-1">
+                            {chunks.map((chunk, idx) => (
+                                <button key={idx} onClick={() => setChunkIndex(idx)} className={`px-3 py-1 text-[11px] font-black tracking-tight whitespace-nowrap rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 border ${chunkIndex === idx ? 'bg-amber-600 text-white border-amber-700 shadow-inner' : 'bg-white text-stone-600 border-stone-300 hover:bg-stone-100'}`}>
+                                    {`${chunk[0]}-${chunk[chunk.length-1]}`}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {/* Main Content Area */}
-                <div className={`flex-1 flex flex-col md:flex-row pt-14 md:pt-0`}>
+                {/* Main Content Scroll Area */}
+                <div className="flex-1 overflow-y-auto p-2 bg-stone-100">
 
-                    {/* Mobile Header elements merged into content area */}
-                    {step !== 'testament' && (
-                        <div className="md:hidden px-4 pt-2 pb-0 flex items-center justify-between">
-                            <button onClick={handleBack} className="flex items-center gap-1 text-stone-500 font-bold text-xs uppercase tracking-wider focus:outline-none">
-                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                                Back
-                            </button>
-                            {book && (
-                                <span className="font-serif font-black uppercase tracking-tight text-stone-800 text-sm">
-                                    {BOOK_NAMES[book]} {step === 'verse' && chapter}
-                                </span>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Book Cover Layout (Testament Step) */}
                     {step === 'testament' && (
-                         <div className="flex-1 flex flex-col md:flex-row relative overflow-y-auto pt-16 md:pt-0">
-                            {/* Spine separator (Desktop only) */}
-                            <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-px bg-stone-300 shadow-[0_0_15px_1px_rgba(0,0,0,0.1)] -translate-x-1/2"></div>
-
-                            <div className="flex-1 p-4 md:p-12 flex flex-col justify-center bg-gradient-to-l from-stone-100/50 to-transparent">
-                                <button onClick={() => handleTestamentSelect('OT')} className="w-full min-h-[12rem] h-auto py-8 md:py-0 md:h-80 bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 rounded-xl flex flex-col items-center justify-center gap-2 md:gap-4 transition-all hover:scale-[1.02] hover:shadow-lg text-amber-900 group">
-                                    <span className="text-4xl md:text-5xl lg:text-6xl font-serif font-black uppercase tracking-tight group-hover:text-amber-700 transition-colors">Old</span>
-                                    <span className="text-2xl md:text-3xl lg:text-4xl font-serif italic text-amber-700/70">Testament</span>
-                                </button>
-                            </div>
-
-                            <div className="flex-1 p-4 md:p-12 flex flex-col justify-center bg-gradient-to-r from-stone-100/50 to-transparent">
-                                <button onClick={() => handleTestamentSelect('NT')} className="w-full min-h-[12rem] h-auto py-8 md:py-0 md:h-80 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 rounded-xl flex flex-col items-center justify-center gap-2 md:gap-4 transition-all hover:scale-[1.02] hover:shadow-lg text-blue-900 group">
-                                    <span className="text-4xl md:text-5xl lg:text-6xl font-serif font-black uppercase tracking-tight group-hover:text-blue-700 transition-colors">New</span>
-                                    <span className="text-2xl md:text-3xl lg:text-4xl font-serif italic text-blue-700/70">Testament</span>
-                                </button>
-                            </div>
-                         </div>
-                    )}
-
-                    {/* Book / Chapter / Verse Views (Full Spread - Split Left/Right) */}
-                    {step !== 'testament' && (
-                        <div className="flex flex-col flex-1 min-h-0 w-full p-4 md:p-8 pt-20 md:pt-20 bg-gradient-to-r from-stone-50 to-transparent overflow-y-auto">
-
-                             {/* Mobile Titles */}
-                             <div className="md:hidden text-center mb-6 mt-0">
-                                {step === 'book' && <h2 className="text-2xl font-serif font-black uppercase text-stone-800">Select Book</h2>}
-                                {step === 'chapter' && <h2 className="text-xl font-serif font-black uppercase text-stone-800">Select Chapter</h2>}
-                                {step === 'verse' && <h2 className="text-xl font-serif font-black uppercase text-stone-800">Select Verse</h2>}
-                            </div>
-
-                             {/* Chunk Selectors for Chapter/Verse */}
-                             {(step === 'chapter' || step === 'verse') && (
-                                <div className="flex flex-wrap gap-2 mb-6 justify-center sticky top-0 bg-stone-50/90 backdrop-blur pb-2 z-10 pt-2">
-                                    {(step === 'chapter' ? chapterChunks : verseChunks).length > 1 && (step === 'chapter' ? chapterChunks : verseChunks).map((chunk, idx) => (
-                                        <button key={idx} onClick={() => step === 'chapter' ? setChapterGroupIndex(idx) : setVerseGroupIndex(idx)} className={`px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${(step === 'chapter' ? chapterGroupIndex : verseGroupIndex) === idx ? 'bg-amber-600 text-white shadow-md' : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'}`}>
-                                            {`${chunk[0]}-${chunk[chunk.length-1]}`}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Mobile Single Column / Desktop Split Pages Container */}
-                            <div className="flex flex-col md:flex-row flex-1 w-full relative">
-                                {/* Spine separator (Desktop only) */}
-                                <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-px bg-stone-300 shadow-[0_0_15px_1px_rgba(0,0,0,0.1)] -translate-x-1/2"></div>
-
-                                {/* Mobile Unified List (Hidden on Desktop) */}
-                                <div className="flex-1 md:hidden pb-12">
-                                    <div className={`grid ${step === 'book' ? 'grid-cols-3 sm:grid-cols-4' : 'grid-cols-5 sm:grid-cols-6'} gap-2 content-start`}>
-                                        {step === 'book' && displayBooks.map(b => (
-                                            <button key={b} onClick={() => handleBookSelect(b)} className="bg-white border border-stone-200 hover:border-amber-400 hover:bg-amber-50 hover:shadow-md rounded-lg p-2 flex flex-col items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 group">
-                                                <span className="text-lg font-black text-stone-800 group-hover:text-amber-700 uppercase">{b}</span>
-                                                <span className="text-[9px] text-stone-500 truncate w-full text-center mt-1">{BOOK_NAMES[b]}</span>
-                                            </button>
-                                        ))}
-                                        {step === 'chapter' && currentChapterChunk.map(c => (
-                                            <button key={c} onClick={() => handleChapterSelect(c)} className="bg-white border border-stone-200 hover:border-amber-400 hover:bg-amber-50 shadow-sm hover:shadow-md rounded-lg p-2 flex items-center justify-center font-bold text-lg text-stone-700 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                                {c}
-                                            </button>
-                                        ))}
-                                         {step === 'verse' && currentVerseChunk.map(v => (
-                                            <button key={v} onClick={() => handleVerseSelect(v)} className="bg-white border border-stone-200 hover:border-amber-400 hover:bg-amber-50 shadow-sm hover:shadow-md rounded-lg p-2 flex items-center justify-center font-bold text-lg text-stone-700 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                                {v}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Desktop Left Page Bucket (Hidden on Mobile) */}
-                                <div className="hidden md:flex flex-1 pr-8 lg:pr-12 pb-8">
-                                    <div className={`grid ${step === 'book' ? 'grid-cols-4' : 'grid-cols-5'} gap-3 content-start w-full`}>
-                                        {step === 'book' && leftBooks.map(b => (
-                                            <button key={b} onClick={() => handleBookSelect(b)} className="bg-white border border-stone-200 hover:border-amber-400 hover:bg-amber-50 hover:shadow-md rounded-lg p-2 flex flex-col items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 group">
-                                                <span className="text-xl font-black text-stone-800 group-hover:text-amber-700 uppercase">{b}</span>
-                                                <span className="text-[10px] text-stone-500 truncate w-full text-center mt-1">{BOOK_NAMES[b]}</span>
-                                            </button>
-                                        ))}
-                                        {step === 'chapter' && leftChapters.map(c => (
-                                            <button key={c} onClick={() => handleChapterSelect(c)} className="bg-white border border-stone-200 hover:border-amber-400 hover:bg-amber-50 shadow-sm hover:shadow-md rounded-lg p-3 flex items-center justify-center font-bold text-lg text-stone-700 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                                {c}
-                                            </button>
-                                        ))}
-                                         {step === 'verse' && leftVerses.map(v => (
-                                            <button key={v} onClick={() => handleVerseSelect(v)} className="bg-white border border-stone-200 hover:border-amber-400 hover:bg-amber-50 shadow-sm hover:shadow-md rounded-lg p-3 flex items-center justify-center font-bold text-lg text-stone-700 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                                {v}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Desktop Right Page Bucket (Hidden on Mobile) */}
-                                <div className="hidden md:flex flex-1 pl-8 lg:pl-12 pt-0 w-full">
-                                    <div className={`grid ${step === 'book' ? 'grid-cols-4' : 'grid-cols-5'} gap-3 content-start w-full`}>
-                                         {step === 'book' && rightBooks.map(b => (
-                                            <button key={b} onClick={() => handleBookSelect(b)} className="bg-white border border-stone-200 hover:border-amber-400 hover:bg-amber-50 hover:shadow-md rounded-lg p-2 flex flex-col items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 group">
-                                                <span className="text-xl font-black text-stone-800 group-hover:text-amber-700 uppercase">{b}</span>
-                                                <span className="text-[10px] text-stone-500 truncate w-full text-center mt-1">{BOOK_NAMES[b]}</span>
-                                            </button>
-                                        ))}
-                                        {step === 'chapter' && rightChapters.map(c => (
-                                            <button key={c} onClick={() => handleChapterSelect(c)} className="bg-white border border-stone-200 hover:border-amber-400 hover:bg-amber-50 shadow-sm hover:shadow-md rounded-lg p-3 flex items-center justify-center font-bold text-lg text-stone-700 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                                {c}
-                                            </button>
-                                        ))}
-                                         {step === 'verse' && rightVerses.map(v => (
-                                            <button key={v} onClick={() => handleVerseSelect(v)} className="bg-white border border-stone-200 hover:border-amber-400 hover:bg-amber-50 shadow-sm hover:shadow-md rounded-lg p-3 flex items-center justify-center font-bold text-lg text-stone-700 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                                {v}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
+                        <div className="flex flex-col gap-3 h-full justify-center px-4 py-8">
+                            <button onClick={() => handleTestamentSelect('OT')} className="flex-1 min-h-[140px] max-h-[200px] bg-white border-2 border-stone-300 rounded-xl flex flex-col items-center justify-center gap-1 shadow-sm hover:border-amber-500 hover:bg-amber-50 transition-all focus:outline-none focus:ring-4 focus:ring-amber-500/50">
+                                <span className="text-4xl sm:text-5xl font-serif font-black uppercase text-stone-800 tracking-tighter">Old</span>
+                                <span className="text-xl sm:text-2xl font-serif italic text-stone-500">Testament</span>
+                            </button>
+                            <button onClick={() => handleTestamentSelect('NT')} className="flex-1 min-h-[140px] max-h-[200px] bg-white border-2 border-stone-300 rounded-xl flex flex-col items-center justify-center gap-1 shadow-sm hover:border-blue-500 hover:bg-blue-50 transition-all focus:outline-none focus:ring-4 focus:ring-blue-500/50">
+                                <span className="text-4xl sm:text-5xl font-serif font-black uppercase text-stone-800 tracking-tighter">New</span>
+                                <span className="text-xl sm:text-2xl font-serif italic text-stone-500">Testament</span>
+                            </button>
                         </div>
                     )}
+
+                    {step === 'book' && (
+                        <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2 content-start">
+                            {displayBooks.map(b => (
+                                <button key={b} onClick={() => handleBookSelect(b)} className="bg-white border border-stone-300 rounded p-1.5 flex flex-col items-center justify-center shadow-sm hover:border-amber-500 hover:bg-amber-50 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[64px]">
+                                    <span className="text-lg sm:text-xl font-black text-stone-900 uppercase leading-none">{b}</span>
+                                    <span className="text-[9px] sm:text-[10px] text-stone-500 truncate w-full text-center mt-1 leading-none">{BOOK_NAMES[b]}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {(step === 'chapter' || step === 'verse') && (
+                        <div className="grid grid-cols-5 sm:grid-cols-7 gap-1.5 sm:gap-2 content-start pb-8">
+                            {currentItems.map(item => (
+                                <button key={item} onClick={() => step === 'chapter' ? handleChapterSelect(item) : handleVerseSelect(item)} className="bg-white border border-stone-300 rounded shadow-sm hover:border-amber-500 hover:bg-amber-50 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 flex items-center justify-center aspect-square text-lg sm:text-xl font-black text-stone-800 leading-none">
+                                    {item}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
                 </div>
             </div>
         </div>
     );
 }
+
 // --- END BIBLE BROWSE DIALOG ---
 
 function App() {
