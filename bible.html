@@ -722,15 +722,17 @@ function App() {
       if (loading || !selectedBook || !selectedChapter) return;
 
       const save = () => {
-          const state = { book: selectedBook, chapter: selectedChapter, verseId: activeVerseId };
+          // Force the URL to prioritize targetScrollVerse until it is explicitly cleared
+          const vToSave = targetScrollVerse || activeVerseId || activeVerseIdRef.current;
+          const state = { book: selectedBook, chapter: selectedChapter, verseId: vToSave };
           localStorage.setItem('bible_browser_state', JSON.stringify(state));
 
           const url = new URL(window.location);
           url.searchParams.set('book', selectedBook);
           url.searchParams.set('chapter', selectedChapter);
 
-          if (activeVerseId) {
-              const parts = activeVerseId.split('.');
+          if (vToSave) {
+              const parts = vToSave.split('.');
               if (parts.length === 3) url.searchParams.set('verse', parts[2]);
           } else {
               url.searchParams.delete('verse');
@@ -741,61 +743,144 @@ function App() {
       // Debounce saves
       const handler = setTimeout(save, 500);
       return () => clearTimeout(handler);
-  }, [selectedBook, selectedChapter, activeVerseId, loading]);
+  }, [selectedBook, selectedChapter, activeVerseId, loading, targetScrollVerse]); // Ensure targetScrollVerse is in dependency array
 
   // Scroll Restoration
   useEffect(() => {
+      // Don't attempt scroll until loading is finished and data is present
       if (!loading && targetScrollVerse && verseMap && sortedVids.length > 0) {
-          let resolvedVid = null;
 
-          console.log("targetScrollVerse:", targetScrollVerse);
-          console.log("focalTranslation:", focalTranslation);
+          let cleanTarget = targetScrollVerse;
+          if (cleanTarget.split('.').length === 3) {
+             const [b, c, v] = cleanTarget.split('.');
+             cleanTarget = `${b}.${c}.${parseInt(v)}`; // ensure v is clean integer string
+          }
 
-          // targetScrollVerse is usually requested based on KJV/LSV from the dialog.
+          // If the targetScrollVerse is exactly in our sortedVids (e.g. from the dialog), use it immediately
+          let resolvedVid = sortedVids.includes(cleanTarget) ? cleanTarget : null;
+
           // We search verseMap to see if the focalTranslation (or any translation) has a matching displayVid.
-          // e.g. targetScrollVerse = "PSA.51.1"
-          for (const vid of sortedVids) {
-              const translations = verseMap[vid];
-              if (!translations) continue;
+          if (!resolvedVid) {
+              const searchTarget = cleanTarget;
+              for (const vid of sortedVids) {
+                  const translations = verseMap[vid];
+                  if (!translations) continue;
 
-              // Check focal first
-              if (focalTranslation && translations[focalTranslation]?.displayVid === targetScrollVerse) {
-                  resolvedVid = vid;
-                  break;
-              }
-
-              // Fallback to checking any translation
-              for (const key in translations) {
-                  if (translations[key]?.displayVid === targetScrollVerse) {
+                  // Check focal first
+                  if (focalTranslation && translations[focalTranslation]?.displayVid === searchTarget) {
                       resolvedVid = vid;
                       break;
                   }
-              }
-              if (resolvedVid) {
-                  console.log("Resolved via translation displayVid:", resolvedVid);
-                  break;
+
+                  // Fallback to checking any translation
+                  for (const key in translations) {
+                      if (translations[key]?.displayVid === searchTarget) {
+                          resolvedVid = vid;
+                          break;
+                      }
+                  }
+                  if (resolvedVid) {
+                      console.log("Resolved via translation displayVid:", resolvedVid);
+                      break;
+                  }
               }
           }
 
-          // Fallback to exact match (in case it IS an original vid or URL match)
-          if (!resolvedVid && sortedVids.includes(targetScrollVerse)) {
-              resolvedVid = targetScrollVerse;
-              console.log("Resolved via exact match:", resolvedVid);
+          // Third fallback: we know it's missing from the data exactly, but maybe it's combined into a range
+          // Check if any visible display string contains the target verse (e.g., "PSA.119.150-PSA.119.151")
+          if (!resolvedVid && cleanTarget.split('.').length === 3) {
+              const [, , targetV] = cleanTarget.split('.');
+              const targetInt = parseInt(targetV);
+
+              for (const vid of sortedVids) {
+                  const translations = verseMap[vid];
+                  if (!translations) continue;
+
+                  const fData = translations[focalTranslation];
+                  if (fData && fData.displayVid) {
+                     const parts = fData.displayVid.split('-');
+                     if (parts.length === 2 && parts[0].includes('.') && parts[1].includes('.')) {
+                         const startV = parseInt(parts[0].split('.')[2]);
+                         const endV = parseInt(parts[1].split('.')[2]);
+                         if (targetInt >= startV && targetInt <= endV) {
+                             resolvedVid = vid;
+                             console.log("Resolved via translation displayVid range fallback:", resolvedVid);
+                             break;
+                         }
+                     }
+                  }
+              }
+          }
+
+          // Final fallback: if the target verse is completely missing (not in ranges or exact IDs),
+          // fallback to the closest preceding verse to at least get them to the right general area,
+          // instead of failing silently and causing URL to clear/overwrite.
+          if (!resolvedVid && cleanTarget.split('.').length === 3) {
+              const targetV = parseInt(cleanTarget.split('.')[2]);
+              let bestDiff = Infinity;
+
+              for (const vId of sortedVids) {
+                  const curV = parseInt(vId.split('.')[2]);
+                  const diff = Math.abs(curV - targetV);
+                  if (diff < bestDiff) {
+                      bestDiff = diff;
+                      resolvedVid = vId;
+                  }
+              }
+              console.log("Resolved via closest visible verse fallback:", resolvedVid);
+          }
+
+          if (!resolvedVid && sortedVids.length > 0) {
+              resolvedVid = sortedVids[0];
+          }
+
+          // Exact match was handled above.
+          // If the target verse doesn't exist in our sparse data, default to the closest visible verse
+          // to prevent the target scroll loop from clearing the URL entirely.
+          if (!resolvedVid) {
+              // Attempt to find the closest verse in the chapter
+              const [b, c, v] = cleanTarget.split('.');
+              const targetV = parseInt(v);
+              let closestVid = sortedVids[0];
+              let minDiff = Infinity;
+
+              for (const vId of sortedVids) {
+                  const curV = parseInt(vId.split('.')[2]);
+                  const diff = Math.abs(curV - targetV);
+                  if (diff < minDiff) {
+                      minDiff = diff;
+                      closestVid = vId;
+                  }
+              }
+              resolvedVid = closestVid;
           }
 
           if (resolvedVid) {
-              // Wait a tick for React to commit and browser to paint the VerseGroup elements
-              setTimeout(() => {
+              let attempts = 0;
+              let foundAndScrolled = 0;
+              const tryScroll = () => {
                   const el = document.getElementById(`verse-${resolvedVid}`);
                   if (el) {
-                      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      el.scrollIntoView({ behavior: 'auto', block: 'center' });
                       setActiveVerseId(resolvedVid);
+                      foundAndScrolled++;
+
+                      if (foundAndScrolled < 3) {
+                          setTimeout(tryScroll, 150);
+                      } else {
+                          // Final scroll using smooth behavior to ensure it lands exactly where intended
+                          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          setTargetScrollVerse(null);
+                      }
+                  } else if (attempts < 20) {
+                      attempts++;
+                      setTimeout(tryScroll, 50);
+                  } else {
+                      setTargetScrollVerse(null);
                   }
-                  // Clear it after attempting to scroll so we don't re-trigger
-                  setTargetScrollVerse(null);
-              }, 50);
+              };
+              setTimeout(tryScroll, 50);
           } else {
-             // If we can't resolve it at all, clear it
              setTargetScrollVerse(null);
           }
       }
@@ -893,7 +978,7 @@ function App() {
 
   // Observer for Scroll Tracking
   useEffect(() => {
-    if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0) return;
+    if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0 || targetScrollVerse) return;
     const observer = new IntersectionObserver((entries) => {
       const intersecting = entries.filter(e => e.isIntersecting);
       if (intersecting.length > 0) {
