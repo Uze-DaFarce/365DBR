@@ -38,3 +38,7 @@
 ## 2025-05-15 - Async Font Loading & Favicon Fix
 **Learning:** Strict CSP prevents inline `onload` handlers for font loading. Using an external `async` script (`js/load-fonts.js`) allows earlier font activation than `defer`, improving FCP. Also, missing favicons caused 404s; replaced with `pics/logo.png`.
 **Action:** Use external async scripts for critical resource activation under strict CSP. Verify asset existence to avoid 404s.
+
+## 2026-03-04 - DOM Read/Write Interleaving
+**Learning:** During element initialization (like scroll reveals), iterating through elements and performing a DOM layout read (e.g. `getBoundingClientRect()`) followed immediately by a DOM write (e.g. `classList.add()`) inside the same loop forces the browser to recalculate the layout synchronously for each element, causing severe layout thrashing.
+**Action:** Always separate DOM reads and writes into distinct phases (a read loop followed by a write loop) to allow the browser to batch layout recalculations and optimize rendering performance.

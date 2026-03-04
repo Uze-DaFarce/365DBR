@@ -198,7 +198,7 @@ const progressBar = document.getElementById('scroll-progress');
 // Throttling scroll events with requestAnimationFrame to reduce main thread blocking
 // and minimizing DOM updates to prevent layout thrashing.
 let isTicking = false;
-let lastActiveLink = null;
+let lastActiveLink = document.querySelector('nav a.active') || null;
 let isBackToTopVisible = false;
 
 function onScroll() {
@@ -227,22 +227,24 @@ function updateScrollState() {
 
   // Only update DOM if active link changed
   if (activeLink !== lastActiveLink) {
-    navLinks.forEach(link => {
-      if (link === activeLink) {
-        link.classList.add('active');
-        link.setAttribute('aria-current', 'page');
+    // ⚡ Bolt: Optimize Active Nav State - O(1) DOM updates instead of O(N) loop
+    if (lastActiveLink) {
+      lastActiveLink.classList.remove('active');
+      lastActiveLink.removeAttribute('aria-current');
+    }
 
-        // 🎨 Palette: Ensure active link is visible in scrollable mobile nav
-        link.scrollIntoView({
-          behavior: 'smooth',
-          inline: 'center',
-          block: 'nearest'
-        });
-      } else {
-        link.classList.remove('active');
-        link.removeAttribute('aria-current');
-      }
-    });
+    if (activeLink) {
+      activeLink.classList.add('active');
+      activeLink.setAttribute('aria-current', 'page');
+
+      // 🎨 Palette: Ensure active link is visible in scrollable mobile nav
+      activeLink.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest'
+      });
+    }
+
     lastActiveLink = activeLink;
   }
 
@@ -426,15 +428,21 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 if (!prefersReducedMotion) {
   const revealElements = document.querySelectorAll('.service-card, .project-card, .package-card, .team-member, .review-card, .contact-info');
 
+  // ⚡ Bolt: Split into Read and Write phases to prevent layout thrashing
+  // Phase 1: Read phase
+  const elementsToAnimate = [];
   revealElements.forEach(el => {
-    // Only animate elements that are NOT already in the viewport
     const rect = el.getBoundingClientRect();
     const isAlreadyVisible = rect.top < window.innerHeight;
-
     if (!isAlreadyVisible) {
-      el.classList.add('reveal-on-scroll');
-      revealObserver.observe(el);
+      elementsToAnimate.push(el);
     }
+  });
+
+  // Phase 2: Write phase
+  elementsToAnimate.forEach(el => {
+    el.classList.add('reveal-on-scroll');
+    revealObserver.observe(el);
   });
 }
 
