@@ -2341,7 +2341,7 @@
   },
   {
     "day": "0918",
-    "api_format": "ECC.12.1-SON.3.11,2CO.3.1-2CO.3.18,PSA.107.22-PSA.107.28,PRO.23.9-PRO.23.11",
+    "api_format": "ECC.12.1-SNG.3.11,2CO.3.1-2CO.3.18,PSA.107.22-PSA.107.28,PRO.23.9-PRO.23.11",
     "text_friendly": "Ecclesiastes 12:1 \u2013 Song of Solomon 3:11, 2 Corinthians 3:1\u201318, Psalms 107:22\u201328, Proverbs 23:9\u201311",
     "ot_verse_count": 59,
     "nt_verse_count": 18,
@@ -2350,7 +2350,7 @@
   },
   {
     "day": "0919",
-    "api_format": "SON.4.1-SON.7.14,2CO.4.1-2CO.4.18,PSA.107.29-PSA.107.34,PRO.23.12-PRO.23.13",
+    "api_format": "SNG.4.1-SNG.7.14,2CO.4.1-2CO.4.18,PSA.107.29-PSA.107.34,PRO.23.12-PRO.23.13",
     "text_friendly": "Song of Solomon 4:1 \u2013 7:14, 2 Corinthians 4:1\u201318, Psalms 107:29\u201334, Proverbs 23:12\u201313",
     "ot_verse_count": 58,
     "nt_verse_count": 18,
@@ -2359,7 +2359,7 @@
   },
   {
     "day": "0920",
-    "api_format": "SON.8.1-ISA.2.8,2CO.5.1-2CO.5.21,PSA.107.35-PSA.107.43,PRO.23.14-PRO.23.16",
+    "api_format": "SNG.8.1-ISA.2.8,2CO.5.1-2CO.5.21,PSA.107.35-PSA.107.43,PRO.23.14-PRO.23.16",
     "text_friendly": "Song of Solomon 8:1 \u2013 Isaiah 2:8, 2 Corinthians 5:1\u201321, Psalms 107:35\u201343, Proverbs 23:14\u201316",
     "ot_verse_count": 53,
     "nt_verse_count": 21,
@@ -3142,7 +3142,7 @@
   },
   {
     "day": "1216",
-    "api_format": "HOS.14.1-JOE.2.27,REV.2.24-REV.3.22,PSA.143.4-PSA.143.9,PRO.30.25-PRO.30.26",
+    "api_format": "HOS.14.1-JOL.2.27,REV.2.24-REV.3.22,PSA.143.4-PSA.143.9,PRO.30.25-PRO.30.26",
     "text_friendly": "Hosea 14:1 \u2013 Joel 2:27, Revelation 2:24 \u2013 3:22, Psalms 143:4\u20139, Proverbs 30:25\u201326",
     "ot_verse_count": 57,
     "nt_verse_count": 28,
@@ -3151,7 +3151,7 @@
   },
   {
     "day": "1217",
-    "api_format": "JOE.3.1-AMO.2.16,REV.4.1-REV.5.14,PSA.143.10-PSA.144.4,PRO.30.27-PRO.30.29",
+    "api_format": "JOL.3.1-AMO.2.16,REV.4.1-REV.5.14,PSA.143.10-PSA.144.4,PRO.30.27-PRO.30.29",
     "text_friendly": "Joel 3:1 \u2013 Amos 2:16, Revelation 4:1 \u2013 5:14, Psalms 143:10 \u2013 144:4, Proverbs 30:27\u201329",
     "ot_verse_count": 57,
     "nt_verse_count": 25,
@@ -3205,7 +3205,7 @@
   },
   {
     "day": "1223",
-    "api_format": "MIC.7.1-NAH.2.14,REV.12.1-REV.13.6,PSA.146.1-PSA.146.7,PRO.31.9-PRO.31.11",
+    "api_format": "MIC.7.1-NAM.2.14,REV.12.1-REV.13.6,PSA.146.1-PSA.146.7,PRO.31.9-PRO.31.11",
     "text_friendly": "Micah 7:1 \u2013 Nahum 2:14, Revelation 12:1 \u2013 13:6, Psalms 146:1\u20137, Proverbs 31:9\u201311",
     "ot_verse_count": 48,
     "nt_verse_count": 23,
@@ -3214,7 +3214,7 @@
   },
   {
     "day": "1224",
-    "api_format": "NAH.3.1-HAB.2.20,REV.13.7-REV.14.11,PSA.146.8-PSA.147.3,PRO.31.12-PRO.31.13",
+    "api_format": "NAM.3.1-HAB.2.20,REV.13.7-REV.14.11,PSA.146.8-PSA.147.3,PRO.31.12-PRO.31.13",
     "text_friendly": "Nahum 3:1 \u2013 Habakkuk 2:20, Revelation 13:7 \u2013 14:11, Psalms 146:8 \u2013 147:3, Proverbs 31:12\u201313",
     "ot_verse_count": 56,
     "nt_verse_count": 23,
