@@ -1,3 +1,7 @@
+# 🛡️ Sentinel: Server Hardening
+# Prevent server version information leakage
+ServerSignature Off
+
 <IfModule mod_autoindex.c>
   # 🛡️ Sentinel: Disable directory listing
   # Prevents attackers from enumerating files in directories like /pics or /css
@@ -5,6 +9,9 @@
 </IfModule>
 
 <IfModule mod_headers.c>
+  # 🛡️ Sentinel: Prevent technology stack leakage
+  Header unset X-Powered-By
+
   # 🛡️ Sentinel: Security Headers Enhancement
   # Added to enforce strict security policies at the server level (Apache)
 
@@ -35,6 +42,7 @@
   # Ensures that the page is isolated in its own browsing context, preventing cross-origin attacks (Spectre)
   # and interactions from other windows (e.g. malicious popups).
   Header set Cross-Origin-Opener-Policy "same-origin"
+  Header set Cross-Origin-Resource-Policy "same-site"
 
   # Content Security Policy (CSP)
   # Matches index.html policy but adds 'frame-ancestors' (ignored in meta tags) for anti-framing protection.
@@ -49,10 +57,10 @@
   RedirectMatch 403 "(^|/)\.(?!well-known(?:$|/))"
 
   # 🛡️ Sentinel: Block access to sensitive source/config files
-  # Prevents leakage of internal documentation, logs, and scripts
-  # Blocks: .py, .log, .sh, .bak, .swp
+  # Prevents leakage of internal documentation, logs, scripts, and database files
+  # Blocks: .py, .log, .sh, .bak, .swp, .env, .sql, .conf, .ini, .yml, .yaml, .sqlite, .db
   # Note: .md is allowed as sub-sites (like 365DBR) may serve markdown content
-  RedirectMatch 403 "(?i)\.(py|log|sh|bak|swp)$"
+  RedirectMatch 403 "(?i)\.(py|log|sh|bak|swp|env|sql|conf|ini|yml|yaml|sqlite|db)$"
 </IfModule>
 
 <IfModule mod_deflate.c>

@@ -53,3 +53,8 @@
 **Vulnerability:** Users clicking on insecure (http) links to Google Forms bypass the security overlay warning, potentially reducing awareness of leaving the site.
 **Learning:** Protocol-specific selectors (like `href^="https://"`) are fragile and can be bypassed by simple protocol changes or typos, even if the destination eventually redirects to HTTPS.
 **Prevention:** Use protocol-agnostic selectors or explicitly include both `http` and `https` variants to ensure consistent behavior regardless of the link format.
+
+## 2026-03-04 - Comprehensive Server Hardening
+**Vulnerability:** Incomplete server hardening can lead to piecemeal information leakage (e.g., server version, tech stack), and access to unexpected sensitive file types (.env, .db).
+**Learning:** Fixing security issues incrementally in Apache configuration wastes time and leaves windows of vulnerability. However, blocking HTTP methods globally using `mod_rewrite` is risky and can break sub-sites relying on full REST APIs.
+**Prevention:** Consolidated safe server hardening in `.htaccess`: added `ServerSignature Off`, unset `X-Powered-By`, added CORP (`Cross-Origin-Resource-Policy`) for Spectre mitigation, and exhaustively expanded `RedirectMatch` to block common config/database file extensions.
