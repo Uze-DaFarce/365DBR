@@ -53,6 +53,10 @@ def setup_data_interception(page, base_url):
                 if split_token in url:
                     rel_path = url.split(split_token)[1]
 
+                    if ".." in rel_path:
+                        route.abort('accessdenied')
+                        return
+
                     # 1. Check Local File
                     local_path = os.path.join(DATA_DIR, rel_path.replace("/", os.sep))
                     if os.path.exists(local_path) and os.path.isfile(local_path):
@@ -111,19 +115,16 @@ def compile_readings(page, readings, base_url, limit=None):
         try:
             response = page.goto(url, wait_until="networkidle")
             if not response:
-                print(f"\nFailed to load {url}: No response")
-                continue
+                raise RuntimeError(f"Failed to load {url}: No response")
 
             if response.status != 200:
-                print(f"\nFailed to load {url}: Status {response.status}")
-                continue
+                raise RuntimeError(f"Failed to load {url}: Status {response.status}")
 
             # Wait for content to load (verse blocks)
             try:
                 page.wait_for_selector(".verse-block", timeout=5000)
             except Exception as e:
-                print(f"\nTimeout waiting for content on {mmdd}. (Data likely missing in both Local and Production)")
-                continue
+                raise RuntimeError(f"Timeout waiting for content on {mmdd}. (Data likely missing in both Local and Production)") from e
 
             # --- Data Embedding Logic ---
 
@@ -184,7 +185,7 @@ def compile_readings(page, readings, base_url, limit=None):
                 f.write(content)
 
         except Exception as e:
-            print(f"\nError processing {mmdd}: {e}")
+            raise RuntimeError(f"Error processing {mmdd}: {e}") from e
 
     print("\nDaily Readings Compilation Complete.        ")
 

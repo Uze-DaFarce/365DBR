@@ -130,17 +130,14 @@ def verify_local_content(readings_path):
             # We only error if the directory exists but manifest is missing,
             # OR if we want to enforce all days must exist (but that might be too strict if incremental).
             if os.path.exists(day_dir):
-                 print(f"❌ {day_id}: Day directory exists but manifest is missing!")
-                 errors += 1
+                 raise ValueError(f"❌ {day_id}: Day directory exists but manifest is missing!")
             continue
 
         try:
             with open(manifest_path, 'r', encoding='utf-8') as f:
                 manifest = json.load(f)
         except json.JSONDecodeError:
-            print(f"❌ {day_id}: Manifest is corrupt JSON!")
-            errors += 1
-            continue
+            raise ValueError(f"❌ {day_id}: Manifest is corrupt JSON!")
 
         files = manifest.get('files', [])
         if not files:
@@ -148,11 +145,11 @@ def verify_local_content(readings_path):
             continue
 
         for filename in files:
+            if ".." in filename:
+                raise ValueError(f"Path traversal detected in filename: {filename}")
             filepath = os.path.join(day_dir, filename)
             if not os.path.exists(filepath):
-                print(f"❌ {day_id}: Missing file listed in manifest: {filename}")
-                errors += 1
-                continue
+                raise ValueError(f"❌ {day_id}: Missing file listed in manifest: {filename}")
 
             # Infer range from filename (e.g. "GEN.1.1-GEN.1.5.json")
             range_str = filename.replace('.json', '')
@@ -171,15 +168,12 @@ def verify_local_content(readings_path):
 
                 checked_files += 1
 
-            except json.JSONDecodeError:
-                 print(f"❌ {day_id}/{filename}: Corrupt JSON!")
-                 errors += 1
+            except json.JSONDecodeError as e:
+                 raise ValueError(f"❌ {day_id}/{filename}: Corrupt JSON!") from e
             except ValueError as e:
-                 print(f"❌ {day_id}/{filename}: Content Error: {e}")
-                 errors += 1
+                 raise ValueError(f"❌ {day_id}/{filename}: Content Error: {e}") from e
             except Exception as e:
-                 print(f"❌ {day_id}/{filename}: Unexpected Error: {e}")
-                 errors += 1
+                 raise ValueError(f"❌ {day_id}/{filename}: Unexpected Error: {e}") from e
 
     if errors == 0:
         if checked_files == 0:
