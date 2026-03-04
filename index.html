@@ -534,6 +534,14 @@ const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
     return parts.join(', ');
 };
 
+function BookmarkIcon({ onBookmark, ...props }) {
+    return (
+        <button {...props} onClick={(e) => { e.stopPropagation(); onBookmark(); }} type="button" className="ml-1 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 print:hidden" aria-label="Bookmark verse" title="Bookmark verse">
+            <svg className="h-3 w-3 text-stone-400 hover:text-stone-900 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+        </button>
+    );
+}
+
 const CopyButton = ({ text, reference, version, ...props }) => {
     const [status, setStatus] = useState('idle');
 
@@ -578,7 +586,7 @@ const CopyButton = ({ text, reference, version, ...props }) => {
     );
 };
 
-const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying }) => {
+const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying, onBookmark }) => {
     const vid = group[0];
     const book = vid.substring(0, 3);
     const sectionIndex = getSectionIndex(vid);
@@ -671,13 +679,16 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                         <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-mono font-bold ${isActive ? 'text-amber-500' : 'text-stone-400'} uppercase`}>
                              <span>{displayLabel}</span>
                              {!isPlaying && (
-                                <CopyButton
-                                    text={text}
-                                    reference={displayLabel}
-                                    version={isHebrew ? 'OH' : 'OG'}
-                                    tabIndex={isActive ? 0 : -1}
-                                    aria-hidden={!isActive}
-                                />
+                                <div className="flex items-center">
+                                    <CopyButton
+                                        text={text}
+                                        reference={displayLabel}
+                                        version={isHebrew ? 'OH' : 'OG'}
+                                        tabIndex={isActive ? 0 : -1}
+                                        aria-hidden={!isActive}
+                                    />
+                                    <BookmarkIcon onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                </div>
                              )}
                         </div>
                     </div>
@@ -698,13 +709,16 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                     <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>
                         <span>{displayLabel}</span>
                         {!isPlaying && dynamicSlots.middle.source && (
-                            <CopyButton
-                                text={text}
-                                reference={displayLabel}
-                                version={dynamicSlots.middle.source.toUpperCase()}
-                                tabIndex={isActive ? 0 : -1}
-                                aria-hidden={!isActive}
-                            />
+                            <div className="flex items-center">
+                                <CopyButton
+                                    text={text}
+                                    reference={displayLabel}
+                                    version={dynamicSlots.middle.source.toUpperCase()}
+                                    tabIndex={isActive ? 0 : -1}
+                                    aria-hidden={!isActive}
+                                />
+                                <BookmarkIcon onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                            </div>
                         )}
                     </div>
                     </div>
@@ -893,6 +907,95 @@ const ReadingProgress = React.memo(({ sectionIndex }) => {
   );
 });
 
+
+const BookmarkButton = ({ onClick, color, number, isUsed }) => (
+    <button
+        onClick={onClick}
+        type="button"
+        title={`Bookmark Slot ${number}`}
+        className={`w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-stone-400 transition-colors ${
+            isUsed
+                ? `${color} text-white shadow-sm border border-black/10 hover:brightness-110`
+                : 'bg-stone-200 text-stone-400 hover:bg-stone-300 border border-stone-300'
+        }`}
+    >
+        {number}
+    </button>
+);
+
+const BookmarkDialog = ({ isOpen, onClose, bookmarks, onSave, onGoTo, currentContext }) => {
+    if (!isOpen) return null;
+
+    const COLORS = [
+        'bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-amber-500', 'bg-purple-500'
+    ];
+
+    const slots = [1, 2, 3, 4, 5];
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm print:hidden">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="px-4 py-3 border-b border-stone-200 flex justify-between items-center bg-stone-50">
+                    <h2 className="text-sm font-black text-stone-800 uppercase tracking-wider">Bookmarks</h2>
+                    <button onClick={onClose} className="p-1 text-stone-400 hover:text-stone-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
+                <div className="p-2 overflow-y-auto min-h-0 flex-1 flex flex-col gap-2">
+                    {slots.map((slotNum) => {
+                        const bm = bookmarks[slotNum];
+                        const isUsed = !!bm;
+                        const isCurrentLocation = isUsed && bm.book === currentContext?.book && bm.chapter === currentContext?.chapter;
+
+                        return (
+                            <div key={slotNum} className="flex items-center gap-3 p-2 border border-stone-200 rounded-lg hover:border-stone-300 bg-white transition-colors">
+                                <BookmarkButton number={slotNum} color={COLORS[slotNum-1]} isUsed={isUsed} onClick={() => isUsed ? onGoTo(slotNum) : null} />
+
+                                <div className="flex-1 min-w-0">
+                                    {isUsed ? (
+                                        <div className="flex flex-col">
+                                            <span className="text-xs font-bold text-stone-800 truncate">{BOOK_NAMES[bm.book] || bm.book} {bm.chapter}</span>
+                                            <span className="text-[10px] text-stone-500 truncate">{new Date(bm.timestamp).toLocaleDateString()}</span>
+                                        </div>
+                                    ) : (
+                                        <span className="text-xs font-medium text-stone-400 italic">Empty Slot</span>
+                                    )}
+                                </div>
+
+                                <div className="flex gap-1 shrink-0">
+                                    <button
+                                        onClick={() => onSave(slotNum)}
+                                        className={`px-2 py-1.5 text-[10px] font-bold uppercase rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
+                                            isCurrentLocation
+                                                ? 'bg-stone-100 text-stone-400 cursor-not-allowed'
+                                                : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+                                        }`}
+                                        disabled={isCurrentLocation}
+                                        title={isCurrentLocation ? "Already bookmarked here" : isUsed ? "Overwrite Bookmark" : "Save Bookmark"}
+                                    >
+                                        {isUsed ? 'Update' : 'Save'}
+                                    </button>
+
+                                    {isUsed && (
+                                        <button
+                                            onClick={() => onGoTo(slotNum)}
+                                            className="px-2 py-1.5 text-[10px] font-bold uppercase bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                                            title="Go to Bookmark"
+                                        >
+                                            Go
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Header = React.memo(({
   isStatic,
   currentDate,
@@ -914,8 +1017,11 @@ const Header = React.memo(({
   handleFocalChange,
   playbackStatus,
   onStopPlayback,
-  handleToggle
+  handleToggle,
+  bookmarks,
+  onOpenBookmarks
 }) => {
+  const COLORS = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-amber-500', 'bg-purple-500'];
   return (
       <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm print:static print:border-none print:shadow-none">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 h-8 min-[450px]:h-10">
@@ -958,12 +1064,7 @@ const Header = React.memo(({
                         aria-label={isActive ? `Current section: ${sectionNames[i]}` : `Jump to ${sectionNames[i]}`}
                         aria-current={isActive ? 'step' : undefined}
                         aria-disabled={!isClickable && !isActive}
-                        className={`transition-all duration-500 flex items-center shrink-0 focus:outline-none focus-visible:ring-2 ${SECTION_THEMES[i]?.ring || 'focus-visible:ring-amber-500'} ${isActive
-                            ? `${SECTION_THEMES[i]?.bg || 'bg-amber-600'} px-2 py-0.5 rounded-full shadow-sm cursor-default`
-                            : isClickable
-                                ? 'px-1.5 py-0.5 rounded hover:bg-stone-200 cursor-pointer text-stone-500 hover:text-stone-800'
-                                : 'px-1.5 py-0.5 rounded cursor-default text-stone-400 opacity-50'
-                        }`}
+                        className={`transition-all duration-500 flex items-center shrink-0 focus:outline-none focus-visible:ring-2 ${SECTION_THEMES[i]?.ring || 'focus-visible:ring-amber-500'} ${isActive ? `${SECTION_THEMES[i]?.bg || 'bg-amber-600'} px-2 py-0.5 rounded-full shadow-sm cursor-default` : isClickable ? 'px-1.5 py-0.5 rounded hover:bg-stone-200 cursor-pointer text-stone-500 hover:text-stone-800' : 'px-1.5 py-0.5 rounded cursor-default text-stone-400 opacity-50'}`}
                     >
                         {isActive
                             ? <span className="text-[10px] min-[450px]:text-xs font-bold text-white whitespace-nowrap">{part}</span>
@@ -1211,6 +1312,18 @@ const App = () => {
   const [focalTranslation, setFocalTranslation] = useState(initialState.focal || null); // Slot 3 (Bottom)
   const [compareTranslation, setCompareTranslation] = useState(initialState.compare || null); // Slot 2 (Middle)
 
+  // Bookmarks State
+  const [bookmarks, setBookmarks] = useState(() => {
+    try {
+        const saved = localStorage.getItem('bible_browser_bookmarks');
+        return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+        return {};
+    }
+  });
+  const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
+  const [bookmarkDialogTarget, setBookmarkDialogTarget] = useState(null);
+
   // Scroll target for restoration
   const [targetScrollVerse, setTargetScrollVerse] = useState(initialState.verseId || null);
 
@@ -1378,6 +1491,35 @@ const App = () => {
   const synthRef = useRef(window.speechSynthesis);
   const isTransitioningRef = useRef(false);
   const playbackStatusRef = useRef('stopped'); // Track playback status in ref for callbacks
+
+  // Bookmark Handlers
+  const handleSaveBookmark = useCallback((slotNum, targetVidOverride) => {
+    // Current Context: DBR doesn't really have a single book/chapter, so we guess based on activeVerseId
+    const targetVid = targetVidOverride || activeVerseId;
+    if (!targetVid) return;
+    const [book, chapter, verse] = targetVid.split('.');
+
+    setBookmarks(prev => {
+        const next = { ...prev };
+        next[slotNum] = {
+            vid: targetVid,
+            book,
+            chapter: parseInt(chapter),
+            timestamp: Date.now(),
+            color: { bg: 'bg-stone-500', hover: 'hover:bg-stone-600', ring: 'focus:ring-stone-400' }
+        };
+        localStorage.setItem('bible_browser_bookmarks', JSON.stringify(next));
+        return next;
+    });
+  }, [activeVerseId]);
+
+  const handleGoToBookmark = useCallback((slotNum) => {
+    const bm = bookmarks[slotNum];
+    if (bm) {
+        setIsBookmarksOpen(false);
+        window.location.href = `bible.html?book=${bm.book}&chapter=${bm.chapter}`;
+    }
+  }, [bookmarks]);
 
   // Handler for Focal Translation change with auto-swap logic for Compare slot
   const handleFocalChange = useCallback((newFocal) => {
@@ -1819,6 +1961,14 @@ const App = () => {
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-stone-900 focus:text-white focus:font-bold focus:rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xl transition-all print:hidden">Skip to Content</a>
+      <BookmarkDialog
+        isOpen={isBookmarksOpen || !!bookmarkDialogTarget}
+        onClose={() => { setIsBookmarksOpen(false); setBookmarkDialogTarget(null); }}
+        bookmarks={bookmarks}
+        onSave={(slotNum) => handleSaveBookmark(slotNum, bookmarkDialogTarget)}
+        onGoTo={handleGoToBookmark}
+        currentContext={activeVerseId ? { book: activeVerseId.split('.')[0], chapter: parseInt(activeVerseId.split('.')[1]) } : null}
+      />
       <Header
         isStatic={isStatic}
         currentDate={currentDate}
@@ -1841,6 +1991,8 @@ const App = () => {
         playbackStatus={playbackStatus}
         onStopPlayback={onStopPlayback}
         handleToggle={handleToggle}
+        bookmarks={bookmarks}
+        onOpenBookmarks={() => setIsBookmarksOpen(true)}
       />
 
       <main id="main-content" tabIndex={-1} className="max-w-7xl mx-auto py-3 md:py-6 px-2 pb-32 md:pb-40 space-y-6 md:space-y-10 outline-none">
@@ -1866,6 +2018,7 @@ const App = () => {
                     isActive={isActive}
                     isDimmed={isDimmed}
                     isPlaying={isPlaying}
+                    onBookmark={(targetVid) => setBookmarkDialogTarget(targetVid)}
                 />
             );
         })}
