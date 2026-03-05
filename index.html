@@ -578,7 +578,15 @@ const CopyButton = ({ text, reference, version, ...props }) => {
     );
 };
 
-const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying }) => {
+const BookmarkButton = React.memo(({ onBookmark, ...props }) => {
+    return (
+        <button {...props} onClick={(e) => { e.stopPropagation(); onBookmark(); }} type="button" className="ml-1 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 print:hidden" aria-label="Bookmark verse" title="Bookmark verse">
+            <svg className="h-3 w-3 text-stone-400 hover:text-stone-900 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+        </button>
+    );
+});
+
+const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying, onBookmark }) => {
     const vid = group[0];
     const book = vid.substring(0, 3);
     const sectionIndex = getSectionIndex(vid);
@@ -742,6 +750,11 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                                     tabIndex={isActive ? 0 : -1}
                                     aria-hidden={!isActive}
                                 />
+                                <BookmarkButton
+                                    onBookmark={() => onBookmark(vid)}
+                                    tabIndex={isActive ? 0 : -1}
+                                    aria-hidden={!isActive}
+                                />
                             </span>
                         )}
                     </div>
@@ -893,6 +906,126 @@ const ReadingProgress = React.memo(({ sectionIndex }) => {
   );
 });
 
+// --- BOOKMARKS DIALOG ---
+const BOOKMARK_COLORS = [
+    { bg: 'bg-red-500', hover: 'hover:bg-red-600', ring: 'focus:ring-red-500', name: 'Red' },
+    { bg: 'bg-orange-500', hover: 'hover:bg-orange-600', ring: 'focus:ring-orange-500', name: 'Orange' },
+    { bg: 'bg-amber-500', hover: 'hover:bg-amber-600', ring: 'focus:ring-amber-500', name: 'Yellow' },
+    { bg: 'bg-green-500', hover: 'hover:bg-green-600', ring: 'focus:ring-green-500', name: 'Green' },
+    { bg: 'bg-blue-500', hover: 'hover:bg-blue-600', ring: 'focus:ring-blue-500', name: 'Blue' },
+    { bg: 'bg-indigo-500', hover: 'hover:bg-indigo-600', ring: 'focus:ring-indigo-500', name: 'Indigo' },
+    { bg: 'bg-purple-500', hover: 'hover:bg-purple-600', ring: 'focus:ring-purple-500', name: 'Purple' },
+    { bg: 'bg-pink-500', hover: 'hover:bg-pink-600', ring: 'focus:ring-pink-500', name: 'Pink' },
+    { bg: 'bg-stone-500', hover: 'hover:bg-stone-600', ring: 'focus:ring-stone-500', name: 'Stone' }
+];
+
+function BookmarkDialog({ isOpen, onClose, onSave, bookmarks, targetVid }) {
+    const [selectedSlot, setSelectedSlot] = useState(1);
+    const [selectedColor, setSelectedColor] = useState(BOOKMARK_COLORS[0]);
+
+    useEffect(() => {
+        if (isOpen) {
+            // Find first empty slot or default to 1
+            const firstEmpty = [1, 2, 3, 4, 5].find(slot => !bookmarks[slot]);
+            const slotToSelect = firstEmpty || 1;
+            setSelectedSlot(slotToSelect);
+
+            // If slot has an existing bookmark, pre-select its color
+            if (bookmarks[slotToSelect]) {
+                const existingColor = BOOKMARK_COLORS.find(c => c.bg === bookmarks[slotToSelect].color.bg);
+                if (existingColor) setSelectedColor(existingColor);
+            }
+        }
+    }, [isOpen, bookmarks]);
+
+    if (!isOpen) return null;
+
+    const handleSave = () => {
+        onSave(selectedSlot, targetVid, selectedColor);
+        onClose();
+    };
+
+    const handleClear = () => {
+        onSave(selectedSlot, null, null);
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 z-[100] bg-stone-50 md:bg-black/60 md:backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-2xl border border-stone-200 w-full max-w-md overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-stone-200 bg-stone-50">
+                    <h3 className="font-serif font-black uppercase text-stone-800 tracking-tight text-lg">Bookmark Verse</h3>
+                    <button onClick={onClose} className="p-1 text-stone-500 hover:text-stone-800 hover:bg-stone-200 rounded focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
+                <div className="p-4 space-y-6">
+                    <div>
+                        <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Select Slot (1-5)</label>
+                        <div className="flex gap-2 justify-between">
+                            {[1, 2, 3, 4, 5].map(slot => {
+                                const isOccupied = !!bookmarks[slot];
+                                const isSelected = selectedSlot === slot;
+                                const slotColor = isOccupied ? bookmarks[slot].color.bg : 'bg-stone-200';
+
+                                return (
+                                    <button
+                                        key={slot}
+                                        onClick={() => {
+                                            setSelectedSlot(slot);
+                                            if (bookmarks[slot]) {
+                                                const c = BOOKMARK_COLORS.find(col => col.bg === bookmarks[slot].color.bg);
+                                                if (c) setSelectedColor(c);
+                                            }
+                                        }}
+                                        className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-black transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-500/50 ${isSelected ? 'ring-4 ring-amber-500 shadow-md scale-110' : 'ring-1 ring-stone-300'} ${isOccupied ? 'text-white ' + slotColor : 'text-stone-400 bg-stone-100 hover:bg-stone-200'}`}
+                                    >
+                                        {slot}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {bookmarks[selectedSlot] && (
+                            <p className="mt-2 text-xs text-amber-600 font-bold uppercase tracking-tight">
+                                Warning: This will overwrite the existing bookmark.
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Select Color</label>
+                        <div className="grid grid-cols-5 gap-2">
+                            {BOOKMARK_COLORS.map(color => (
+                                <button
+                                    key={color.name}
+                                    onClick={() => setSelectedColor(color)}
+                                    className={`w-10 h-10 rounded-full ${color.bg} ${color.hover} transition-all transform hover:scale-110 focus:outline-none focus:ring-4 ${color.ring} ${selectedColor.name === color.name ? 'ring-4 ring-stone-800 shadow-lg scale-110' : 'shadow-sm'}`}
+                                    aria-label={`Select color ${color.name}`}
+                                    title={color.name}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="px-4 py-3 border-t border-stone-200 bg-stone-50 flex justify-between">
+                    {bookmarks[selectedSlot] ? (
+                        <button onClick={handleClear} className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-600 hover:bg-red-50 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">
+                            Clear Slot
+                        </button>
+                    ) : (
+                        <div></div>
+                    )}
+                    <button onClick={handleSave} className="px-6 py-2 bg-stone-900 hover:bg-black text-white text-xs font-bold uppercase tracking-widest rounded transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 shadow-md">
+                        Save Bookmark
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 const Header = React.memo(({
   isStatic,
   currentDate,
@@ -914,67 +1047,112 @@ const Header = React.memo(({
   handleFocalChange,
   playbackStatus,
   onStopPlayback,
-  handleToggle
+  handleToggle,
+  bookmarks
 }) => {
-  return (
-      <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm print:static print:border-none print:shadow-none">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 h-8 min-[450px]:h-10">
-          <div className="flex items-center gap-1 min-w-0 flex-1">
-             <div className="flex items-center bg-stone-100 rounded-md px-0.5 relative group">
-               <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={-1} onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></LinkOrButton>
-               <h1 className="text-[11px] min-[450px]:text-sm font-black text-stone-900 uppercase whitespace-nowrap flex items-center">
-                  {currentDate === todayString ? (
-                      <span className="px-1 cursor-default">{formattedDate}</span>
-                  ) : (
-                      <button
-                          onClick={() => { setCurrentDate(todayString); window.scrollTo({ top: 0 }); }}
-                          title="Jump to Today"
-                          aria-label={`Current reading: ${formattedDate}. Click to jump to Today.`}
-                          className="px-1 hover:text-amber-600 uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded flex items-center gap-1"
-                      >
-                          {formattedDate}
-                          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 print:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" /></svg>
-                      </button>
-                  )}
-               </h1>
-               <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={1} onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></LinkOrButton>
-             </div>
-             <a href="bible.html" className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase text-stone-400 hover:text-amber-600 transition-colors tracking-widest border border-transparent hover:border-stone-200 rounded print:hidden" aria-label="Switch to Bible Browser" title="Switch to Bible Browser">
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                <span className="hidden min-[450px]:inline">Browse</span>
-             </a>
-             <div className="flex items-center gap-1 min-w-0 overflow-hidden print:hidden">
-                {labelParts.map((part, i) => {
-                  const isActive = activeSectionIndex === i;
-                  const isClickable = !isActive && playbackStatus !== 'playing';
-                  const sectionNames = ['Old Testament', 'New Testament', 'Psalms', 'Proverbs'];
+  const handleNavigateToBookmark = (vid) => {
+      const parts = vid.split('.');
+      if (parts.length === 3) {
+          window.location.href = `bible.html?book=${parts[0]}&chapter=${parts[1]}&verse=${parts[2]}`;
+      } else {
+          window.location.href = `bible.html`;
+      }
+  };
 
-                  return (
-                    <button
-                        key={i}
-                        type="button"
-                        onClick={() => scrollToSection(i)}
-                        title={isClickable ? `Jump to ${sectionNames[i]}` : ''}
-                        aria-label={isActive ? `Current section: ${sectionNames[i]}` : `Jump to ${sectionNames[i]}`}
-                        aria-current={isActive ? 'step' : undefined}
-                        aria-disabled={!isClickable && !isActive}
-                        className={`transition-all duration-500 flex items-center shrink-0 focus:outline-none focus-visible:ring-2 ${SECTION_THEMES[i]?.ring || 'focus-visible:ring-amber-500'} ${isActive
-                            ? `${SECTION_THEMES[i]?.bg || 'bg-amber-600'} px-2 py-0.5 rounded-full shadow-sm cursor-default`
-                            : isClickable
-                                ? 'px-1.5 py-0.5 rounded hover:bg-stone-200 cursor-pointer text-stone-500 hover:text-stone-800'
-                                : 'px-1.5 py-0.5 rounded cursor-default text-stone-400 opacity-50'
-                        }`}
-                    >
-                        {isActive
-                            ? <span className="text-[10px] min-[450px]:text-xs font-bold text-white whitespace-nowrap">{part}</span>
-                            : <span className="text-[9px] font-black uppercase tracking-tighter">{PILL_LABELS[i]}</span>
-                        }
-                    </button>
-                  );
-                })}
+  // Safe fallback to prevent rendering crash if bookmarks is undefined
+  const safeBookmarks = bookmarks || {};
+
+  return (
+      <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-2 min-[450px]:px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm print:static print:border-none print:shadow-none">
+        <div className="max-w-7xl mx-auto flex flex-col min-[450px]:flex-row items-center justify-between gap-1 min-[450px]:gap-3 min-[450px]:h-10">
+
+          {/* Row 1 (Mobile) / Left Side (Desktop) */}
+          <div className="flex items-center justify-between min-[450px]:justify-start gap-1 min-w-0 w-full min-[450px]:w-auto flex-1">
+             <div className="flex items-center gap-1 min-w-0 flex-1">
+                 <div className="flex items-center bg-stone-100 rounded-md px-0.5 relative group shrink-0">
+                   <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={-1} onClick={() => navigateDate(-1)} aria-label="Previous Day" aria-keyshortcuts="ArrowLeft" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M15 19l-7-7 7-7" /></svg></LinkOrButton>
+                   <h1 className="text-[11px] min-[450px]:text-sm font-black text-stone-900 uppercase whitespace-nowrap flex items-center">
+                      {currentDate === todayString ? (
+                          <span className="px-1 cursor-default">{formattedDate}</span>
+                      ) : (
+                          <button
+                              onClick={() => { setCurrentDate(todayString); window.scrollTo({ top: 0 }); }}
+                              title="Jump to Today"
+                              aria-label={`Current reading: ${formattedDate}. Click to jump to Today.`}
+                              className="px-1 hover:text-amber-600 uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded flex items-center gap-1"
+                          >
+                              {formattedDate}
+                              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 print:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9" /></svg>
+                          </button>
+                      )}
+                   </h1>
+                   <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={1} onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></LinkOrButton>
+                 </div>
+                 <div className="flex items-center justify-center min-[450px]:justify-start gap-1 min-w-0 overflow-hidden print:hidden flex-1">
+                    {labelParts.map((part, i) => {
+                      const isActive = activeSectionIndex === i;
+                      const isClickable = !isActive && playbackStatus !== 'playing';
+                      const sectionNames = ['Old Testament', 'New Testament', 'Psalms', 'Proverbs'];
+
+                      return (
+                        <button
+                            key={i}
+                            type="button"
+                            onClick={() => scrollToSection(i)}
+                            title={isClickable ? `Jump to ${sectionNames[i]}` : ''}
+                            aria-label={isActive ? `Current section: ${sectionNames[i]}` : `Jump to ${sectionNames[i]}`}
+                            aria-current={isActive ? 'step' : undefined}
+                            aria-disabled={!isClickable && !isActive}
+                            className={`transition-all duration-500 flex items-center shrink-0 focus:outline-none focus-visible:ring-2 ${SECTION_THEMES[i]?.ring || 'focus-visible:ring-amber-500'} ${isActive
+                                ? `${SECTION_THEMES[i]?.bg || 'bg-amber-600'} px-2 py-0.5 rounded-full shadow-sm cursor-default`
+                                : isClickable
+                                    ? 'px-1.5 py-0.5 rounded hover:bg-stone-200 cursor-pointer text-stone-500 hover:text-stone-800'
+                                    : 'px-1.5 py-0.5 rounded cursor-default text-stone-400 opacity-50'
+                            }`}
+                        >
+                            {isActive
+                                ? <span className="text-[10px] min-[450px]:text-xs font-bold text-white whitespace-nowrap">{part}</span>
+                                : <span className="text-[9px] font-black uppercase tracking-tighter">{PILL_LABELS[i]}</span>
+                            }
+                        </button>
+                      );
+                    })}
+                 </div>
+             </div>
+
+             {/* Mobile Listen Button - Only visible < 450px */}
+             <div className="flex min-[450px]:hidden items-center shrink-0">
+                 {playbackStatus !== 'stopped' && <button onClick={onStopPlayback} aria-label="Stop Playback" aria-keyshortcuts="Escape" title="Stop Playback (Escape)" className="p-1.5 text-stone-300 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
+                 <button onClick={handleToggle} aria-keyshortcuts="k" title="Toggle Playback (k)" className={`px-3 py-1 rounded-full font-black text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
              </div>
           </div>
-             <div className="flex items-center gap-2 shrink-0 print:hidden">
+
+          {/* Row 2 (Mobile) / Right Side (Desktop) */}
+          <div className="flex items-center justify-between min-[450px]:justify-end gap-2 shrink-0 print:hidden w-full min-[450px]:w-auto mt-1 min-[450px]:mt-0">
+             <div className="flex items-center gap-2">
+                 <a href="bible.html" className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase text-stone-400 hover:text-amber-600 transition-colors tracking-widest border border-transparent hover:border-stone-200 rounded print:hidden" aria-label="Switch to Bible Browser" title="Switch to Bible Browser">
+                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    <span className="hidden min-[450px]:inline">Browse</span>
+                 </a>
+
+                 {/* Bookmarks (Mobile Only - positioned before Focal Dropdown per spec) */}
+                 <div className="flex min-[450px]:hidden items-center gap-1 bg-stone-100 rounded-full px-1.5 py-0.5 border border-stone-200 shadow-sm">
+                     {[1, 2, 3, 4, 5].map(slot => {
+                         const bm = safeBookmarks[slot];
+                         if (!bm) return null;
+                         return (
+                             <button
+                                 key={slot}
+                                 onClick={() => handleNavigateToBookmark(bm.vid)}
+                                 className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white ${bm.color.bg} ${bm.color.hover} transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-1 ${bm.color.ring} shadow-sm`}
+                                 title={`Go to ${bm.vid.replace(/\./g, ' ')}`}
+                             >
+                                 {slot}
+                             </button>
+                         );
+                     })}
+                 </div>
+
              {/* Slot 2 Selector (Middle) */}
              {availableTranslations.length > 2 ? (
               <div className="relative hidden min-[450px]:block">
@@ -1008,35 +1186,58 @@ const Header = React.memo(({
                 )
              )}
 
-             {/* Slot 3 Selector (Focal) */}
-             {availableTranslations.length > 0 && (
-              <div className="relative mr-1">
-                <button onClick={() => { setIsFocalOpen(!isFocalOpen); setIsCompareOpen(false); }} aria-haspopup="true" aria-expanded={isFocalOpen} aria-label="Select Focal Translation" className="flex items-center gap-1 text-[10px] min-[450px]:text-xs font-black uppercase text-stone-600 hover:text-stone-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Focal (Audio) Translation">
-                  {focalTranslation ? focalTranslation.toUpperCase() : '-'}
-                  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isFocalOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                </button>
-                {isFocalOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsFocalOpen(false)}></div>
-                    <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
-                      {availableTranslations.map(key => (
-                        <button key={key} onClick={() => handleFocalChange(key)} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${focalTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
-                          <span>{key}</span>
-                          {focalTranslation === key && (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-             )}
+                 {/* Slot 3 Selector (Focal) */}
+                 {availableTranslations.length > 0 && (
+                  <div className="relative mr-1">
+                    <button onClick={() => { setIsFocalOpen(!isFocalOpen); setIsCompareOpen(false); }} aria-haspopup="true" aria-expanded={isFocalOpen} aria-label="Select Focal Translation" className="flex items-center gap-1 text-[10px] min-[450px]:text-xs font-black uppercase text-stone-600 hover:text-stone-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Focal (Audio) Translation">
+                      {focalTranslation ? focalTranslation.toUpperCase() : '-'}
+                      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isFocalOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    </button>
+                    {isFocalOpen && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setIsFocalOpen(false)}></div>
+                        <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
+                          {availableTranslations.map(key => (
+                            <button key={key} onClick={() => handleFocalChange(key)} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${focalTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
+                              <span>{key}</span>
+                              {focalTranslation === key && (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                 )}
 
-             {playbackStatus !== 'stopped' && <button onClick={onStopPlayback} aria-label="Stop Playback" aria-keyshortcuts="Escape" title="Stop Playback (Escape)" className="p-1.5 text-stone-300 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
-             <button onClick={handleToggle} aria-keyshortcuts="k" title="Toggle Playback (k)" className={`px-3 min-[450px]:px-5 py-1 rounded-full font-black text-[12px] min-[450px]:text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
+                 {/* Bookmarks (Desktop Only - positioned after Focal Dropdown per spec) */}
+                 <div className="hidden min-[450px]:flex items-center gap-1 bg-stone-100 rounded-full px-1.5 py-0.5 border border-stone-200 shadow-sm">
+                     {[1, 2, 3, 4, 5].map(slot => {
+                         const bm = safeBookmarks[slot];
+                         if (!bm) return null;
+                         return (
+                             <button
+                                 key={slot}
+                                 onClick={() => handleNavigateToBookmark(bm.vid)}
+                                 className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white ${bm.color.bg} ${bm.color.hover} transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-1 ${bm.color.ring} shadow-sm`}
+                                 title={`Go to ${bm.vid.replace(/\./g, ' ')}`}
+                             >
+                                 {slot}
+                             </button>
+                         );
+                     })}
+                 </div>
+
+             </div>
+
+             {/* Desktop Listen Button - Only visible >= 450px */}
+             <div className="hidden min-[450px]:flex items-center">
+                 {playbackStatus !== 'stopped' && <button onClick={onStopPlayback} aria-label="Stop Playback" aria-keyshortcuts="Escape" title="Stop Playback (Escape)" className="p-1.5 text-stone-300 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
+                 <button onClick={handleToggle} aria-keyshortcuts="k" title="Toggle Playback (k)" className={`px-5 py-1 rounded-full font-black text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
+             </div>
           </div>
         </div>
         <ReadingProgress sectionIndex={activeSectionIndex} />
@@ -1213,6 +1414,44 @@ const App = () => {
 
   // Scroll target for restoration
   const [targetScrollVerse, setTargetScrollVerse] = useState(initialState.verseId || null);
+
+  // Bookmarks State
+  const [bookmarks, setBookmarks] = useState({});
+  const [bookmarkDialogTarget, setBookmarkDialogTarget] = useState(null);
+
+  // Load bookmarks on mount
+  useEffect(() => {
+      const loadBookmarks = () => {
+          try {
+              const saved = localStorage.getItem('bible_browser_bookmarks');
+              if (saved) setBookmarks(JSON.parse(saved));
+          } catch (e) { console.warn("Failed to load bookmarks", e); }
+      };
+
+      loadBookmarks();
+
+      window.addEventListener('bookmarksUpdated', loadBookmarks);
+      window.addEventListener('storage', (e) => {
+          if (e.key === 'bible_browser_bookmarks') loadBookmarks();
+      });
+
+      return () => {
+          window.removeEventListener('bookmarksUpdated', loadBookmarks);
+          window.removeEventListener('storage', loadBookmarks);
+      };
+  }, []);
+
+  const handleSaveBookmark = (slot, vid, color) => {
+      const newBookmarks = { ...bookmarks };
+      if (!vid) {
+          delete newBookmarks[slot];
+      } else {
+          newBookmarks[slot] = { vid, color };
+      }
+      setBookmarks(newBookmarks);
+      localStorage.setItem('bible_browser_bookmarks', JSON.stringify(newBookmarks));
+      window.dispatchEvent(new Event('bookmarksUpdated'));
+  };
 
   // Check if running in Static Mode (preloaded data present)
   // We use a ref to track if we *started* with preloaded data, but strictly checking DOM is fine.
@@ -1841,6 +2080,7 @@ const App = () => {
         playbackStatus={playbackStatus}
         onStopPlayback={onStopPlayback}
         handleToggle={handleToggle}
+        bookmarks={bookmarks}
       />
 
       <main id="main-content" tabIndex={-1} className="max-w-7xl mx-auto py-3 md:py-6 px-2 pb-32 md:pb-40 space-y-6 md:space-y-10 outline-none">
@@ -1866,11 +2106,21 @@ const App = () => {
                     isActive={isActive}
                     isDimmed={isDimmed}
                     isPlaying={isPlaying}
+                    onBookmark={(vid) => setBookmarkDialogTarget(vid)}
                 />
             );
         })}
         
       </main>
+
+      <BookmarkDialog
+          isOpen={!!bookmarkDialogTarget}
+          onClose={() => setBookmarkDialogTarget(null)}
+          onSave={handleSaveBookmark}
+          bookmarks={bookmarks}
+          targetVid={bookmarkDialogTarget}
+      />
+
       <Footer
         isStatic={isStatic}
         currentDate={currentDate}
