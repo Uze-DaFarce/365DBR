@@ -1246,6 +1246,11 @@ function App() {
       }
   };
 
+  const handleFocalChange = useCallback((newFocal) => {
+      setFocalTranslation(newFocal);
+      setIsFocalOpen(false);
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
@@ -1258,11 +1263,6 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [sortedVids, playbackStatus]);
-
-  const handleFocalChange = useCallback((newFocal) => {
-    setFocalTranslation(newFocal);
-    setIsFocalOpen(false);
-  }, []);
 
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
