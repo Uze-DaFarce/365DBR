@@ -1272,13 +1272,18 @@ function App() {
             {/* Top Row / Left Side */}
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full min-[450px]:w-auto justify-between min-[450px]:justify-start">
                 <div className="flex items-center gap-2">
+                    <a href="index.html" className="text-stone-400 hover:text-amber-600 transition-colors font-bold text-[10px] min-[450px]:text-[10px] uppercase tracking-widest flex items-center gap-1 shrink-0 px-1 py-1 border border-transparent hover:border-stone-200 rounded hidden min-[450px]:flex">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
+                        DBR
+                    </a>
+
                     <button
                         onClick={() => openBrowseDialog('testament')}
                         className="bg-stone-100 hover:bg-stone-200 border-none rounded text-[10px] min-[450px]:text-xs font-black uppercase tracking-tight py-1 px-2 min-[450px]:px-3 focus:ring-2 focus:ring-amber-500 transition-colors flex items-center gap-1 shrink-0"
                         aria-label="Browse Bible"
                     >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                        <span className="hidden min-[450px]:inline">Browse Bible</span>
+                        <span className="hidden min-[450px]:inline">Browse</span>
                     </button>
                     {selectedBook && selectedChapter && (
                         <div className="flex items-center text-xs min-[450px]:text-sm font-bold text-stone-600 shrink-0 uppercase tracking-tight gap-1 bg-stone-100 rounded px-1.5 py-0.5">
@@ -1294,21 +1299,39 @@ function App() {
                     )}
                 </div>
 
-                {/* Mobile Listen Button - Only visible < 450px */}
-                <div className="flex min-[450px]:hidden items-center">
-                    {verseMap && (
-                        <button onClick={handleToggle} aria-keyshortcuts="k" className={`px-3 py-1 rounded-full font-black text-[12px] uppercase ${playbackStatus==='playing'?'bg-amber-600 text-white':'bg-stone-200 text-stone-600'} hover:opacity-90 transition-opacity`}>
-                            {playbackStatus==='playing'?'Pause':(playbackStatus==='paused'?'Resume':'Listen')}
-                        </button>
+                {/* Focal Dropdown (Mobile Row 1 Right / Desktop Right) */}
+                {availableTranslations.length > 0 && (
+                  <div className="relative mr-1 flex items-center min-[450px]:hidden">
+                    <button onClick={() => { setIsFocalOpen(!isFocalOpen); setIsCompareOpen && setIsCompareOpen(false); }} aria-haspopup="true" aria-expanded={isFocalOpen} aria-label="Select Focal Translation" className="flex items-center gap-1 text-[10px] min-[450px]:text-xs font-black uppercase text-stone-600 hover:text-stone-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Focal (Audio) Translation">
+                      {focalTranslation ? focalTranslation.toUpperCase() : '-'}
+                      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isFocalOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    </button>
+                    {isFocalOpen && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setIsFocalOpen(false)}></div>
+                        <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
+                          {availableTranslations.map(key => (
+                            <button key={key} onClick={() => handleFocalChange(key)} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${focalTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
+                              <span>{key}</span>
+                              {focalTranslation === key && (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </>
                     )}
-                </div>
+                  </div>
+                 )}
             </div>
 
             {/* Bottom Row / Right Side: Translation Settings & Bookmarks */}
             <div className="flex w-full min-[450px]:w-auto items-center justify-between min-[450px]:justify-end gap-2 shrink-0 mt-1 min-[450px]:mt-0">
                  <div className="flex items-center gap-2">
-                     <a href="index.html" className="text-stone-400 hover:text-amber-600 transition-colors font-bold text-[10px] min-[450px]:text-[10px] uppercase tracking-widest flex items-center gap-1 shrink-0 px-2 py-1 border border-transparent hover:border-stone-200 rounded">
-                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
+                     <a href="index.html" className="text-stone-400 hover:text-amber-600 transition-colors font-bold text-[10px] min-[450px]:text-[10px] uppercase tracking-widest flex items-center gap-1 shrink-0 px-2 py-1 border border-transparent hover:border-stone-200 rounded min-[450px]:hidden">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
                         DBR
                     </a>
 
@@ -1330,9 +1353,9 @@ function App() {
                          })}
                      </div>
 
-                     {/* Slot 3 Selector (Focal) */}
+                     {/* Slot 3 Selector (Desktop Focal) */}
                      {availableTranslations.length > 0 && (
-                      <div className="relative mr-1">
+                      <div className="relative mr-1 hidden min-[450px]:flex items-center">
                         <button onClick={() => { setIsFocalOpen(!isFocalOpen); setIsCompareOpen && setIsCompareOpen(false); }} aria-haspopup="true" aria-expanded={isFocalOpen} aria-label="Select Focal Translation" className="flex items-center gap-1 text-[10px] min-[450px]:text-xs font-black uppercase text-stone-600 hover:text-stone-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Focal (Audio) Translation">
                           {focalTranslation ? focalTranslation.toUpperCase() : '-'}
                           <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isFocalOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
@@ -1358,10 +1381,10 @@ function App() {
                      )}
                  </div>
 
-                 {/* Desktop Listen Button - Only visible >= 450px */}
-                 <div className="hidden min-[450px]:flex items-center">
+                 {/* Listen Button (Both Mobile Row 2 and Desktop Far Right) */}
+                 <div className="flex items-center">
                      {verseMap && (
-                         <button onClick={handleToggle} aria-keyshortcuts="k" className={`px-5 py-1 rounded-full font-black text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus==='playing'?'bg-amber-600 text-white':'bg-stone-200 text-stone-600'} hover:opacity-90 transition-opacity`}>
+                         <button onClick={handleToggle} aria-keyshortcuts="k" className={`px-3 min-[450px]:px-5 py-1 rounded-full font-black text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus==='playing'?'bg-amber-600 text-white':'bg-stone-200 text-stone-600'} hover:opacity-90 transition-opacity`}>
                             {playbackStatus==='playing'?'Pause':(playbackStatus==='paused'?'Resume':'Listen')}
                          </button>
                      )}

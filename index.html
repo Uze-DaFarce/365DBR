@@ -1088,6 +1088,11 @@ const Header = React.memo(({
                    </h1>
                    <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={1} onClick={() => navigateDate(1)} aria-label="Next Day" aria-keyshortcuts="ArrowRight" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" /></svg></LinkOrButton>
                  </div>
+
+                 <a href="bible.html" className="hidden min-[450px]:flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase text-stone-400 hover:text-amber-600 transition-colors tracking-widest border border-transparent hover:border-stone-200 rounded print:hidden" aria-label="Switch to Bible Browser" title="Switch to Bible Browser">
+                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    <span className="hidden min-[450px]:inline">Browse</span>
+                 </a>
                  <div className="flex items-center justify-center min-[450px]:justify-start gap-1 min-w-0 overflow-hidden print:hidden flex-1">
                     {labelParts.map((part, i) => {
                       const isActive = activeSectionIndex === i;
@@ -1120,17 +1125,12 @@ const Header = React.memo(({
                  </div>
              </div>
 
-             {/* Mobile Listen Button - Only visible < 450px */}
-             <div className="flex min-[450px]:hidden items-center shrink-0">
-                 {playbackStatus !== 'stopped' && <button onClick={onStopPlayback} aria-label="Stop Playback" aria-keyshortcuts="Escape" title="Stop Playback (Escape)" className="p-1.5 text-stone-300 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
-                 <button onClick={handleToggle} aria-keyshortcuts="k" title="Toggle Playback (k)" className={`px-3 py-1 rounded-full font-black text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
-             </div>
           </div>
 
           {/* Row 2 (Mobile) / Right Side (Desktop) */}
           <div className="flex items-center justify-between min-[450px]:justify-end gap-2 shrink-0 print:hidden w-full min-[450px]:w-auto mt-1 min-[450px]:mt-0">
              <div className="flex items-center gap-2">
-                 <a href="bible.html" className="flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase text-stone-400 hover:text-amber-600 transition-colors tracking-widest border border-transparent hover:border-stone-200 rounded print:hidden" aria-label="Switch to Bible Browser" title="Switch to Bible Browser">
+                 <a href="bible.html" className="min-[450px]:hidden flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase text-stone-400 hover:text-amber-600 transition-colors tracking-widest border border-transparent hover:border-stone-200 rounded print:hidden" aria-label="Switch to Bible Browser" title="Switch to Bible Browser">
                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     <span className="hidden min-[450px]:inline">Browse</span>
                  </a>
@@ -1233,10 +1233,10 @@ const Header = React.memo(({
 
              </div>
 
-             {/* Desktop Listen Button - Only visible >= 450px */}
-             <div className="hidden min-[450px]:flex items-center">
+             {/* Listen Button - Now on bottom row for mobile, far right for desktop */}
+             <div className="flex items-center">
                  {playbackStatus !== 'stopped' && <button onClick={onStopPlayback} aria-label="Stop Playback" aria-keyshortcuts="Escape" title="Stop Playback (Escape)" className="p-1.5 text-stone-300 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>}
-                 <button onClick={handleToggle} aria-keyshortcuts="k" title="Toggle Playback (k)" className={`px-5 py-1 rounded-full font-black text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
+                 <button onClick={handleToggle} aria-keyshortcuts="k" title="Toggle Playback (k)" className={`px-3 min-[450px]:px-5 py-1 rounded-full font-black text-[12px] uppercase tracking-tighter transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${playbackStatus === 'playing' ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-600'}`}>{playbackStatus === 'playing' ? 'Pause' : playbackStatus === 'paused' ? 'Resume' : 'Listen'}</button>
              </div>
           </div>
         </div>
