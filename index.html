@@ -503,7 +503,15 @@
     .btn-outline {
       border: 2px solid #F4A623; color: #401b51; background: transparent;
       padding: 12px 32px; border-radius: 50px; font-weight: 700; cursor: pointer;
-      display: block; margin: 40px auto 0; transition: background-color 0.3s ease, color 0.3s ease; font-size: 16px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 40px auto 0; transition: background-color 0.3s ease, color 0.3s ease; font-size: 16px; width: fit-content;
+    }
+
+    .btn-outline .chevron-icon {
+      transition: transform 0.3s ease;
+      will-change: transform;
+    }
+    .btn-outline[aria-expanded="true"] .chevron-icon {
+      transform: rotate(180deg);
     }
     .btn-outline:hover { background: #F4A623; color: #FFFFFF; }
 
@@ -715,6 +723,23 @@
     @keyframes highlight-card {
       0% { background-color: #fff9e6; transform: scale(1.02); }
       100% { background-color: #FFFFFF; transform: scale(1); }
+    }
+
+    /* 🎨 Palette: Loading animation for Form Handoff overlay */
+    @keyframes pulse-emoji {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .pulsing-emoji {
+      animation: pulse-emoji 1.5s infinite ease-in-out;
+      display: inline-block;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pulsing-emoji {
+        animation: none;
+      }
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>
@@ -961,7 +986,12 @@
             </div>
           </div>
 
-          <button id="toggle-reviews-btn" class="btn-outline" aria-expanded="false" aria-controls="more-reviews">Read More Client Stories</button>
+          <div style="text-align: center;">
+            <button id="toggle-reviews-btn" class="btn-outline" aria-expanded="false" aria-controls="more-reviews">
+              <span class="btn-text">Read More Client Stories</span>
+              <svg class="chevron-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </div>
         </div>
       </section>
 

@@ -166,3 +166,18 @@ Implemented a lightweight Scroll Progress Bar:
 **Action:**
 1. Added `.service-card:focus-within` and `.project-card:focus-within` to match hover states.
 2. Implemented a consolidated `@media (prefers-reduced-motion: reduce)` block to force `transform: none` and `transition: none` on all interactive elements (`.service-card`, `.project-card`, `.team-member`, `.btn-primary`, `.back-to-top`).
+
+## 2026-03-04 - State Affordance via Animated Icons
+**Learning:**
+Buttons that toggle large state changes (like expanding a section) lack predictability if their action is implied only by text changes after the fact. Visual indicators of directionality improve usability.
+**Action:**
+1.  **Iconography:** Added an explicit `<svg>` chevron to the expand/collapse button.
+2.  **Animation:** Tied the CSS `transform: rotate(180deg)` directly to the button's `aria-expanded` state, ensuring visual and semantic state remain perfectly in sync.
+3.  **DOM Preservation:** Modified JavaScript logic to selectively update only a `<span class="btn-text">` inside the button, preventing the `textContent` assignment from obliterating the SVG icon.
+
+## 2026-03-04 - Activity States during Delays
+**Learning:**
+Overlays that impose a time delay (like the Form Handoff's 8-second redirect/dismiss window) can feel "stuck" if there is no visual indicator of ongoing activity.
+**Action:**
+1.  **Visual Cue:** Added a subtle CSS `@keyframes pulse-emoji` animation to the Form Handoff emoji (`.pulsing-emoji`).
+2.  **Accessibility Check:** Wrapped the animation in `@media (prefers-reduced-motion: reduce) { animation: none; }` to protect users with motion sensitivity.

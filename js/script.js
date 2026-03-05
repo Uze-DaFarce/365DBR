@@ -47,6 +47,7 @@ document.querySelectorAll('a[href^="https://docs.google.com/forms/"], a[href^="h
     emojiDiv.style.fontSize = '40px';
     emojiDiv.style.marginBottom = '12px';
     emojiDiv.textContent = '📝';
+    emojiDiv.classList.add('pulsing-emoji');
     emojiDiv.setAttribute('aria-hidden', 'true'); // Hide decorative emoji from screen readers
     container.appendChild(emojiDiv);
 
@@ -102,7 +103,14 @@ if (toggleBtn && reviewsContainer) {
       setTimeout(() => {
           reviewsContainer.classList.add('reviews-expanded');
       }, 10);
-      toggleBtn.textContent = 'Show Less Client Stories';
+
+      const btnText = toggleBtn.querySelector('.btn-text');
+      if (btnText) {
+        btnText.textContent = 'Show Less Client Stories';
+      } else {
+        toggleBtn.textContent = 'Show Less Client Stories';
+      }
+
       toggleBtn.setAttribute('aria-expanded', 'true');
 
       // 🎨 Palette: Move focus to new content for screen readers
@@ -116,7 +124,14 @@ if (toggleBtn && reviewsContainer) {
       toggleBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       reviewsContainer.classList.remove('reviews-expanded');
-      toggleBtn.textContent = 'Read More Client Stories';
+
+      const btnText = toggleBtn.querySelector('.btn-text');
+      if (btnText) {
+        btnText.textContent = 'Read More Client Stories';
+      } else {
+        toggleBtn.textContent = 'Read More Client Stories';
+      }
+
       toggleBtn.setAttribute('aria-expanded', 'false');
 
       // Wait for transition to finish before hiding
