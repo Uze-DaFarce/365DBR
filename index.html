@@ -1058,33 +1058,9 @@ const Header = React.memo(({
   handleFocalChange,
   playbackStatus,
   onStopPlayback,
-  handleToggle
+  handleToggle,
+  bookmarks
 }) => {
-  const [bookmarks, setBookmarks] = useState({});
-
-  useEffect(() => {
-      const loadBookmarks = () => {
-          try {
-              const saved = localStorage.getItem('bible_browser_bookmarks');
-              if (saved) setBookmarks(JSON.parse(saved));
-          } catch (e) { console.warn("Failed to load bookmarks", e); }
-      };
-
-      loadBookmarks();
-
-      // Listen for custom event when bookmarks are updated in App
-      window.addEventListener('bookmarksUpdated', loadBookmarks);
-      // Listen for storage event (cross-tab sync)
-      window.addEventListener('storage', (e) => {
-          if (e.key === 'bible_browser_bookmarks') loadBookmarks();
-      });
-
-      return () => {
-          window.removeEventListener('bookmarksUpdated', loadBookmarks);
-          window.removeEventListener('storage', loadBookmarks);
-      };
-  }, []);
-
   const handleNavigateToBookmark = (vid) => {
       // Navigate to bible.html with query parameters
       const parts = vid.split('.');
@@ -1167,6 +1143,24 @@ const Header = React.memo(({
                     <span className="hidden min-[450px]:inline">Browse</span>
                  </a>
 
+                 {/* Bookmarks (Mobile Only) */}
+                 <div className="flex min-[450px]:hidden items-center gap-1 bg-stone-100 rounded-full px-1.5 py-0.5 border border-stone-200 shadow-sm">
+                     {[1, 2, 3, 4, 5].map(slot => {
+                         const bm = bookmarks[slot];
+                         if (!bm) return null;
+                         return (
+                             <button
+                                 key={slot}
+                                 onClick={() => handleNavigateToBookmark(bm.vid)}
+                                 className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white ${bm.color.bg} ${bm.color.hover} transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-1 ${bm.color.ring} shadow-sm`}
+                                 title={`Go to ${bm.vid.replace(/\./g, ' ')}`}
+                             >
+                                 {slot}
+                             </button>
+                         );
+                     })}
+                 </div>
+
                  {/* Slot 2 Selector (Middle) */}
                  {availableTranslations.length > 2 ? (
               <div className="relative hidden min-[450px]:block">
@@ -1226,6 +1220,24 @@ const Header = React.memo(({
                     )}
                   </div>
                  )}
+
+                 {/* Bookmarks (Desktop) */}
+                 <div className="hidden min-[450px]:flex items-center gap-1 bg-stone-100 rounded-full px-1.5 py-0.5 border border-stone-200 shadow-sm">
+                     {[1, 2, 3, 4, 5].map(slot => {
+                         const bm = bookmarks[slot];
+                         if (!bm) return null;
+                         return (
+                             <button
+                                 key={slot}
+                                 onClick={() => handleNavigateToBookmark(bm.vid)}
+                                 className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white ${bm.color.bg} ${bm.color.hover} transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-1 ${bm.color.ring} shadow-sm`}
+                                 title={`Go to ${bm.vid.replace(/\./g, ' ')}`}
+                             >
+                                 {slot}
+                             </button>
+                         );
+                     })}
+                 </div>
              </div>
 
              {/* Desktop Listen Button - Only visible >= 450px */}
@@ -1416,10 +1428,26 @@ const App = () => {
 
   // Load bookmarks on mount
   useEffect(() => {
-      try {
-          const saved = localStorage.getItem('bible_browser_bookmarks');
-          if (saved) setBookmarks(JSON.parse(saved));
-      } catch (e) { console.warn("Failed to load bookmarks", e); }
+      const loadBookmarks = () => {
+          try {
+              const saved = localStorage.getItem('bible_browser_bookmarks');
+              if (saved) setBookmarks(JSON.parse(saved));
+          } catch (e) { console.warn("Failed to load bookmarks", e); }
+      };
+
+      loadBookmarks();
+
+      // Listen for custom event when bookmarks are updated (e.g. from Header)
+      window.addEventListener('bookmarksUpdated', loadBookmarks);
+      // Listen for storage event (cross-tab sync)
+      window.addEventListener('storage', (e) => {
+          if (e.key === 'bible_browser_bookmarks') loadBookmarks();
+      });
+
+      return () => {
+          window.removeEventListener('bookmarksUpdated', loadBookmarks);
+          window.removeEventListener('storage', loadBookmarks);
+      };
   }, []);
 
   const handleSaveBookmark = (slot, vid, color) => {
@@ -2062,6 +2090,7 @@ const App = () => {
         playbackStatus={playbackStatus}
         onStopPlayback={onStopPlayback}
         handleToggle={handleToggle}
+        bookmarks={bookmarks}
       />
 
       <main id="main-content" tabIndex={-1} className="max-w-7xl mx-auto py-3 md:py-6 px-2 pb-32 md:pb-40 space-y-6 md:space-y-10 outline-none">
