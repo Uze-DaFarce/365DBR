@@ -42,7 +42,6 @@ ServerSignature Off
   # Ensures that the page is isolated in its own browsing context, preventing cross-origin attacks (Spectre)
   # and interactions from other windows (e.g. malicious popups).
   Header set Cross-Origin-Opener-Policy "same-origin"
-  Header set Cross-Origin-Resource-Policy "same-site"
 
   # Content Security Policy (CSP)
   # Matches index.html policy but adds 'frame-ancestors' (ignored in meta tags) for anti-framing protection.
@@ -57,10 +56,10 @@ ServerSignature Off
   RedirectMatch 403 "(^|/)\.(?!well-known(?:$|/))"
 
   # 🛡️ Sentinel: Block access to sensitive source/config files
-  # Prevents leakage of internal documentation, logs, scripts, and database files
-  # Blocks: .py, .log, .sh, .bak, .swp, .env, .sql, .conf, .ini, .yml, .yaml, .sqlite, .db
+  # Prevents leakage of internal documentation, logs, and scripts
+  # Blocks: .py, .log, .sh, .bak, .swp
   # Note: .md is allowed as sub-sites (like 365DBR) may serve markdown content
-  RedirectMatch 403 "(?i)\.(py|log|sh|bak|swp|env|sql|conf|ini|yml|yaml|sqlite|db)$"
+  RedirectMatch 403 "(?i)\.(py|log|sh|bak|swp)$"
 </IfModule>
 
 <IfModule mod_deflate.c>
