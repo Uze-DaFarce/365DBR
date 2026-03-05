@@ -1,3 +1,7 @@
+# 🛡️ Sentinel: Server Hardening
+# Prevent server version information leakage
+ServerSignature Off
+
 <IfModule mod_autoindex.c>
   # 🛡️ Sentinel: Disable directory listing
   # Prevents attackers from enumerating files in directories like /pics or /css
@@ -5,6 +9,9 @@
 </IfModule>
 
 <IfModule mod_headers.c>
+  # 🛡️ Sentinel: Prevent technology stack leakage
+  Header unset X-Powered-By
+
   # 🛡️ Sentinel: Security Headers Enhancement
   # Added to enforce strict security policies at the server level (Apache)
 

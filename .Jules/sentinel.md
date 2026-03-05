@@ -53,3 +53,8 @@
 **Vulnerability:** Users clicking on insecure (http) links to Google Forms bypass the security overlay warning, potentially reducing awareness of leaving the site.
 **Learning:** Protocol-specific selectors (like `href^="https://"`) are fragile and can be bypassed by simple protocol changes or typos, even if the destination eventually redirects to HTTPS.
 **Prevention:** Use protocol-agnostic selectors or explicitly include both `http` and `https` variants to ensure consistent behavior regardless of the link format.
+
+## 2026-03-04 - Safe Server Hardening
+**Vulnerability:** Server configuration files leaking server version and technology stack information, which can assist attackers in fingerprinting vulnerabilities.
+**Learning:** Hardening the root `.htaccess` file can easily break unrepresented production sub-sites. I must only apply modifications that are 100% safe to inherit. Adding `Cross-Origin-Resource-Policy "same-site"` or expanding `RedirectMatch 403` to block database extensions (e.g. `.sqlite`, `.db`) risks breaking legitimate client-side database downloads or cross-origin features required by sub-sites like `365DBR`.
+**Prevention:** Consolidated safe server hardening in `.htaccess` avoiding assumptions: added `ServerSignature Off` and `Header unset X-Powered-By`. These changes do not affect application routing or sub-site features.
