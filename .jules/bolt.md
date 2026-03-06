@@ -17,3 +17,7 @@
 ## 2026-05-19 - Inline JSX Performance Trap
 **Learning:** In a single-file React app, it's easy to keep components like `Footer` inline within the main `App` for convenience. However, this causes the entire footer (and its diffing cost) to run on every `App` re-render (e.g., during scrolling).
 **Action:** Extracted `Footer` to a `React.memo` component and memoized its callbacks (`navigateVerse`). This isolates the footer from scroll-driven state updates, reducing main thread work during the critical scroll interaction.
+
+## 2026-08-14 - Broken Memoization from Inline Functions
+**Learning:** Passing an inline arrow function as a prop (e.g. `onBookmark={(vid) => setBookmarkDialogTarget(vid)}`) to a `React.memo` component (like `VerseGroup`) creates a new function reference on every parent render. This defeats the memoization, causing all instances of the component to re-render whenever the parent updates (e.g., during high-frequency events like scrolling that update `activeVerseId`).
+**Action:** Pass the state setter function directly (e.g., `onBookmark={setBookmarkDialogTarget}`) since React guarantees state setters maintain a stable reference across renders, preserving the memoization and preventing O(N) re-renders.

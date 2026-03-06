@@ -2106,7 +2106,9 @@ const App = () => {
                     isActive={isActive}
                     isDimmed={isDimmed}
                     isPlaying={isPlaying}
-                    onBookmark={(vid) => setBookmarkDialogTarget(vid)}
+                    // ⚡ Bolt Optimization: Pass state setter directly instead of inline arrow function
+                    // to maintain stable reference and prevent O(N) re-renders of React.memo component
+                    onBookmark={setBookmarkDialogTarget}
                 />
             );
         })}
