@@ -603,7 +603,12 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
         if (selection && selection.type === 'Range' && selection.toString().length > 0) return;
 
         const el = document.getElementById(`verse-${vid}`);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (el) {
+            const rect = el.getBoundingClientRect();
+            const absoluteTop = window.scrollY + rect.top;
+            const targetY = absoluteTop - 125;
+            window.scrollTo({ top: targetY, behavior: 'smooth' });
+        }
     };
 
     // ⚡ Bolt Optimization: Memoize content generation to prevent expensive string operations
@@ -1604,7 +1609,10 @@ const App = () => {
       if (!loading && targetScrollVerse && verseMap) {
           const el = document.getElementById(`verse-${targetScrollVerse}`);
           if (el) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              const rect = el.getBoundingClientRect();
+              const absoluteTop = window.scrollY + rect.top;
+              const targetY = absoluteTop - 125;
+              window.scrollTo({ top: targetY, behavior: 'smooth' });
               setTargetScrollVerse(null);
           }
       }
@@ -1756,7 +1764,19 @@ const App = () => {
       const el = document.getElementById(`verse-${vid}`);
       if (el) observer.observe(el);
     });
-    return () => observer.disconnect();
+
+    const handleScroll = () => {
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+         const lastGroup = groupedVids[groupedVids.length - 1];
+         if (lastGroup) setActiveVerseId(lastGroup[0]);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+        observer.disconnect();
+        window.removeEventListener('scroll', handleScroll);
+    };
   }, [playbackStatus, loading, verseMap, groupedVids]);
 
   useEffect(() => {
@@ -1879,7 +1899,12 @@ const App = () => {
 
     // Scroll to the LEADER vid container
     const el = document.getElementById(`verse-${leaderVid}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) {
+        const rect = el.getBoundingClientRect();
+        const absoluteTop = window.scrollY + rect.top;
+        const targetY = absoluteTop - 125;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+    }
 
     const currentIdx = getSectionIndex(leaderVid);
     const prevIdx = previousVid ? getSectionIndex(previousVid) : -1; 
@@ -2046,7 +2071,12 @@ const App = () => {
     const targetVid = sortedVids.find(vid => getSectionIndex(vid) === index);
     if (targetVid) {
       const el = document.getElementById(`verse-${targetVid}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (el) {
+          const rect = el.getBoundingClientRect();
+          const absoluteTop = window.scrollY + rect.top;
+          const targetY = absoluteTop - 125;
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+      }
     }
   }, [playbackStatus, activeSectionIndex, sortedVids]);
 
@@ -2106,7 +2136,9 @@ const App = () => {
                     isActive={isActive}
                     isDimmed={isDimmed}
                     isPlaying={isPlaying}
-                    onBookmark={(vid) => setBookmarkDialogTarget(vid)}
+                    // ⚡ Bolt Optimization: Pass state setter directly instead of inline arrow function
+                    // to maintain stable reference and prevent O(N) re-renders of React.memo component
+                    onBookmark={setBookmarkDialogTarget}
                 />
             );
         })}
