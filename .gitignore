@@ -4,3 +4,6 @@ dist/
 *.png
 test-scripts/
 verification/
+node_modules/
+playwright-report/
+test-results/
