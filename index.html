@@ -1755,6 +1755,12 @@ const App = () => {
   useEffect(() => {
     if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0) return;
     const observer = new IntersectionObserver((entries) => {
+      // Check if we are at the absolute bottom of the page first to prevent bounce-back
+      // Use scrollHeight and Math.ceil/floor tolerance for cross-browser sub-pixel accuracy
+      if (Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
+          return; // Let handleScroll manage the final verse
+      }
+
       const intersecting = entries.filter(e => e.isIntersecting);
       if (intersecting.length > 0) {
         const bestEntry = intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top - 120) - Math.abs(b.boundingClientRect.top - 120))[0];
@@ -1768,7 +1774,7 @@ const App = () => {
     });
 
     const handleScroll = () => {
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+      if (Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
          const lastGroup = groupedVids[groupedVids.length - 1];
          if (lastGroup) setActiveVerseId(lastGroup[0]);
       }
