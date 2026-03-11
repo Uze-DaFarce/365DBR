@@ -181,3 +181,12 @@ Overlays that impose a time delay (like the Form Handoff's 8-second redirect/dis
 **Action:**
 1.  **Visual Cue:** Added a subtle CSS `@keyframes pulse-emoji` animation to the Form Handoff emoji (`.pulsing-emoji`).
 2.  **Accessibility Check:** Wrapped the animation in `@media (prefers-reduced-motion: reduce) { animation: none; }` to protect users with motion sensitivity.
+
+## 2026-03-04 - Native Smooth Scroll Focus Synchronization
+**Learning:**
+When using native CSS smooth scrolling (`scroll-behavior: smooth`) alongside internal anchor links (`href="#target"`), the visual viewport moves to the target, but keyboard focus often remains on the clicked link. This strands keyboard/screen reader users.
+**Action:**
+Added a global JavaScript event listener for all `a[href^="#"]` links that:
+1.  **Extracts** the target ID.
+2.  **Sets** `tabindex="-1"` on the target element (making it programmatically focusable).
+3.  **Applies** `.focus({ preventScroll: true })` inside a `setTimeout` (to allow smooth scroll to execute) so users can immediately continue tabbing from their new visual location.
