@@ -42,3 +42,7 @@
 ## 2026-03-04 - DOM Read/Write Interleaving
 **Learning:** During element initialization (like scroll reveals), iterating through elements and performing a DOM layout read (e.g. `getBoundingClientRect()`) followed immediately by a DOM write (e.g. `classList.add()`) inside the same loop forces the browser to recalculate the layout synchronously for each element, causing severe layout thrashing.
 **Action:** Always separate DOM reads and writes into distinct phases (a read loop followed by a write loop) to allow the browser to batch layout recalculations and optimize rendering performance.
+
+## 2026-03-05 - LCP Priority Contention
+**Learning:** Using `fetchpriority="high"` on multiple resources, such as a site logo and a Hero background image, causes them to compete for bandwidth during the initial load, which can delay the actual Largest Contentful Paint (LCP) element (the Hero image).
+**Action:** Ensure `fetchpriority="high"` is only applied to the actual LCP element and not secondary decorative elements like logos, so the critical resource loads first.
