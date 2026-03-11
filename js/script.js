@@ -467,3 +467,28 @@ if (!prefersReducedMotion) {
 document.querySelectorAll('a[target="_blank"]:not([rel~="noopener"])').forEach(link => {
   link.rel = (link.rel + ' noopener noreferrer').trim();
 });
+
+// 🎨 Palette: Enhance In-Page Navigation Focus Management
+// Native smooth scrolling moves the viewport, but keyboard focus doesn't automatically follow.
+// This ensures focus moves to the target element so keyboard/screen reader users aren't left behind.
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    const targetId = this.getAttribute('href').substring(1);
+    if (!targetId) return; // Ignore href="#"
+
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      // Set tabindex to -1 to make the element programmatically focusable
+      // without adding it to the normal tab order
+      targetElement.setAttribute('tabindex', '-1');
+
+      // Move focus after the scroll animation has a chance to start
+      setTimeout(() => {
+        targetElement.focus({ preventScroll: true }); // Prevent jumping if smooth scroll is active
+
+        // Remove outline if it's not a naturally focusable element to avoid visual artifacts on click
+        targetElement.style.outline = 'none';
+      }, 100);
+    }
+  });
+});
