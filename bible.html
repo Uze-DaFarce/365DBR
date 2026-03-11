@@ -819,26 +819,27 @@ function App() {
                                     if (!newIndex[book][c]) newIndex[book][c] = [];
                                     if (!newIndex[book][c].includes(day.day)) newIndex[book][c].push(day.day);
                                 }
-                            } else {
-                                // Cross book: Index the known endpoints
-                                if (isStartBook) {
-                                    const c = parseInt(sCh);
+                            } else if (isStartBook) {
+                                // Cross book: Add from start chapter to end of book
+                                const startC = parseInt(sCh);
+                                const maxC = VERSE_COUNTS[book] ? VERSE_COUNTS[book].length : startC;
+                                for (let c = startC; c <= maxC; c++) {
                                     if (!newIndex[book][c]) newIndex[book][c] = [];
                                     if (!newIndex[book][c].includes(day.day)) newIndex[book][c].push(day.day);
                                 }
-                                if (isEndBook) {
-                                    const c = parseInt(eCh); // Usually ends at specific chapter
-                                    // Also index chapter 1? Usually cross-book implies full chapters in between.
-                                    // For now, strict index: only what's explicitly in range endpoints if multi-book is complex.
-                                    // But typically "DEU.33.1-JOS.1.18" -> DEU 33, JOS 1.
+                            } else if (isEndBook) {
+                                // Cross book: Add from chapter 1 to end chapter
+                                const endC = parseInt(eCh);
+                                for (let c = 1; c <= endC; c++) {
                                     if (!newIndex[book][c]) newIndex[book][c] = [];
                                     if (!newIndex[book][c].includes(day.day)) newIndex[book][c].push(day.day);
-
-                                    // Assume Chapter 1 is present if eCh > 1?
-                                    if (c > 1) {
-                                         if (!newIndex[book][1]) newIndex[book][1] = [];
-                                         if (!newIndex[book][1].includes(day.day)) newIndex[book][1].push(day.day);
-                                    }
+                                }
+                            } else {
+                                // Cross book: Entire book is in between, add all its chapters
+                                const maxC = VERSE_COUNTS[book] ? VERSE_COUNTS[book].length : 1;
+                                for (let c = 1; c <= maxC; c++) {
+                                    if (!newIndex[book][c]) newIndex[book][c] = [];
+                                    if (!newIndex[book][c].includes(day.day)) newIndex[book][c].push(day.day);
                                 }
                             }
                         }
