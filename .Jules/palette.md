@@ -57,3 +57,7 @@
 ## 2026-02-24 - Time Investment Transparency
 **Learning:** In daily habit apps (like Bible reading), users often hesitate to start a session if they are unsure of the length. Providing a time estimate reduces friction and encourages engagement ("It's only 5 mins").
 **Action:** Calculate and display estimated reading time (e.g., '5 min read') based on content length (approx. 200-250 wpm) near the primary content label or footer to set clear expectations.
+
+## 2024-03-08 - Automated Screenshot Reviews
+**Learning:** Users want to visually review test output screenshots (.png), but committing these to Git causes code review failures and repo bloat.
+**Action:** Always configure the CI pipeline (e.g. GitHub Actions) to automatically upload `test-results` and `playwright-report` as downloadable artifacts rather than ignoring them completely. This makes visual regressions visible without git consequences.
