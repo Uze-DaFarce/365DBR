@@ -414,7 +414,7 @@ function BookmarkDialog({ isOpen, onClose, onSave, bookmarks, targetVid }) {
             <div className="bg-white rounded-xl shadow-2xl border border-stone-200 w-full max-w-md overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 border-b border-stone-200 bg-stone-50">
                     <h3 className="font-serif font-black uppercase text-stone-800 tracking-tight text-lg">Bookmark Verse</h3>
-                    <button onClick={onClose} className="p-1 text-stone-500 hover:text-stone-800 hover:bg-stone-200 rounded focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <button onClick={onClose} aria-label="Close Bookmark Dialog" className="p-1 text-stone-500 hover:text-stone-800 hover:bg-stone-200 rounded focus:outline-none focus:ring-2 focus:ring-amber-500">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
@@ -470,13 +470,13 @@ function BookmarkDialog({ isOpen, onClose, onSave, bookmarks, targetVid }) {
 
                 <div className="px-4 py-3 border-t border-stone-200 bg-stone-50 flex justify-between">
                     {bookmarks[selectedSlot] ? (
-                        <button onClick={handleClear} className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-600 hover:bg-red-50 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <button onClick={handleClear} aria-label="Clear bookmark slot" className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-600 hover:bg-red-50 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">
                             Clear Slot
                         </button>
                     ) : (
                         <div></div>
                     )}
-                    <button onClick={handleSave} className="px-6 py-2 bg-stone-900 hover:bg-black text-white text-xs font-bold uppercase tracking-widest rounded transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 shadow-md">
+                    <button onClick={handleSave} aria-label="Save bookmark" className="px-6 py-2 bg-stone-900 hover:bg-black text-white text-xs font-bold uppercase tracking-widest rounded transition-colors focus:outline-none focus:ring-2 focus:ring-stone-900 shadow-md">
                         Save Bookmark
                     </button>
                 </div>
@@ -656,11 +656,11 @@ function BibleBrowseDialog({ isOpen, onClose, index, availableBooks, onSelect, i
 
                     {step === 'testament' && (
                         <div className="flex flex-col gap-3 h-full justify-center px-4 py-8">
-                            <button onClick={() => handleTestamentSelect('OT')} className="flex-1 min-h-[140px] max-h-[200px] bg-white border-2 border-stone-300 rounded-xl flex flex-col items-center justify-center gap-1 shadow-sm hover:border-amber-500 hover:bg-amber-50 transition-all focus:outline-none focus:ring-4 focus:ring-amber-500/50">
+                            <button onClick={() => handleTestamentSelect('OT')} aria-label="Select Old Testament" className="flex-1 min-h-[140px] max-h-[200px] bg-white border-2 border-stone-300 rounded-xl flex flex-col items-center justify-center gap-1 shadow-sm hover:border-amber-500 hover:bg-amber-50 transition-all focus:outline-none focus:ring-4 focus:ring-amber-500/50">
                                 <span className="text-4xl sm:text-5xl font-serif font-black uppercase text-stone-800 tracking-tighter">Old</span>
                                 <span className="text-xl sm:text-2xl font-serif italic text-stone-500">Testament</span>
                             </button>
-                            <button onClick={() => handleTestamentSelect('NT')} className="flex-1 min-h-[140px] max-h-[200px] bg-white border-2 border-stone-300 rounded-xl flex flex-col items-center justify-center gap-1 shadow-sm hover:border-blue-500 hover:bg-blue-50 transition-all focus:outline-none focus:ring-4 focus:ring-blue-500/50">
+                            <button onClick={() => handleTestamentSelect('NT')} aria-label="Select New Testament" className="flex-1 min-h-[140px] max-h-[200px] bg-white border-2 border-stone-300 rounded-xl flex flex-col items-center justify-center gap-1 shadow-sm hover:border-blue-500 hover:bg-blue-50 transition-all focus:outline-none focus:ring-4 focus:ring-blue-500/50">
                                 <span className="text-4xl sm:text-5xl font-serif font-black uppercase text-stone-800 tracking-tighter">New</span>
                                 <span className="text-xl sm:text-2xl font-serif italic text-stone-500">Testament</span>
                             </button>
