@@ -19,7 +19,8 @@ from bible_common import (
     validate_api_response,
     OT_HEBREW_ID,
     NT_GREEK_ID,
-    API_BASE_URL
+    API_BASE_URL,
+    validate_safe_path
 )
 
 def get_api_key():
@@ -122,6 +123,9 @@ def verify_local_content(readings_path):
 
     for day in readings:
         day_id = day['day']
+        if not validate_safe_path(day_id):
+            raise ValueError(f"❌ Path traversal detected in day_id: {day_id}")
+
         day_dir = os.path.join(data_dir, day_id)
         manifest_path = os.path.join(day_dir, "manifest.json")
 
@@ -145,7 +149,7 @@ def verify_local_content(readings_path):
             continue
 
         for filename in files:
-            if ".." in filename:
+            if not validate_safe_path(filename):
                 raise ValueError(f"Path traversal detected in filename: {filename}")
             filepath = os.path.join(day_dir, filename)
             if not os.path.exists(filepath):

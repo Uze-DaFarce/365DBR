@@ -23,6 +23,7 @@ from bible_common import (
     REVERSE_HEBREW_BOOK_MAP,
     OT_HEBREW_BOOK_MAP,
     atomic_write_json,
+    validate_safe_path,
     ALL_BOOKS
 )
 
@@ -39,17 +40,6 @@ def get_api_key():
     masked_key = key[:4] + "..." + key[-4:] if len(key) > 8 else "***"
     print(f"DEBUG: Using API Key: '{masked_key}' (Length: {len(key)})")
     return key
-
-def validate_safe_path(name):
-    """
-    Validates that the filename/path component is safe and does not contain
-    directory traversal characters or separators.
-    """
-    if ".." in name:
-        return False
-    if "/" in name or "\\" in name:
-        return False
-    return True
 
 def validate_args(args):
     """
