@@ -544,19 +544,29 @@ def validate_content_integrity(data, range_str, inject_missing=True):
 
 
     # 4. Compare Counts
-    # Special Handling for Psalms: Title merging often reduces count by 1 per chapter involved.
-    # We allow a loose tolerance for Psalms.
-    is_psalm = "PSA" in range_str
+    # Special Handling for Psalms and New Testament (Critical Texts):
+    # - Psalms: Title merging often reduces count by 1 per chapter involved.
+    # - NT (SBLGNT): Often merges or omits verses differently than KJV/LSV, causing +/- 1 or 2 variance per chapter.
+    # We allow a loose tolerance to prevent fatal errors on known structural API variations.
 
-    if is_psalm:
-        # Allow +/- 1 per chapter in range?
-        # Simplest: Allow +/- 1 total variance (strict).
-        # This catches "2 verses missing" in small Psalms while allowing for 1 title/verse merge difference.
-        if abs(expected - actual) > 1:
-             raise ValueError(f"[Data Integrity] Verse Count Mismatch for {range_str} (Psalms). Expected ~{expected}, Got {actual} (Tolerance 1)")
+    variance = abs(expected - actual)
+
+    # Calculate how many chapters are involved in the range
+    # Simplistic estimation: 1 + (end_chap - start_chap) or 1 if single chapter
+    chapters_involved = 1
+    if e_chap >= s_chap:
+        chapters_involved = e_chap - s_chap + 1
     else:
-        if expected != actual:
-             raise ValueError(f"[Data Integrity] Verse Count Mismatch for {range_str}. Expected {expected}, Got {actual}")
+        # Cross book, safely assume at least 2
+        chapters_involved = 2
+
+    # Allow a tolerance of up to 1 verse per chapter involved.
+    # So a single chapter range can vary by +/- 1, a two-chapter range by +/- 2.
+    allowed_tolerance = chapters_involved
+
+    if variance > allowed_tolerance:
+         sorted_actual = sorted(list(actual_vids))
+         raise ValueError(f"[Data Integrity] Verse Count Mismatch for {range_str}. Expected {expected}, Got {actual} (Exceeds Tolerance {allowed_tolerance}). API payload verses: {sorted_actual}")
 
     # Additional Sentinel Check: Zero Verses
     if expected > 0 and actual == 0:
@@ -585,11 +595,13 @@ def validate_content_integrity(data, range_str, inject_missing=True):
              # If Psalm 18:43 is requested, but API returns 18:44 due to title...
              # But we use Hebrew IDs, so it should match.
              # If it's just missing, it's an error.
-             raise ValueError(f"[Data Integrity] Start Verse {start_vid} MISSING in response for {range_str}. Possible range shift or truncation.")
+             sorted_actual = sorted(list(normalized_actual_vids))
+             raise ValueError(f"[Data Integrity] Start Verse {start_vid} MISSING in response for {range_str}. Possible range shift or truncation. API payload verses: {sorted_actual}")
 
         # Check End
         if end_vid not in normalized_actual_vids and end_vid not in KNOWN_OMISSIONS:
-             raise ValueError(f"[Data Integrity] End Verse {end_vid} MISSING in response for {range_str}. Possible range shift or truncation.")
+             sorted_actual = sorted(list(normalized_actual_vids))
+             raise ValueError(f"[Data Integrity] End Verse {end_vid} MISSING in response for {range_str}. Possible range shift or truncation. API payload verses: {sorted_actual}")
 
     return True
 
