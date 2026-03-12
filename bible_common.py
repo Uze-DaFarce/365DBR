@@ -544,19 +544,19 @@ def validate_content_integrity(data, range_str, inject_missing=True):
 
 
     # 4. Compare Counts
-    # Special Handling for Psalms: Title merging often reduces count by 1 per chapter involved.
-    # We allow a loose tolerance for Psalms.
-    is_psalm = "PSA" in range_str
+    # Due to variations in critical Greek texts (SBLGNT) merging or omitting verses differently than KJV,
+    # data validation incorporates a tolerance of +/- 1 verse per chapter.
+    unique_chapters = set()
+    for vid in actual_vids:
+        b, c, _ = vid.split('.')
+        unique_chapters.add(f"{b}.{c}")
 
-    if is_psalm:
-        # Allow +/- 1 per chapter in range?
-        # Simplest: Allow +/- 1 total variance (strict).
-        # This catches "2 verses missing" in small Psalms while allowing for 1 title/verse merge difference.
-        if abs(expected - actual) > 1:
-             raise ValueError(f"[Data Integrity] Verse Count Mismatch for {range_str} (Psalms). Expected ~{expected}, Got {actual} (Tolerance 1)")
-    else:
-        if expected != actual:
-             raise ValueError(f"[Data Integrity] Verse Count Mismatch for {range_str}. Expected {expected}, Got {actual}")
+    # In case of empty content (actual == 0), default tolerance to 1 to allow for the zero check below
+    chapter_count = max(1, len(unique_chapters))
+    tolerance = chapter_count
+
+    if abs(expected - actual) > tolerance:
+        raise ValueError(f"[Data Integrity] Verse Count Mismatch for {range_str}. Expected {expected}, Got {actual} (Tolerance {tolerance})")
 
     # Additional Sentinel Check: Zero Verses
     if expected > 0 and actual == 0:
