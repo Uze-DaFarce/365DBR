@@ -1408,6 +1408,8 @@ const App = () => {
   const [playbackStatus, setPlaybackStatus] = useState('stopped');
   const [activeVerseId, setActiveVerseId] = useState(initialState.verseId || null); // Visual position (scroll tracking)
   const activeVerseIdRef = useRef(activeVerseId);
+  const isNavigatingRef = useRef(false);
+  const navigationTimeoutRef = useRef(null);
   useEffect(() => { activeVerseIdRef.current = activeVerseId; }, [activeVerseId]);
 
   const [playbackVerseId, setPlaybackVerseId] = useState(null); // Where playback is at
@@ -1755,6 +1757,9 @@ const App = () => {
   useEffect(() => {
     if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0) return;
     const observer = new IntersectionObserver((entries) => {
+      // Suspend observer during programmatic scroll to prevent bounce-back and skipped verses
+      if (isNavigatingRef.current) return;
+
       // Check if we are at the absolute bottom of the page first to prevent bounce-back
       // Use scrollHeight and Math.ceil/floor tolerance for cross-browser sub-pixel accuracy
       if (Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
@@ -1774,7 +1779,20 @@ const App = () => {
     });
 
     const handleScroll = () => {
+      if (isNavigatingRef.current) return;
       if (Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
+         // Prevent snapping to the last verse if the currently active verse is already fully visible on screen.
+         // This preserves keyboard/click navigation for short verses at the end of the page.
+         if (activeVerseIdRef.current) {
+             const activeEl = document.getElementById(`verse-${activeVerseIdRef.current}`);
+             if (activeEl) {
+                 const rect = activeEl.getBoundingClientRect();
+                 // If the active verse is visible within the viewport (allowing some margin for sticky headers)
+                 if (rect.top >= 50 && rect.bottom <= window.innerHeight) {
+                     return;
+                 }
+             }
+         }
          const lastGroup = groupedVids[groupedVids.length - 1];
          if (lastGroup) setActiveVerseId(lastGroup[0]);
       }
@@ -2062,6 +2080,11 @@ const App = () => {
         // ⚡ Bolt Optimization: Update state immediately so subsequent key presses have correct reference context
         // and the UI highlights the target verse even if smooth scrolling lands outside the observer rootMargin.
         setActiveVerseId(nextVid);
+
+        // Suspend IntersectionObserver during programmatic smooth scroll (approx 500ms-700ms)
+        isNavigatingRef.current = true;
+        if (navigationTimeoutRef.current) clearTimeout(navigationTimeoutRef.current);
+        navigationTimeoutRef.current = setTimeout(() => { isNavigatingRef.current = false; }, 800);
 
         const el = document.getElementById(`verse-${nextVid}`);
         if (el) {

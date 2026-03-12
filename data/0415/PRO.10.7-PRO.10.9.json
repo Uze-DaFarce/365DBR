@@ -1,0 +1,775 @@
+{
+  "data": {
+    "id": "PRO.10.7-PRO.10.9",
+    "orgId": "PRO.10.7-PRO.10.9",
+    "bibleId": "0b262f1ed7f084a6-01",
+    "bookId": "PRO",
+    "chapterIds": [
+      "PRO.10"
+    ],
+    "reference": "מִשְׁלֵי 10:7-9",
+    "content": [
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H2143"
+            },
+            "items": [
+              {
+                "text": "זֵ֣כֶר",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.7",
+                  "verseOrgIds": [
+                    "PRO.10.7"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.7",
+              "verseOrgIds": [
+                "PRO.10.7"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6662"
+            },
+            "items": [
+              {
+                "text": "צַ֭דִּיק",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.7",
+                  "verseOrgIds": [
+                    "PRO.10.7"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.7",
+              "verseOrgIds": [
+                "PRO.10.7"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1293"
+            },
+            "items": [
+              {
+                "text": "לִבְרָכָ֑ה",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.7",
+                  "verseOrgIds": [
+                    "PRO.10.7"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.7",
+              "verseOrgIds": [
+                "PRO.10.7"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8034"
+            },
+            "items": [
+              {
+                "text": "וְשֵׁ֖ם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.7",
+                  "verseOrgIds": [
+                    "PRO.10.7"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.7",
+              "verseOrgIds": [
+                "PRO.10.7"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7563"
+            },
+            "items": [
+              {
+                "text": "רְשָׁעִ֣ים",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.7",
+                  "verseOrgIds": [
+                    "PRO.10.7"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.7",
+              "verseOrgIds": [
+                "PRO.10.7"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H7537"
+            },
+            "items": [
+              {
+                "text": "יִרְקָֽב",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.7",
+                  "verseOrgIds": [
+                    "PRO.10.7"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.7",
+              "verseOrgIds": [
+                "PRO.10.7"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H2450"
+            },
+            "items": [
+              {
+                "text": "חֲכַם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "־",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.8",
+              "verseOrgIds": [
+                "PRO.10.8"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3820"
+            },
+            "items": [
+              {
+                "text": "לֵ֭ב",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.8",
+              "verseOrgIds": [
+                "PRO.10.8"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3947"
+            },
+            "items": [
+              {
+                "text": "יִקַּ֣ח",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.8",
+              "verseOrgIds": [
+                "PRO.10.8"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H4687"
+            },
+            "items": [
+              {
+                "text": "מִצְוֺ֑ת",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.8",
+              "verseOrgIds": [
+                "PRO.10.8"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0191"
+            },
+            "items": [
+              {
+                "text": "וֶאֱוִ֥יל",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.8",
+              "verseOrgIds": [
+                "PRO.10.8"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8193"
+            },
+            "items": [
+              {
+                "text": "שְׂ֝פָתַ֗יִם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.8",
+              "verseOrgIds": [
+                "PRO.10.8"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3832"
+            },
+            "items": [
+              {
+                "text": "יִלָּבֵֽט",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.8",
+              "verseOrgIds": [
+                "PRO.10.8"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1980"
+            },
+            "items": [
+              {
+                "text": "הוֹלֵ֣ךְ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.9",
+                  "verseOrgIds": [
+                    "PRO.10.9"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.9",
+              "verseOrgIds": [
+                "PRO.10.9"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H8537"
+            },
+            "items": [
+              {
+                "text": "בַּ֭תֹּם",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.9",
+                  "verseOrgIds": [
+                    "PRO.10.9"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.9",
+              "verseOrgIds": [
+                "PRO.10.9"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3212"
+            },
+            "items": [
+              {
+                "text": "יֵ֣לֶךְ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.9",
+                  "verseOrgIds": [
+                    "PRO.10.9"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.9",
+              "verseOrgIds": [
+                "PRO.10.9"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H0983"
+            },
+            "items": [
+              {
+                "text": "בֶּ֑טַח",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.9",
+                  "verseOrgIds": [
+                    "PRO.10.9"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.9",
+              "verseOrgIds": [
+                "PRO.10.9"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H6140"
+            },
+            "items": [
+              {
+                "text": "וּמְעַקֵּ֥שׁ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.9",
+                  "verseOrgIds": [
+                    "PRO.10.9"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.9",
+              "verseOrgIds": [
+                "PRO.10.9"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H1870"
+            },
+            "items": [
+              {
+                "text": "דְּ֝רָכָ֗יו",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.9",
+                  "verseOrgIds": [
+                    "PRO.10.9"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": " ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.9",
+              "verseOrgIds": [
+                "PRO.10.9"
+              ]
+            }
+          },
+          {
+            "name": "char",
+            "type": "tag",
+            "attrs": {
+              "style": "w",
+              "strong": "H3045"
+            },
+            "items": [
+              {
+                "text": "יִוָּדֵֽעַ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.9",
+                  "verseOrgIds": [
+                    "PRO.10.9"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "text": "׃ ",
+            "type": "text",
+            "attrs": {
+              "verseId": "PRO.10.9",
+              "verseOrgIds": [
+                "PRO.10.9"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "verseCount": 3,
+    "copyright": "PUBLIC DOMAIN",
+    "parallels": [
+      {
+        "id": "PRO.10.7-PRO.10.9",
+        "orgId": "PRO.10.7-PRO.10.9",
+        "bibleId": "de4e12af7f28f599-01",
+        "bookId": "PRO",
+        "chapterIds": [
+          "PRO.10"
+        ],
+        "reference": "Proverbs 10:7-9",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "The memory of the just ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.7",
+                  "verseOrgIds": [
+                    "PRO.10.7"
+                  ]
+                }
+              },
+              {
+                "name": "char",
+                "type": "tag",
+                "attrs": {
+                  "style": "add"
+                },
+                "items": [
+                  {
+                    "text": "is",
+                    "type": "text",
+                    "attrs": {
+                      "verseId": "PRO.10.7",
+                      "verseOrgIds": [
+                        "PRO.10.7"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " blessed: but the name of the wicked shall rot. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.7",
+                  "verseOrgIds": [
+                    "PRO.10.7"
+                  ]
+                }
+              },
+              {
+                "text": "The wise in heart will receive commandments: but a prating fool shall fall.",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              },
+              {
+                "text": "He that walketh uprightly walketh surely: but he that perverteth his ways shall be known. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.9",
+                  "verseOrgIds": [
+                    "PRO.10.9"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 3,
+        "copyright": "PUBLIC DOMAIN except in the United Kingdom, where a Crown Copyright applies to printing the KJV. See http://www.cambridge.org/about-us/who-we-are/queens-printers-patent"
+      },
+      {
+        "id": "PRO.10.7-PRO.10.9",
+        "orgId": "PRO.10.7-PRO.10.9",
+        "bibleId": "01b29f4b342acc35-01",
+        "bookId": "PRO",
+        "chapterIds": [
+          "PRO.10"
+        ],
+        "reference": "Proverbs 10:7-9",
+        "content": [
+          {
+            "name": "para",
+            "type": "tag",
+            "attrs": {
+              "style": "p"
+            },
+            "items": [
+              {
+                "text": "The remembrance of the righteous [is] for a blessing, || And the name of the wicked rots. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.7",
+                  "verseOrgIds": [
+                    "PRO.10.7"
+                  ]
+                }
+              },
+              {
+                "text": "The wise in heart accepts commands, || And a talkative fool kicks. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.8",
+                  "verseOrgIds": [
+                    "PRO.10.8"
+                  ]
+                }
+              },
+              {
+                "text": "Whoever is walking in integrity walks confidently, || And whoever is perverting his ways is known. ",
+                "type": "text",
+                "attrs": {
+                  "verseId": "PRO.10.9",
+                  "verseOrgIds": [
+                    "PRO.10.9"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "verseCount": 3,
+        "copyright": "The Literal Standard Version of The Holy Bible is a registered copyright of Covenant Press and the Covenant Christian Coalition (© 2020), but has been subsequently released under the Creative Commons Attribution-ShareAlike license (CC BY-SA) per our desire to provide God’s word freely. Covenant Press requests that the text remain unaltered in the English language and that translations based on the LSV maintain the same spirit of faithfulness to the original Hebrew, Aramaic, and Greek text. Attribution of minor citations for personal or non-commercial use can be provided as simply “LSV” or “Literal Standard Version.” Citations for commercial use, or distribution of the entire LSV Bible or entire book(s) of the LSV Bible, must be fully attributed and include both “Literal Standard Version (LSV)” and the name of our organization. Covenant Press is soliciting partnerships with Bible publishers that are interested in the LSV project. For queries about partnering with us, please email the translation team at covenantpress@ccc.one. To learn more, visit lsvbible.com. The purpose behind the LSV is to provide readers with a modern, easy-to-read, literal, and accurate translation of the Bible that is free to read, distribute, and translate from. We pray that God will use the LSV to illuminate the hearts and minds of multitudes with the good news that His Son Jesus Christ came in the flesh, died for our sins as a substitutionary sacrifice, rose bodily from the dead, and is coming back again."
+      }
+    ]
+  },
+  "meta": {
+    "fumsToken": "G8UBIBwHbqxlyoOgvZ4vje1Tf_lsOw-RZBHS2YDvkixdfaEzeE4HqoEDq7BZgGyPogtfMOxa6NdteihiBNFTM8q1-4v3lzvAfpAlzs1X6zonFloziyuhJe3IPtPZq90dtoacybr7CkiVg51TqL7DLzJubSYQAuB4U8NQA4lho-wYSTWH3wDnQ59N8fUIuL5WLLy_LBCnt9OXTgZC7CSL1Rz-Yububt3F5GSXc4VF3CQLF4m1Solf_cP86qhzldB94DaGj5IG8n7_qt8WpUqVnE4iSwdaUbccuh5RPC_FnKYkDA"
+  }
+}
