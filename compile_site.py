@@ -10,6 +10,7 @@ import sys
 import re
 import requests
 from playwright.sync_api import sync_playwright
+from bible_common import validate_safe_path, validate_safe_relative_path
 
 # Use port 0 to let OS choose a free port
 DATA_DIR = "data"
@@ -53,7 +54,7 @@ def setup_data_interception(page, base_url):
                 if split_token in url:
                     rel_path = url.split(split_token)[1]
 
-                    if ".." in rel_path:
+                    if not validate_safe_relative_path(rel_path):
                         route.abort('accessdenied')
                         return
 
@@ -101,6 +102,9 @@ def compile_readings(page, readings, base_url, limit=None):
 
     for i, day in enumerate(readings):
         mmdd = day['day'] # e.g. "0225"
+
+        if not validate_safe_path(mmdd):
+             raise ValueError(f"[Security Error] Invalid day ID: {mmdd}")
 
         # Determine output path: data/0225/index.html
         day_dir = os.path.join(DATA_DIR, mmdd)
@@ -150,6 +154,8 @@ def compile_readings(page, readings, base_url, limit=None):
                 full_data_payload['manifest'] = manifest_content
                 full_data_payload['files'] = {}
                 for fname in manifest_content.get('files', []):
+                    if not validate_safe_path(fname):
+                         raise ValueError(f"[Security Error] Invalid filename in manifest: {fname}")
                     fpath = os.path.join(DATA_DIR, mmdd, fname)
                     # Try Local File
                     if os.path.exists(fpath):

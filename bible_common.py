@@ -222,6 +222,27 @@ REVERSE_HEBREW_BOOK_MAP = {v: k for k, v in OT_HEBREW_BOOK_MAP.items()}
 # FUNCTIONS (From fetch_readings.py)
 # =============================================================================
 
+def validate_safe_path(name):
+    """
+    Validates that the filename/path component is safe and does not contain
+    directory traversal characters or separators.
+    """
+    if ".." in name:
+        return False
+    if "/" in name or "\\" in name:
+        return False
+    return True
+
+def validate_safe_relative_path(path):
+    """
+    Validates that a relative path is safe and does not contain
+    directory traversal characters (e.g. "..").
+    It permits forward slashes and backslashes.
+    """
+    if ".." in path:
+        return False
+    return True
+
 def get_books_in_range(range_str):
     """
     Extracts all book codes involved in a range string.
