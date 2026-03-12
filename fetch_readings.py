@@ -24,10 +24,6 @@ from bible_common import (
     OT_HEBREW_BOOK_MAP,
     atomic_write_json,
     validate_safe_path,
-    extract_verse_ids,
-    count_expected_verses,
-    inject_missing_verses,
-    get_books_in_range,
     ALL_BOOKS
 )
 
