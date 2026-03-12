@@ -554,8 +554,13 @@ def validate_content_integrity(data, range_str, inject_missing=True):
     # Calculate how many chapters are involved in the range
     # Simplistic estimation: 1 + (end_chap - start_chap) or 1 if single chapter
     chapters_involved = 1
-    if e_chap >= s_chap:
-        chapters_involved = e_chap - s_chap + 1
+
+    # Cast to int just in case, though parse_reference already returns ints.
+    s_chap_int = int(s_chap)
+    e_chap_int = int(e_chap)
+
+    if e_chap_int >= s_chap_int:
+        chapters_involved = e_chap_int - s_chap_int + 1
     else:
         # Cross book, safely assume at least 2
         chapters_involved = 2
