@@ -563,6 +563,21 @@ def process_day(day_entry, api_key, output_dir):
             if not validate_safe_path(rng_str):
                 raise ValueError(f"[Security Error] Invalid range string detected: '{rng_str}'. Path traversal characters detected.")
 
+            # Proactive API Bug Mitigation: Force split ALL cross-book ranges.
+            # api.bible has a bug where cross-book queries (e.g. JDG.20.35-RUT.1.22)
+            # return garbage data from completely different books (like 1SA) instead of a 404.
+            # Splitting guarantees clean requests for each book.
+            if '-' in rng_str:
+                start_book = rng_str.split('-')[0].split('.')[0]
+                end_book = rng_str.split('-')[1].split('.')[0]
+                if start_book != end_book:
+                    splits = split_cross_book_range(rng_str)
+                    if len(splits) > 1:
+                        print(f"  [Proactive Split] Splitting cross-book range {rng_str} -> {splits} to prevent API corruption.")
+                        for s in reversed(splits):
+                            processing_queue.insert(0, s)
+                        continue # Re-process the split ranges
+
             # Integrity Check: Validate range belongs to section
             # This catches cases where a split range (e.g. from a 404 recovery) might include prohibited books for the section.
             validate_range_for_section(section_name, rng_str)
@@ -591,18 +606,7 @@ def process_day(day_entry, api_key, output_dir):
                 time.sleep(0.1)
 
             except RuntimeError as e:
-                # Check for 404 and try to recover by splitting if it's a cross-book range
-                is_404 = "404" in str(e)
-                if is_404 and bible_id == OT_HEBREW_ID:
-                    splits = split_cross_book_range(rng_str)
-                    if len(splits) > 1:
-                        print(f"    [Recovered] 404 encountered for cross-book range. Splitting {rng_str} -> {splits}")
-                        # Insert splits at the front of the queue to be processed next
-                        for s in reversed(splits):
-                            processing_queue.insert(0, s)
-                        continue # Retry with new splits
-
-                # If not recovered, raise
+                # Fallback: We no longer handle 404 splitting here because we proactively split above.
                 raise e
 
     # All parts fetched successfully. Commit to disk.
