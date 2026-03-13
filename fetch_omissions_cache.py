@@ -72,12 +72,11 @@ def build_cache():
         print(f"Fetching bulk passages for {version}...")
         try:
             passages = []
-            # Batch the vids into chunks of 5 to avoid 400 Bad Request limits
-            chunk_size = 5
-            for i in range(0, len(vids), chunk_size):
-                chunk = vids[i:i + chunk_size]
-                print(f"    Fetching batch {i//chunk_size + 1}: {','.join(chunk)}")
-                data = fetch_bulk_passages(api_key, bible_id, chunk)
+            # API documentation implies comma separation, but the server actively rejects it with 400.
+            # We will make individual verse queries. It costs 20 credits per translation, which is minimal for a one-time script.
+            for vid in vids:
+                print(f"    Fetching {vid}...")
+                data = fetch_bulk_passages(api_key, bible_id, [vid])
 
                 chunk_passages = data.get('data', [])
                 if isinstance(chunk_passages, dict):
