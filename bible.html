@@ -750,6 +750,7 @@ function App() {
   }, []);
 
   const handleSaveBookmark = (slot, vid, color) => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       const newBookmarks = { ...bookmarks };
       if (!vid) {
           delete newBookmarks[slot];
@@ -761,6 +762,7 @@ function App() {
   };
 
   const handleNavigateToBookmark = (vid) => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       const parts = vid.split('.');
       if (parts.length === 3) {
           setSelectedBook(parts[0]);
@@ -909,6 +911,7 @@ function App() {
   }, [loading, selectedBook]);
 
   const openBrowseDialog = (step = 'testament', testament = null, book = null, chapter = null) => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       setBrowseInitialStep(step);
       setBrowseInitialTestament(testament);
       setBrowseInitialBook(book);
@@ -1249,6 +1252,7 @@ function App() {
   };
 
   const navigateChapter = useCallback((direction) => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       if (!selectedBook || !selectedChapter || !availableBooks.length) return;
 
       const currentBookIndex = availableBooks.indexOf(selectedBook);
@@ -1286,6 +1290,7 @@ function App() {
   }, [selectedBook, selectedChapter, availableBooks]);
 
   const navigateVerse = (direction) => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       if (!sortedVids || sortedVids.length === 0) return;
       let currentIndex = -1;
       if (activeVerseIdRef.current) currentIndex = sortedVids.indexOf(activeVerseIdRef.current);
@@ -1308,6 +1313,7 @@ function App() {
   };
 
   const handleToggle = () => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       if (playbackStatus === 'playing') {
           window.speechSynthesis.pause();
           setPlaybackStatus('paused');
@@ -1321,6 +1327,7 @@ function App() {
   };
 
   const handleFocalChange = useCallback((newFocal) => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       setFocalTranslation(newFocal);
       setIsFocalOpen(false);
   }, []);
@@ -1354,7 +1361,7 @@ function App() {
                     </a>
 
                     <button
-                        onClick={() => openBrowseDialog('testament')}
+                        onClick={(e) => { e.currentTarget.blur(); openBrowseDialog('testament'); }}
                         className="bg-stone-100 hover:bg-stone-200 border-none rounded text-[10px] min-[450px]:text-xs font-black uppercase tracking-tight py-1 px-2 min-[450px]:px-3 focus:ring-2 focus:ring-amber-500 transition-colors flex items-center gap-1 shrink-0"
                         aria-label="Browse Bible"
                     >
@@ -1363,18 +1370,18 @@ function App() {
                     </button>
                     {selectedBook && selectedChapter && (
                         <div className="flex items-center text-xs min-[450px]:text-sm font-bold text-stone-600 shrink-0 uppercase tracking-tight gap-1 bg-stone-100 rounded px-0.5 relative group">
-                            <button onClick={() => navigateChapter(-1)} aria-label="Previous Chapter" aria-keyshortcuts="ArrowLeft" title="Previous Chapter (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden">
+                            <button onClick={(e) => { e.currentTarget.blur(); navigateChapter(-1); }} aria-label="Previous Chapter" aria-keyshortcuts="ArrowLeft" title="Previous Chapter (Left Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden">
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" /></svg>
                             </button>
-                            <button onClick={() => openBrowseDialog('book', NT_BOOKS.has(selectedBook) ? 'NT' : 'OT', null, null)} className="hover:text-amber-600 hover:bg-stone-200 px-1 py-0.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500">{BOOK_NAMES[selectedBook]}</button>
-                            <button onClick={() => openBrowseDialog('chapter', NT_BOOKS.has(selectedBook) ? 'NT' : 'OT', selectedBook, null)} className="hover:text-amber-600 hover:bg-stone-200 px-1 py-0.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500">{selectedChapter}</button>
+                            <button onClick={(e) => { e.currentTarget.blur(); openBrowseDialog('book', NT_BOOKS.has(selectedBook) ? 'NT' : 'OT', null, null); }} className="hover:text-amber-600 hover:bg-stone-200 px-1 py-0.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500">{BOOK_NAMES[selectedBook]}</button>
+                            <button onClick={(e) => { e.currentTarget.blur(); openBrowseDialog('chapter', NT_BOOKS.has(selectedBook) ? 'NT' : 'OT', selectedBook, null); }} className="hover:text-amber-600 hover:bg-stone-200 px-1 py-0.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500">{selectedChapter}</button>
                             {activeVerseId && activeVerseId.split('.').length === 3 && (
                                 <>
                                     <span className="text-stone-400 font-black">:</span>
-                                    <button onClick={() => openBrowseDialog('verse', NT_BOOKS.has(selectedBook) ? 'NT' : 'OT', selectedBook, selectedChapter)} className="hover:text-amber-600 hover:bg-stone-200 px-1 py-0.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500">{activeVerseId.split('.')[2]}</button>
+                                    <button onClick={(e) => { e.currentTarget.blur(); openBrowseDialog('verse', NT_BOOKS.has(selectedBook) ? 'NT' : 'OT', selectedBook, selectedChapter); }} className="hover:text-amber-600 hover:bg-stone-200 px-1 py-0.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500">{activeVerseId.split('.')[2]}</button>
                                 </>
                             )}
-                            <button onClick={() => navigateChapter(1)} aria-label="Next Chapter" aria-keyshortcuts="ArrowRight" title="Next Chapter (Right Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden">
+                            <button onClick={(e) => { e.currentTarget.blur(); navigateChapter(1); }} aria-label="Next Chapter" aria-keyshortcuts="ArrowRight" title="Next Chapter (Right Arrow)" className="p-1 font-black text-stone-900 hover:text-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded print:hidden">
                                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
                             </button>
                         </div>
@@ -1519,7 +1526,7 @@ function App() {
         {selectedBook && selectedChapter && !loading && !error && (
             <div className="flex justify-center mt-12 mb-10 pb-20">
                 <button
-                    onClick={() => navigateChapter(1)}
+                    onClick={(e) => { e.currentTarget.blur(); navigateChapter(1); }}
                     className="flex items-center gap-2 px-6 py-3 bg-white border border-stone-300 rounded-full shadow-sm text-sm font-black uppercase tracking-widest text-stone-700 hover:text-amber-600 hover:border-amber-400 hover:bg-amber-50 transition-all focus:outline-none focus:ring-4 focus:ring-amber-500/30 group"
                 >
                     Next Chapter
