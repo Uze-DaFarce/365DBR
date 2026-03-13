@@ -71,13 +71,18 @@ def build_cache():
     for version, bible_id in bible_mappings:
         print(f"Fetching bulk passages for {version}...")
         try:
-            data = fetch_bulk_passages(api_key, bible_id, vids)
-            # The API returns a list of passages in `data['data']` when multiple are requested
-            passages = data.get('data', [])
-            if isinstance(passages, dict):
-                # Sometimes if it's one block, it's a dict. But with a comma separated list, it should be a list.
-                # Actually, the documentation says multiple passages returns an array under `data`
-                passages = [passages]
+            passages = []
+            # Batch the vids into chunks of 5 to avoid 400 Bad Request limits
+            chunk_size = 5
+            for i in range(0, len(vids), chunk_size):
+                chunk = vids[i:i + chunk_size]
+                print(f"    Fetching batch {i//chunk_size + 1}: {','.join(chunk)}")
+                data = fetch_bulk_passages(api_key, bible_id, chunk)
+
+                chunk_passages = data.get('data', [])
+                if isinstance(chunk_passages, dict):
+                    chunk_passages = [chunk_passages]
+                passages.extend(chunk_passages)
 
             for passage in passages:
                 ref = passage.get('reference')
