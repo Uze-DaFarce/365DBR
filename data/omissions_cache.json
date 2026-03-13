@@ -1,0 +1,72 @@
+{
+  "KJV": {
+    "ACT.8.37": [
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "verse",
+            "type": "tag",
+            "attrs": {
+              "verseId": "ACT.8.37",
+              "style": "v",
+              "data-number": "37"
+            },
+            "items": [
+              {
+                "text": "37",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "text": "And Philip said, If thou believest with all thine heart, thou mayest. And he answered and said, I believe that Jesus Christ is the Son of God. ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ACT.8.37"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "LSV": {
+    "ACT.8.37": [
+      {
+        "name": "para",
+        "type": "tag",
+        "attrs": {
+          "style": "p"
+        },
+        "items": [
+          {
+            "name": "verse",
+            "type": "tag",
+            "attrs": {
+              "verseId": "ACT.8.37",
+              "style": "v",
+              "data-number": "37"
+            },
+            "items": [
+              {
+                "text": "37",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "text": "And Philip said, \u201cIf you believe out of all the heart, it is lawful;\u201d and he answering said, \u201cI believe Jesus Christ to be the Son of God;\u201d ",
+            "type": "text",
+            "attrs": {
+              "verseId": "ACT.8.37"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

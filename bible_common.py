@@ -94,6 +94,7 @@ KNOWN_OMISSIONS = {
     "LUK.17.36", "LUK.23.17",
     "JHN.5.4",
     "ACT.8.37", "ACT.15.34", "ACT.19.41", "ACT.24.7", "ACT.28.29",
+    "ROM.14.24", "ROM.14.25", "ROM.14.26",
     "ROM.16.24"
 }
 
@@ -415,8 +416,7 @@ def count_expected_verses(range_str):
 
 def inject_missing_verses(data, range_str):
     """
-    Injects placeholder objects for verses known to be missing in the Critical Text
-    but expected by the reading plan (KJV/LSV counts).
+    Injects missing verses from the cache directly into the API payload.
     Modifies data in-place.
     """
     if 'data' not in data or 'content' not in data['data']:
@@ -440,12 +440,22 @@ def inject_missing_verses(data, range_str):
     if not verses_to_inject:
         return
 
+    # Try to load the omissions cache
+    import os, json
+    cache = {"KJV": {}, "LSV": {}}
+    if os.path.exists("data/omissions_cache.json"):
+        try:
+            with open("data/omissions_cache.json", "r", encoding="utf-8") as f:
+                cache = json.load(f)
+        except Exception as e:
+            print(f"    [Warning] Could not load omissions cache: {e}")
+
     # 2. Inject them
     for vid in verses_to_inject:
-        print(f"    [Injection] Injecting placeholder for missing verse {vid}...")
+        print(f"    [Injection] Injecting missing verse {vid} from cache...")
 
-        # Create the Verse Object
-        verse_obj = {
+        # Create the Primary (Greek) Verse Object
+        verse_obj_primary = {
             "name": "para",
             "type": "tag",
             "attrs": { "style": "p" },
@@ -454,30 +464,59 @@ def inject_missing_verses(data, range_str):
                     "name": "verse",
                     "type": "tag",
                     "attrs": { "verseId": vid, "style": "v", "data-number": vid.split('.')[2] },
-                    "items": [{ "text": vid.split('.')[2], "type": "text" }] # Verse Number
+                    "items": [{ "text": vid.split('.')[2], "type": "text" }]
                 },
                 {
-                    "text": " [Verse omitted in Greek text] ",
+                    "text": " [Verse omitted in oldest historical manuscripts] ",
                     "type": "text"
                 }
             ]
         }
 
-        # Naive Injection: Just append to content.
-        # Ideally we place it correctly.
         b, c, v = parse_reference(vid)
         preceding_vid = f"{b}.{c}.{v-1}"
 
+        # Inject into Primary Content
         inserted = False
-
         for i, item in enumerate(content_list):
             if str(preceding_vid) in str(item):
-                content_list.insert(i + 1, verse_obj)
+                content_list.insert(i + 1, verse_obj_primary)
                 inserted = True
                 break
-
         if not inserted:
-            content_list.append(verse_obj)
+            content_list.append(verse_obj_primary)
+
+        # Inject into Parallels (KJV and LSV)
+        parallels = data['data'].get('parallels', [])
+        for p in parallels:
+            # Parallel blocks might not have a reliable translation ID at the root,
+            # but we fetch KJV first and LSV second in our API request.
+            # However, the safest way is to just identify the parallel by checking its copyright/ID
+            # Or simpler: The cache keys are 'KJV' and 'LSV', parallel index 0 is KJV, index 1 is LSV
+            p_content = p.get('content', [])
+
+            # Attempt to determine which parallel it is
+            translation_name = None
+            if p.get('bibleId') == PARALLEL_IDS[0]:
+                translation_name = "KJV"
+            elif len(PARALLEL_IDS) > 1 and p.get('bibleId') == PARALLEL_IDS[1]:
+                translation_name = "LSV"
+
+            if translation_name and translation_name in cache:
+                cached_items = cache[translation_name].get(vid)
+                if cached_items:
+                    # Inject it
+                    p_inserted = False
+                    for i, item in enumerate(p_content):
+                        if str(preceding_vid) in str(item):
+                            # cached_items is a list of items (usually 1 para tag)
+                            # We unpack it and insert
+                            for offset, c_item in enumerate(cached_items):
+                                p_content.insert(i + 1 + offset, c_item)
+                            p_inserted = True
+                            break
+                    if not p_inserted:
+                        p_content.extend(cached_items)
 
 def validate_content_integrity(data, range_str, inject_missing=True):
     """
