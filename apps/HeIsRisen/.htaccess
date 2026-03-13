@@ -1,0 +1,38 @@
+<IfModule mod_headers.c>
+  # 🛡️ Sentinel: Strict Security Headers
+  # Enforces strict Content Security Policy matching the application's meta tags.
+  # Blocks unsafe-eval and restricts scripts to self and approved CDNs.
+
+  # Strict CSP
+  # - script-src: 'self' + jsdelivr (for Phaser)
+  # - style-src: 'self' + unsafe-inline (required for Phaser canvas)
+  # - img-src: 'self' + data: + blob: (Phaser assets)
+  # - connect-src: 'self' (JSON data)
+  # - worker-src: 'self' + blob: (Web Workers)
+  # - object-src: 'none' (Block plugins)
+  Header always unset Content-Security-Policy
+  Header unset Content-Security-Policy
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests;"
+
+  # Prevent clickjacking
+  Header always unset X-Frame-Options
+  Header unset X-Frame-Options
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Prevent MIME sniffing
+  Header always unset X-Content-Type-Options
+  Header unset X-Content-Type-Options
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Override Permissions Policy to ensure game features work
+  # The root policy blocks `publickey-credentials-get` and `geolocation`. We enable them here.
+  # This prevents strict root policies from breaking the game.
+  Header always unset Permissions-Policy
+  Header unset Permissions-Policy
+  Header always set Permissions-Policy "geolocation=(self), microphone=(), camera=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), publickey-credentials-get=(self)"
+
+  # Referrer Policy
+  Header always unset Referrer-Policy
+  Header unset Referrer-Policy
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

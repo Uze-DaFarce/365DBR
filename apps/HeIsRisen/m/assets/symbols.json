@@ -1,0 +1,426 @@
+{
+    "symbols": [
+      {
+        "name": "Golden Calf",
+        "filename": "assets/symbols/pagan/golden-calf.png",
+        "category": "Pagan",
+        "scripture": "Exodus 32:4",
+        "explanation": "The Israelites made a golden calf to worship, turning away from God. This symbol represents idolatry and the danger of placing anything above God in our lives."
+      },
+      {
+        "name": "Roman Gold Coin",
+        "filename": "assets/symbols/pagan/caesar.png",
+        "category": "Pagan",
+        "scripture": "Matthew 22:21",
+        "explanation": "Wealth can become an idol if we prioritize it over God. Jesus teaches us to give to God what is rightfully His, emphasizing that our devotion should be to God above all else."
+      },
+      {
+        "name": "Sun Worship",
+        "filename": "assets/symbols/pagan/sun.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "Pagans worshiped the sun instead of the Creator. This represents the error of valuing created things above God, who alone is worthy of worship."
+      },
+      {
+        "name": "Three Spiral Wiccan Symbol",
+        "filename": "assets/symbols/pagan/3-spi-wiccan.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "Wiccans often focus on self-worship or nature worship instead of the Creator. This symbol represents the error of valuing personal spirituality or nature above God, who alone is worthy of worship"
+      },
+      {
+        "name": "Serpent Idol",
+        "filename": "assets/symbols/pagan/viper.png",
+        "category": "Pagan",
+        "scripture": "Exodus 20:4, 2 Kings 18:4",
+        "explanation": "Idols like serpent statues lead us away from God. The Bible warns against creating and worshiping images, as they can distract us from the true worship of the Creator"
+      },
+      {
+        "name": "Aries Zodiac Sign",
+        "filename": "assets/symbols/pagan/aries.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "Astrology can lead to idolatry, as it often places the stars above God. The Bible teaches us that God is sovereign over all creation, including the stars and their movements."
+      },
+      {
+        "name": "Amulet",
+        "filename": "assets/symbols/pagan/amulet.png",
+        "category": "Pagan",
+        "scripture": "1 Corinthians 10:14",
+        "explanation": "Amulets were used in pagan rituals, leading to idolatry. The Bible warns against seeking protection or power from anything other than God."
+      },
+      {
+        "name": "Ankh",
+        "filename": "assets/symbols/pagan/ankh.png",
+        "category": "Pagan",
+        "scripture": "Exodus 20:4",
+        "explanation": "The ankh is a symbol of life in pagan cultures, but it can lead to idolatry. The Bible teaches that true life comes from God alone."
+      },
+      {
+        "name": "Aztec Temple",
+        "filename": "assets/symbols/pagan/aztec-temple.png",
+        "category": "Pagan",
+        "scripture": "Exodus 20:4",
+        "explanation": "Aztec temples were built for idol worship, not for the true God. The Bible warns against creating places of worship that do not honor God."
+      },
+      {
+        "name": "Celtic Rune",
+        "filename": "assets/symbols/pagan/celtic-rune.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "Celtic runes were used in pagan rituals, often leading to idolatry. The Bible teaches that we should not seek power or knowledge from anything other than God."
+
+      },
+      {
+        "name": "Celtic Tree of Life",
+        "filename": "assets/symbols/pagan/celtic-tree.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Celtic Tree of Life symbolizes the connection between heaven and earth, but it can lead to idolatry. The Bible teaches that our true connection is through Jesus Christ."
+      },
+      {
+        "name": "Chakana",
+        "filename": "assets/symbols/pagan/chakana.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Chakana is a symbol of the Inca culture, representing the connection between the physical and spiritual worlds. However, it can lead to idolatry if it replaces the worship of the true God."
+      },
+      {
+        "name": "Confucianism Symbol",
+        "filename": "assets/symbols/pagan/confucianism.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "Confucianism emphasizes human relationships and ethics, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our primary relationship should be with God."
+       },
+      {
+        "name": "Ganesh",
+        "filename": "assets/symbols/pagan/ganesh.png",
+        "category": "Pagan",
+        "scripture": "Exodus 20:4",
+        "explanation": "Ganesh is a Hindu deity, representing the worship of false gods. The Bible warns against idolatry and calls us to worship the one true God."
+      },
+      {
+        "name": "Hecates Wheel Wiccan Symbol",
+        "filename": "assets/symbols/pagan/hecates-wheel-wiccan.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "Hecate's Wheel is a symbol of the goddess Hecate, representing the worship of false gods. The Bible warns against idolatry and calls us to worship the one true God."
+      },
+      {
+        "name": "Hindu Om Symbol",
+        "filename": "assets/symbols/pagan/hindu-om.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Om symbol represents the Hindu concept of the universe, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our true understanding of the universe comes from God."
+      },
+      {
+        "name": "Celtic Knot",
+        "filename": "assets/symbols/pagan/knotty-celt.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "Celtic knots symbolize eternity and interconnectedness, but they can lead to idolatry if they replace the worship of the true God. The Bible teaches that our understanding of eternity comes from God."
+      },
+      {
+        "name": "Celtic Moon",
+        "filename": "assets/symbols/pagan/moon-celtic.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Celtic Moon symbolizes the cycles of nature, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our understanding of nature comes from God."
+      },
+      {
+        "name": "Mystical Eye",
+        "filename": "assets/symbols/pagan/mystical.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The mystical eye symbolizes knowledge and enlightenment, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that true knowledge comes from God."
+      },
+      {
+        "name": "Pagan Cross",
+        "filename": "assets/symbols/pagan/pagan-cross.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The pagan cross symbolizes the blending of pagan and Christian beliefs, which can lead to idolatry. The Bible warns against mixing true worship with false beliefs."
+      },
+      {
+        "name": "Pagan Cross with Circle",
+        "filename": "assets/symbols/pagan/pagan-cross1.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The pagan cross with a circle symbolizes the blending of pagan and Christian beliefs, which can lead to idolatry. The Bible warns against mixing true worship with false beliefs."
+
+      },
+      {
+        "name": "Paganism Symbol",
+        "filename": "assets/symbols/pagan/paganism.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "Paganism emphasizes nature and self-worship, leading to idolatry. The Bible teaches that we should worship the Creator, not creation."
+      },
+      {
+        "name": "Ramadan Symbol",
+        "filename": "assets/symbols/pagan/ramadan.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Ramadan symbol represents the Islamic month of fasting, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our primary devotion should be to God."
+      },
+      {
+        "name": "Sikhism",
+        "filename": "assets/symbols/pagan/sikhism.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "Sikhism emphasizes devotion to God, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our primary devotion should be to God."
+      },
+      {
+        "name": "Swastika Symbol",
+        "filename": "assets/symbols/pagan/swastika.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The swastika is an ancient symbol used in various cultures, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our primary devotion should be to God."
+      },
+      {
+        "name": "Tao Yin Yang",
+        "filename": "assets/symbols/pagan/tao-yin-yang.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Yin Yang symbol represents balance in Taoism, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our understanding of balance comes from God."
+      },
+      {
+        "name": "Tiki Idol",
+        "filename": "assets/symbols/pagan/tiki-idol.png",
+        "category": "Pagan",
+        "scripture": "Exodus 20:4",
+        "explanation": "Tiki idols were used in pagan worship, representing false gods. The Bible warns against creating and worshiping images that distract us from the true worship of the Creator."
+      },
+      {
+        "name": "Triquetra Symbol",
+        "filename": "assets/symbols/pagan/triquetra.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Triquetra symbol represents the interconnectedness of mind, body, and spirit, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our understanding of ourselves comes from God."
+      },
+      {
+        "name": "Valknut Symbol",
+        "filename": "assets/symbols/pagan/valknut.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Valknut symbol represents the connection between life and death in Norse mythology, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our understanding of life and death comes from God."
+      },
+      {
+        "name": "Cross",
+        "filename": "assets/symbols/christian/cross.png",
+        "category": "Christian",
+        "scripture": "1 Corinthians 1:18",
+        "explanation": "The cross represents Jesus’ sacrifice for our sins. It is a symbol of hope and redemption."
+      },
+      {
+        "name": "Empty Tomb",
+        "filename": "assets/symbols/christian/empty-tomb.png",
+        "category": "Christian",
+        "scripture": "Matthew 28:6",
+        "explanation": "The empty tomb signifies Jesus’ resurrection, the cornerstone of Christian faith."
+      },
+      {
+        "name": "Dove",
+        "filename"  : "assets/symbols/christian/dove.png",
+        "category": "Christian",
+        "scripture": "Matthew 3:16",
+        "explanation": "The dove represents the Holy Spirit, who descended upon Jesus at His baptism."
+      },
+      {
+        "name": "Heart",
+        "filename": "assets/symbols/christian/heart.png",
+        "category": "Christian",
+        "scripture": "1 John 4:19",
+        "explanation": "The heart symbolizes God’s love for us and our love for Him."
+      },
+      {
+        "name": "Angel",
+        "filename": "assets/symbols/christian/angel.png",
+        "category": "Christian",
+        "scripture": "Hebrews 1:14",
+        "explanation": "Angels are messengers of God, serving and protecting His people."
+      },
+      {
+        "name": "Alpha & Omega",
+        "filename": "assets/symbols/christian/a-o.png",
+        "category": "Christian",
+        "scripture": "Revelation 22:13",
+        "explanation": "Alpha and Omega represent the beginning and the end, signifying God’s eternal nature."
+      },
+      {
+        "name": "Fish (Ichthys)",
+        "filename": "assets/symbols/christian/fish.png",
+        "category": "Christian",
+        "scripture": "Matthew 4:19",
+        "explanation": "The fish symbol represents Jesus and His followers, who are called to be 'fishers of men'."
+      },
+      {
+        "name": "Noah’s Ark",
+        "filename": "assets/symbols/christian/ark.png",
+        "category": "Christian",
+        "scripture": "Genesis 6:14",
+        "explanation": "Noah’s Ark represents God’s salvation and covenant with humanity."
+      },
+      {
+        "name": "Bread",
+        "filename": "assets/symbols/christian/bread.png",
+        "category": "Christian",
+        "scripture": "John 6:35",
+        "explanation": "Bread symbolizes Jesus as the Bread of Life, sustaining us spiritually."
+      },
+      {
+        "name": "Wine",
+        "filename": "assets/symbols/christian/wine.png",
+        "category": "Christian",
+        "scripture": "Matthew 26:27-28",
+        "explanation": "Wine represents the blood of Christ, shed for our sins."
+      },
+      {
+        "name": "Shepherd",
+        "filename": "assets/symbols/christian/shepherd.png",
+        "category": "Christian",
+        "scripture": "John 10:11",
+        "explanation": "The shepherd symbolizes Jesus as the Good Shepherd, who cares for His flock."
+      },
+      {
+        "name": "Palm Leaf",
+        "filename": "assets/symbols/christian/palm-leaf.png",
+        "category": "Christian",
+        "scripture": "John 12:13",
+        "explanation": "The palm leaf symbolizes victory and triumph, as seen during Jesus’ triumphal entry into Jerusalem."
+      },
+      {
+        "name": "Star of Bethlehem",
+        "filename": "assets/symbols/christian/beth-star.png",
+        "category": "Christian",
+        "scripture": "Matthew 2:2",
+        "explanation": "The Star of Bethlehem guided the wise men to Jesus’ birthplace, symbolizing divine guidance."
+      },
+      {
+        "name": "Bible",
+        "filename": "assets/symbols/christian/bible.png",
+        "category": "Christian",
+        "scripture": "2 Timothy 3:16",
+        "explanation": "The Bible is the inspired Word of God, providing guidance and truth for believers."
+      },
+      {
+        "name": "Candle",
+        "filename": "assets/symbols/christian/candle.png",
+        "category": "Christian",
+        "scripture": "John 8:12",
+        "explanation": "The candle symbolizes Jesus as the Light of the world, illuminating our path."
+      },
+      {
+        "name": "Chalice",
+        "filename": "assets/symbols/christian/chalice.png",
+        "category": "Christian",
+        "scripture": "1 Corinthians 11:25",
+        "explanation": "The chalice represents the blood of Christ, shed for our sins during communion."
+      },
+      {
+        "name": "Lion of Judah",
+        "filename": "assets/symbols/christian/lion.png",
+        "category": "Christian",
+        "scripture": "Revelation 5:5",
+        "explanation": "The lion symbolizes Jesus as the Lion of Judah, representing His power and authority."
+      },
+      {
+        "name": "Praying Hands",
+        "filename": "assets/symbols/christian/pray.png",
+        "category": "Christian",
+        "scripture": "Philippians 4:6",
+        "explanation": "Praying hands symbolize the importance of prayer in a believer’s life."
+      },
+      {
+        "name": "Rainbow",
+        "filename": "assets/symbols/christian/rainbow.png",
+        "category": "Christian",
+        "scripture": "Genesis 9:13",
+        "explanation": "The rainbow symbolizes God’s covenant with Noah, representing His promise never to flood the earth again."
+      },
+      {
+        "name": "Star of David",
+        "filename": "assets/symbols/christian/star-david.png",
+        "category": "Christian",
+        "scripture": "Matthew 2:2",
+        "explanation": "The Star of David symbolizes the Jewish faith and God’s covenant with His people."
+      },
+      {
+        "name": "Manger",
+        "filename": "assets/symbols/christian/manger.png",
+        "category": "Christian",
+        "scripture": "Luke 2:7",
+        "explanation": "The manger represents Jesus’ humble birth, signifying His incarnation."
+      },
+      {
+        "name": "Vine",
+        "filename": "assets/symbols/christian/vine.png",
+        "category": "Christian",
+        "scripture": "John 15:5",
+        "explanation": "Jesus is the true vine, and we are the branches, symbolizing our connection to Him."
+      },
+      {
+        "name": "Wheat",
+        "filename": "assets/symbols/christian/wheat.png",
+        "category": "Christian",
+        "scripture": "Matthew 13:30",
+        "explanation": "Wheat symbolizes the harvest of souls, representing the growth of God’s kingdom."
+      },
+      {
+        "name": "Sling-Shot",
+        "filename": "assets/symbols/christian/sling.png",
+        "category": "Christian",
+        "scripture": "1 Samuel 17:49",
+        "explanation": "David used a sling-shot to defeat Goliath, symbolizing faith and courage."
+      },
+      {
+        "name": "Star",
+        "filename": "assets/symbols/christian/star.png",
+        "category": "Christian",
+        "scripture": "Matthew 2:2",
+        "explanation": "The star guided three wise men to Jesus, symbolizing divine guidance."
+      },
+      {
+        "name": "Temple of Jerusalem",
+        "filename": "assets/symbols/christian/temple.png",
+        "category": "Christian",
+        "scripture": "Matthew 21:12",
+        "explanation": "The Temple of Jerusalem represents God’s dwelling place among His people, symbolizing worship and sacrifice."
+      },
+      {
+        "name": "Pentagram",
+        "filename": "assets/symbols/pagan/pentagram.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Pentagram is often associated with modern paganism and witchcraft, representing the elements. It can lead to idolatry if it replaces the worship of the true God."
+      },
+      {
+        "name": "Crown of Thorns",
+        "filename": "assets/symbols/christian/crown-thorns.png",
+        "category": "Christian",
+        "scripture": "Matthew 27:29",
+        "explanation": "The crown of thorns symbolizes Jesus’ suffering and kingship, worn during His crucifixion."
+      },
+      {
+        "name": "Ten Commandments",
+        "filename": "assets/symbols/christian/commandments.png",
+        "category": "Christian",
+        "scripture": "Exodus 20:1-17",
+        "explanation": "The Ten Commandments represent God’s moral law given to Moses for His people."
+      },
+      {
+        "name": "Anchor",
+        "filename": "assets/symbols/christian/anchor.png",
+        "category": "Christian",
+        "scripture": "Hebrews 6:19",
+        "explanation": "The anchor symbolizes hope in Christ, which is a sure and steadfast anchor of the soul."
+      },
+      {
+        "name": "Lily",
+        "filename": "assets/symbols/christian/lily.png",
+        "category": "Christian",
+        "scripture": "Song of Solomon 2:1",
+        "explanation": "The lily symbolizes purity and the resurrection of Jesus, often associated with Easter."
+      }
+      ]
+  }

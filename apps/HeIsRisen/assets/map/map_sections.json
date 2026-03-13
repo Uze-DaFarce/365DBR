@@ -1,0 +1,112 @@
+[
+  {
+    "name": "mammoth-hot-springs",
+    "coords": {
+      "x": 318,
+      "y": 118,
+      "width": 169,
+      "height": 94
+    },
+    "background": "mammoth-hot-springs.jpg"
+  },
+  {
+    "name": "yellowstone-geology",
+    "coords": {
+      "x": 72,
+      "y": 414,
+      "width": 139,
+      "height": 94
+    },
+    "background": "yellowstone-geology.jpg"
+  },
+  {
+    "name": "norris-geyser-basin",
+    "coords": {
+      "x": 398,
+      "y": 304,
+      "width": 169,
+      "height": 94
+    },
+    "background": "norris-geyser-basin.jpg"
+  },
+  {
+    "name": "grand-canyon-yellowstone",
+    "coords": {
+      "x": 744,
+      "y": 438,
+      "width": 139,
+      "height": 94
+    },
+    "background": "grand-canyon-yellowstone.jpg"
+  },
+  {
+    "name": "yellowstone-wildlife",
+    "coords": {
+      "x": 1267,
+      "y": 154,
+      "width": 139,
+      "height": 94
+    },
+    "background": "yellowstone-wildlife.jpg"
+  },
+  {
+    "name": "grand-prismatic",
+    "coords": {
+      "x": 335,
+      "y": 473,
+      "width": 169,
+      "height": 94
+    },
+    "background": "grand-prismatic.jpg"
+  },
+  {
+    "name": "yellowstone-hydrothermal",
+    "coords": {
+      "x": 66,
+      "y": 531,
+      "width": 169,
+      "height": 94
+    },
+    "background": "yellowstone-hydrothermal.jpg"
+  },
+  {
+    "name": "yellowstone-history",
+    "coords": {
+      "x": 1054,
+      "y": 388,
+      "width": 169,
+      "height": 94
+    },
+    "background": "yellowstone-history.jpg"
+  },
+  {
+    "name": "old-faithful",
+    "coords": {
+      "x": 667,
+      "y": 542,
+      "width": 139,
+      "height": 94
+    },
+    "background": "old-faithful.jpg"
+  },
+  {
+    "name": "west-thumb-geyser-basin",
+    "coords": {
+      "x": 886,
+      "y": 668,
+      "width": 169,
+      "height": 94
+    },
+    "background": "west-thumb-geyser-basin.jpg"
+  },
+  {
+    "name": "yellowstone-preservation",
+    "coords": {
+      "x": 1307,
+      "y": 478,
+      "width": 169,
+      "height": 94
+    },
+    "background": "yellowstone-preservation.jpg"
+  }
+]
