@@ -18,11 +18,9 @@ After collecting eggs, players enter the "EggZam Room" where they sort the symbo
 This project is currently being revived and documented. It was previously left unfinished.
 
 ### Known Issues
-- **Symbol Count**: The current data file (`assets/symbols.json`) contains **56** symbols, but the goal is **60**.
-- **Egg Assets**: The game code expects up to 60 egg images, but verification is needed to ensure all 60 exist.
-- **Platform Discrepancies**: There are separate versions for Desktop (root) and Mobile (`m/`), which have diverged in logic and egg counts (Desktop expects 57, Mobile expects 60).
+- **Platform Discrepancies**: There are separate versions for Desktop (root) and Mobile (`m/`), which have diverged in logic.
+
 - **Bugs**:
-    - Potential crashes or errors if the game tries to load non-existent symbols (indices 56-59).
     - Mobile version scaling and "magnifying glass" mechanic need tuning.
 
 ## Development

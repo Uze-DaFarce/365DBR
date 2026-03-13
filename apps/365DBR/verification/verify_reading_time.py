@@ -1,35 +1,116 @@
-from playwright.sync_api import sync_playwright
+import argparse
+import os
+import sys
 import re
+import requests
+from playwright.sync_api import sync_playwright
 
-def verify_reading_time():
+# Ensure bible_common can be imported from the parent directory
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+try:
+    from bible_common import validate_safe_relative_path
+except ImportError:
+    print("Error: Could not import 'validate_safe_relative_path' from 'bible_common.py'.")
+    sys.exit(1)
+
+# --- Constants ---
+DATA_DIR = "data"
+PRODUCTION_DATA_URL = "https://mt-sin.ai/365DBR/data"
+
+def setup_data_interception(page, source):
+    """
+    Intercepts network requests to the /data/ directory and serves them
+    from the specified source (local or production).
+    """
+    def handle_route(route):
+        request = route.request
+        url = request.url
+
+        if "/data/" in url:
+            try:
+                rel_path = url.split("/data/")[1]
+                if not validate_safe_relative_path(rel_path):
+                    route.abort('accessdenied')
+                    return
+
+                if source == "local":
+                    local_path = os.path.join(DATA_DIR, rel_path.replace("/", os.sep))
+                    if os.path.exists(local_path):
+                        with open(local_path, "rb") as f:
+                            content = f.read()
+                        route.fulfill(status=200, body=content, content_type="application/json")
+                    else:
+                        route.fulfill(status=404, body=b"File not found in local data")
+                else: # production
+                    prod_url = f"{PRODUCTION_DATA_URL}/{rel_path}"
+                    try:
+                        resp = requests.get(prod_url, timeout=10)
+                        resp.raise_for_status()
+                        route.fulfill(status=resp.status_code, body=resp.content, content_type=resp.headers.get("Content-Type"))
+                    except requests.exceptions.RequestException as e:
+                        print(f"[Production] Error fetching {prod_url}: {e}")
+                        route.abort()
+
+            except Exception as e:
+                print(f"[Interceptor Error] {e}")
+                route.abort()
+            return
+
+        route.continue_()
+
+    page.route("**/data/**/*.json", handle_route)
+
+def verify_reading_time(source: str):
+    print(f"Running Reading Time verification with data source: '{source.upper()}'")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
-        page.goto("http://localhost:3000/index.html?startDate=0222")
 
-        # Wait for data to load
+        # Set up data interception
+        setup_data_interception(page, source)
+
+        # Navigate to a day with known content (Feb 22nd)
+        page.goto("http://localhost:8000/index.html?startDate=0222", wait_until="networkidle")
+
+        # Wait for data to load and content to be rendered
         page.wait_for_selector(".verse-block", timeout=20000)
 
-        # Scroll to bottom
+        # Scroll to the bottom to ensure the footer is in view
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
 
-        # Verify reading time text
+        # Locate the footer and verify the reading time text
         footer = page.locator("footer")
         text_content = footer.text_content()
         print(f"Footer content: {text_content}")
 
+        # Use regex to find a pattern like "X min read"
         match = re.search(r"\d+ min read", text_content)
         if match:
             print(f"PASS: Found reading time: '{match.group(0)}'")
         else:
-            print("FAIL: Reading time not found in footer.")
-            exit(1)
+            page.screenshot(path="verification/reading_time_fail.png")
+            raise AssertionError("FAIL: Reading time text not found in footer.")
 
-        # Take screenshot
+        # Save a screenshot for baseline verification
         footer.screenshot(path="verification/reading_time.png")
         print("Screenshot saved to verification/reading_time.png")
 
         browser.close()
+        print("\nReading Time verification successful!")
 
 if __name__ == "__main__":
-    verify_reading_time()
+    parser = argparse.ArgumentParser(description="Verify the reading time calculation in the footer.")
+    parser.add_argument(
+        "--source",
+        type=str,
+        choices=['local', 'production'],
+        default='production',
+        help="Specify the data source: 'production' (default) or 'local'."
+    )
+    args = parser.parse_args()
+
+    try:
+        verify_reading_time(source=args.source)
+    except Exception as e:
+        print(f"\nERROR: {e}")
+        sys.exit(1)
