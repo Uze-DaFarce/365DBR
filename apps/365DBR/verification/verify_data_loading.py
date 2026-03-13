@@ -1,3 +1,4 @@
+import os
 from playwright.sync_api import sync_playwright, expect
 
 def run():
@@ -10,7 +11,7 @@ def run():
             # 1. Verify index.html (Daily Bread)
             print("Verifying index.html...")
             # Use 0202 as reference date (Feb 2nd) which has content
-            page.goto("http://localhost:8000/index.html?startDate=0202")
+            page.goto("https://mt-sin.ai/365DBR/index.html?startDate=0202")
 
             # Wait for content
             page.wait_for_selector(".verse-block", timeout=5000)
@@ -25,12 +26,12 @@ def run():
             if not first_text or len(first_text.strip()) < 10:
                 raise Exception(f"Verse text seems empty or too short: {first_text}")
 
-            page.screenshot(path="verification/index_baseline.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "index_baseline.png"))
 
             # 2. Verify bible.html (Browser)
             print("Verifying bible.html...")
             # 0202 covers EXO.9.1-EXO.10.29
-            page.goto("http://localhost:8000/bible.html?book=EXO&chapter=9")
+            page.goto("https://mt-sin.ai/365DBR/bible.html?book=EXO&chapter=9")
 
             # Wait for content
             page.wait_for_selector(".verse-block", timeout=5000)
@@ -45,13 +46,13 @@ def run():
             if not first_text or len(first_text.strip()) < 10:
                 raise Exception(f"Verse text seems empty or too short: {first_text}")
 
-            page.screenshot(path="verification/bible_baseline.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "bible_baseline.png"))
 
             print("Verification successful!")
 
         except Exception as e:
             print(f"Error: {e}")
-            page.screenshot(path="verification/error.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "error.png"))
             raise e
         finally:
             browser.close()

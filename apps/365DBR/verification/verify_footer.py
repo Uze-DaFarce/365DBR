@@ -1,10 +1,11 @@
+import os
 from playwright.sync_api import sync_playwright
 
 def verify_footer():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
-        page.goto("http://localhost:3000/index.html?startDate=0222")
+        page.goto("https://mt-sin.ai/365DBR/index.html?startDate=0222")
 
         # Wait for data to load
         page.wait_for_selector("text=Literal Standard Version", timeout=10000)
@@ -14,7 +15,7 @@ def verify_footer():
 
         # Take screenshot of footer
         footer = page.locator("footer")
-        footer.screenshot(path="verification/footer_verification.png")
+        footer.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "footer_verification.png"))
 
         browser.close()
 

@@ -14,36 +14,36 @@ def test_mobile_browse_link():
         page = context.new_page()
 
         # Load index.html
-        cwd = os.getcwd()
-        page.goto(f"file://{cwd}/index.html")
+        page.goto("https://mt-sin.ai/365DBR/index.html")
 
         # Wait for content to load
         page.wait_for_selector("header")
 
         # Find the Browse link
-        # It has title="Switch to Bible Browser"
-        browse_link = page.locator('a[title="Switch to Bible Browser"]')
+        # There are two links, one for larger screens, one for mobile. Find the one visible on mobile.
+        browse_link = page.locator('a[title="Switch to Bible Browser"]').filter(has_text="BROWSE").first
 
-        # Check if it is visible
-        if browse_link.is_visible():
+        # If we can't find it easily this way, let's just pick the visible one
+        visible_link = None
+        for i in range(page.locator('a[title="Switch to Bible Browser"]').count()):
+            link = page.locator('a[title="Switch to Bible Browser"]').nth(i)
+            if link.is_visible():
+                visible_link = link
+                break
+
+        if visible_link:
             print("SUCCESS: Browse link is visible on mobile.")
+            text_span = visible_link.locator("span")
+            if text_span.count() > 0 and text_span.is_hidden():
+                 print("SUCCESS: 'Browse' text is hidden on mobile.")
+            else:
+                 print("FAILURE: 'Browse' text is visible on mobile (or no span found).")
         else:
             print("FAILURE: Browse link is NOT visible on mobile.")
 
-        # Check if the text "Browse" is hidden
-        # The text is inside a span with class "hidden md:inline"
-        text_span = browse_link.locator("span")
-
-        # In Tailwind, 'hidden' class sets display: none
-        # We can check computed style or visibility
-        if text_span.is_hidden():
-             print("SUCCESS: 'Browse' text is hidden on mobile.")
-        else:
-             print("FAILURE: 'Browse' text is visible on mobile.")
-
         # Take screenshot of header
         header = page.locator("header")
-        header.screenshot(path="verification/mobile_header.png")
+        header.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "mobile_header.png"))
 
         browser.close()
 

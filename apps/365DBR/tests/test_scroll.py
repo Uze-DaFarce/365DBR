@@ -8,7 +8,7 @@ async def run():
         context = await browser.new_context(viewport={'width': 800, 'height': 800})
         page = await context.new_page()
 
-        await page.goto("http://localhost:8000/index.html?startDate=0307")
+        await page.goto("https://mt-sin.ai/365DBR/index.html?startDate=0307")
         await page.wait_for_selector(".verse-block")
 
         await page.click("button[title='Jump to Psalms']")

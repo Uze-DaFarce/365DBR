@@ -1,3 +1,4 @@
+import os
 from playwright.sync_api import sync_playwright
 import time
 
@@ -13,7 +14,7 @@ def verify_bible_browse():
         page.route("**/*", lambda route: route.continue_())
 
         print("Navigating to app...")
-        page.goto("http://localhost:3000/bible.html")
+        page.goto("https://mt-sin.ai/365DBR/bible.html")
 
         # Wait for page load
         page.wait_for_selector("text=Browse Bible", state="visible")
@@ -26,14 +27,14 @@ def verify_bible_browse():
         page.wait_for_selector("text=Old", state="visible")
 
         # Take a screenshot of Testament View
-        page.screenshot(path="verification/browse_testament.png")
+        page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "browse_testament.png"))
 
         print("Selecting Old Testament...")
         page.click("text=Old")
         time.sleep(1)
 
         # Take a screenshot of Book View
-        page.screenshot(path="verification/browse_books.png")
+        page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "browse_books.png"))
 
         print("Selecting Psalms...")
         page.click("button:has-text('PSA')")
@@ -44,7 +45,7 @@ def verify_bible_browse():
         time.sleep(1)
 
         # Take a screenshot of Chapter View
-        page.screenshot(path="verification/browse_chapters.png")
+        page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "browse_chapters.png"))
 
         print("Selecting Chapter 119...")
         page.click("button:text-is('119')")
@@ -55,7 +56,7 @@ def verify_bible_browse():
         time.sleep(1)
 
         # Take a screenshot of Verse View (50 buttons)
-        page.screenshot(path="verification/browse_verses.png")
+        page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "browse_verses.png"))
 
         print("Selecting Verse 151...")
         page.click("button:text-is('151')")

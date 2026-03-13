@@ -22,7 +22,15 @@ def get_eggs_for_section(page, section_name):
 def test_collect_eggs_in_level(is_mobile=False):
     print(f"Testing {'Mobile' if is_mobile else 'Desktop'} context...")
 
-    server_process = subprocess.Popen(["npx", "http-server", "-p", "8080", "-c-1"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    app_dir = os.path.join(script_dir, "..")
+
+    server_process = subprocess.Popen(
+        ["npx", "http-server", "-p", "8080", "-c-1"],
+        cwd=app_dir,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
     time.sleep(2) # wait for server to start
 
     try:
@@ -46,7 +54,11 @@ def test_collect_eggs_in_level(is_mobile=False):
                 });
             """)
 
-            page.goto("http://127.0.0.1:8080/m/")
+            if is_mobile:
+                page.goto("http://127.0.0.1:8080/m/")
+            else:
+                page.goto("http://127.0.0.1:8080/")
+
             page.wait_for_load_state('networkidle')
 
             # Wait for Phaser to initialize
@@ -104,26 +116,28 @@ def test_collect_eggs_in_level(is_mobile=False):
                 # So to make lensX = egg_x, pointer.x must be egg_x - lensOffsetX
 
                 # Fetch scale from scene
-                scale = page.evaluate("() => window.game.scene.getScene('SectionHunt').gameScale")
+                scale = page.evaluate("() => { const scene = window.game.scene.getScene('SectionHunt'); return scene.gameScale || scene.bgScale || 1; }")
 
-                # Desktop cursor tracks the mouse directly (with small 35px offset via CSS/logic usually, but let's assume direct for Desktop pointer).
-                # But we are testing the MOBILE application here (m/main.js), so the lens logic applies everywhere.
-                lens_offset_x = -97.5 * scale
-                lens_offset_y = -135 * scale
+                if is_mobile:
+                    lens_offset_x = -97.5 * scale
+                    lens_offset_y = -135 * scale
+                else:
+                    lens_offset_x = 0
+                    lens_offset_y = 0
 
                 pointer_x = egg_x - lens_offset_x
                 pointer_y = egg_y - lens_offset_y
 
-                # In Phaser's RESIZE mode, the game config dimensions scale to the viewport window.
-                # However, on some phones (like Playwright iPhone 12 emulation), CSS scaling makes the Canvas size
-                # match the device screen, but Phaser's config width/height is mapped to the internal resolution.
                 # Let's get the actual canvas boundaries and map the game coordinate to the DOM coordinate.
                 dom_coords = page.evaluate(f"""
                     () => {{
                         const canvas = document.querySelector('canvas');
                         const rect = canvas.getBoundingClientRect();
-                        const scaleX = rect.width / window.game.config.width;
-                        const scaleY = rect.height / window.game.config.height;
+                        const width = typeof window.game.config.width === 'number' ? window.game.config.width : canvas.width;
+                        const height = typeof window.game.config.height === 'number' ? window.game.config.height : canvas.height;
+
+                        const scaleX = rect.width / width;
+                        const scaleY = rect.height / height;
                         return {{
                             x: rect.left + ({pointer_x} * scaleX),
                             y: rect.top + ({pointer_y} * scaleY)
