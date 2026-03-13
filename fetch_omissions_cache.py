@@ -79,6 +79,13 @@ def build_cache():
         ("LSV", PARALLEL_IDS[1])
     ]
 
+    # Map API-missing coordinates (e.g. Greek structure) to where they actually live in KJV/LSV
+    api_fetch_map = {
+        "ROM.14.24": "ROM.16.25",
+        "ROM.14.25": "ROM.16.26",
+        "ROM.14.26": "ROM.16.27"
+    }
+
     for version, bible_id in bible_mappings:
         print(f"\nProcessing {version}...")
         for vid in vids:
@@ -86,22 +93,24 @@ def build_cache():
                 print(f"  [Skip] {vid} already cached for {version}.")
                 continue
 
-            print(f"  [Fetch] Requesting {vid} for {version}...")
-            try:
-                data = fetch_single_passage(api_key, bible_id, vid)
-                passage = data.get('data', {})
-                content = passage.get('content', [])
+            fetch_vid = api_fetch_map.get(vid, vid)
 
-                if content:
-                    cache[version][vid] = content
+            print(f"  [Fetch] Requesting {vid} (via {fetch_vid}) for {version}...")
+            try:
+                data = fetch_single_passage(api_key, bible_id, fetch_vid)
+                passage = data.get('data', {})
+                fetched_content = passage.get('content', [])
+
+                if fetched_content:
+                    cache[version][vid] = fetched_content
                     # Save incrementally
                     atomic_write_json(cache_path, cache)
                     print(f"    -> Saved {vid}")
                 else:
-                    print(f"    -> Warning: Empty content returned for {vid}")
+                    print(f"    -> Warning: Empty content returned for {vid} (via {fetch_vid})")
 
             except Exception as e:
-                print(f"    -> [Error] Failed to fetch {vid}: {e}")
+                print(f"    -> [Error] Failed to fetch {vid} (via {fetch_vid}): {e}")
                 # We do NOT break here. We continue to the next verse.
                 continue
 
