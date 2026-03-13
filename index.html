@@ -387,18 +387,23 @@ const calculateDate = (currentDate, direction) => {
 };
 
 const LinkOrButton = ({ isStatic, currentDate, direction, children, onClick, ...props }) => {
+    const handleClick = (e) => {
+        if (e.currentTarget instanceof HTMLElement) e.currentTarget.blur();
+        if (onClick) onClick(e);
+    };
+
     // If static, render an <a> tag for standard navigation
     if (isStatic) {
         const nextDate = calculateDate(currentDate, direction);
         return (
-            <a href={`../${nextDate}/index.html`} {...props} onClick={undefined} title={props['aria-label']}>
+            <a href={`../${nextDate}/index.html`} {...props} onClick={handleClick} title={props['aria-label']}>
                 {children}
             </a>
         );
     }
     // Else render button for SPA navigation
     return (
-        <button onClick={onClick} type="button" {...props}>
+        <button onClick={handleClick} type="button" {...props}>
             {children}
         </button>
     );
@@ -1057,6 +1062,7 @@ const Header = React.memo(({
   bookmarks
 }) => {
   const handleNavigateToBookmark = (vid) => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       const parts = vid.split('.');
       if (parts.length === 3) {
           window.location.href = `bible.html?book=${parts[0]}&chapter=${parts[1]}&verse=${parts[2]}`;
@@ -1082,7 +1088,7 @@ const Header = React.memo(({
                           <span className="px-1 cursor-default">{formattedDate}</span>
                       ) : (
                           <button
-                              onClick={() => { setCurrentDate(todayString); window.scrollTo({ top: 0 }); }}
+                              onClick={(e) => { e.currentTarget.blur(); setCurrentDate(todayString); window.scrollTo({ top: 0 }); }}
                               title="Jump to Today"
                               aria-label={`Current reading: ${formattedDate}. Click to jump to Today.`}
                               className="px-1 hover:text-amber-600 uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded flex items-center gap-1"
@@ -1109,7 +1115,7 @@ const Header = React.memo(({
                         <button
                             key={i}
                             type="button"
-                            onClick={() => scrollToSection(i)}
+                            onClick={(e) => { e.currentTarget.blur(); scrollToSection(i); }}
                             title={isClickable ? `Jump to ${sectionNames[i]}` : ''}
                             aria-label={isActive ? `Current section: ${sectionNames[i]}` : `Jump to ${sectionNames[i]}`}
                             aria-current={isActive ? 'step' : undefined}
@@ -1172,7 +1178,7 @@ const Header = React.memo(({
                     <div className="fixed inset-0 z-40" onClick={() => setIsCompareOpen(false)}></div>
                     <div className="absolute right-0 top-full mt-1 w-24 bg-white border border-stone-200 shadow-lg rounded-md overflow-hidden z-50">
                       {availableTranslations.filter(k => k !== focalTranslation).map(key => (
-                        <button key={key} aria-label={`Select translation ${key}`} onClick={() => { setCompareTranslation(key); setIsCompareOpen(false); }} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${compareTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
+                        <button key={key} aria-label={`Select translation ${key}`} onClick={(e) => { e.currentTarget.blur(); setCompareTranslation(key); setIsCompareOpen(false); }} className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase hover:bg-stone-100 focus:outline-none focus-visible:bg-stone-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 ${compareTranslation === key ? 'text-amber-600' : 'text-stone-600'}`}>
                           <span>{key}</span>
                           {compareTranslation === key && (
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
@@ -1264,8 +1270,8 @@ const Footer = React.memo(({ isStatic, currentDate, readingLabel, readingTime, n
         <div className="hidden md:flex justify-center gap-3 md:gap-4 my-1 text-[9px] text-stone-400 font-mono uppercase tracking-wider select-none print:hidden flex-wrap">
           <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={-1} onClick={() => navigateDate(-1)} aria-label="Previous Day (Shortcut: Left Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">←</kbd> Day</LinkOrButton>
           <LinkOrButton isStatic={isStatic} currentDate={currentDate} direction={1} onClick={() => navigateDate(1)} aria-label="Next Day (Shortcut: Right Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">→</kbd> Day</LinkOrButton>
-          <button onClick={() => navigateVerse(-1)} type="button" aria-label="Previous Verse (Shortcut: Up Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">↑</kbd> Verse</button>
-          <button onClick={() => navigateVerse(1)} type="button" aria-label="Next Verse (Shortcut: Down Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">↓</kbd> Verse</button>
+          <button onClick={(e) => { e.currentTarget.blur(); navigateVerse(-1); }} type="button" aria-label="Previous Verse (Shortcut: Up Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">↑</kbd> Verse</button>
+          <button onClick={(e) => { e.currentTarget.blur(); navigateVerse(1); }} type="button" aria-label="Next Verse (Shortcut: Down Arrow)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">↓</kbd> Verse</button>
           <button onClick={handleToggle} type="button" aria-label="Toggle Playback (Shortcut: K)" className="flex items-center gap-1 hover:text-stone-600 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded"><kbd className="font-sans border border-stone-300 rounded px-1 min-w-[1.2em] text-center group-hover:border-stone-400 group-hover:bg-white transition-colors">K</kbd> Play</button>
         </div>
 
@@ -1451,6 +1457,7 @@ const App = () => {
   }, []);
 
   const handleSaveBookmark = (slot, vid, color) => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       const newBookmarks = { ...bookmarks };
       if (!vid) {
           delete newBookmarks[slot];
@@ -1632,6 +1639,7 @@ const App = () => {
 
   // Handler for Focal Translation change with auto-swap logic for Compare slot
   const handleFocalChange = useCallback((newFocal) => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     if (newFocal === compareTranslation) {
         // If user picks a focal that matches current compare, we must change compare.
         // Pick the first available key that is NOT the new focal.
@@ -2015,6 +2023,7 @@ const App = () => {
 };
 
   const handleToggle = useCallback(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     // ⚡ Bolt Optimization: Use ref to access latest activeVerseId inside stale closures (like event listeners)
     // to avoid recreating the listener on every scroll event.
     const currentActive = activeVerseIdRef.current;
@@ -2045,6 +2054,7 @@ const App = () => {
   }, [playbackStatus, sortedVids, verseMap]);
 
   const navigateDate = useCallback((direction) => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     // If static mode, navigation is handled by LinkOrButton hrefs unless we intercept here.
     // Since we want full page reload for static, we let default happen?
     // Actually LinkOrButton handles rendering. If we click a button (SPA), we run this.
@@ -2058,6 +2068,7 @@ const App = () => {
   }, [currentDate]);
 
   const navigateVerse = useCallback((direction) => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     if (!sortedVids || sortedVids.length === 0) return;
 
     // Find current index
@@ -2098,6 +2109,7 @@ const App = () => {
   }, [sortedVids]);
 
   const scrollToSection = useCallback((index) => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     if (playbackStatus === 'playing' || activeSectionIndex === index) return;
     const targetVid = sortedVids.find(vid => getSectionIndex(vid) === index);
     if (targetVid) {
@@ -2112,6 +2124,7 @@ const App = () => {
   }, [playbackStatus, activeSectionIndex, sortedVids]);
 
   const onStopPlayback = useCallback(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     synthRef.current.cancel();
     setPlaybackStatus('stopped');
   }, []);
