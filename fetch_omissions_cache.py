@@ -12,9 +12,8 @@ def get_api_key():
         return None
     return key.strip()
 
-def fetch_bulk_passages(api_key, bible_id, vids):
-    passage_str = ",".join(vids)
-    url = f"{API_BASE_URL}/bibles/{bible_id}/passages/{passage_str}"
+def fetch_single_passage(api_key, bible_id, vid):
+    url = f"{API_BASE_URL}/bibles/{bible_id}/passages/{vid}"
 
     params = {
         "content-type": "json",
@@ -23,7 +22,7 @@ def fetch_bulk_passages(api_key, bible_id, vids):
         "include-chapter-numbers": "false",
         "include-verse-numbers": "false",
         "include-verse-spans": "false",
-        "use-org-id": "false" # CRITICAL: We want the standard translation mapping to fetch KJV/LSV properly
+        "use-org-id": "false"
     }
 
     query_string = urllib.parse.urlencode(params)
@@ -40,13 +39,13 @@ def fetch_bulk_passages(api_key, bible_id, vids):
     try:
         with urllib.request.urlopen(req) as response:
             if response.status != 200:
-                raise RuntimeError(f"API returned status {response.status} for {passage_str}")
+                raise RuntimeError(f"API returned status {response.status} for {vid}")
             data = json.loads(response.read().decode('utf-8'))
             return data
     except urllib.error.HTTPError as e:
-        raise RuntimeError(f"HTTP {e.code}: {e.reason} for {passage_str}") from e
+        raise RuntimeError(f"HTTP {e.code}: {e.reason} for {vid}") from e
     except Exception as e:
-        raise RuntimeError(f"Network/Parse Error: {str(e)} for {passage_str}") from e
+        raise RuntimeError(f"Network/Parse Error: {str(e)} for {vid}") from e
 
 def build_cache():
     api_key = get_api_key()
@@ -55,69 +54,67 @@ def build_cache():
         return
 
     vids = sorted(list(KNOWN_OMISSIONS))
-    print(f"Building omissions cache for {len(vids)} verses...")
+    print(f"Checking omissions cache for {len(vids)} verses...")
 
+    os.makedirs("data", exist_ok=True)
+    cache_path = "data/omissions_cache.json"
+
+    # Load existing cache to prevent redundant API calls
     cache = {
         "KJV": {},
         "LSV": {}
     }
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, "r", encoding="utf-8") as f:
+                loaded = json.load(f)
+                if "KJV" in loaded: cache["KJV"] = loaded["KJV"]
+                if "LSV" in loaded: cache["LSV"] = loaded["LSV"]
+            print("Loaded existing cache from disk.")
+        except Exception as e:
+            print(f"Could not load existing cache: {e}")
 
-    # PARALLEL_IDS[0] is KJV, [1] is LSV
     bible_mappings = [
         ("KJV", PARALLEL_IDS[0]),
         ("LSV", PARALLEL_IDS[1])
     ]
 
+    # Map API-missing coordinates (e.g. Greek structure) to where they actually live in KJV/LSV
+    api_fetch_map = {
+        "ROM.14.24": "ROM.16.25",
+        "ROM.14.25": "ROM.16.26",
+        "ROM.14.26": "ROM.16.27"
+    }
+
     for version, bible_id in bible_mappings:
-        print(f"Fetching bulk passages for {version}...")
-        try:
-            passages = []
-            # Batch the vids into chunks of 5 to avoid 400 Bad Request limits
-            chunk_size = 5
-            for i in range(0, len(vids), chunk_size):
-                chunk = vids[i:i + chunk_size]
-                print(f"    Fetching batch {i//chunk_size + 1}: {','.join(chunk)}")
-                data = fetch_bulk_passages(api_key, bible_id, chunk)
+        print(f"\nProcessing {version}...")
+        for vid in vids:
+            if vid in cache[version]:
+                print(f"  [Skip] {vid} already cached for {version}.")
+                continue
 
-                chunk_passages = data.get('data', [])
-                if isinstance(chunk_passages, dict):
-                    chunk_passages = [chunk_passages]
-                passages.extend(chunk_passages)
+            fetch_vid = api_fetch_map.get(vid, vid)
 
-            for passage in passages:
-                ref = passage.get('reference')
-                content = passage.get('content')
+            print(f"  [Fetch] Requesting {vid} (via {fetch_vid}) for {version}...")
+            try:
+                data = fetch_single_passage(api_key, bible_id, fetch_vid)
+                passage = data.get('data', {})
+                fetched_content = passage.get('content', [])
 
-                # We need to map the content back to the specific verseId.
-                # The API usually returns `reference` like "Acts 8:37", which is hard to map perfectly back to "ACT.8.37".
-                # It's better to extract the `verseId` from the content itself.
-                verse_id = None
-
-                # Search the content tree for the verseId
-                def find_vid(items):
-                    for item in items:
-                        if isinstance(item, dict):
-                            if 'attrs' in item and 'verseId' in item['attrs']:
-                                return item['attrs']['verseId']
-                            if 'items' in item:
-                                res = find_vid(item['items'])
-                                if res: return res
-                    return None
-
-                verse_id = find_vid(content)
-                if verse_id and verse_id in vids:
-                    cache[version][verse_id] = content
-                    print(f"  Mapped {verse_id} for {version}")
+                if fetched_content:
+                    cache[version][vid] = fetched_content
+                    # Save incrementally
+                    atomic_write_json(cache_path, cache)
+                    print(f"    -> Saved {vid}")
                 else:
-                    print(f"  Warning: Could not parse exact verseId for passage block. Ref: {ref}")
+                    print(f"    -> Warning: Empty content returned for {vid} (via {fetch_vid})")
 
-        except Exception as e:
-            print(f"Failed to fetch {version}: {e}")
-            return
+            except Exception as e:
+                print(f"    -> [Error] Failed to fetch {vid} (via {fetch_vid}): {e}")
+                # We do NOT break here. We continue to the next verse.
+                continue
 
-    os.makedirs("data", exist_ok=True)
-    atomic_write_json("data/omissions_cache.json", cache)
-    print("Successfully built data/omissions_cache.json")
+    print("\nFinished checking and building data/omissions_cache.json")
 
 if __name__ == "__main__":
     build_cache()
