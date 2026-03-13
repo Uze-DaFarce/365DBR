@@ -1,3 +1,4 @@
+import os
 from playwright.sync_api import sync_playwright, expect
 
 def run():
@@ -7,7 +8,7 @@ def run():
         page = browser.new_page(viewport={"width": 375, "height": 667})
 
         try:
-            page.goto("http://localhost:8000/index.html")
+            page.goto("https://mt-sin.ai/365DBR/index.html")
 
             # Wait for content to load
             page.wait_for_selector("header")
@@ -30,12 +31,12 @@ def run():
 
             # Take screenshot of header to confirm layout
             header = page.locator("header")
-            header.screenshot(path="verification/header_mobile.png")
+            header.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "header_mobile.png"))
             print("Screenshot saved to verification/header_mobile.png")
 
         except Exception as e:
             print(f"Error: {e}")
-            page.screenshot(path="verification/error.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "error.png"))
             raise e
         finally:
             browser.close()

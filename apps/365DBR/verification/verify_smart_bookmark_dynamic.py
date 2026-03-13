@@ -1,3 +1,4 @@
+import os
 import time
 from playwright.sync_api import sync_playwright
 import datetime
@@ -24,7 +25,7 @@ def run():
         # Note: Must navigate first before setting localStorage
         page = context.new_page()
         print("Navigating to index.html...")
-        page.goto("http://localhost:8000/index.html")
+        page.goto("https://mt-sin.ai/365DBR/index.html")
 
         # Set storage
         page.evaluate(f"localStorage.setItem('biblical_reading_state', '{initial_state}')")
@@ -35,7 +36,7 @@ def run():
             # 2. Navigate to TOMORROW (Allowed Future)
             print(f"Navigating to Tomorrow ({tomorrow_mmdd})...")
             # Navigate using URL to be precise and avoid UI button issues
-            page.goto(f"http://localhost:8000/index.html?startDate={tomorrow_mmdd}")
+            page.goto(f"https://mt-sin.ai/365DBR/index.html?startDate={tomorrow_mmdd}")
             time.sleep(2)
 
             saved_state = page.evaluate("localStorage.getItem('biblical_reading_state')")
@@ -48,7 +49,7 @@ def run():
 
             # 3. Navigate to DAY AFTER TOMORROW (Blocked Future)
             print(f"Navigating to Day After Tomorrow ({future_mmdd})...")
-            page.goto(f"http://localhost:8000/index.html?startDate={future_mmdd}")
+            page.goto(f"https://mt-sin.ai/365DBR/index.html?startDate={future_mmdd}")
             time.sleep(2)
 
             saved_state_2 = page.evaluate("localStorage.getItem('biblical_reading_state')")
@@ -61,7 +62,7 @@ def run():
             else:
                  print(f"FAILURE: Unexpected state: {saved_state_2}")
 
-            page.screenshot(path="verification/smart_bookmark_dynamic_test.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "smart_bookmark_dynamic_test.png"))
 
         except Exception as e:
             print(f"Error: {e}")

@@ -43,7 +43,7 @@ def test_mobile_browse_link():
 
         # Take screenshot of header
         header = page.locator("header")
-        header.screenshot(path="verification/mobile_header.png")
+        header.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "mobile_header.png"))
 
         browser.close()
 
