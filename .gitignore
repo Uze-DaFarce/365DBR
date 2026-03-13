@@ -1,9 +1,9 @@
+# Python cache
 __pycache__/
 *.pyc
+
+# Distribution directory
 dist/
-*.png
+
+# Dependencies
 node_modules/
-playwright-report/
-test-results/
-verification/*.png
-verification/*.webm
