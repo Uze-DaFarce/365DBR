@@ -1927,7 +1927,7 @@ class EggZamRoom extends Phaser.Scene {
         scriptText.on('pointerdown', (p, x, y, event) => {
             event.stopPropagation();
             const link = parseScriptureLink(data.scripture);
-            if (link) window.open(link, '_blank');
+            if (link) window.open(link, '_blank', 'noopener,noreferrer');
         });
 
         const continueText = this.add.text(0, bgHeight/2 - 40 * uiScale, "[ Click anywhere to continue ]", {
