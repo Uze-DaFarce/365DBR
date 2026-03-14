@@ -21,3 +21,11 @@
 ## 2026-08-14 - Broken Memoization from Inline Functions
 **Learning:** Passing an inline arrow function as a prop (e.g. `onBookmark={(vid) => setBookmarkDialogTarget(vid)}`) to a `React.memo` component (like `VerseGroup`) creates a new function reference on every parent render. This defeats the memoization, causing all instances of the component to re-render whenever the parent updates (e.g., during high-frequency events like scrolling that update `activeVerseId`).
 **Action:** Pass the state setter function directly (e.g., `onBookmark={setBookmarkDialogTarget}`) since React guarantees state setters maintain a stable reference across renders, preserving the memoization and preventing O(N) re-renders.
+
+## 2026-03-14 - [Security Enhancement] Enforced Strict Path Validation & URL Encoding
+
+**Learning:** The `validate_safe_path` function previously only checked for directory traversal characters (`..`, `/`, `\`), which left the door open for other forms of injection or invalid characters when generating filenames or parsing inputs. Furthermore, external API endpoints were constructed without explicitly encoding dynamic parameters like `passage_range` and `bible_id`.
+
+**Action:**
+1. Updated `validate_safe_path` in `bible_common.py` to use a strict regex `r'^[a-zA-Z0-9.\-]+$'`, definitively blocking any unexpected characters from entering file paths or internal string references.
+2. Updated `fetch_readings.py`, `check_data_integrity.py`, and `fetch_omissions_cache.py` to aggressively encode API URL parameters using `urllib.parse.quote()` to prevent HTTP parameter pollution or API endpoint manipulation.

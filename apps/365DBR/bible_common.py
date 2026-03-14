@@ -223,14 +223,20 @@ REVERSE_HEBREW_BOOK_MAP = {v: k for k, v in OT_HEBREW_BOOK_MAP.items()}
 # FUNCTIONS (From fetch_readings.py)
 # =============================================================================
 
+import re
+
 def validate_safe_path(name):
     """
     Validates that the filename/path component is safe and does not contain
-    directory traversal characters or separators.
+    directory traversal characters or separators. Ensures strictly alphanumeric
+    characters, dots, and hyphens to prevent injection or corruption.
     """
     if ".." in name:
         return False
     if "/" in name or "\\" in name:
+        return False
+    # Enforce strict characters (Alphanumeric, dot, hyphen)
+    if not re.match(r'^[a-zA-Z0-9.\-]+$', name):
         return False
     return True
 
