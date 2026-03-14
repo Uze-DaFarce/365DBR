@@ -64,10 +64,14 @@ def fetch_passage(api_key, bible_id, passage_range):
     """
     Fetches a passage from api.bible.
     """
+    # URL Encode the passage range and bible_id to prevent API endpoint injection/manipulation
+    safe_passage_range = urllib.parse.quote(passage_range)
+    safe_bible_id = urllib.parse.quote(bible_id)
+
     # Construct parallel string
     parallels_str = ",".join(PARALLEL_IDS)
     
-    url = f"{API_BASE_URL}/bibles/{bible_id}/passages/{passage_range}"
+    url = f"{API_BASE_URL}/bibles/{safe_bible_id}/passages/{safe_passage_range}"
     
     params = {
         "content-type": "json",
