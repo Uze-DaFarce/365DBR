@@ -81,7 +81,7 @@ def run(source: str):
 
         # Must navigate first before setting localStorage
         print("Navigating to index.html and setting initial state...")
-        page.goto("http://localhost:8000/index.html", wait_until="networkidle")
+        page.goto("https://mt-sin.ai/365DBR/index.html", timeout=60000)
 
         # Set storage to simulate a previous session
         page.evaluate(f"localStorage.setItem('biblical_reading_state', '{initial_state}')")
@@ -89,7 +89,7 @@ def run(source: str):
         try:
             # 1. Navigate to TOMORROW (Allowed Future Date)
             print(f"\nNavigating to Tomorrow ({tomorrow_mmdd})...")
-            page.goto(f"http://localhost:8000/index.html?startDate={tomorrow_mmdd}", wait_until="networkidle")
+            page.goto(f"https://mt-sin.ai/365DBR/index.html?startDate={tomorrow_mmdd}", timeout=60000)
 
             saved_state = page.evaluate("localStorage.getItem('biblical_reading_state')")
             print(f"State after navigating to Tomorrow: {saved_state}")
@@ -101,7 +101,7 @@ def run(source: str):
 
             # 2. Navigate to DAY AFTER TOMORROW (Blocked Future Date)
             print(f"\nNavigating to Day After Tomorrow ({future_mmdd})...")
-            page.goto(f"http://localhost:8000/index.html?startDate={future_mmdd}", wait_until="networkidle")
+            page.goto(f"https://mt-sin.ai/365DBR/index.html?startDate={future_mmdd}", timeout=60000)
 
             saved_state_2 = page.evaluate("localStorage.getItem('biblical_reading_state')")
             print(f"State after navigating to Future+2: {saved_state_2}")
@@ -113,11 +113,11 @@ def run(source: str):
             else:
                 raise AssertionError(f"FAIL: State has an unexpected value: {saved_state_2}")
 
-            page.screenshot(path="verification/smart_bookmark_dynamic_test.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "smart_bookmark_dynamic_test.png"))
             print("\nSmart Bookmark verification successful!")
 
         except Exception as e:
-            page.screenshot(path="verification/smart_bookmark_error.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "smart_bookmark_error.png"))
             print(f"\nERROR: {e}")
             raise e
         finally:
