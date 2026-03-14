@@ -1751,9 +1751,16 @@ const App = () => {
           // This catches the Psalm Title (Verse 1) vs English (Verse 1 in Verse 2 slot) case
           if (!hasTranslationContent(currentVid) && i + 1 < sortedVids.length) {
               const nextVid = sortedVids[i+1];
-              // Ensure same book/chapter to avoid merges across boundaries
-              const [b1, c1] = currentVid.split('.');
-              const [b2, c2] = nextVid.split('.');
+              // ⚡ Bolt Optimization: Use fast substring instead of slow string split for boundary checks
+              const dot1A = currentVid.indexOf('.');
+              const dot2A = currentVid.indexOf('.', dot1A + 1);
+              const b1 = currentVid.substring(0, dot1A);
+              const c1 = currentVid.substring(dot1A + 1, dot2A);
+
+              const dot1B = nextVid.indexOf('.');
+              const dot2B = nextVid.indexOf('.', dot1B + 1);
+              const b2 = nextVid.substring(0, dot1B);
+              const c2 = nextVid.substring(dot1B + 1, dot2B);
               
               if (b1 === b2 && c1 === c2 && hasTranslationContent(nextVid)) {
                   group.push(nextVid);

@@ -29,3 +29,7 @@
 **Action:**
 1. Updated `validate_safe_path` in `bible_common.py` to use a strict regex `r'^[a-zA-Z0-9.\-]+$'`, definitively blocking any unexpected characters from entering file paths or internal string references.
 2. Updated `fetch_readings.py`, `check_data_integrity.py`, and `fetch_omissions_cache.py` to aggressively encode API URL parameters using `urllib.parse.quote()` to prevent HTTP parameter pollution or API endpoint manipulation.
+
+## 2026-03-14 - String Allocation Performance in Critical Loops
+**Learning:** Using `String.split()` for simple boundary checks or data extraction inside large `while` loops (like grouping hundreds of verses per day during app initialization) causes significant array allocation overhead and increased garbage collection pressure on mobile devices.
+**Action:** Replace `String.split()` with `String.substring()` and `String.indexOf()` when extracting parts of structured IDs within performance-critical initialization or rendering loops.
