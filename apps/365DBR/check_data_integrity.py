@@ -222,7 +222,10 @@ def verify_with_api(readings_path, day_limit=1):
                 # Need to translate range for Hebrew bible if needed (e.g. JOE -> JOL)
                 api_rng = translate_range_for_bible(rng, bible_id)
 
-                url = f"{API_BASE_URL}/bibles/{bible_id}/passages/{api_rng}?include-verse-spans=true"
+                safe_api_rng = urllib.parse.quote(api_rng)
+                safe_bible_id = urllib.parse.quote(bible_id)
+
+                url = f"{API_BASE_URL}/bibles/{safe_bible_id}/passages/{safe_api_rng}?include-verse-spans=true"
                 req = urllib.request.Request(url, headers={"api-key": api_key})
 
                 try:

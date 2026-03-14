@@ -13,7 +13,9 @@ def get_api_key():
     return key.strip()
 
 def fetch_single_passage(api_key, bible_id, vid):
-    url = f"{API_BASE_URL}/bibles/{bible_id}/passages/{vid}"
+    safe_bible_id = urllib.parse.quote(bible_id)
+    safe_vid = urllib.parse.quote(vid)
+    url = f"{API_BASE_URL}/bibles/{safe_bible_id}/passages/{safe_vid}"
 
     params = {
         "content-type": "json",
