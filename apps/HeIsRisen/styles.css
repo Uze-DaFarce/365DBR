@@ -23,3 +23,23 @@ canvas {
   outline: 4px solid #ffff00;
   outline-offset: -4px;
 }
+
+/* Skip link for accessibility */
+.skip-to-main {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+  z-index: 100000;
+  text-decoration: none;
+  font-family: 'Comic Sans MS', sans-serif;
+  transition: top 0.2s;
+  border: 2px solid #ffff00;
+}
+
+.skip-to-main:focus {
+  top: 0;
+  outline: none;
+}
