@@ -69,7 +69,7 @@ def run_header_test(source: str):
         setup_data_interception(page, source)
 
         try:
-            page.goto("http://localhost:8000/index.html", wait_until="networkidle")
+            page.goto("https://mt-sin.ai/365DBR/index.html", timeout=60000)
 
             # Wait for main content to load before checking the header state
             page.wait_for_selector(".verse-block", timeout=15000)
@@ -86,13 +86,13 @@ def run_header_test(source: str):
 
             # Take a screenshot of the header to confirm layout
             header = page.locator("header")
-            header.screenshot(path="verification/header_mobile.png")
+            header.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "header_mobile.png"))
             print("Screenshot saved to verification/header_mobile.png")
 
             print("\nHeader verification successful!")
 
         except Exception as e:
-            page.screenshot(path="verification/header_error.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "header_error.png"))
             print(f"\nERROR: {e}")
             raise e
         finally:

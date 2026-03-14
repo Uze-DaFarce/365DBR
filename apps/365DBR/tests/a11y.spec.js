@@ -16,7 +16,7 @@ test('verify a11y labels in index.html', async ({ page }) => {
   // Verify Playback Toggle Label exists on index.html
   await page.waitForSelector("button[aria-label*='Playback']", { timeout: 10000 });
 
-  await page.screenshot({ path: 'test-results/a11y_index.png' });
+  await page.screenshot({ path: require('path').join(__dirname, '..', 'test-results', 'a11y_index.png') });
 });
 
 test('verify a11y labels in bible.html', async ({ page }) => {
@@ -34,5 +34,5 @@ test('verify a11y labels in bible.html', async ({ page }) => {
   await page.locator("button[aria-label='Browse Bible']").click();
   await page.waitForSelector("button[aria-label='Select Old Testament']", { timeout: 10000 });
 
-  await page.screenshot({ path: 'test-results/a11y_bible.png' });
+  await page.screenshot({ path: require('path').join(__dirname, '..', 'test-results', 'a11y_bible.png') });
 });

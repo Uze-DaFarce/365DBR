@@ -78,7 +78,7 @@ def verify_bible_browse(source: str):
 
         print("Navigating to app...")
         # Standardize on port 8000
-        page.goto("http://localhost:8000/bible.html")
+        page.goto("https://mt-sin.ai/365DBR/bible.html", timeout=60000)
 
         # Wait for page to indicate it's ready for browsing
         page.wait_for_selector("text=Browse Bible", state="visible")
@@ -86,12 +86,12 @@ def verify_bible_browse(source: str):
 
         print("App auto-opened Bible Browse dialog...")
         page.wait_for_selector("text=Old", state="visible")
-        page.screenshot(path="verification/browse_testament.png")
+        page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "browse_testament.png"))
 
         print("Selecting Old Testament...")
         page.click("text=Old")
         page.wait_for_selector("button:has-text('PSA')") # Wait for book list
-        page.screenshot(path="verification/browse_books.png")
+        page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "browse_books.png"))
 
         print("Selecting Psalms...")
         page.click("button:has-text('PSA')")
@@ -100,7 +100,7 @@ def verify_bible_browse(source: str):
         print("Selecting Chunk 101-150...")
         page.click("button:has-text('101-150')")
         page.wait_for_selector("button:text-is('119')") # Wait for chapter list
-        page.screenshot(path="verification/browse_chapters.png")
+        page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "browse_chapters.png"))
 
         print("Selecting Chapter 119...")
         page.click("button:text-is('119')")
@@ -109,7 +109,7 @@ def verify_bible_browse(source: str):
         print("Selecting Chunk 151-176...")
         page.click("button:has-text('151-176')")
         page.wait_for_selector("button:text-is('151')") # Wait for verse list
-        page.screenshot(path="verification/browse_verses.png")
+        page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "browse_verses.png"))
 
         print("Selecting Verse 151...")
         page.click("button:text-is('151')")

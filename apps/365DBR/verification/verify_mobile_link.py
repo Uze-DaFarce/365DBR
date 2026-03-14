@@ -71,13 +71,13 @@ def test_mobile_browse_link(source: str):
 
         try:
             print("Navigating to index.html...")
-            page.goto("http://localhost:8000/index.html", wait_until="networkidle")
+            page.goto("https://mt-sin.ai/365DBR/index.html", timeout=60000)
 
             # Wait for the main verse content to load to ensure the app is in a stable state
             page.wait_for_selector(".verse-block", timeout=15000)
 
             # Find the link to the Bible Browser
-            browse_link = page.locator('a[title="Switch to Bible Browser"]')
+            browse_link = page.locator('a[title="Switch to Bible Browser"]').last
 
             # On mobile, the link icon should be visible
             if browse_link.is_visible():
@@ -94,13 +94,13 @@ def test_mobile_browse_link(source: str):
 
             # Take a screenshot of the header for visual verification
             header = page.locator("header")
-            header.screenshot(path="verification/mobile_header.png")
+            header.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "mobile_header.png"))
             print("Screenshot saved to verification/mobile_header.png")
             
             print("\nMobile Link verification successful!")
 
         except Exception as e:
-            page.screenshot(path="verification/mobile_link_error.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "mobile_link_error.png"))
             print(f"\nERROR: {e}")
             raise e
         finally:
