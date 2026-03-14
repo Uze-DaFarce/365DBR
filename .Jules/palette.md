@@ -257,7 +257,3 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 1.  **Extracts** the target ID.
 2.  **Sets** `tabindex="-1"` on the target element (making it programmatically focusable).
 3.  **Applies** `.focus({ preventScroll: true })` inside a `setTimeout` (to allow smooth scroll to execute) so users can immediately continue tabbing from their new visual location.
-
-## 2026-03-14 - Skip Links for Canvas Applications
-**Learning:** Full-screen canvas applications (like Phaser games) often trap or confuse keyboard focus if the canvas isn't explicitly targeted. Keyboard users need a direct way to bypass the browser UI and enter the application context.
-**Action:** Implemented a visually hidden "Skip to game" link (`<a href="#game" class="skip-to-main">`) immediately after `<body>` that targets the game container (`tabindex="-1"`). The link becomes visible on focus (`:focus { top: 0; }`), ensuring keyboard-only users can immediately engage with the canvas interactively without tabbing through browser chrome.
