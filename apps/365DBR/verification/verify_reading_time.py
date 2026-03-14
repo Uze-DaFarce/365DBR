@@ -70,7 +70,7 @@ def verify_reading_time(source: str):
         setup_data_interception(page, source)
 
         # Navigate to a day with known content (Feb 22nd)
-        page.goto("http://localhost:8000/index.html?startDate=0222", wait_until="networkidle")
+        page.goto("https://mt-sin.ai/365DBR/index.html?startDate=0222", timeout=60000)
 
         # Wait for data to load and content to be rendered
         page.wait_for_selector(".verse-block", timeout=20000)
@@ -88,11 +88,11 @@ def verify_reading_time(source: str):
         if match:
             print(f"PASS: Found reading time: '{match.group(0)}'")
         else:
-            page.screenshot(path="verification/reading_time_fail.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "reading_time_fail.png"))
             raise AssertionError("FAIL: Reading time text not found in footer.")
 
         # Save a screenshot for baseline verification
-        footer.screenshot(path="verification/reading_time.png")
+        footer.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "reading_time.png"))
         print("Screenshot saved to verification/reading_time.png")
 
         browser.close()

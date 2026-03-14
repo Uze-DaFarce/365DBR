@@ -929,7 +929,7 @@ const BOOKMARK_COLORS = [
     { bg: 'bg-stone-500', hover: 'hover:bg-stone-600', ring: 'focus:ring-stone-500', name: 'Stone' }
 ];
 
-function BookmarkDialog({ isOpen, onClose, onSave, bookmarks, targetVid }) {
+const BookmarkDialog = React.memo(({ isOpen, onClose, onSave, bookmarks, targetVid }) => {
     const [selectedSlot, setSelectedSlot] = useState(1);
     const [selectedColor, setSelectedColor] = useState(BOOKMARK_COLORS[0]);
 
@@ -1035,7 +1035,7 @@ function BookmarkDialog({ isOpen, onClose, onSave, bookmarks, targetVid }) {
             </div>
         </div>
     );
-}
+});
 
 const Header = React.memo(({
   isStatic,
@@ -1303,7 +1303,7 @@ const Footer = React.memo(({ isStatic, currentDate, readingLabel, readingTime, n
   );
 });
 
-const ScrollToTop = () => {
+const ScrollToTop = React.memo(() => {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -1337,7 +1337,7 @@ const ScrollToTop = () => {
       </svg>
     </button>
   );
-};
+});
 
 const App = () => {
   // Helper to resolve initial state from URL -> LocalStorage -> Today
@@ -1434,6 +1434,8 @@ const App = () => {
   const [bookmarks, setBookmarks] = useState({});
   const [bookmarkDialogTarget, setBookmarkDialogTarget] = useState(null);
 
+  const closeBookmarkDialog = useCallback(() => setBookmarkDialogTarget(null), []);
+
   // Load bookmarks on mount
   useEffect(() => {
       const loadBookmarks = () => {
@@ -1456,18 +1458,20 @@ const App = () => {
       };
   }, []);
 
-  const handleSaveBookmark = (slot, vid, color) => {
+  const handleSaveBookmark = useCallback((slot, vid, color) => {
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-      const newBookmarks = { ...bookmarks };
-      if (!vid) {
-          delete newBookmarks[slot];
-      } else {
-          newBookmarks[slot] = { vid, color };
-      }
-      setBookmarks(newBookmarks);
-      localStorage.setItem('bible_browser_bookmarks', JSON.stringify(newBookmarks));
-      window.dispatchEvent(new Event('bookmarksUpdated'));
-  };
+      setBookmarks(prevBookmarks => {
+          const newBookmarks = { ...prevBookmarks };
+          if (!vid) {
+              delete newBookmarks[slot];
+          } else {
+              newBookmarks[slot] = { vid, color };
+          }
+          localStorage.setItem('bible_browser_bookmarks', JSON.stringify(newBookmarks));
+          window.dispatchEvent(new Event('bookmarksUpdated'));
+          return newBookmarks;
+      });
+  }, []);
 
   // Check if running in Static Mode (preloaded data present)
   // We use a ref to track if we *started* with preloaded data, but strictly checking DOM is fine.
@@ -2191,7 +2195,7 @@ const App = () => {
 
       <BookmarkDialog
           isOpen={!!bookmarkDialogTarget}
-          onClose={() => setBookmarkDialogTarget(null)}
+          onClose={closeBookmarkDialog}
           onSave={handleSaveBookmark}
           bookmarks={bookmarks}
           targetVid={bookmarkDialogTarget}

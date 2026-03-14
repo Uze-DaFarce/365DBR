@@ -69,7 +69,7 @@ def verify_footer(source: str):
 
         try:
             # Navigate to a day with known content
-            page.goto("http://localhost:8000/index.html?startDate=0222", wait_until="networkidle")
+            page.goto("https://mt-sin.ai/365DBR/index.html?startDate=0222", timeout=60000)
 
             # Wait for text that indicates data has loaded. This text is in the footer itself.
             page.wait_for_selector("text=Literal Standard Version", timeout=15000)
@@ -79,13 +79,13 @@ def verify_footer(source: str):
 
             # Take a screenshot of the footer for verification
             footer = page.locator("footer")
-            footer.screenshot(path="verification/footer_verification.png")
+            footer.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "footer_verification.png"))
             print("Footer screenshot saved.")
 
             print("\nFooter verification successful!")
 
         except Exception as e:
-            page.screenshot(path="verification/footer_error.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "footer_error.png"))
             print(f"\nERROR: {e}")
             raise e
         finally:

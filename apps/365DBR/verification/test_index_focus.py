@@ -70,12 +70,12 @@ def run_focus_test(source: str):
 
         try:
             print("Navigating to index.html...")
-            page.goto("http://localhost:8000/index.html", wait_until="networkidle")
+            page.goto("https://mt-sin.ai/365DBR/index.html", timeout=60000)
 
             # Wait for data to load
             print("Waiting for verse content to load...")
             page.wait_for_selector('.verse-block', timeout=15000)
-            page.screenshot(path="verification/index_before.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "index_before.png"))
             print("Initial content loaded.")
 
             # Click the NT pill to jump to the New Testament section
@@ -83,7 +83,7 @@ def run_focus_test(source: str):
             nt_button = page.locator('button[aria-label="Jump to New Testament"]')
             nt_button.click()
             time.sleep(1) # Allow for scroll animation
-            page.screenshot(path="verification/index_after_pill.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "index_after_pill.png"))
             print("Jumped to NT section.")
 
             # Click the Next Day button
@@ -91,24 +91,24 @@ def run_focus_test(source: str):
             next_day_btn = page.locator('button[aria-label="Next Day (Shortcut: Right Arrow)"]')
             next_day_btn.click()
             page.wait_for_selector('.verse-block', timeout=15000) # Wait for new day's content
-            page.screenshot(path="verification/index_after_next_day.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "index_after_next_day.png"))
             print("Loaded next day's content.")
 
             # Change a translation to verify dropdown interaction
             print("Changing translation via dropdown...")
-            compare_btn = page.locator('button[title="Select Translation for Middle Slot"]')
+            compare_btn = page.locator('button[title="Select Translation for Middle Slot"]').first
             compare_btn.click()
             time.sleep(0.5)
             web_btn = page.locator('button[aria-label="Select translation web"]')
             web_btn.click()
             time.sleep(0.5)
-            page.screenshot(path="verification/index_after_dropdown.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "index_after_dropdown.png"))
             print("Translation changed.")
 
             print("\nSuccessfully executed focus verification script.")
 
         except Exception as e:
-            page.screenshot(path="verification/focus_test_error.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "focus_test_error.png"))
             print(f"\nERROR: {e}")
             raise e
         finally:

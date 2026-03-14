@@ -96,7 +96,7 @@ def run(source: str):
             # 1. Verify index.html (Daily Bread)
             print("\nVerifying index.html (Daily Reading)...")
             # Use 0202 as a reliable reference date with content
-            page.goto("http://localhost:8000/index.html?startDate=0202", wait_until="networkidle")
+            page.goto("https://mt-sin.ai/365DBR/index.html?startDate=0202", timeout=60000)
 
             # Wait for verse content to appear
             page.wait_for_selector(".verse-block", timeout=10000)
@@ -111,13 +111,13 @@ def run(source: str):
             if not first_text or len(first_text.strip()) < 10:
                 raise Exception(f"Verse text seems empty or too short: {first_text}")
 
-            page.screenshot(path="verification/index_baseline.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "index_baseline.png"))
             print("index.html verification PASSED.")
 
             # 2. Verify bible.html (Bible Browser)
             print("\nVerifying bible.html (Bible Browser)...")
             # The reading for 0202 includes Exodus 9
-            page.goto("http://localhost:8000/bible.html?book=EXO&chapter=9", wait_until="networkidle")
+            page.goto("https://mt-sin.ai/365DBR/bible.html?book=EXO&chapter=9", timeout=60000)
 
             # Wait for verse content to appear
             page.wait_for_selector(".verse-block", timeout=10000)
@@ -132,14 +132,14 @@ def run(source: str):
             if not first_text or len(first_text.strip()) < 10:
                 raise Exception(f"Verse text seems empty or too short: {first_text}")
 
-            page.screenshot(path="verification/bible_baseline.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "bible_baseline.png"))
             print("bible.html verification PASSED.")
 
             print("\nVerification successful!")
 
         except Exception as e:
             print(f"\nERROR: {e}")
-            page.screenshot(path="verification/error.png")
+            page.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "error.png"))
             # Re-raise the exception to ensure the script exits with a non-zero code
             raise e
         finally:
