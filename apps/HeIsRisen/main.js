@@ -1769,10 +1769,8 @@ class EndgameScene extends Phaser.Scene {
         const offsetX = (width - 1280 * scale) / 2;
         const offsetY = (height - 720 * scale) / 2;
 
-        // Base Background
         this.add.rectangle(width/2, height/2, width, height, 0x1a0f00).setDepth(0);
 
-        // Setup Emitter for celebration
         const particles = this.add.particles(0, 0, 'egg-1', {
             x: { min: 0, max: width },
             y: { min: -100, max: 0 },
@@ -1786,7 +1784,6 @@ class EndgameScene extends Phaser.Scene {
             blendMode: 'ADD'
         }).setDepth(1);
 
-        // Since we don't have a generic particle image, let's randomly change the texture to different eggs
         this.time.addEvent({
             delay: 500,
             loop: true,
@@ -1796,7 +1793,6 @@ class EndgameScene extends Phaser.Scene {
             }
         });
 
-        // Background Panel
         const panelWidth = 1000 * scale;
         const panelHeight = 600 * scale;
         const panel = this.add.graphics();
@@ -1806,7 +1802,6 @@ class EndgameScene extends Phaser.Scene {
         panel.strokeRoundedRect(offsetX + (1280*scale - panelWidth)/2, offsetY + (720*scale - panelHeight)/2, panelWidth, panelHeight, 30 * scale);
         panel.setDepth(2);
 
-        // Calculate Scores
         const foundEggs = this.registry.get('foundEggs') || [];
         const totalFound = foundEggs.length;
 
@@ -1827,15 +1822,10 @@ class EndgameScene extends Phaser.Scene {
             }
         });
 
-        // Points logic:
-        // 10 pts for finding
-        // 10 pts for categorizing
-        // 10 bonus pts for first try
         const totalScore = (totalFound * 10) +
                            ((eggSelentFound + eggstraStinkyFound) * 10) +
                            ((eggSelentFirstTry + eggstraStinkyFirstTry) * 10);
 
-        // Title
         this.add.text(width / 2, offsetY + 120 * scale, "Final Score", {
             fontSize: `${64 * scale}px`,
             fill: '#8b4513',
@@ -1847,14 +1837,13 @@ class EndgameScene extends Phaser.Scene {
 
         this.add.text(width / 2, offsetY + 220 * scale, `${totalScore} Points!`, {
             fontSize: `${80 * scale}px`,
-            fill: '#d4af37', // Gold
+            fill: '#d4af37',
             fontStyle: 'bold',
             fontFamily: 'Comic Sans MS',
             stroke: '#000',
             strokeThickness: 10 * scale
         }).setOrigin(0.5).setDepth(3);
 
-        // Breakdown Left (EggSelent)
         this.add.text(offsetX + 350 * scale, offsetY + 350 * scale, "Egg-Selent (Holy):\n" +
                                                                     `Found: ${eggSelentFound}/30\n` +
                                                                     `Perfect Sort: ${eggSelentFirstTry}`, {
@@ -1867,7 +1856,6 @@ class EndgameScene extends Phaser.Scene {
             strokeThickness: 4 * scale
         }).setOrigin(0.5).setDepth(3);
 
-        // Breakdown Right (Eggstra-Stinky)
         this.add.text(offsetX + 930 * scale, offsetY + 350 * scale, "Egg-stra Stinky (Worldly):\n" +
                                                                     `Found: ${eggstraStinkyFound}/30\n` +
                                                                     `Perfect Sort: ${eggstraStinkyFirstTry}`, {
@@ -1880,7 +1868,6 @@ class EndgameScene extends Phaser.Scene {
             strokeThickness: 4 * scale
         }).setOrigin(0.5).setDepth(3);
 
-        // PLAY AGAIN Button
         const playBtnContainer = this.add.container(width / 2, offsetY + 550 * scale).setDepth(100);
 
         const playBtnWidth = 350 * scale;
@@ -1929,19 +1916,15 @@ class EndgameScene extends Phaser.Scene {
         const resetAndPlay = () => {
             this.input.setDefaultCursor('default');
 
-            // Play sound
             const musicScene = this.scene.get('MusicScene');
             if (musicScene) musicScene.playSFX('menu-click');
 
-            // Clear Registry Progress
             this.registry.set('foundEggs', []);
             this.registry.set('stampedSections', []);
             this.registry.set('correctCategorizations', 0);
 
-            // We must force the map data to be regenerated to randomly place eggs again
             this.registry.remove('eggData');
 
-            // Re-run MainMenu map logic without showing intro video
             const mapSections = this.cache.json.get('map_sections');
             const symbolsData = this.cache.json.get('symbols');
 
@@ -1991,7 +1974,6 @@ class EndgameScene extends Phaser.Scene {
                 this.registry.set('eggData', eggData);
             }
 
-            // Start MapScene directly
             this.scene.start('MapScene');
         };
 
@@ -2131,13 +2113,13 @@ class EggZamRoom extends Phaser.Scene {
             this.registry.set('correctCategorizations', correctCount);
             this.correctText.setText(`Correct: ${correctCount}`);
             this.currentEgg.categorized = true;
+
             if (this.currentEgg.attempts === 1) {
                 this.currentEgg.firstTryCorrect = true;
             } else {
                 this.currentEgg.firstTryCorrect = false;
             }
 
-            // Update the registry foundEggs to persist these new properties
             const foundEggs = this.registry.get('foundEggs');
             const index = foundEggs.findIndex(e => e.eggId === this.currentEgg.eggId);
             if (index !== -1) {
@@ -2271,7 +2253,6 @@ class EggZamRoom extends Phaser.Scene {
                 wordWrap: { width: 800 * scale, useAdvancedWrap: true }
             }).setOrigin(0.5).setDepth(100);
 
-            // Transition to EndgameScene after a short delay
             this.time.delayedCall(3000, () => {
                 this.scene.start('EndgameScene');
             });
