@@ -189,7 +189,9 @@ def verify_local_content(readings_path):
         print(f"❌ Found {errors} content integrity issues.")
         return False
 
-def verify_with_api(readings_path, day_limit=1):
+import random
+
+def verify_with_api(readings_path, day_limit=1, random_days=False):
     api_key = get_api_key()
     if not api_key:
         print("⚠️ No API_BIBLE_KEY found. Skipping API verification.")
@@ -200,7 +202,10 @@ def verify_with_api(readings_path, day_limit=1):
     with open(readings_path, 'r', encoding='utf-8') as f:
         readings = json.load(f)
 
-    targets = readings[:day_limit]
+    if random_days:
+        targets = random.sample(readings, min(day_limit, len(readings)))
+    else:
+        targets = readings[:day_limit]
     errors_found = False
 
     for day in targets:
@@ -273,6 +278,7 @@ def main():
     parser.add_argument("--content", action="store_true", help="Verify local file content integrity")
     parser.add_argument("--api", action="store_true", help="Run API verification")
     parser.add_argument("--days", type=int, default=1, help="Number of days to verify via API")
+    parser.add_argument("--random", action="store_true", help="Randomly select days to verify with API")
     parser.add_argument("--readings", default="data/readings.json", help="Path to readings.json (default: data/readings.json)")
     args = parser.parse_args()
 
@@ -287,7 +293,7 @@ def main():
             success = False
 
     if args.api:
-        if not verify_with_api(args.readings, args.days):
+        if not verify_with_api(args.readings, args.days, args.random):
             success = False
 
     if not success:
