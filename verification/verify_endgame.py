@@ -52,7 +52,7 @@ def verify_desktop_game(page: Page):
         const simulatedFound = eggData.map(e => ({
             eggId: e.eggId,
             symbolData: e.symbol,
-            categorized: false
+            categorized: true
         }));
 
         // Manipulate category for test scoring (30 holy, 30 pagan)
@@ -62,6 +62,7 @@ def verify_desktop_game(page: Page):
         });
 
         game.registry.set('foundEggs', simulatedFound);
+        game.registry.set('correctCategorizations', 60);
 
         // Jump to EggZamRoom
         const mapScene = game.scene.getScene('MapScene');
@@ -71,6 +72,7 @@ def verify_desktop_game(page: Page):
     page.wait_for_timeout(2000)
     wait_for_scene(page, "EggZamRoom")
 
+    page.wait_for_timeout(2000)
     # We are now in EggZamRoom with all eggs found. The summary panel should be visible.
     print("Taking desktop summary screenshot...")
     page.screenshot(path="verification/desktop_summary.png")
@@ -82,7 +84,7 @@ def verify_desktop_game(page: Page):
         const game = window.game;
         const eggZamRoom = game.scene.getScene('EggZamRoom');
         // We know the global initializeGameData exists
-        initializeGameData(eggZamRoom.registry, eggZamRoom.scene.systems.cache);
+        initializeGameData(eggZamRoom.registry, eggZamRoom.cache);
         eggZamRoom.scene.start('MapScene');
     }''')
 
@@ -125,7 +127,7 @@ def verify_mobile_game(page: Page):
         const simulatedFound = eggData.map(e => ({
             eggId: e.eggId,
             symbolData: e.symbol,
-            categorized: false
+            categorized: true
         }));
 
         simulatedFound.forEach((e, i) => {
@@ -134,6 +136,7 @@ def verify_mobile_game(page: Page):
         });
 
         game.registry.set('foundEggs', simulatedFound);
+        game.registry.set('correctCategorizations', 60);
 
         const mapScene = game.scene.getScene('MapScene');
         mapScene.scene.start('EggZamRoom');
@@ -141,6 +144,7 @@ def verify_mobile_game(page: Page):
 
     page.wait_for_timeout(2000)
     wait_for_scene(page, "EggZamRoom")
+    page.wait_for_timeout(2000)
     print("Taking mobile summary screenshot...")
     page.screenshot(path="verification/mobile_summary.png")
     page.wait_for_timeout(1000)
@@ -149,7 +153,7 @@ def verify_mobile_game(page: Page):
     page.evaluate('''() => {
         const game = window.game;
         const eggZamRoom = game.scene.getScene('EggZamRoom');
-        initializeGameData(eggZamRoom.registry, eggZamRoom.scene.systems.cache);
+        initializeGameData(eggZamRoom.registry, eggZamRoom.cache);
         eggZamRoom.scene.start('MapScene');
     }''')
 
@@ -176,7 +180,7 @@ if __name__ == "__main__":
 
         # Mobile
         context_mobile = browser.new_context(
-            viewport={'width': 390, 'height': 844},
+            viewport={'width': 844, 'height': 390},
             is_mobile=True,
             record_video_dir="verification/video"
         )
