@@ -23,8 +23,9 @@ def get_easter_date(year):
     day = ((h + l - 7 * m + 114) % 31) + 1
     return datetime.date(year, month, day)
 
-def days_until_easter(current_datetime):
-    current_date = current_datetime.date()
+def days_until_easter():
+    # ALWAYS evaluate based on TODAY (MST/MDT) to prevent passing an arbitrary date
+    current_date = get_mst_time().date()
     easter_this_year = get_easter_date(current_date.year)
 
     if current_date > easter_this_year:
@@ -38,7 +39,7 @@ def days_until_easter(current_datetime):
 def test_day_of_week():
     now_mst = get_mst_time()
     day_name = now_mst.strftime("%A")
-    days_left, next_easter = days_until_easter(now_mst)
+    days_left, next_easter = days_until_easter()
 
     print(f"Current MST/MDT Time: {now_mst}")
     print(f"Day of the week: {day_name}")
