@@ -310,3 +310,6 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 **Action:**
 *   Always use `input.setDraggable(obj)` for draggable elements.
 *   Use manual viewport swapping for landscape mobile tests.
+## 2026-03-16 - Semantic Wrappers for Full-Screen Apps
+**Learning:** Even fully Canvas-rendered apps (like Phaser games) benefit from `<main>` semantic wrappers and `<noscript>` tags at the HTML level. It provides structure for screen readers and graceful degradation for users without JS without disrupting the game container.
+**Action:** Always wrap `#game` or `#game-container` in `<main>` when scaffolding new Phaser apps in the monorepo, and provide a `<noscript>` styled fallback.
