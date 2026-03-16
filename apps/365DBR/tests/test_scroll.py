@@ -75,7 +75,7 @@ async def run(source: str):
         try:
             # Navigate to a day with known psalm-to-proverb transition
             print("Navigating to page with startDate=0307...")
-            await page.goto("http://localhost:8000/apps/365DBR/index.html?startDate=0307", timeout=60000)
+            await page.goto("https://mt-sin.ai/365DBR/index.html?startDate=0307", timeout=60000)
             await page.wait_for_selector(".verse-block")
             print("Page loaded.")
 
