@@ -1670,12 +1670,7 @@ class SectionHunt extends Phaser.Scene {
 
     // Ensure stamp is scaled and positioned correctly relative to the "world"
     this.renderStamp.setOrigin(0, 0);
-
-    // Calculate target scale directly without redundant matrix operations
-    // Base scale = (1280 * this.bgScale) / renderStamp.width
-    const targetScaleX = (1280 * this.bgScale / this.renderStamp.width) * zoom;
-    const targetScaleY = (720 * this.bgScale / this.renderStamp.height) * zoom;
-    this.renderStamp.setScale(targetScaleX, targetScaleY);
+    this.renderStamp.setDisplaySize(1280 * this.bgScale, 720 * this.bgScale);
 
     // Position the stamp relative to the scroll position
     // If the background is at (bgOffsetX, bgOffsetY) in the world,
@@ -1685,6 +1680,8 @@ class SectionHunt extends Phaser.Scene {
 
     const drawX = (this.bgOffsetX - scrollX) * zoom;
     const drawY = (this.bgOffsetY - scrollY) * zoom;
+
+    this.renderStamp.setScale((1280 * this.bgScale / this.renderStamp.width) * zoom, (720 * this.bgScale / this.renderStamp.height) * zoom);
 
     this.zoomedView.draw(this.renderStamp, drawX, drawY);
 

@@ -1616,9 +1616,6 @@ class SectionHunt extends Phaser.Scene {
     // Check level complete immediately if returning to a completed map
     this.checkLevelComplete(true);
 
-    // Pre-allocate array for buttons once
-    this.uiButtons = [this.eggZitButton, this.eggsAmminHaul];
-
     // Global capture handler
     this.input.on('pointerdown', (pointer) => {
       // Calculate lens position based on pointer
@@ -1697,13 +1694,11 @@ class SectionHunt extends Phaser.Scene {
          this.renderStamp.setTexture(this.sectionName);
     }
 
-    // Calculate target scale directly without redundant matrix operations
-    // 1. Base scale to fit screen
-    const baseScaleX = this.game.config.width / this.renderStamp.width;
-    const baseScaleY = this.game.config.height / this.renderStamp.height;
+    // Set explicit size before scaling
+    this.renderStamp.setDisplaySize(this.game.config.width, this.game.config.height);
 
-    // 2. Apply zoom
-    this.renderStamp.setScale(baseScaleX * zoom, baseScaleY * zoom);
+    // Scale by 2 for zoom
+    this.renderStamp.setScale(this.renderStamp.scaleX * zoom, this.renderStamp.scaleY * zoom);
 
     // We already scaled the stamp by zoom. So we only offset by scrollX*zoom.
     this.renderStamp.setPosition(-scrollX * zoom, -scrollY * zoom);
@@ -1751,9 +1746,10 @@ class SectionHunt extends Phaser.Scene {
     });
 
     // Handle Button Hover and Cursor Swap
+    const buttons = [this.eggZitButton, this.eggsAmminHaul];
     let isHoveringButton = false;
 
-    this.uiButtons.forEach(btn => {
+    buttons.forEach(btn => {
         if (btn && btn.active) {
              // Store base scale if not already stored
              if (btn.baseScaleX === undefined) btn.baseScaleX = btn.scaleX;
