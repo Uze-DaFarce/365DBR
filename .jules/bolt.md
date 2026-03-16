@@ -84,3 +84,7 @@
 **Action:**
 1. Updated `validate_safe_path` in `bible_common.py` to use a strict regex `r'^[a-zA-Z0-9.\-]+$'`, definitively blocking any unexpected characters from entering file paths or internal string references.
 2. Updated `fetch_readings.py`, `check_data_integrity.py`, and `fetch_omissions_cache.py` to aggressively encode API URL parameters using `urllib.parse.quote()` to prevent HTTP parameter pollution or API endpoint manipulation.
+
+## 2026-03-16 - Redundant Array Allocation and Transform Computations in Update Loop
+**Learning:** During continuous execution loops like Phaser's `update()`, initializing arrays implicitly (e.g. `[this.button1, this.button2].forEach(...)`) causes constant garbage collection pressure from creating array instances every frame. Furthermore, consecutive scale/size alterations (e.g. `setDisplaySize()` immediately followed by `setScale()`) result in multiple redundant transformation matrix recalculations behind the scenes per frame.
+**Action:** Always allocate array references outside of hot paths like `update()` loops, and calculate the target explicit transform values (`baseScale` * `zoom`) using math directly ahead of applying a single setting method.
