@@ -257,3 +257,56 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 1.  **Extracts** the target ID.
 2.  **Sets** `tabindex="-1"` on the target element (making it programmatically focusable).
 3.  **Applies** `.focus({ preventScroll: true })` inside a `setTimeout` (to allow smooth scroll to execute) so users can immediately continue tabbing from their new visual location.
+## 2024-05-22 - Map Interaction Feedback
+**Learning:** Invisible hit areas on maps leave users guessing; adding a simple hover outline significantly improves discoverability.
+**Action:** Ensure all interactive zones, especially non-rectangular ones, have a visual hover state (outline or tint).
+
+## 2024-05-25 - Consistent Interaction Feedback
+**Learning:** Users expect consistent feedback across scenes. Since `MapScene` provided hover outlines and cursor scaling, the absence of these in `EggZamRoom` made the interactive zones feel broken or undiscoverable.
+**Action:** Reused the feedback pattern (yellow outline + cursor scale) from `MapScene` in `EggZamRoom` to maintain consistency and improve discoverability.
+
+## 2024-05-26 - Center Alignment for Labels
+**Learning:** Left-aligned labels in fixed-width containers often look unbalanced or get clipped if the container logic isn't perfect. Centering text (`setOrigin(0.5)`) ensures it expands evenly and looks more polished in score boxes.
+**Action:** Use centered origin for HUD labels like scores or counts to prevent visual imbalance.
+
+## 2024-05-27 - Responsive HUD Text Scaling
+**Learning:** HUD text that looks perfect on mobile often overlaps or feels overwhelmingly large when the same codebase is rendered on desktop (e.g., in responsive or emulated views). Checking `sys.game.device.os.desktop` allows for nuanced typography adjustments.
+**Action:** Always verify HUD element spacing on both mobile and desktop contexts, and use device detection to scale font sizes and adjust vertical spacing to prevent overlap.
+
+## 2026-03-02 - Keyboard Accessibility Parity on Mobile
+**Learning:** Dismissing overlays or modals via keyboard commands (like `ESC`) is frequently missed on "mobile" environments where touch is presumed to be the only input. However, on tablets or mobile web views attached to external keyboards, the absence of basic keyboard navigation feels broken. Parity with the desktop codebase on core keyboard interactions is essential.
+**Action:** Ensure standard keyboard dismiss handlers (`ESC`, `ENTER` for modals) are consistently applied across both desktop and mobile scenes.
+
+## 2026-03-08 - Auto-focus Game Canvas for Screen Readers
+**Learning:** HTML5 canvas games (like Phaser) wrapped in an `aria-label` container rely on that container gaining focus to be announced by screen readers. Since games don't inherently pull focus without interaction, users relying on keyboards/screen readers might have difficulty discovering the game if it is not explicitly focused on load. The existing `tabindex="0"` on the wrapper requires the user to manually `Tab` to it first.
+**Action:** Always add a `window.addEventListener('load', () => { container.focus() })` to auto-focus the game container on load, and ensure a `:focus-visible` CSS rule provides a visual outline for sighted keyboard users.
+
+## 2026-03-11 - Endgame Keyboard Accessibility Parity
+**Learning:** When adding end-of-game actions like "Play Again" buttons, relying solely on pointer events breaks the loop for keyboard users who might have navigated the final modals using Space/Enter. Critical flow actions must always have keyboard parity.
+**Action:** Always bind `Space` and `Enter` keys to primary final-screen CTAs (like Restart/Play Again) to ensure the game loop can be completed without a mouse.
+## 2025-05-15 - Consistent Interaction Patterns
+**Learning:** The project uses a custom `addButtonInteraction` function to provide scale-based hover/press feedback for `Phaser.GameObjects`. This pattern was missing from the `UIScene` Gear Icon, leading to an inconsistent feel.
+**Action:** Always check for existing interaction helpers (like `addButtonInteraction`) before implementing custom pointer handlers. When modifying UI elements, ensure they use the established feedback patterns (scale 1.1x on hover, 0.9x on press) for a cohesive experience.
+
+## 2025-05-15 - Asset Orientation and Hotspots
+**Learning:** When using directional cursors (like a pointing finger), `setOrigin` and `angle` must be coordinated to align the visual "tip" with the logical "hotspot" (coordinates). Specifically, flipping a cursor 180 degrees requires changing the origin (e.g., from Center or Top-Left to match the new Tip location relative to the unrotated texture) so that the GameObject's `(x, y)` position remains the click point.
+**Action:** When rotating interaction cursors, visualize the texture in local space. If the "hotspot" moves due to rotation, adjust `setOrigin` so the pivot point remains the desired hotspot (e.g., the fingertip).
+
+## 2024-05-24 - [Slider and Settings UX]
+**Learning:** Phaser 3's `setInteractive` on shapes doesn't automatically enable the pointer cursor unless configured. Furthermore, small interactive elements (like slider tracks) need larger invisible hit areas to be accessible and easy to use.
+**Action:** Always add an invisible, larger "hit area" rectangle/circle behind small UI elements and explicitly set `{ cursor: 'pointer' }` or `object.input.cursor = 'pointer'` for better affordance.
+
+## 2024-05-22 - [Phaser 3 Input & Playwright Mobile]
+**Learning:**
+1.  **Phaser 3 Container Draggability:**
+    *   Using `container.setInteractive(hitArea, callback, { draggable: true })` does NOT automatically enable dragging.
+    *   Correct pattern: Call `container.setInteractive(...)` then explicitly call `scene.input.setDraggable(container)`.
+    *   This is critical for mobile sliders using Container wrappers for larger hit areas.
+
+2.  **Playwright Mobile Emulation:**
+    *   `iPhone 12 Landscape` is not a valid device descriptor.
+    *   To emulate landscape on mobile devices in Playwright, use the base device (e.g., `iPhone 12`) and manually swap the viewport width/height in the context options.
+
+**Action:**
+*   Always use `input.setDraggable(obj)` for draggable elements.
+*   Use manual viewport swapping for landscape mobile tests.
