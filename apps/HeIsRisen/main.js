@@ -2093,7 +2093,7 @@ class EggZamRoom extends Phaser.Scene {
 
           const triggerRestart = () => {
               this.input.setDefaultCursor('default');
-              initializeGameData(this.registry, this.scene.systems.cache);
+              initializeGameData(this.registry, this.cache);
               this.scene.start('MapScene');
           };
 
