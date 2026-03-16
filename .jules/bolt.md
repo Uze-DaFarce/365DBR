@@ -88,3 +88,7 @@
 ## 2026-03-16 - Redundant Array Allocation and Transform Computations in Update Loop
 **Learning:** During continuous execution loops like Phaser's `update()`, initializing arrays implicitly (e.g. `[this.button1, this.button2].forEach(...)`) causes constant garbage collection pressure from creating array instances every frame. Furthermore, consecutive scale/size alterations (e.g. `setDisplaySize()` immediately followed by `setScale()`) result in multiple redundant transformation matrix recalculations behind the scenes per frame.
 **Action:** Always allocate array references outside of hot paths like `update()` loops, and calculate the target explicit transform values (`baseScale` * `zoom`) using math directly ahead of applying a single setting method.
+
+## 2026-03-16 - Environment Desync Circuit Breaker
+**Learning:** When a tool or environment limit (like a massive git diff warning) is triggered silently or inconsistently, it traps the session in a state where the agent is seeing an outdated version of the world while trying to operate on the new one. Attempting to reconcile this reality results in a death spiral of wasted tokens and failed attempts, as the agent operates on corrupted state.
+**Action:** If `git diff` or `git status` throws a "Diff size unusually large" warning, or otherwise prevents file state verification, IMMEDIATELY trigger a hard circuit breaker. Do not attempt to forcefully reconcile or guess the state. Halt all operations, alert the user to the desync, and request a fresh session to start cleanly.
