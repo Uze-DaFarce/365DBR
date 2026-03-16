@@ -7,6 +7,7 @@ import urllib.request
 import urllib.error
 import urllib.parse
 import re
+import random
 
 from bible_common import (
     BIBLE_DATA,
@@ -188,8 +189,6 @@ def verify_local_content(readings_path):
     else:
         print(f"❌ Found {errors} content integrity issues.")
         return False
-
-import random
 
 def verify_with_api(readings_path, day_limit=1, random_days=False):
     api_key = get_api_key()

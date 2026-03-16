@@ -79,4 +79,4 @@
 
 ## 2024-03-16 - [Testing Depth & Production Reality]
 **Learning:** Testing against static, stale sample data (like `0101` and `0102` directories left in the repo) hides edge cases and produces false positives. The `check_data_integrity.py` script previously had no simple mechanism to sample production JSONs randomly or efficiently check wide swaths of the plan when `--days` was limited to sequential starts.
-**Action:** Enhanced `check_data_integrity.py` with a `--random` flag that allows it to select a random subset of days to verify against the API, increasing testing depth, breadth, and grounding verification strictly in the reality of production data rather than local mocks. Corrected a hardcoded corrupted starting range `PSA.1.7` in `generate_january.py` and `manifest.json`.
+**Action:** Enhanced `check_data_integrity.py` with a `--random` flag that allows it to select a random subset of days to verify against the API, increasing testing depth, breadth, and grounding verification strictly in the reality of production data rather than local mocks.
