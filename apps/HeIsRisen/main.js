@@ -794,7 +794,14 @@ class MainMenu extends Phaser.Scene {
       const height = gameSize.height;
 
       if (this.cameras && this.cameras.main) {
-          this.cameras.main.setViewport(0, 0, width, height);
+          // Use requestAnimationFrame to defer the viewport update until after the WebGL context
+          // has completely re-allocated the framebuffers for the new window size.
+          // This prevents the 'Framebuffer status: Incomplete Attachment' crash.
+          requestAnimationFrame(() => {
+              if (this.cameras && this.cameras.main) {
+                  try { this.cameras.main.setViewport(0, 0, width, height); } catch (e) {}
+              }
+          });
       }
 
       if (this.introVideo && this.introVideo.active) {
@@ -1088,7 +1095,11 @@ class MapScene extends Phaser.Scene {
 
   updateLayout(width, height) {
       if (this.cameras && this.cameras.main) {
-          this.cameras.main.setViewport(0, 0, width, height);
+          requestAnimationFrame(() => {
+              if (this.cameras && this.cameras.main) {
+                  try { this.cameras.main.setViewport(0, 0, width, height); } catch (e) {}
+              }
+          });
       }
 
       // Calculate scale to COVER based on native map size, not forced 1280x720
@@ -1576,7 +1587,11 @@ class SectionHunt extends Phaser.Scene {
       const height = gameSize.height;
 
       if (this.cameras && this.cameras.main) {
-          this.cameras.main.setViewport(0, 0, width, height);
+          requestAnimationFrame(() => {
+              if (this.cameras && this.cameras.main) {
+                  try { this.cameras.main.setViewport(0, 0, width, height); } catch (e) {}
+              }
+          });
       }
 
       const scaleX = width / 1280;
