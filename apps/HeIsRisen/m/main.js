@@ -578,7 +578,11 @@ class MainMenu extends Phaser.Scene {
 
       // Set camera bounds to match viewport
       this.cameras.main.setBounds(0, 0, this.game.config.width, this.game.config.height);
-      this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height);
+      requestAnimationFrame(() => {
+          if (this.cameras && this.cameras.main) {
+              try { this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height); } catch(e) {}
+          }
+      });
       this.cameras.main.setPosition(0, 0);
 
       // Debug: Log camera position
@@ -886,7 +890,11 @@ class MapScene extends Phaser.Scene {
 
     // Set camera bounds to match viewport
     this.cameras.main.setBounds(0, 0, this.game.config.width, this.game.config.height);
-    this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height);
+    requestAnimationFrame(() => {
+        if (this.cameras && this.cameras.main) {
+            try { this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height); } catch(e) {}
+        }
+    });
     this.cameras.main.setPosition(0, 0);
 
     // NEW: Retrieve existing eggData and sections from registry
@@ -2383,7 +2391,11 @@ function resizeGame() {
     if (scene.gameScale) scene.gameScale = scale;
     if (scene.cameras && scene.cameras.main) {
       scene.cameras.main.setBounds(0, 0, width, height);
-      scene.cameras.main.setViewport(0, 0, width, height);
+      requestAnimationFrame(() => {
+          if (scene.cameras && scene.cameras.main) {
+              try { scene.cameras.main.setViewport(0, 0, width, height); } catch(e) {}
+          }
+      });
       scene.cameras.main.setPosition(0, 0);
     }
     if (scene.scene.key === 'MainMenu') {
