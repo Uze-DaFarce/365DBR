@@ -506,11 +506,15 @@ class MainMenu extends Phaser.Scene {
     // Note: introVideo.width might be 0 initially if not fully loaded metadata
     // We should rely on resize or use displayWidth/displayHeight if set
 
-    if (introVideo.width > 0) {
-        const scaleX = width / introVideo.width;
-        const scaleY = height / introVideo.height;
+    const iWidth = introVideo.video?.videoWidth || introVideo.width || 0;
+    const iHeight = introVideo.video?.videoHeight || introVideo.height || 0;
+    if (iWidth > 0 && iHeight > 0) {
+        const scaleX = width / iWidth;
+        const scaleY = height / iHeight;
         const videoScale = Math.max(scaleX, scaleY);
-        introVideo.setScale(videoScale);
+        if (!isNaN(videoScale) && isFinite(videoScale) && videoScale > 0) {
+            introVideo.setScale(videoScale);
+        }
     } else {
         // Fallback or wait for texture
         // We will rely on resize event which fires or we can force a resize check in update/timeout
@@ -778,11 +782,16 @@ class MainMenu extends Phaser.Scene {
       if (this.introVideo && this.introVideo.active) {
           this.introVideo.setPosition(width/2, height/2);
           // Only scale if we have valid dimensions
-          if (this.introVideo.width > 0 && this.introVideo.height > 0) {
-              const scaleX = width / this.introVideo.width;
-              const scaleY = height / this.introVideo.height;
+          const iWidth = this.introVideo.video?.videoWidth || this.introVideo.width || 0;
+          const iHeight = this.introVideo.video?.videoHeight || this.introVideo.height || 0;
+          if (iWidth > 0 && iHeight > 0) {
+              const scaleX = width / iWidth;
+              const scaleY = height / iHeight;
               const videoScale = Math.max(scaleX, scaleY);
-              this.introVideo.setScale(videoScale);
+              // Avoid zero scale which triggers Incomplete Attachment in WebGL
+              if (!isNaN(videoScale) && isFinite(videoScale) && videoScale > 0) {
+                  this.introVideo.setScale(videoScale);
+              }
           }
       }
 
@@ -812,17 +821,18 @@ class MainMenu extends Phaser.Scene {
        }
 
        // Ensure scaled if dimensions valid
-       if (this.introVideo.width > 0 && this.introVideo.height > 0) {
+       const iWidth = this.introVideo.video?.videoWidth || this.introVideo.width || 0;
+       const iHeight = this.introVideo.video?.videoHeight || this.introVideo.height || 0;
+       if (iWidth > 0 && iHeight > 0) {
            const width = this.scale.width;
            const height = this.scale.height;
-           const scaleX = width / this.introVideo.width;
-           const scaleY = height / this.introVideo.height;
+           const scaleX = width / iWidth;
+           const scaleY = height / iHeight;
            const desiredScale = Math.max(scaleX, scaleY);
 
            // If current scale is default (1) but desired is different, apply it
            // Use a small epsilon to avoid float jitter
-           if (Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
-               console.log(`MainMenu: Applying delayed scale. Video: ${this.introVideo.width}x${this.introVideo.height}, Screen: ${width}x${height}, Scale: ${desiredScale}`);
+           if (!isNaN(desiredScale) && isFinite(desiredScale) && desiredScale > 0 && Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
                this.introVideo.setScale(desiredScale);
            }
        }
@@ -976,7 +986,11 @@ class MapScene extends Phaser.Scene {
                   const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
-                  stampVideo.setScale(calculatedScale);
+
+                  // Prevent 0x0 scaling or NaN which causes Framebuffer Incomplete Attachment errors
+                  if (!isNaN(calculatedScale) && isFinite(calculatedScale) && calculatedScale > 0) {
+                      stampVideo.setScale(calculatedScale);
+                  }
               };
               updateStampSize();
 
@@ -2267,11 +2281,18 @@ function addTooltip(scene, object, text) {
 // Game configuration
 const config = {
   type: Phaser.AUTO,
+  transparent: true, // Fix WebM framebuffer attachments rendering black backgrounds natively
   scale: {
       mode: Phaser.Scale.RESIZE, // Fill the window
       parent: 'game',
       width: '100%',
       height: '100%'
+  },
+  render: {
+      // Incomplete Attachment on resize often occurs when the canvas is resized to 0x0
+      // or if there's a WebGL state desync during fullscreen. We explicitly configure gl vars if needed.
+      // But typically, clearing before render solves dirty framebuffers.
+      clearBeforeRender: true
   },
   scene: [MainMenu, MapScene, SectionHunt, EggZamRoom, MusicScene, UIScene, CursorScene],
   parent: 'game',

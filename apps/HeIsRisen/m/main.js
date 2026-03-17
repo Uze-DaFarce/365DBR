@@ -1017,11 +1017,12 @@ class MapScene extends Phaser.Scene {
 
       if (isCompleted) {
           if (!stampedSections.includes(section.name)) {
-              // FIRST TIME COMPLETE: Play the video
+              // FIRST MULTIPLY: Play the video
               const stampVideo = this.add.video(thumb.x, thumb.y, 'level-complete');
               stampVideo.setOrigin(0.5, 0.5);
               stampVideo.setDepth(2);
               stampVideo.disableInteractive();
+              stampVideo.setBlendMode(Phaser.BlendModes.MULTIPLY);
 
               const updateStampSize = () => {
                   stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
@@ -1029,7 +1030,9 @@ class MapScene extends Phaser.Scene {
                   const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
-                  stampVideo.setScale(calculatedScale);
+                  if (!isNaN(calculatedScale) && isFinite(calculatedScale) && calculatedScale > 0) {
+                      stampVideo.setScale(calculatedScale);
+                  }
               };
               updateStampSize();
 
@@ -2220,6 +2223,7 @@ function getViewportDimensions() {
 const { width, height } = getViewportDimensions();
 const config = {
   type: Phaser.AUTO,
+  transparent: true,
   width: width,
   height: height,
   scale: {
