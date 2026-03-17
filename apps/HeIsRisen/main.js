@@ -1,6 +1,67 @@
 // Define all scene classes first
 const TOTAL_EGGS = 60;
 
+function initializeGameData(registry, cache) {
+    const symbolsData = cache.json.get('symbols');
+    if (symbolsData) {
+      if (symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+        // Validation happens in MainMenu preload/create, but we store it here
+        registry.set('symbols', symbolsData);
+      }
+    }
+
+    const mapSections = cache.json.get('map_sections');
+    if (mapSections) {
+        const eggCounts = [];
+        let remainingEggs = TOTAL_EGGS;
+        const numSections = mapSections.length;
+
+        for (let i = 0; i < numSections - 1; i++) {
+            const maxPossible = remainingEggs - ((numSections - 1 - i) * 3);
+            const minPossible = remainingEggs - ((numSections - 1 - i) * 8);
+            const max = Math.min(8, maxPossible);
+            const min = Math.max(3, minPossible);
+            const count = Phaser.Math.Between(min, max);
+            eggCounts.push(count);
+            remainingEggs -= count;
+        }
+        eggCounts.push(remainingEggs);
+
+        const eggs = Phaser.Utils.Array.Shuffle(Array.from({ length: TOTAL_EGGS }, (_, i) => i + 1));
+        const sections = mapSections.map(section => ({ name: section.name, eggs: [] }));
+
+        let eggIndex = 0;
+        const shuffledSymbols = Phaser.Utils.Array.Shuffle([...(symbolsData ? symbolsData.symbols : [])]);
+        const eggData = [];
+
+        sections.forEach((section, index) => {
+          section.eggs = eggs.slice(eggIndex, eggIndex + eggCounts[index]);
+          eggIndex += eggCounts[index];
+
+          section.eggs.forEach(eggId => {
+              const originalX = Phaser.Math.Between(200, 1270);
+              const originalY = Phaser.Math.Between(100, 710);
+
+              eggData.push({
+                  eggId: eggId,
+                  section: section.name,
+                  x: originalX,
+                  y: originalY,
+                  symbol: shuffledSymbols[eggId - 1] || null,
+                  collected: false
+              });
+          });
+        });
+
+        registry.set('sections', sections);
+        registry.set('eggData', eggData);
+    }
+
+    registry.set('foundEggs', []);
+    registry.set('stampedSections', []);
+    registry.set('correctCategorizations', 0);
+}
+
 class CursorScene extends Phaser.Scene {
   constructor() {
     super({ key: 'CursorScene', active: false });
@@ -707,63 +768,16 @@ class MainMenu extends Phaser.Scene {
     });
 
     const symbolsData = this.cache.json.get('symbols');
-    if (symbolsData) {
-      if (symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+    if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
         const validSymbols = symbolsData.symbols.filter(s => this.isValidSymbol(s));
-        this.registry.set('symbols', symbolsData);
-      }
-    }
-
-    const mapSections = this.cache.json.get('map_sections');
-    if (mapSections && !this.registry.has('eggData')) {
-        const eggCounts = [];
-        let remainingEggs = TOTAL_EGGS;
-        const numSections = mapSections.length;
-
-        for (let i = 0; i < numSections - 1; i++) {
-            const maxPossible = remainingEggs - ((numSections - 1 - i) * 3);
-            const minPossible = remainingEggs - ((numSections - 1 - i) * 8);
-            const max = Math.min(8, maxPossible);
-            const min = Math.max(3, minPossible);
-            const count = Phaser.Math.Between(min, max);
-            eggCounts.push(count);
-            remainingEggs -= count;
+        if (validSymbols.length !== symbolsData.symbols.length) {
+            console.warn(`Security: Filtered ${symbolsData.symbols.length - validSymbols.length} invalid symbols.`);
+            symbolsData.symbols = validSymbols;
         }
-        eggCounts.push(remainingEggs);
-
-        const eggs = Phaser.Utils.Array.Shuffle(Array.from({ length: TOTAL_EGGS }, (_, i) => i + 1));
-        const sections = mapSections.map(section => ({ name: section.name, eggs: [] }));
-
-        let eggIndex = 0;
-        const shuffledSymbols = Phaser.Utils.Array.Shuffle([...(symbolsData ? symbolsData.symbols : [])]);
-        const eggData = [];
-
-        sections.forEach((section, index) => {
-          section.eggs = eggs.slice(eggIndex, eggIndex + eggCounts[index]);
-          eggIndex += eggCounts[index];
-
-          section.eggs.forEach(eggId => {
-              const originalX = Phaser.Math.Between(200, 1270);
-              const originalY = Phaser.Math.Between(100, 710);
-
-              eggData.push({
-                  eggId: eggId,
-                  section: section.name,
-                  x: originalX,
-                  y: originalY,
-                  symbol: shuffledSymbols[eggId - 1] || null,
-                  collected: false
-              });
-          });
-        });
-
-        this.registry.set('sections', sections);
-        this.registry.set('eggData', eggData);
     }
 
-    if (!this.registry.has('foundEggs')) {
-      this.registry.set('foundEggs', []);
-      this.registry.set('stampedSections', []);
+    if (!this.registry.has('eggData')) {
+        initializeGameData(this.registry, this.cache);
     }
   }
 
@@ -782,7 +796,16 @@ class MainMenu extends Phaser.Scene {
               const scaleX = width / this.introVideo.width;
               const scaleY = height / this.introVideo.height;
               const videoScale = Math.max(scaleX, scaleY);
-              this.introVideo.setScale(videoScale);
+
+              if (this.sys.game.renderer && this.sys.game.renderer.gl) {
+                  this.time.delayedCall(200, () => {
+                      if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
+                          try { this.introVideo.setScale(videoScale); } catch(e) {}
+                      }
+                  });
+              } else {
+                  try { this.introVideo.setScale(videoScale); } catch(e) {}
+              }
           }
       }
 
@@ -823,7 +846,18 @@ class MainMenu extends Phaser.Scene {
            // Use a small epsilon to avoid float jitter
            if (Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
                console.log(`MainMenu: Applying delayed scale. Video: ${this.introVideo.width}x${this.introVideo.height}, Screen: ${width}x${height}, Scale: ${desiredScale}`);
-               this.introVideo.setScale(desiredScale);
+
+               // Avoid forcefully changing the scale if the webgl context isn't ready
+               // This prevents the 'Framebuffer status: Incomplete Attachment' crash
+               if (this.sys.game.renderer && this.sys.game.renderer.gl) {
+                   this.time.delayedCall(200, () => {
+                       if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
+                           try { this.introVideo.setScale(desiredScale); } catch(e) {}
+                       }
+                   });
+               } else {
+                   try { this.introVideo.setScale(desiredScale); } catch(e) {}
+               }
            }
        }
     }
@@ -2000,20 +2034,63 @@ class EggZamRoom extends Phaser.Scene {
         }).setOrigin(0, 0);
 
         if (foundEggs.length === TOTAL_EGGS) {
-          // PLAY AGAIN Button
-          const playBtnContainer = this.add.container(offsetX + 420 * scale, offsetY + 300 * scale).setDepth(100);
+          // Summary Panel
+          const summaryContainer = this.add.container(offsetX + 420 * scale, offsetY + 300 * scale).setDepth(100);
+
+          const holyEggs = foundEggs.filter(e => e.symbolData && e.symbolData.category === 'Christian').length;
+          const worldlyEggs = foundEggs.filter(e => e.symbolData && e.symbolData.category === 'Pagan').length;
+
+          const panelWidth = 480 * scale;
+          const panelHeight = 240 * scale;
+
+          const panelBg = this.add.graphics();
+          panelBg.fillStyle(0xfff8dc, 1);
+          panelBg.lineStyle(6 * scale, 0x8b4513, 1);
+          panelBg.fillRoundedRect(0, 0, panelWidth, panelHeight, 20 * scale);
+          panelBg.strokeRoundedRect(0, 0, panelWidth, panelHeight, 20 * scale);
+
+          const titleText = this.add.text(panelWidth / 2, 30 * scale, 'Final EggZamination!', {
+              fontSize: `${32 * scale}px`,
+              fill: '#8b4513',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS'
+          }).setOrigin(0.5);
+
+          const holyText = this.add.text(panelWidth / 2, 75 * scale, `EggSelent (Holy) Eggs: ${holyEggs} / 30`, {
+              fontSize: `${24 * scale}px`,
+              fill: '#008000',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS'
+          }).setOrigin(0.5);
+
+          const worldlyText = this.add.text(panelWidth / 2, 115 * scale, `Eggstra-Stinky (Worldly) Eggs: ${worldlyEggs} / 30`, {
+              fontSize: `${24 * scale}px`,
+              fill: '#d32f2f',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS'
+          }).setOrigin(0.5);
+
+          const totalText = this.add.text(panelWidth / 2, 155 * scale, `Total Categorized: 60/60`, {
+              fontSize: `${24 * scale}px`,
+              fill: '#000000',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS'
+          }).setOrigin(0.5);
+
+          // PLAY AGAIN Button inside Summary Panel
+          const playBtnContainer = this.add.container(panelWidth / 2 - 125 * scale, 180 * scale).setDepth(101);
 
           const playBtnWidth = 250 * scale;
-          const playBtnHeight = 60 * scale;
+          const playBtnHeight = 45 * scale;
 
           const playBtnBg = this.add.graphics();
           playBtnBg.fillStyle(0xffff00, 1);
-          playBtnBg.lineStyle(4 * scale, 0x000000, 1);
-          playBtnBg.fillRoundedRect(0, 0, playBtnWidth, playBtnHeight, 15 * scale);
-          playBtnBg.strokeRoundedRect(0, 0, playBtnWidth, playBtnHeight, 15 * scale);
+          playBtnBg.lineStyle(3 * scale, 0x000000, 1);
+          playBtnBg.fillRoundedRect(0, 0, playBtnWidth, playBtnHeight, 10 * scale);
+          playBtnBg.strokeRoundedRect(0, 0, playBtnWidth, playBtnHeight, 10 * scale);
 
           const playBtnText = this.add.text(playBtnWidth / 2, playBtnHeight / 2, 'PLAY AGAIN', {
-              fontSize: `${28 * scale}px`,
+              fontSize: `${22 * scale}px`,
               fill: '#000',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
@@ -2034,14 +2111,17 @@ class EggZamRoom extends Phaser.Scene {
               playBtnContainer.setScale(1);
           });
 
-          const triggerReload = () => {
+          const triggerRestart = () => {
               this.input.setDefaultCursor('default');
-              window.location.reload();
+              initializeGameData(this.registry, this.cache);
+              this.scene.start('MapScene');
           };
 
-          playBtnContainer.on('pointerdown', triggerReload);
-          this.input.keyboard.once('keydown-SPACE', triggerReload);
-          this.input.keyboard.once('keydown-ENTER', triggerReload);
+          playBtnContainer.on('pointerdown', triggerRestart);
+          this.input.keyboard.once('keydown-SPACE', triggerRestart);
+          this.input.keyboard.once('keydown-ENTER', triggerRestart);
+
+          summaryContainer.add([panelBg, titleText, holyText, worldlyText, totalText, playBtnContainer]);
         }
 
         return;
