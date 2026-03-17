@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test",
+    "start": "http-server ./apps -o --cors"
   },
   "keywords": [],
   "author": "",
