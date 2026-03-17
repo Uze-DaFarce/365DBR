@@ -55,7 +55,6 @@ function initializeGameData(registry, cache) {
             eggIndex += eggCounts[index];
 
             sectionEggs.forEach(eggId => {
-                // Mobile layout viewport calculation with correct lens margin mappings
                 const minX = 50 * scale;
                 const maxX = Math.max(minX, screenWidth - (160 * scale));
                 const minY = 50 * scale;
@@ -69,7 +68,7 @@ function initializeGameData(registry, cache) {
                     section: section.name,
                     x: x,
                     y: y,
-                    symbol: shuffledSymbols[eggId - 1] || null, // Guarantees strictly uniform unique symbols mapped from 1..60
+                    symbol: shuffledSymbols[eggId - 1] || null, // Mobile app guarantees 60 index mappings
                     collected: false
                 });
             });
@@ -568,6 +567,7 @@ class MainMenu extends Phaser.Scene {
       // console.log('MainMenu: highScore:', this.registry.get('highScore'));
 
       // Load and validate symbols and map sections
+      const symbolsData = this.cache.json.get('symbols');
       if (!this.registry.has('eggData')) {
           initializeGameData(this.registry, this.cache);
       }
@@ -577,11 +577,7 @@ class MainMenu extends Phaser.Scene {
 
       // Set camera bounds to match viewport
       this.cameras.main.setBounds(0, 0, this.game.config.width, this.game.config.height);
-      requestAnimationFrame(() => {
-          if (this.cameras && this.cameras.main) {
-              try { this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height); } catch(e) {}
-          }
-      });
+      this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height);
       this.cameras.main.setPosition(0, 0);
 
       // Debug: Log camera position
@@ -889,11 +885,7 @@ class MapScene extends Phaser.Scene {
 
     // Set camera bounds to match viewport
     this.cameras.main.setBounds(0, 0, this.game.config.width, this.game.config.height);
-    requestAnimationFrame(() => {
-        if (this.cameras && this.cameras.main) {
-            try { this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height); } catch(e) {}
-        }
-    });
+    this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height);
     this.cameras.main.setPosition(0, 0);
 
     // NEW: Retrieve existing eggData and sections from registry
@@ -2119,55 +2111,10 @@ class EggZamRoom extends Phaser.Scene {
         }).setOrigin(0, 0).setDepth(10);
 
         if (foundEggs.length === TOTAL_EGGS) {
-          // Summary Panel
-          // Use an origin top-left style like the desktop, but responsive to mobile scaling
-          const summaryContainer = this.add.container(0.36 * width, textY + 80 * this.gameScale).setDepth(100);
+          // PLAY AGAIN Button
+          const playBtnContainer = this.add.container((0.36 * width) + (125 * this.gameScale), textY + (100 * this.gameScale)).setDepth(100);
 
-          const holyEggs = foundEggs.filter(e => e.symbolData && e.symbolData.category === 'Christian').length;
-          const worldlyEggs = foundEggs.filter(e => e.symbolData && e.symbolData.category === 'Pagan').length;
-
-          // Increase panel sizes for mobile readability
-          const panelWidth = 500 * this.gameScale;
-          const panelHeight = 320 * this.gameScale;
-
-          const panelBg = this.add.graphics();
-          panelBg.fillStyle(0xfff8dc, 1);
-          panelBg.lineStyle(6 * this.gameScale, 0x8b4513, 1);
-          panelBg.fillRoundedRect(0, 0, panelWidth, panelHeight, 20 * this.gameScale);
-          panelBg.strokeRoundedRect(0, 0, panelWidth, panelHeight, 20 * this.gameScale);
-
-          const titleText = this.add.text(panelWidth / 2, 40 * this.gameScale, 'Final EggZamination!', {
-              fontSize: `${(isDesktop ? 32 : 40) * this.gameScale}px`,
-              fill: '#8b4513',
-              fontStyle: 'bold',
-              fontFamily: 'Comic Sans MS'
-          }).setOrigin(0.5);
-
-          const holyText = this.add.text(panelWidth / 2, 100 * this.gameScale, `EggSelent (Holy) Eggs: ${holyEggs} / 30`, {
-              fontSize: `${(isDesktop ? 24 : 30) * this.gameScale}px`,
-              fill: '#008000',
-              fontStyle: 'bold',
-              fontFamily: 'Comic Sans MS'
-          }).setOrigin(0.5);
-
-          const worldlyText = this.add.text(panelWidth / 2, 150 * this.gameScale, `Eggstra-Stinky (Worldly) Eggs: ${worldlyEggs} / 30`, {
-              fontSize: `${(isDesktop ? 24 : 30) * this.gameScale}px`,
-              fill: '#d32f2f',
-              fontStyle: 'bold',
-              fontFamily: 'Comic Sans MS'
-          }).setOrigin(0.5);
-
-          const totalText = this.add.text(panelWidth / 2, 200 * this.gameScale, `Total Categorized: 60/60`, {
-              fontSize: `${(isDesktop ? 24 : 30) * this.gameScale}px`,
-              fill: '#000000',
-              fontStyle: 'bold',
-              fontFamily: 'Comic Sans MS'
-          }).setOrigin(0.5);
-
-          // PLAY AGAIN Button inside Summary Panel
-          const playBtnContainer = this.add.container(panelWidth / 2, 260 * this.gameScale).setDepth(101);
-
-          const playBtnWidth = 280 * this.gameScale;
+          const playBtnWidth = 250 * this.gameScale;
           const playBtnHeight = 60 * this.gameScale;
 
           const playBtnBg = this.add.graphics();
@@ -2177,29 +2124,26 @@ class EggZamRoom extends Phaser.Scene {
           playBtnBg.strokeRoundedRect(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight, 15 * this.gameScale);
 
           const playBtnText = this.add.text(0, 0, 'PLAY AGAIN', {
-              fontSize: `${(isDesktop ? 28 : 34) * this.gameScale}px`,
+              fontSize: `${28 * this.gameScale}px`,
               fill: '#000',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0.5, 0.5);
 
           playBtnContainer.add([playBtnBg, playBtnText]);
+
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
           playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
 
-          const triggerRestart = () => {
-              if (this.input.setDefaultCursor) this.input.setDefaultCursor('default');
-              initializeGameData(this.registry, this.cache);
-              this.scene.start('MapScene');
+          const triggerReload = () => {
+              window.location.reload();
           };
 
-          playBtnContainer.on('pointerdown', triggerRestart);
+          playBtnContainer.on('pointerdown', triggerReload);
           if (this.input.keyboard) {
-              this.input.keyboard.once('keydown-SPACE', triggerRestart);
-              this.input.keyboard.once('keydown-ENTER', triggerRestart);
+              this.input.keyboard.once('keydown-SPACE', triggerReload);
+              this.input.keyboard.once('keydown-ENTER', triggerReload);
           }
-
-          summaryContainer.add([panelBg, titleText, holyText, worldlyText, totalText, playBtnContainer]);
         }
         return;
       }
@@ -2390,21 +2334,13 @@ function resizeGame() {
     if (scene.gameScale) scene.gameScale = scale;
     if (scene.cameras && scene.cameras.main) {
       scene.cameras.main.setBounds(0, 0, width, height);
-      requestAnimationFrame(() => {
-          if (scene.cameras && scene.cameras.main) {
-              try { scene.cameras.main.setViewport(0, 0, width, height); } catch(e) {}
-          }
-      });
+      scene.cameras.main.setViewport(0, 0, width, height);
       scene.cameras.main.setPosition(0, 0);
     }
     if (scene.scene.key === 'MainMenu') {
       if (scene.introVideo) {
         scene.introVideo.setPosition(width / 2, height / 2);
-        requestAnimationFrame(() => {
-            if (scene.introVideo && scene.introVideo.active) {
-                try { scene.introVideo.setDisplaySize(width, height); } catch (e) {}
-            }
-        });
+        scene.introVideo.setDisplaySize(width, height);
       }
       if (scene.startBtnContainer) {
         scene.startBtnContainer.setPosition(width / 2, 580 * scale);
