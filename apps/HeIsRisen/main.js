@@ -3,11 +3,19 @@ const TOTAL_EGGS = 60;
 
 function initializeGameData(registry, cache) {
     const symbolsData = cache.json.get('symbols');
-    if (symbolsData) {
-      if (symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
-        // Validation happens in MainMenu preload/create, but we store it here
+    if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+        // Pre-validate and inject into registry just as originally done in MainMenu
+        const validSymbols = symbolsData.symbols.filter(s => {
+            return s && typeof s === 'object' &&
+                   typeof s.filename === 'string' &&
+                   !s.filename.includes('..') &&
+                   /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
+        });
+        if (validSymbols.length !== symbolsData.symbols.length) {
+            console.warn(`Security: Filtered ${symbolsData.symbols.length - validSymbols.length} invalid symbols.`);
+            symbolsData.symbols = validSymbols;
+        }
         registry.set('symbols', symbolsData);
-      }
     }
 
     const mapSections = cache.json.get('map_sections');
@@ -464,7 +472,7 @@ class MainMenu extends Phaser.Scene {
     this.load.json('symbols', 'assets/symbols.json');
     this.load.json('map_sections', 'assets/map/map_sections.json');
     this.load.video('intro-video', 'assets/video/HeIsRisen-Intro.mp4');
-    this.load.video('level-complete', 'assets/video/level-complete.mp4');
+    this.load.video('level-complete', 'assets/video/level-complete.webm');
     this.load.image('level-complete-stamp', 'assets/objects/level-complete-stamp.png');
     this.load.image('finger-cursor', 'assets/cursor/pointer-finger-pointer.png');
 
@@ -796,16 +804,7 @@ class MainMenu extends Phaser.Scene {
               const scaleX = width / this.introVideo.width;
               const scaleY = height / this.introVideo.height;
               const videoScale = Math.max(scaleX, scaleY);
-
-              if (this.sys.game.renderer && this.sys.game.renderer.gl) {
-                  this.time.delayedCall(200, () => {
-                      if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
-                          try { this.introVideo.setScale(videoScale); } catch(e) {}
-                      }
-                  });
-              } else {
-                  try { this.introVideo.setScale(videoScale); } catch(e) {}
-              }
+              this.introVideo.setScale(videoScale);
           }
       }
 
@@ -846,18 +845,7 @@ class MainMenu extends Phaser.Scene {
            // Use a small epsilon to avoid float jitter
            if (Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
                console.log(`MainMenu: Applying delayed scale. Video: ${this.introVideo.width}x${this.introVideo.height}, Screen: ${width}x${height}, Scale: ${desiredScale}`);
-
-               // Avoid forcefully changing the scale if the webgl context isn't ready
-               // This prevents the 'Framebuffer status: Incomplete Attachment' crash
-               if (this.sys.game.renderer && this.sys.game.renderer.gl) {
-                   this.time.delayedCall(200, () => {
-                       if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
-                           try { this.introVideo.setScale(desiredScale); } catch(e) {}
-                       }
-                   });
-               } else {
-                   try { this.introVideo.setScale(desiredScale); } catch(e) {}
-               }
+               this.introVideo.setScale(desiredScale);
            }
        }
     }
@@ -1000,18 +988,14 @@ class MapScene extends Phaser.Scene {
               stampVideo.setOrigin(0.5, 0.5);
               stampVideo.setDepth(2);
               stampVideo.disableInteractive();
+              // Retain MULTIPLY on desktop as requested, but we should make sure it actually plays and has dimensions.
               stampVideo.setBlendMode(Phaser.BlendModes.MULTIPLY);
-              const updateStampSize = () => {
-                  // Offset the video slightly up so it visually matches the stamp image
-                  stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
 
-                  // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
-                  // We must wait for the video metadata to load to get its intrinsic height,
-                  // but we can set a fallback or set scale immediately based on a standard 1080p/720p assumption if needed.
-                  // Wait, Phaser Video objects have a default size of 256x256 before load.
-                  // To be safe, we can apply the scale based on the thumbnail's physical displayHeight.
-                  // Since video height might be 0 initially, we use a fallback of 720 (standard height).
-                  const intrinsicHeight = stampVideo.height || 720;
+              // We must wait for the video metadata to load before scaling reliably, especially for webm which
+              // sometimes defers resolution until the first frame is decoded in headless browsers
+              const updateStampSize = () => {
+                  stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
+                  const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
                   stampVideo.setScale(calculatedScale);
@@ -1023,6 +1007,11 @@ class MapScene extends Phaser.Scene {
 
               const sfxVol = this.registry.get('sfxVolume') !== undefined ? this.registry.get('sfxVolume') : 0.5;
               stampVideo.setVolume(sfxVol);
+
+              stampVideo.on('play', () => {
+                  updateStampSize();
+              });
+
               stampVideo.play();
 
               stampedSections.push(section.name);
@@ -2085,19 +2074,18 @@ class EggZamRoom extends Phaser.Scene {
 
           const playBtnBg = this.add.graphics();
           playBtnBg.fillStyle(0xffff00, 1);
-          playBtnBg.lineStyle(3 * scale, 0x000000, 1);
+          playBtnBg.lineStyle(4 * scale, 0x000000, 1);
           playBtnBg.fillRoundedRect(0, 0, playBtnWidth, playBtnHeight, 10 * scale);
           playBtnBg.strokeRoundedRect(0, 0, playBtnWidth, playBtnHeight, 10 * scale);
 
           const playBtnText = this.add.text(playBtnWidth / 2, playBtnHeight / 2, 'PLAY AGAIN', {
-              fontSize: `${22 * scale}px`,
+              fontSize: `${24 * scale}px`,
               fill: '#000',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0.5, 0.5);
 
           playBtnContainer.add([playBtnBg, playBtnText]);
-
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
           playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
 
