@@ -393,32 +393,39 @@
         "explanation": "The Temple of Jerusalem represents God’s dwelling place among His people, symbolizing worship and sacrifice."
       },
       {
-        "name": "Daily Cross",
-        "filename": "assets/symbols/christian/cross.png",
-        "category": "Christian",
-        "scripture": "Luke 9:23",
-        "explanation": "Jesus calls us to take up our cross daily and follow Him, symbolizing self-denial and commitment."
+        "name": "Pentagram",
+        "filename": "assets/symbols/pagan/pentagram.png",
+        "category": "Pagan",
+        "scripture": "Romans 1:25",
+        "explanation": "The Pentagram is often associated with modern paganism and witchcraft, representing the elements. It can lead to idolatry if it replaces the worship of the true God."
       },
       {
-        "name": "Sword of the Spirit",
-        "filename": "assets/symbols/christian/bible.png",
+              "name": "Crown of Thorns",
+        "filename": "assets/symbols/christian/crown-thorns.png",
         "category": "Christian",
-        "scripture": "Ephesians 6:17",
-        "explanation": "The Bible is called the Sword of the Spirit, our weapon against spiritual darkness."
+        "scripture": "Matthew 27:29",
+        "explanation": "The crown of thorns symbolizes Jesus’ suffering and kingship, worn during His crucifixion."
       },
       {
-        "name": "New Covenant",
-        "filename": "assets/symbols/christian/wine.png",
+        "name": "Ten Commandments",
+        "filename": "assets/symbols/christian/commandments.png",
         "category": "Christian",
-        "scripture": "Luke 22:20",
-        "explanation": "The cup of wine represents the New Covenant in Jesus' blood, poured out for us."
+        "scripture": "Exodus 20:1-17",
+        "explanation": "The Ten Commandments represent God’s moral law given to Moses for His people."
       },
       {
-        "name": "Believers as Light",
-        "filename": "assets/symbols/christian/candle.png",
+        "name": "Anchor",
+        "filename": "assets/symbols/christian/anchor.png",
         "category": "Christian",
-        "scripture": "Matthew 5:14",
-        "explanation": "Jesus calls His followers the light of the world, commanding us to let our light shine."
+        "scripture": "Hebrews 6:19",
+        "explanation": "The anchor symbolizes hope in Christ, which is a sure and steadfast anchor of the soul."
+      },
+      {
+        "name": "Lily",
+        "filename": "assets/symbols/christian/lily.png",
+        "category": "Christian",
+        "scripture": "Song of Solomon 2:1",
+        "explanation": "The lily symbolizes purity and the resurrection of Jesus, often associated with Easter."
       }
       ]
   }

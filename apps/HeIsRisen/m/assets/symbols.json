@@ -4,206 +4,211 @@
         "name": "Golden Calf",
         "filename": "assets/symbols/pagan/golden-calf.png",
         "category": "Pagan",
-        "scripture": "Exodus 32:4",
+        "scripture": "Exodus 32:4, 1 Kings 12:28",
         "explanation": "The Israelites made a golden calf to worship, turning away from God. This symbol represents idolatry and the danger of placing anything above God in our lives."
       },
       {
         "name": "Roman Gold Coin",
         "filename": "assets/symbols/pagan/caesar.png",
         "category": "Pagan",
-        "scripture": "Matthew 22:21",
-        "explanation": "Wealth can become an idol if we prioritize it over God. Jesus teaches us to give to God what is rightfully His, emphasizing that our devotion should be to God above all else."
+        "scripture": "Matthew 6:24, 1 Timothy 6:10",
+        "explanation": "Jesus taught, 'You cannot serve both God and money.' Wealth becomes an idol when we love and trust in it, rather than in God who provides all things."
       },
       {
         "name": "Sun Worship",
         "filename": "assets/symbols/pagan/sun.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "Pagans worshiped the sun instead of the Creator. This represents the error of valuing created things above God, who alone is worthy of worship."
+        "scripture": "Deuteronomy 4:19, Romans 1:25",
+        "explanation": "God specifically commanded the Israelites not to worship the sun, moon, or stars. This represents the error of worshiping created things rather than the Creator."
       },
       {
         "name": "Three Spiral Wiccan Symbol",
         "filename": "assets/symbols/pagan/3-spi-wiccan.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "Wiccans often focus on self-worship or nature worship instead of the Creator. This symbol represents the error of valuing personal spirituality or nature above God, who alone is worthy of worship"
+        "scripture": "Deuteronomy 18:10-12, Galatians 5:19-21",
+        "explanation": "This symbol is associated with modern witchcraft (Wicca), which the Bible forbids. Scripture warns against witchcraft, sorcery, and seeking spiritual power or guidance from any source other than the one true God."
       },
       {
         "name": "Serpent Idol",
         "filename": "assets/symbols/pagan/viper.png",
         "category": "Pagan",
-        "scripture": "Exodus 20:4, 2 Kings 18:4",
-        "explanation": "Idols like serpent statues lead us away from God. The Bible warns against creating and worshiping images, as they can distract us from the true worship of the Creator"
+        "scripture": "2 Kings 18:4, Exodus 20:4",
+        "explanation": "Even a God-ordained object, like the bronze serpent Moses made, can become an idol if people worship it. King Hezekiah destroyed it because the Israelites began burning incense to it, which is an act of worship reserved for God alone."
       },
       {
         "name": "Aries Zodiac Sign",
         "filename": "assets/symbols/pagan/aries.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "Astrology can lead to idolatry, as it often places the stars above God. The Bible teaches us that God is sovereign over all creation, including the stars and their movements."
+        "scripture": "Isaiah 47:13-14, Deuteronomy 18:10",
+        "explanation": "Astrology and fortune-telling are forbidden because they seek guidance from created things (stars) instead of the Creator. The Bible mocks those who trust in stargazers, saying they cannot save themselves, let alone others."
       },
       {
         "name": "Amulet",
         "filename": "assets/symbols/pagan/amulet.png",
         "category": "Pagan",
-        "scripture": "1 Corinthians 10:14",
-        "explanation": "Amulets were used in pagan rituals, leading to idolatry. The Bible warns against seeking protection or power from anything other than God."
+        "scripture": "Ezekiel 13:20, Isaiah 2:6",
+        "explanation": "Amulets and magic charms are condemned in the Bible. They represent a false trust in objects for protection or power, which should only come from God."
       },
       {
         "name": "Ankh",
         "filename": "assets/symbols/pagan/ankh.png",
         "category": "Pagan",
-        "scripture": "Exodus 20:4",
-        "explanation": "The ankh is a symbol of life in pagan cultures, but it can lead to idolatry. The Bible teaches that true life comes from God alone."
+        "scripture": "John 14:6, Acts 4:12",
+        "explanation": "The ankh is an ancient Egyptian symbol for 'life.' This can be a form of idolatry when it represents a source of life apart from God. Jesus Christ is the only way to eternal life."
       },
       {
         "name": "Aztec Temple",
         "filename": "assets/symbols/pagan/aztec-temple.png",
         "category": "Pagan",
-        "scripture": "Exodus 20:4",
-        "explanation": "Aztec temples were built for idol worship, not for the true God. The Bible warns against creating places of worship that do not honor God."
+        "scripture": "1 Kings 11:7, Acts 17:24",
+        "explanation": "Pagan temples were often built on 'high places' for the worship of false gods, an act Solomon himself fell into. The Bible teaches that the true God does not dwell in temples made by human hands."
       },
       {
         "name": "Celtic Rune",
         "filename": "assets/symbols/pagan/celtic-rune.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "Celtic runes were used in pagan rituals, often leading to idolatry. The Bible teaches that we should not seek power or knowledge from anything other than God."
-
+        "scripture": "Deuteronomy 18:10-11, Leviticus 19:31",
+        "explanation": "Runes are used for divination and sorcery, practices the Bible strictly forbids. We are commanded not to consult mediums or spirits, but to seek wisdom from God alone."
       },
       {
         "name": "Celtic Tree of Life",
         "filename": "assets/symbols/pagan/celtic-tree.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The Celtic Tree of Life symbolizes the connection between heaven and earth, but it can lead to idolatry. The Bible teaches that our true connection is through Jesus Christ."
+        "scripture": "Jeremiah 10:3-4, 1 Timothy 2:5",
+        "explanation": "This symbol can represent nature worship, similar to the pagan custom of cutting a tree from the forest and decorating it. The Bible teaches there is only one mediator between God and men, Jesus Christ, not a mystical tree."
       },
       {
         "name": "Chakana",
         "filename": "assets/symbols/pagan/chakana.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The Chakana is a symbol of the Inca culture, representing the connection between the physical and spiritual worlds. However, it can lead to idolatry if it replaces the worship of the true God."
+        "scripture": "Colossians 2:8, Exodus 20:3",
+        "explanation": "This symbol represents a non-biblical worldview and cosmology. The Bible warns us not to be taken captive by human tradition and the basic principles of this world, rather than on Christ. We are to have no other gods before the Lord."
       },
       {
         "name": "Confucianism Symbol",
         "filename": "assets/symbols/pagan/confucianism.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "Confucianism emphasizes human relationships and ethics, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our primary relationship should be with God."
+        "scripture": "Proverbs 14:12, John 14:6",
+        "explanation": "Confucianism is a philosophy that emphasizes human ethics and wisdom. While it may seem good, it is a path that seems right to a man, but its end is the way of death, because it does not acknowledge Jesus as the only way to the Father."
        },
       {
         "name": "Ganesh",
         "filename": "assets/symbols/pagan/ganesh.png",
         "category": "Pagan",
-        "scripture": "Exodus 20:4",
-        "explanation": "Ganesh is a Hindu deity, representing the worship of false gods. The Bible warns against idolatry and calls us to worship the one true God."
+        "scripture": "Isaiah 44:9-10, 1 Corinthians 8:4",
+        "explanation": "Ganesh is a Hindu deity, an idol made by human hands. The Bible teaches that an idol is nothing at all, and that those who make them will be put to shame. We know there is no God but one."
       },
       {
         "name": "Hecates Wheel Wiccan Symbol",
         "filename": "assets/symbols/pagan/hecates-wheel-wiccan.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "Hecate's Wheel is a symbol of the goddess Hecate, representing the worship of false gods. The Bible warns against idolatry and calls us to worship the one true God."
+        "scripture": "1 Samuel 15:23, Revelation 21:8",
+        "explanation": "This is a symbol used in modern witchcraft to represent a goddess. The Bible is clear that rebellion is as the sin of witchcraft, and that sorcerers will have their place in the lake of fire."
       },
       {
         "name": "Hindu Om Symbol",
         "filename": "assets/symbols/pagan/hindu-om.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The Om symbol represents the Hindu concept of the universe, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our true understanding of the universe comes from God."
+        "scripture": "John 1:1, 3, Colossians 1:16-17",
+        "explanation": "The Om symbol represents a universal sound or vibration in Hinduism. This contradicts the Bible, which says 'In the beginning was the Word (Jesus),' and that through Him all things were made and are held together."
       },
       {
         "name": "Celtic Knot",
         "filename": "assets/symbols/pagan/knotty-celt.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "Celtic knots symbolize eternity and interconnectedness, but they can lead to idolatry if they replace the worship of the true God. The Bible teaches that our understanding of eternity comes from God."
+        "scripture": "John 17:3, 1 John 5:20",
+        "explanation": "This symbol can represent endlessness or eternity apart from Heaven (with God) and Hell (apart from God). The Bible teaches that eternal life is not an abstract concept, but is found in knowing the one true God and Jesus Christ whom He sent."
       },
       {
         "name": "Celtic Moon",
         "filename": "assets/symbols/pagan/moon-celtic.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The Celtic Moon symbolizes the cycles of nature, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our understanding of nature comes from God."
+        "scripture": "Deuteronomy 17:3, Jeremiah 8:2",
+        "explanation": "Worshiping the moon is a form of idolatry explicitly forbidden by God. The Bible teaches that our understanding of nature comes from God the Creator of time, space, and everything in it."
       },
       {
         "name": "Mystical Eye",
         "filename": "assets/symbols/pagan/mystical.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The mystical eye symbolizes knowledge and enlightenment, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that true knowledge comes from God."
+        "scripture": "Genesis 3:5, 2 Corinthians 11:14",
+        "explanation": "This symbol represents a promise of secret knowledge or enlightenment, echoing the Satan's lie in the garden that 'your eyes will be opened.' It is a deception, as Satan himself masquerades as an angel of light but in reality is the father of lies."
       },
       {
         "name": "Pagan Cross",
         "filename": "assets/symbols/pagan/pagan-cross.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The pagan cross symbolizes the blending of pagan and Christian beliefs, which can lead to idolatry. The Bible warns against mixing true worship with false beliefs."
+        "scripture": "Galatians 1:8, 2 Corinthians 6:14-15",
+        "explanation": "This symbol, often with equal arms, represents a pre-Christian, pagan concept. Mixing it with Christian meaning is syncretism. The Bible warns not to be yoked with unbelievers and that there is no harmony between Christ and Belial (a term for the devil)."
       },
       {
         "name": "Pagan Cross with Circle",
         "filename": "assets/symbols/pagan/pagan-cross1.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The pagan cross with a circle symbolizes the blending of pagan and Christian beliefs, which can lead to idolatry. The Bible warns against mixing true worship with false beliefs."
-
+        "scripture": "2 Corinthians 11:3-4, Galatians 6:12",
+        "explanation": "This symbol, often called a 'sun cross,' combines a pagan symbol with the cross. This represents a distortion of the gospel, presenting 'another Jesus' or a 'different gospel,' which the Apostle Paul warns against."
       },
       {
         "name": "Paganism Symbol",
         "filename": "assets/symbols/pagan/paganism.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "Paganism emphasizes nature and self-worship, leading to idolatry. The Bible teaches that we should worship the Creator, not creation."
+        "scripture": "Romans 1:21-23, 1 Corinthians 10:20",
+        "explanation": "Paganism involves the worship of false gods, idols, and created things. The Bible says that what pagans sacrifice they offer to demons and not to God."
       },
       {
         "name": "Ramadan Symbol",
         "filename": "assets/symbols/pagan/ramadan.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The Ramadan symbol represents the Islamic month of fasting, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our primary devotion should be to God."
+        "scripture": "John 14:6, Galatians 1:8",
+        "explanation": "The crescent and star are symbols of Islam, a religion that denies that Jesus is the Son of God. The Bible teaches that Jesus is the only way to the Father and warns that even if an angel from heaven preaches another gospel, he is to be accursed."
       },
       {
         "name": "Sikhism",
         "filename": "assets/symbols/pagan/sikhism.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "Sikhism emphasizes devotion to God, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our primary devotion should be to God."
+        "scripture": "Acts 4:12, 1 Timothy 2:5",
+        "explanation": "The Khanda is the symbol of Sikhism, a religion that does not recognize Jesus Christ as the only Son of God and savior. The Bible is clear that salvation is found in no one else, for there is no other name under heaven given to mankind by which we must be saved."
       },
       {
         "name": "Swastika Symbol",
         "filename": "assets/symbols/pagan/swastika.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The swastika is an ancient symbol used in various cultures, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our primary devotion should be to God."
+        "scripture": "Ephesians 5:11, Philippians 3:18-19",
+        "explanation": "Though an ancient symbol, the swastika is now inseparable from the evil of Nazism, which was hostile to Christianity, and attempted to wipe entire people groups from the face of the earth using macro-evolution as justification for racism. The Bible says there is only one race, the human race; we all come from Adam and Eve via Noah and his Family."
       },
       {
         "name": "Tao Yin Yang",
         "filename": "assets/symbols/pagan/tao-yin-yang.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The Yin Yang symbol represents balance in Taoism, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our understanding of balance comes from God."
+        "scripture": "Isaiah 45:7, 2 Corinthians 6:14",
+        "explanation": "The Yin-Yang represents a dualistic balance of good and evil. The Bible teaches that God is sovereign over both light and darkness, and asks, 'What fellowship has light with darkness?'"
       },
       {
         "name": "Tiki Idol",
         "filename": "assets/symbols/pagan/tiki-idol.png",
         "category": "Pagan",
-        "scripture": "Exodus 20:4",
-        "explanation": "Tiki idols were used in pagan worship, representing false gods. The Bible warns against creating and worshiping images that distract us from the true worship of the Creator."
+        "scripture": "Psalm 115:4-8, Habakkuk 2:18",
+        "explanation": "Tiki idols are man-made images worshiped as gods. The Bible says such idols are silver and gold, the work of human hands. They have mouths, but do not speak; eyes, but do not see. Those who make them become like them."
       },
       {
         "name": "Triquetra Symbol",
         "filename": "assets/symbols/pagan/triquetra.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The Triquetra symbol represents the interconnectedness of mind, body, and spirit, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our understanding of ourselves comes from God."
+        "scripture": "Colossians 2:8, 2 Corinthians 11:3",
+        "explanation": "This symbol, used in ancient paganism and modern witchcraft, represents concepts outside of biblical truth. It is a hollow and deceptive philosophy, which depends on human tradition and the elemental spiritual forces of this world rather than on Christ."
       },
       {
         "name": "Valknut Symbol",
         "filename": "assets/symbols/pagan/valknut.png",
         "category": "Pagan",
-        "scripture": "Romans 1:25",
-        "explanation": "The Valknut symbol represents the connection between life and death in Norse mythology, but it can lead to idolatry if it replaces the worship of the true God. The Bible teaches that our understanding of life and death comes from God."
+        "scripture": "Hebrews 9:27, John 11:25",
+        "explanation": "This Norse pagan symbol is associated with death and the god Odin. This is idolatry. The Bible teaches that it is appointed for man to die once, and after that comes judgment, and that Jesus is the resurrection and the life."
+      },
+      {
+        "name": "Lunar Worship",
+        "filename": "assets/symbols/pagan/moon-celtic.png",
+        "category": "Pagan",
+        "scripture": "Deuteronomy 4:19, 2 Kings 23:5",
+        "explanation": "Worshiping the moon or other celestial bodies is a form of idolatry. The Bible teaches that we should worship the Creator of the heavens, not the heavens themselves. Good kings like Josiah removed priests who made offerings to the moon."
       },
       {
         "name": "Cross",
@@ -395,7 +400,7 @@
         "explanation": "The Pentagram is often associated with modern paganism and witchcraft, representing the elements. It can lead to idolatry if it replaces the worship of the true God."
       },
       {
-        "name": "Crown of Thorns",
+              "name": "Crown of Thorns",
         "filename": "assets/symbols/christian/crown-thorns.png",
         "category": "Christian",
         "scripture": "Matthew 27:29",
