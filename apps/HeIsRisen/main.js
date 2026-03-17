@@ -668,7 +668,6 @@ class MainMenu extends Phaser.Scene {
             introVideo.setVolume(vol);
             introVideo.play(true); // Restart loop with sound
         }
-
         // Request Fullscreen (Desktop logic)
         if (this.scale.fullscreen.available) {
             this.scale.startFullscreen();
@@ -799,12 +798,14 @@ class MainMenu extends Phaser.Scene {
 
       if (this.introVideo && this.introVideo.active) {
           this.introVideo.setPosition(width/2, height/2);
-          // Only scale if we have valid dimensions
+          // Only scale if we have valid dimensions and avoid 0/NaN scale which causes WebGL Framebuffer crashes
           if (this.introVideo.width > 0 && this.introVideo.height > 0) {
               const scaleX = width / this.introVideo.width;
               const scaleY = height / this.introVideo.height;
               const videoScale = Math.max(scaleX, scaleY);
-              this.introVideo.setScale(videoScale);
+              if (videoScale > 0 && !isNaN(videoScale)) {
+                  this.introVideo.setScale(videoScale);
+              }
           }
       }
 
