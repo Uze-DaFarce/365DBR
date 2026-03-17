@@ -46,7 +46,6 @@ function initializeGameData(registry, cache) {
         let eggIndex = 0;
 
         // Use fallback static bounds if window is not available to prevent crashes during headless reset
-        // Use fallback static bounds if window is not available to prevent crashes during headless reset
         const screenWidth = window.innerWidth || 844;
         const screenHeight = window.innerHeight || 390;
         const scale = Math.min(screenWidth / 1280, screenHeight / 720);
@@ -2401,7 +2400,11 @@ function resizeGame() {
     if (scene.scene.key === 'MainMenu') {
       if (scene.introVideo) {
         scene.introVideo.setPosition(width / 2, height / 2);
-        scene.introVideo.setDisplaySize(width, height);
+        requestAnimationFrame(() => {
+            if (scene.introVideo && scene.introVideo.active) {
+                try { scene.introVideo.setDisplaySize(width, height); } catch (e) {}
+            }
+        });
       }
       if (scene.startBtnContainer) {
         scene.startBtnContainer.setPosition(width / 2, 580 * scale);
