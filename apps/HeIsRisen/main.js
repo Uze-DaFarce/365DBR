@@ -50,7 +50,7 @@ function initializeGameData(registry, cache) {
               const originalY = Phaser.Math.Between(100, 710);
 
               eggData.push({
-                  eggId,
+                  eggId: eggId,
                   section: section.name,
                   x: originalX,
                   y: originalY,
@@ -670,7 +670,7 @@ class MainMenu extends Phaser.Scene {
 
         // Request Fullscreen (Desktop logic)
         if (this.scale.fullscreen.available) {
-            this.scale.startFullscreen();
+            try { this.scale.startFullscreen(); } catch (e) {}
         }
 
         // Show Play Button almost immediately (short delay for visual transition)

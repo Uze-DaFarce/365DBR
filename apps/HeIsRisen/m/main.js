@@ -567,7 +567,6 @@ class MainMenu extends Phaser.Scene {
       // console.log('MainMenu: highScore:', this.registry.get('highScore'));
 
       // Load and validate symbols and map sections
-      const symbolsData = this.cache.json.get('symbols');
       if (!this.registry.has('eggData')) {
           initializeGameData(this.registry, this.cache);
       }
@@ -2111,10 +2110,55 @@ class EggZamRoom extends Phaser.Scene {
         }).setOrigin(0, 0).setDepth(10);
 
         if (foundEggs.length === TOTAL_EGGS) {
-          // PLAY AGAIN Button
-          const playBtnContainer = this.add.container((0.36 * width) + (125 * this.gameScale), textY + (100 * this.gameScale)).setDepth(100);
+          // Summary Panel
+          // Use an origin top-left style like the desktop, but responsive to mobile scaling
+          const summaryContainer = this.add.container(0.36 * width, textY + 80 * this.gameScale).setDepth(100);
 
-          const playBtnWidth = 250 * this.gameScale;
+          const holyEggs = foundEggs.filter(e => e.symbolData && e.symbolData.category === 'Christian').length;
+          const worldlyEggs = foundEggs.filter(e => e.symbolData && e.symbolData.category === 'Pagan').length;
+
+          // Increase panel sizes for mobile readability
+          const panelWidth = 500 * this.gameScale;
+          const panelHeight = 320 * this.gameScale;
+
+          const panelBg = this.add.graphics();
+          panelBg.fillStyle(0xfff8dc, 1);
+          panelBg.lineStyle(6 * this.gameScale, 0x8b4513, 1);
+          panelBg.fillRoundedRect(0, 0, panelWidth, panelHeight, 20 * this.gameScale);
+          panelBg.strokeRoundedRect(0, 0, panelWidth, panelHeight, 20 * this.gameScale);
+
+          const titleText = this.add.text(panelWidth / 2, 40 * this.gameScale, 'Final EggZamination!', {
+              fontSize: `${(isDesktop ? 32 : 40) * this.gameScale}px`,
+              fill: '#8b4513',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS'
+          }).setOrigin(0.5);
+
+          const holyText = this.add.text(panelWidth / 2, 100 * this.gameScale, `EggSelent (Holy) Eggs: ${holyEggs} / 30`, {
+              fontSize: `${(isDesktop ? 24 : 30) * this.gameScale}px`,
+              fill: '#008000',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS'
+          }).setOrigin(0.5);
+
+          const worldlyText = this.add.text(panelWidth / 2, 150 * this.gameScale, `Eggstra-Stinky (Worldly) Eggs: ${worldlyEggs} / 30`, {
+              fontSize: `${(isDesktop ? 24 : 30) * this.gameScale}px`,
+              fill: '#d32f2f',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS'
+          }).setOrigin(0.5);
+
+          const totalText = this.add.text(panelWidth / 2, 200 * this.gameScale, `Total Categorized: 60/60`, {
+              fontSize: `${(isDesktop ? 24 : 30) * this.gameScale}px`,
+              fill: '#000000',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS'
+          }).setOrigin(0.5);
+
+          // PLAY AGAIN Button inside Summary Panel
+          const playBtnContainer = this.add.container(panelWidth / 2, 260 * this.gameScale).setDepth(101);
+
+          const playBtnWidth = 280 * this.gameScale;
           const playBtnHeight = 60 * this.gameScale;
 
           const playBtnBg = this.add.graphics();
@@ -2124,26 +2168,29 @@ class EggZamRoom extends Phaser.Scene {
           playBtnBg.strokeRoundedRect(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight, 15 * this.gameScale);
 
           const playBtnText = this.add.text(0, 0, 'PLAY AGAIN', {
-              fontSize: `${28 * this.gameScale}px`,
+              fontSize: `${(isDesktop ? 28 : 34) * this.gameScale}px`,
               fill: '#000',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0.5, 0.5);
 
           playBtnContainer.add([playBtnBg, playBtnText]);
-
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
           playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
 
-          const triggerReload = () => {
-              window.location.reload();
+          const triggerRestart = () => {
+              if (this.input.setDefaultCursor) this.input.setDefaultCursor('default');
+              initializeGameData(this.registry, this.cache);
+              this.scene.start('MapScene');
           };
 
-          playBtnContainer.on('pointerdown', triggerReload);
+          playBtnContainer.on('pointerdown', triggerRestart);
           if (this.input.keyboard) {
-              this.input.keyboard.once('keydown-SPACE', triggerReload);
-              this.input.keyboard.once('keydown-ENTER', triggerReload);
+              this.input.keyboard.once('keydown-SPACE', triggerRestart);
+              this.input.keyboard.once('keydown-ENTER', triggerRestart);
           }
+
+          summaryContainer.add([panelBg, titleText, holyText, worldlyText, totalText, playBtnContainer]);
         }
         return;
       }
