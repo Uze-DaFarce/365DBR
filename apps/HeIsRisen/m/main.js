@@ -2,6 +2,94 @@
 // Define total eggs as a variable to avoid hardcoding
 const TOTAL_EGGS = 60;
 
+function initializeGameData(registry, cache) {
+    const symbolsData = cache.json.get('symbols');
+    if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+        // Pre-validate and inject into registry just as originally done in MainMenu
+        const validSymbols = symbolsData.symbols.filter(s => {
+            return s && typeof s === 'object' &&
+                   typeof s.filename === 'string' &&
+                   !s.filename.includes('..') &&
+                   /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
+        });
+        if (validSymbols.length !== symbolsData.symbols.length) {
+            console.warn(`Security: Filtered ${symbolsData.symbols.length - validSymbols.length} invalid symbols.`);
+            symbolsData.symbols = validSymbols;
+        }
+        registry.set('symbols', symbolsData);
+    }
+
+    const mapSections = cache.json.get('map_sections');
+    if (mapSections) {
+        const eggCounts = [];
+        let remainingEggs = TOTAL_EGGS;
+        const numSections = mapSections.length;
+
+        for (let i = 0; i < numSections - 1; i++) {
+            const maxPossible = remainingEggs - ((numSections - 1 - i) * 3);
+            const minPossible = remainingEggs - ((numSections - 1 - i) * 8);
+            const max = Math.min(8, maxPossible);
+            const min = Math.max(3, minPossible);
+            const count = Phaser.Math.Between(min, max);
+            eggCounts.push(count);
+            remainingEggs -= count;
+        }
+        eggCounts.push(remainingEggs);
+
+        const eggs = Phaser.Utils.Array.Shuffle(Array.from({ length: TOTAL_EGGS }, (_, i) => i + 1));
+        let shuffledSymbols = [];
+        if (symbolsData && symbolsData.symbols) {
+            shuffledSymbols = Phaser.Utils.Array.Shuffle([...symbolsData.symbols]);
+        }
+
+        const eggData = [];
+        let eggIndex = 0;
+
+        // Use fallback static bounds if window is not available to prevent crashes during headless reset
+        // Use fallback static bounds if window is not available to prevent crashes during headless reset
+        const screenWidth = window.innerWidth || 844;
+        const screenHeight = window.innerHeight || 390;
+        const scale = Math.min(screenWidth / 1280, screenHeight / 720);
+
+        const sections = mapSections.map((section, index) => {
+            const sectionEggs = eggs.slice(eggIndex, eggIndex + eggCounts[index]);
+            eggIndex += eggCounts[index];
+
+            sectionEggs.forEach(eggId => {
+                // Mobile layout viewport calculation with correct lens margin mappings
+                const minX = 50 * scale;
+                const maxX = Math.max(minX, screenWidth - (160 * scale));
+                const minY = 50 * scale;
+                const maxY = Math.max(minY, screenHeight - (200 * scale));
+
+                const x = Phaser.Math.Between(minX, maxX);
+                const y = Phaser.Math.Between(minY, maxY);
+
+                eggData.push({
+                    eggId: eggId,
+                    section: section.name,
+                    x: x,
+                    y: y,
+                    symbol: shuffledSymbols[eggId - 1] || null, // Guarantees strictly uniform unique symbols mapped from 1..60
+                    collected: false
+                });
+            });
+
+            return {
+                name: section.name,
+                eggs: sectionEggs
+            };
+        });
+
+        registry.set('sections', sections);
+        registry.set('eggData', eggData);
+    }
+
+    registry.set('foundEggs', []);
+    registry.set('stampedSections', []);
+    registry.set('correctCategorizations', 0);
+}
+
 // Define all scene classes first
 
 class MusicScene extends Phaser.Scene {
@@ -481,103 +569,9 @@ class MainMenu extends Phaser.Scene {
       // console.log('MainMenu: highScore:', this.registry.get('highScore'));
 
       // Load and validate symbols and map sections
-      const symbolsData = this.cache.json.get('symbols');
-      const mapSections = this.cache.json.get('map_sections');
-      if (!symbolsData || !symbolsData.symbols || !Array.isArray(symbolsData.symbols)) {
-        console.error('MainMenu: Invalid symbols data:', symbolsData);
-        return;
+      if (!this.registry.has('eggData')) {
+          initializeGameData(this.registry, this.cache);
       }
-
-      // Sentinel: Filter invalid symbols before using them in game logic
-      const validSymbols = symbolsData.symbols.filter(s => this.isValidSymbol(s));
-      if (validSymbols.length !== symbolsData.symbols.length) {
-          console.warn(`Security: Filtered ${symbolsData.symbols.length - validSymbols.length} invalid symbols.`);
-          symbolsData.symbols = validSymbols;
-      }
-
-      if (symbolsData.symbols.length !== TOTAL_EGGS) {
-        console.error(`MainMenu: Expected ${TOTAL_EGGS} symbols, found ${symbolsData.symbols.length}`);
-      }
-      if (!mapSections) { console.error('Map sections missing'); return; }
-      if (mapSections.length !== 11) {
-        console.warn(`MainMenu: Expected 11 sections, found ${mapSections.length || 0}`);
-      }
-      this.registry.set('symbols', symbolsData);
-
-      // Randomly assign 3-8 eggs per section, totaling TOTAL_EGGS
-      const eggCounts = [];
-      let remainingEggs = TOTAL_EGGS;
-      const numSections = mapSections.length;
-      for (let i = 0; i < numSections - 1; i++) {
-        const maxPossible = remainingEggs - ((numSections - 1 - i) * 3);
-        const minPossible = remainingEggs - ((numSections - 1 - i) * 8);
-
-        const maxEggs = Math.min(8, maxPossible);
-        const minEggs = Math.max(3, minPossible);
-
-        const count = Phaser.Math.Between(minEggs, maxEggs);
-        eggCounts.push(count);
-        remainingEggs -= count;
-      }
-      eggCounts.push(remainingEggs);
-
-      // console.log('MainMenu: Egg distribution:', eggCounts);
-
-      // Shuffle egg IDs and symbols
-      const eggs = Phaser.Utils.Array.Shuffle(Array.from({ length: TOTAL_EGGS }, (_, i) => i + 1));
-      const shuffledSymbols = Phaser.Utils.Array.Shuffle([...symbolsData.symbols]);
-
-      // Create eggData and sections
-      const eggData = [];
-      let eggIndex = 0;
-      const sections = mapSections.map((section, index) => {
-        const sectionEggs = eggs.slice(eggIndex, eggIndex + eggCounts[index]);
-        eggIndex += eggCounts[index];
-        sectionEggs.forEach((eggId, idx) => {
-          // Fix: Mobile viewport coordinates are absolute, don't divide by scale for the max bounds.
-          // The visual lens has an offset of (-97.5, -135) relative to the physical touch pointer.
-          // This means to reach an egg at (x, y), the user must touch at (x + 97.5, y + 135).
-          // We must ensure that this required touch point never falls outside the screen bounds.
-          // Therefore, the max bounds for an egg must be at least that far from the right/bottom edges.
-          // We also must ensure that min bounds are respected relative to negative offsets.
-          // The lens offset in Mobile is X: -97.5, Y: -135 (lens is UP and LEFT of pointer).
-          // Meaning if an egg is at X=0, the user must touch at X=+97.5.
-          // Conversely, if an egg is at X=width, the user must touch at X=width+97.5 (which is OFF SCREEN).
-          // To ensure the required TOUCH is within [0, width], the EGG must be within [0 - 97.5, width - 97.5].
-          // However, we also want the egg to be visible on screen.
-          // So the EGG must be within [50, width - 150].
-
-          // Phaser.Math.Between requires max >= min. If screen is very small, we might get negative ranges.
-          // We clamp maxX and maxY to be at least minX and minY to avoid Phaser errors.
-          // Wait, the lens offset is scaling based on the *current* scale (which can be very different based on device orientation).
-          // And we must ensure the REQUIRED touch (egg.x - (-97.5 * scale)) is <= screen width.
-          // required_touch_x = egg.x + 97.5 * scale <= width => egg.x <= width - 97.5 * scale
-          // Let's add an extra safety margin. width - 150 * scale is good.
-          // BUT what if width is VERY small?
-          // Let's use strict bounds:
-          const minX = 50 * scale;
-          const maxX = Math.max(minX, this.game.config.width - (160 * scale));
-          const minY = 50 * scale;
-          const maxY = Math.max(minY, this.game.config.height - (200 * scale));
-
-          const x = Phaser.Math.Between(minX, maxX);
-          const y = Phaser.Math.Between(minY, maxY);
-
-          eggData.push({
-            eggId: eggId,
-            section: section.name,
-            x: x,
-            y: y,
-            symbol: shuffledSymbols[eggId - 1] || null,
-            collected: false
-          });
-        });
-        return { name: section.name, eggs: sectionEggs };
-      });
-
-      this.registry.set('eggData', eggData);
-      this.registry.set('sections', sections);
-      // console.log('MainMenu: Initialized eggData:', eggData);
 
       // Debug: Log game dimensions and scale
       // console.log(`MainMenu: Game dimensions - width: ${this.game.config.width}, height: ${this.game.config.height}, scale: ${scale}`);

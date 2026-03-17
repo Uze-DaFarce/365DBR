@@ -3,10 +3,19 @@ const TOTAL_EGGS = 60;
 
 function initializeGameData(registry, cache) {
     const symbolsData = cache.json.get('symbols');
-    if (symbolsData) {
-      if (symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+    if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+        // Pre-validate and inject into registry just as originally done in MainMenu
+        const validSymbols = symbolsData.symbols.filter(s => {
+            return s && typeof s === 'object' &&
+                   typeof s.filename === 'string' &&
+                   !s.filename.includes('..') &&
+                   /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
+        });
+        if (validSymbols.length !== symbolsData.symbols.length) {
+            console.warn(`Security: Filtered ${symbolsData.symbols.length - validSymbols.length} invalid symbols.`);
+            symbolsData.symbols = validSymbols;
+        }
         registry.set('symbols', symbolsData);
-      }
     }
 
     const mapSections = cache.json.get('map_sections');
@@ -26,25 +35,11 @@ function initializeGameData(registry, cache) {
         }
         eggCounts.push(remainingEggs);
 
-        Phaser.Utils.Array.Shuffle(eggCounts);
-
-        let shuffledSymbols = [];
-        if (symbolsData && symbolsData.symbols) {
-             shuffledSymbols = Phaser.Utils.Array.Shuffle([...symbolsData.symbols]);
-        }
-
-        const sectionsData = mapSections.map((section, index) => {
-            return {
-                name: section.name,
-                count: eggCounts[index],
-                eggs: []
-            };
-        });
-
         const eggs = Phaser.Utils.Array.Shuffle(Array.from({ length: TOTAL_EGGS }, (_, i) => i + 1));
         const sections = mapSections.map(section => ({ name: section.name, eggs: [] }));
 
         let eggIndex = 0;
+        const shuffledSymbols = Phaser.Utils.Array.Shuffle([...(symbolsData ? symbolsData.symbols : [])]);
         const eggData = [];
 
         sections.forEach((section, index) => {
@@ -56,21 +51,17 @@ function initializeGameData(registry, cache) {
               const originalY = Phaser.Math.Between(100, 710);
 
               eggData.push({
-                  eggId,
+                  eggId: eggId,
                   section: section.name,
                   x: originalX,
                   y: originalY,
-                  symbol: shuffledSymbols.length > 0 ? Phaser.Utils.Array.GetRandom(shuffledSymbols) : null,
+                  symbol: shuffledSymbols[eggId - 1] || null,
                   collected: false
               });
           });
         });
 
-        // Ensure registry sets the proper structure expected by MapScene & SectionHunt
-        sectionsData.length = 0;
-        sections.forEach(s => sectionsData.push(s));
-
-        registry.set('sections', sectionsData);
+        registry.set('sections', sections);
         registry.set('eggData', eggData);
     }
 
