@@ -996,10 +996,13 @@ class MapScene extends Phaser.Scene {
               // sometimes defers resolution until the first frame is decoded in headless browsers
               const updateStampSize = () => {
                   stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
-                  const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
-                  const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
-                  const calculatedScale = targetHeight / intrinsicHeight;
-                  stampVideo.setScale(calculatedScale);
+                  const videoHasDims = stampVideo.video && stampVideo.video.videoHeight > 0;
+                  if (videoHasDims) {
+                      const intrinsicHeight = stampVideo.video.videoHeight;
+                      const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
+                      const calculatedScale = targetHeight / intrinsicHeight;
+                      if (calculatedScale > 0 && !isNaN(calculatedScale)) stampVideo.setScale(calculatedScale);
+                  }
               };
               updateStampSize();
 
@@ -1147,9 +1150,13 @@ class MapScene extends Phaser.Scene {
                   item.video.setPosition(item.thumb.x, item.thumb.y + offsetY);
 
                   // Cover thumbnail height + 25%, maintaining intrinsic stamp ratio
-                  const intrinsicHeight = item.video.height || 720;
-                  const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
-                  item.video.setScale(targetHeight / intrinsicHeight);
+                  const hasDims = item.video.type === 'Video' ? (item.video.video && item.video.video.videoHeight > 0) : (item.video.height > 0);
+                  if (hasDims) {
+                      const intrinsicHeight = item.video.type === 'Video' ? item.video.video.videoHeight : item.video.height;
+                      const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
+                      const calcScale = targetHeight / intrinsicHeight;
+                      if (calcScale > 0 && !isNaN(calcScale)) item.video.setScale(calcScale);
+                  }
               }
           });
       }
@@ -1591,7 +1598,9 @@ class SectionHunt extends Phaser.Scene {
 
       if (this.isUsingVideo && this.sectionVideo) {
           this.sectionVideo.setPosition(width/2, height/2);
-          this.sectionVideo.setDisplaySize(1280 * scale, 720 * scale);
+          if (this.sectionVideo.video && this.sectionVideo.video.videoWidth > 0 && scale > 0 && !isNaN(scale)) {
+              this.sectionVideo.setDisplaySize(1280 * scale, 720 * scale);
+          }
       } else if (this.sectionImage) {
           this.sectionImage.setPosition(width/2, height/2);
           this.sectionImage.setDisplaySize(1280 * scale, 720 * scale);
@@ -1755,7 +1764,7 @@ class SectionHunt extends Phaser.Scene {
 
     // Robust scaling check for Video in SectionHunt
     if (this.isUsingVideo && this.sectionVideo && this.sectionVideo.active) {
-        if (this.sectionVideo.width > 0 && this.sectionVideo.height > 0) {
+        if (this.sectionVideo.video && this.sectionVideo.video.videoWidth > 0) {
              // Check if scale matches Cover requirement
              const width = this.scale.width;
              const height = this.scale.height;
@@ -1764,7 +1773,7 @@ class SectionHunt extends Phaser.Scene {
              const targetScale = Math.max(scaleX, scaleY);
              const targetDisplayW = 1280 * targetScale;
 
-             if (Math.abs(this.sectionVideo.displayWidth - targetDisplayW) > 5) {
+             if (targetScale > 0 && !isNaN(targetScale) && Math.abs(this.sectionVideo.displayWidth - targetDisplayW) > 5) {
                  // console.log(`SectionHunt: Fixing video scale. Screen: ${width}x${height}, TargetW: ${targetDisplayW}`);
                  this.sectionVideo.setDisplaySize(1280 * targetScale, 720 * targetScale);
                  this.sectionVideo.setPosition(width/2, height/2);
