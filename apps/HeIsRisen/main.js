@@ -3,11 +3,19 @@ const TOTAL_EGGS = 60;
 
 function initializeGameData(registry, cache) {
     const symbolsData = cache.json.get('symbols');
-    if (symbolsData) {
-      if (symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
-        // Validation happens in MainMenu preload/create, but we store it here
+    if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+        // Pre-validate and inject into registry just as originally done in MainMenu
+        const validSymbols = symbolsData.symbols.filter(s => {
+            return s && typeof s === 'object' &&
+                   typeof s.filename === 'string' &&
+                   !s.filename.includes('..') &&
+                   /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
+        });
+        if (validSymbols.length !== symbolsData.symbols.length) {
+            console.warn(`Security: Filtered ${symbolsData.symbols.length - validSymbols.length} invalid symbols.`);
+            symbolsData.symbols = validSymbols;
+        }
         registry.set('symbols', symbolsData);
-      }
     }
 
     const mapSections = cache.json.get('map_sections');
@@ -796,16 +804,7 @@ class MainMenu extends Phaser.Scene {
               const scaleX = width / this.introVideo.width;
               const scaleY = height / this.introVideo.height;
               const videoScale = Math.max(scaleX, scaleY);
-
-              if (this.sys.game.renderer && this.sys.game.renderer.gl) {
-                  this.time.delayedCall(200, () => {
-                      if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
-                          try { this.introVideo.setScale(videoScale); } catch(e) {}
-                      }
-                  });
-              } else {
-                  try { this.introVideo.setScale(videoScale); } catch(e) {}
-              }
+              this.introVideo.setScale(videoScale);
           }
       }
 
@@ -846,18 +845,7 @@ class MainMenu extends Phaser.Scene {
            // Use a small epsilon to avoid float jitter
            if (Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
                console.log(`MainMenu: Applying delayed scale. Video: ${this.introVideo.width}x${this.introVideo.height}, Screen: ${width}x${height}, Scale: ${desiredScale}`);
-
-               // Avoid forcefully changing the scale if the webgl context isn't ready
-               // This prevents the 'Framebuffer status: Incomplete Attachment' crash
-               if (this.sys.game.renderer && this.sys.game.renderer.gl) {
-                   this.time.delayedCall(200, () => {
-                       if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
-                           try { this.introVideo.setScale(desiredScale); } catch(e) {}
-                       }
-                   });
-               } else {
-                   try { this.introVideo.setScale(desiredScale); } catch(e) {}
-               }
+               this.introVideo.setScale(desiredScale);
            }
        }
     }
@@ -2085,19 +2073,18 @@ class EggZamRoom extends Phaser.Scene {
 
           const playBtnBg = this.add.graphics();
           playBtnBg.fillStyle(0xffff00, 1);
-          playBtnBg.lineStyle(3 * scale, 0x000000, 1);
+          playBtnBg.lineStyle(4 * scale, 0x000000, 1);
           playBtnBg.fillRoundedRect(0, 0, playBtnWidth, playBtnHeight, 10 * scale);
           playBtnBg.strokeRoundedRect(0, 0, playBtnWidth, playBtnHeight, 10 * scale);
 
           const playBtnText = this.add.text(playBtnWidth / 2, playBtnHeight / 2, 'PLAY AGAIN', {
-              fontSize: `${22 * scale}px`,
+              fontSize: `${24 * scale}px`,
               fill: '#000',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0.5, 0.5);
 
           playBtnContainer.add([playBtnBg, playBtnText]);
-
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
           playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
 

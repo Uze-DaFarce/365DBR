@@ -3,99 +3,91 @@
 const TOTAL_EGGS = 60;
 
 function initializeGameData(registry, cache) {
-    // NEW: Initialize all game variables
-    registry.set('foundEggs', []);
-    registry.set('stampedSections', []);
-    registry.set('correctCategorizations', 0);
-    registry.set('currentScore', 0);
-
-    try {
-        registry.set('highScore', parseInt(localStorage.getItem('highScore')) || 0);
-    } catch (e) {
-        console.warn('LocalStorage access failed:', e);
-        registry.set('highScore', 0);
-    }
-
     const symbolsData = cache.json.get('symbols');
-    const mapSections = cache.json.get('map_sections');
-
-    if (symbolsData) {
+    if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+        // Pre-validate and inject into registry just as originally done in MainMenu
+        const validSymbols = symbolsData.symbols.filter(s => {
+            return s && typeof s === 'object' &&
+                   typeof s.filename === 'string' &&
+                   !s.filename.includes('..') &&
+                   /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
+        });
+        if (validSymbols.length !== symbolsData.symbols.length) {
+            console.warn(`Security: Filtered ${symbolsData.symbols.length - validSymbols.length} invalid symbols.`);
+            symbolsData.symbols = validSymbols;
+        }
         registry.set('symbols', symbolsData);
     }
 
-    if (mapSections && symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
-        // Randomly assign 3-8 eggs per section, totaling TOTAL_EGGS
+    const mapSections = cache.json.get('map_sections');
+    if (mapSections) {
         const eggCounts = [];
         let remainingEggs = TOTAL_EGGS;
         const numSections = mapSections.length;
+
         for (let i = 0; i < numSections - 1; i++) {
-          const maxPossible = remainingEggs - ((numSections - 1 - i) * 3);
-          const minPossible = remainingEggs - ((numSections - 1 - i) * 8);
-
-          const maxEggs = Math.min(8, maxPossible);
-          const minEggs = Math.max(3, minPossible);
-
-          const count = Phaser.Math.Between(minEggs, maxEggs);
-          eggCounts.push(count);
-          remainingEggs -= count;
+            const maxPossible = remainingEggs - ((numSections - 1 - i) * 3);
+            const minPossible = remainingEggs - ((numSections - 1 - i) * 8);
+            const max = Math.min(8, maxPossible);
+            const min = Math.max(3, minPossible);
+            const count = Phaser.Math.Between(min, max);
+            eggCounts.push(count);
+            remainingEggs -= count;
         }
         eggCounts.push(remainingEggs);
 
-        // Shuffle egg IDs and symbols
         const eggs = Phaser.Utils.Array.Shuffle(Array.from({ length: TOTAL_EGGS }, (_, i) => i + 1));
-        const shuffledSymbols = Phaser.Utils.Array.Shuffle([...symbolsData.symbols]);
-
-        // We assume scale is somewhat consistent or we recalculate.
-        // In the original, the scale is based on window dimensions when `create` runs.
-        // In `initializeGameData`, we must get the same viewport config or bounds logic.
-        // Wait, if we use window logic:
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        let gameWidth, gameHeight;
-        if (isMobile) {
-          gameWidth = screen.width;
-          gameHeight = screen.height;
-          if (gameWidth < gameHeight) {
-            [gameWidth, gameHeight] = [gameHeight, gameWidth];
-          }
-        } else {
-          gameWidth = window.innerWidth;
-          gameHeight = document.documentElement.clientHeight;
+        let shuffledSymbols = [];
+        if (symbolsData && symbolsData.symbols) {
+            shuffledSymbols = Phaser.Utils.Array.Shuffle([...symbolsData.symbols]);
         }
 
-        const scaleX = gameWidth / 1280;
-        const scaleY = gameHeight / 720;
-        const scale = Math.min(scaleX, scaleY);
-
-        // Create eggData and sections
         const eggData = [];
         let eggIndex = 0;
+
+        // Use fallback static bounds if window is not available to prevent crashes during headless reset
+        // Use fallback static bounds if window is not available to prevent crashes during headless reset
+        const screenWidth = window.innerWidth || 844;
+        const screenHeight = window.innerHeight || 390;
+        const scale = Math.min(screenWidth / 1280, screenHeight / 720);
+
         const sections = mapSections.map((section, index) => {
-          const sectionEggs = eggs.slice(eggIndex, eggIndex + eggCounts[index]);
-          eggIndex += eggCounts[index];
-          sectionEggs.forEach((eggId, idx) => {
-            const minX = 50 * scale;
-            const maxX = Math.max(minX, gameWidth - (160 * scale));
-            const minY = 50 * scale;
-            const maxY = Math.max(minY, gameHeight - (200 * scale));
+            const sectionEggs = eggs.slice(eggIndex, eggIndex + eggCounts[index]);
+            eggIndex += eggCounts[index];
 
-            const x = Phaser.Math.Between(minX, maxX);
-            const y = Phaser.Math.Between(minY, maxY);
+            sectionEggs.forEach(eggId => {
+                // Mobile layout viewport calculation with correct lens margin mappings
+                const minX = 50 * scale;
+                const maxX = Math.max(minX, screenWidth - (160 * scale));
+                const minY = 50 * scale;
+                const maxY = Math.max(minY, screenHeight - (200 * scale));
 
-            eggData.push({
-              eggId: eggId,
-              section: section.name,
-              x: x,
-              y: y,
-              symbol: shuffledSymbols[eggId - 1] || null,
-              collected: false
+                const x = Phaser.Math.Between(minX, maxX);
+                const y = Phaser.Math.Between(minY, maxY);
+
+                eggData.push({
+                    eggId: eggId,
+                    section: section.name,
+                    x: x,
+                    y: y,
+                    symbol: shuffledSymbols[eggId - 1] || null, // Guarantees strictly uniform unique symbols mapped from 1..60
+                    collected: false
+                });
             });
-          });
-          return { name: section.name, eggs: sectionEggs };
+
+            return {
+                name: section.name,
+                eggs: sectionEggs
+            };
         });
 
-        registry.set('eggData', eggData);
         registry.set('sections', sections);
+        registry.set('eggData', eggData);
     }
+
+    registry.set('foundEggs', []);
+    registry.set('stampedSections', []);
+    registry.set('correctCategorizations', 0);
 }
 
 // Define all scene classes first
@@ -561,16 +553,22 @@ class MainMenu extends Phaser.Scene {
       const scale = Math.min(scaleX, scaleY);
       this.gameScale = scale;
 
-      // Load and validate symbols and map sections
-      const symbolsData = this.cache.json.get('symbols');
-      if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
-          const validSymbols = symbolsData.symbols.filter(s => this.isValidSymbol(s));
-          if (validSymbols.length !== symbolsData.symbols.length) {
-              console.warn(`Security: Filtered ${symbolsData.symbols.length - validSymbols.length} invalid symbols.`);
-              symbolsData.symbols = validSymbols;
-          }
-      }
+      // NEW: Initialize all game variables
+      // console.log('MainMenu: Initializing game state');
+      this.registry.set('foundEggs', []);
+      this.registry.set('stampedSections', []);
+      this.registry.set('correctCategorizations', 0);
+      this.registry.set('currentScore', 0);
 
+      try {
+          this.registry.set('highScore', parseInt(localStorage.getItem('highScore')) || 0);
+      } catch (e) {
+          console.warn('LocalStorage access failed:', e);
+          this.registry.set('highScore', 0);
+      }
+      // console.log('MainMenu: highScore:', this.registry.get('highScore'));
+
+      // Load and validate symbols and map sections
       if (!this.registry.has('eggData')) {
           initializeGameData(this.registry, this.cache);
       }
@@ -861,15 +859,7 @@ class MainMenu extends Phaser.Scene {
     // Ensure video size is correct once texture loads
     if (this.introVideo && this.introVideo.active && this.introVideo.width > 0) {
         if (Math.abs(this.introVideo.displayWidth - this.game.config.width) > 10) {
-            if (this.sys.game.renderer && this.sys.game.renderer.gl) {
-                this.time.delayedCall(200, () => {
-                    if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
-                        try { this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height); } catch(e) {}
-                    }
-                });
-            } else {
-                try { this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height); } catch(e) {}
-            }
+            this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height);
         }
     }
   }
@@ -2175,31 +2165,20 @@ class EggZamRoom extends Phaser.Scene {
 
           const playBtnBg = this.add.graphics();
           playBtnBg.fillStyle(0xffff00, 1);
-          playBtnBg.lineStyle(3 * this.gameScale, 0x000000, 1);
-          playBtnBg.fillRoundedRect(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight, 10 * this.gameScale);
-          playBtnBg.strokeRoundedRect(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight, 10 * this.gameScale);
+          playBtnBg.lineStyle(4 * this.gameScale, 0x000000, 1);
+          playBtnBg.fillRoundedRect(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight, 15 * this.gameScale);
+          playBtnBg.strokeRoundedRect(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight, 15 * this.gameScale);
 
           const playBtnText = this.add.text(0, 0, 'PLAY AGAIN', {
-              fontSize: `${(isDesktop ? 22 : 28) * this.gameScale}px`,
+              fontSize: `${(isDesktop ? 28 : 34) * this.gameScale}px`,
               fill: '#000',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0.5, 0.5);
 
           playBtnContainer.add([playBtnBg, playBtnText]);
-
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
           playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
-
-          playBtnContainer.on('pointerover', () => {
-              if (this.input.setDefaultCursor) this.input.setDefaultCursor('pointer');
-              playBtnContainer.setScale(1.05);
-          });
-
-          playBtnContainer.on('pointerout', () => {
-              if (this.input.setDefaultCursor) this.input.setDefaultCursor('default');
-              playBtnContainer.setScale(1);
-          });
 
           const triggerRestart = () => {
               if (this.input.setDefaultCursor) this.input.setDefaultCursor('default');
@@ -2207,12 +2186,7 @@ class EggZamRoom extends Phaser.Scene {
               this.scene.start('MapScene');
           };
 
-          playBtnContainer.on('pointerdown', () => {
-              this.tweens.add({
-                  targets: playBtnContainer, scaleX: 0.9, scaleY: 0.9, duration: 50, ease: 'Power1', yoyo: true,
-                  onComplete: triggerRestart
-              });
-          });
+          playBtnContainer.on('pointerdown', triggerRestart);
           if (this.input.keyboard) {
               this.input.keyboard.once('keydown-SPACE', triggerRestart);
               this.input.keyboard.once('keydown-ENTER', triggerRestart);
@@ -2415,16 +2389,7 @@ function resizeGame() {
     if (scene.scene.key === 'MainMenu') {
       if (scene.introVideo) {
         scene.introVideo.setPosition(width / 2, height / 2);
-
-        if (scene.sys.game.renderer && scene.sys.game.renderer.gl) {
-            scene.time.delayedCall(200, () => {
-                if (scene.introVideo && scene.introVideo.active && scene.introVideo.texture) {
-                    try { scene.introVideo.setDisplaySize(width, height); } catch(e) {}
-                }
-            });
-        } else {
-            try { scene.introVideo.setDisplaySize(width, height); } catch(e) {}
-        }
+        scene.introVideo.setDisplaySize(width, height);
       }
       if (scene.startBtnContainer) {
         scene.startBtnContainer.setPosition(width / 2, 580 * scale);
