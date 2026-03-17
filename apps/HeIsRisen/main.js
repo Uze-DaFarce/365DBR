@@ -5,7 +5,6 @@ function initializeGameData(registry, cache) {
     const symbolsData = cache.json.get('symbols');
     if (symbolsData) {
       if (symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
-        // Validation happens in MainMenu preload/create, but we store it here
         registry.set('symbols', symbolsData);
       }
     }
@@ -27,11 +26,25 @@ function initializeGameData(registry, cache) {
         }
         eggCounts.push(remainingEggs);
 
+        Phaser.Utils.Array.Shuffle(eggCounts);
+
+        let shuffledSymbols = [];
+        if (symbolsData && symbolsData.symbols) {
+             shuffledSymbols = Phaser.Utils.Array.Shuffle([...symbolsData.symbols]);
+        }
+
+        const sectionsData = mapSections.map((section, index) => {
+            return {
+                name: section.name,
+                count: eggCounts[index],
+                eggs: []
+            };
+        });
+
         const eggs = Phaser.Utils.Array.Shuffle(Array.from({ length: TOTAL_EGGS }, (_, i) => i + 1));
         const sections = mapSections.map(section => ({ name: section.name, eggs: [] }));
 
         let eggIndex = 0;
-        const shuffledSymbols = Phaser.Utils.Array.Shuffle([...(symbolsData ? symbolsData.symbols : [])]);
         const eggData = [];
 
         sections.forEach((section, index) => {
@@ -43,17 +56,21 @@ function initializeGameData(registry, cache) {
               const originalY = Phaser.Math.Between(100, 710);
 
               eggData.push({
-                  eggId: eggId,
+                  eggId,
                   section: section.name,
                   x: originalX,
                   y: originalY,
-                  symbol: shuffledSymbols[eggId - 1] || null,
+                  symbol: shuffledSymbols.length > 0 ? Phaser.Utils.Array.GetRandom(shuffledSymbols) : null,
                   collected: false
               });
           });
         });
 
-        registry.set('sections', sections);
+        // Ensure registry sets the proper structure expected by MapScene & SectionHunt
+        sectionsData.length = 0;
+        sections.forEach(s => sectionsData.push(s));
+
+        registry.set('sections', sectionsData);
         registry.set('eggData', eggData);
     }
 
@@ -796,16 +813,7 @@ class MainMenu extends Phaser.Scene {
               const scaleX = width / this.introVideo.width;
               const scaleY = height / this.introVideo.height;
               const videoScale = Math.max(scaleX, scaleY);
-
-              if (this.sys.game.renderer && this.sys.game.renderer.gl) {
-                  this.time.delayedCall(200, () => {
-                      if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
-                          try { this.introVideo.setScale(videoScale); } catch(e) {}
-                      }
-                  });
-              } else {
-                  try { this.introVideo.setScale(videoScale); } catch(e) {}
-              }
+              this.introVideo.setScale(videoScale);
           }
       }
 
@@ -846,18 +854,7 @@ class MainMenu extends Phaser.Scene {
            // Use a small epsilon to avoid float jitter
            if (Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
                console.log(`MainMenu: Applying delayed scale. Video: ${this.introVideo.width}x${this.introVideo.height}, Screen: ${width}x${height}, Scale: ${desiredScale}`);
-
-               // Avoid forcefully changing the scale if the webgl context isn't ready
-               // This prevents the 'Framebuffer status: Incomplete Attachment' crash
-               if (this.sys.game.renderer && this.sys.game.renderer.gl) {
-                   this.time.delayedCall(200, () => {
-                       if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
-                           try { this.introVideo.setScale(desiredScale); } catch(e) {}
-                       }
-                   });
-               } else {
-                   try { this.introVideo.setScale(desiredScale); } catch(e) {}
-               }
+               this.introVideo.setScale(desiredScale);
            }
        }
     }
@@ -2085,19 +2082,18 @@ class EggZamRoom extends Phaser.Scene {
 
           const playBtnBg = this.add.graphics();
           playBtnBg.fillStyle(0xffff00, 1);
-          playBtnBg.lineStyle(3 * scale, 0x000000, 1);
+          playBtnBg.lineStyle(4 * scale, 0x000000, 1);
           playBtnBg.fillRoundedRect(0, 0, playBtnWidth, playBtnHeight, 10 * scale);
           playBtnBg.strokeRoundedRect(0, 0, playBtnWidth, playBtnHeight, 10 * scale);
 
           const playBtnText = this.add.text(playBtnWidth / 2, playBtnHeight / 2, 'PLAY AGAIN', {
-              fontSize: `${22 * scale}px`,
+              fontSize: `${24 * scale}px`,
               fill: '#000',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0.5, 0.5);
 
           playBtnContainer.add([playBtnBg, playBtnText]);
-
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
           playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
 
