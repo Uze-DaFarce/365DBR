@@ -668,10 +668,16 @@ class MainMenu extends Phaser.Scene {
             introVideo.play(true); // Restart loop with sound
         }
 
-        // Request Fullscreen (Desktop logic)
-        if (this.scale.fullscreen.available) {
-            try { this.scale.startFullscreen(); } catch (e) {}
-        }
+        // Handle fullscreen via HTML5 DOM API (matches Mobile logic) to prevent WebGL Framebuffer crash
+        const canvas = this.game.canvas;
+        const safeRequestFullscreen = (element) => {
+            if (element.requestFullscreen) {
+                element.requestFullscreen().catch(err => {});
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen().catch(err => {});
+            }
+        };
+        safeRequestFullscreen(canvas);
 
         // Show Play Button almost immediately (short delay for visual transition)
         this.time.delayedCall(100, () => {
