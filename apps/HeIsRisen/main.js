@@ -668,6 +668,7 @@ class MainMenu extends Phaser.Scene {
             introVideo.setVolume(vol);
             introVideo.play(true); // Restart loop with sound
         }
+
         // Request Fullscreen (Desktop logic)
         if (this.scale.fullscreen.available) {
             this.scale.startFullscreen();
@@ -759,7 +760,11 @@ class MainMenu extends Phaser.Scene {
         this.registry.events.off('changedata', updateIntroVolume);
         if (this.introVideo) {
             this.introVideo.stop();
-            this.introVideo.destroy();
+            const v = this.introVideo;
+            this.time.delayedCall(1000, () => {
+                if (v && v.active) v.destroy();
+            });
+            this.introVideo = null;
         }
     });
 
