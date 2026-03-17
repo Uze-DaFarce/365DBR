@@ -313,3 +313,7 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 ## 2026-03-16 - Semantic Wrappers for Full-Screen Apps
 **Learning:** Even fully Canvas-rendered apps (like Phaser games) benefit from `<main>` semantic wrappers and `<noscript>` tags at the HTML level. It provides structure for screen readers and graceful degradation for users without JS without disrupting the game container.
 **Action:** Always wrap `#game` or `#game-container` in `<main>` when scaffolding new Phaser apps in the monorepo, and provide a `<noscript>` styled fallback.
+
+## 2026-03-22 - In-game Popups and Keyboard Parity
+**Learning:** Dismissal of temporary, interactive in-game overlays (like the explanation text popup in EggZamRoom) via mouse clicks (`pointerdown` on background) traps keyboard and screen reader users, who rely on standard keys (Escape, Space, Enter) to close dialogs.
+**Action:** Always map `Escape`, `Space`, and `Enter` key events (via `input.keyboard.on`) to the same close/dismiss callback used by the pointer events for any dynamically generated popup overlay, and ensure you `input.keyboard.off` the events when destroying the popup to prevent memory leaks or double-firing.
