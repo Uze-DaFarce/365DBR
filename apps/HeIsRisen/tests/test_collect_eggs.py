@@ -118,50 +118,72 @@ def test_collect_eggs_in_level(is_mobile=False):
                 # Fetch scale from scene
                 scale = page.evaluate("() => { const scene = window.game.scene.getScene('SectionHunt'); return scene.gameScale || scene.bgScale || 1; }")
 
-                # Desktop cursor tracks the mouse directly (with small 35px offset via CSS/logic usually, but let's assume direct for Desktop pointer).
-                # But we are testing the MOBILE application here (m/main.js), so the lens logic applies everywhere.
-                # Desktop cursor tracks the mouse directly (with small 35px offset via CSS/logic usually, but let's assume direct for Desktop pointer).
-                # But we are testing the MOBILE application here (m/main.js), so the lens logic applies everywhere.
-                # In desktop (main.js), the offset is slightly different but this script appears to be mainly tuned for testing both. Let's adapt if needed.
-                # Directly bypass DOM clicking and emit event in Phaser
-                # This bypasses any Playwright screen-size/lens calculation coordinate mismatches which are flaky
-                page.evaluate(f"""
+                dom_coords = page.evaluate(f"""
                     () => {{
                         const scene = window.game.scene.getScene('SectionHunt');
-                        const scale = scene.gameScale || scene.bgScale || 1;
-                        let pointer_x = {egg_x};
-                        let pointer_y = {egg_y};
+                        const canvas = document.querySelector('canvas');
+                        const rect = canvas.getBoundingClientRect();
+                        const isDesktop = !{str(is_mobile).lower()};
 
-                        if ({str(is_mobile).lower()}) {{
-                            // Mobile lens logic offset
-                            pointer_x = {egg_x} - (-97.5 * scale);
-                            pointer_y = {egg_y} - (-135 * scale);
-                        }} else {{
-                            // Desktop lens logic offset
-                            // On desktop, the global click handler in SectionHunt checks:
-                            // The lens center is exactly the pointer position.
-                            pointer_x = {egg_x};
-                            pointer_y = {egg_y};
-                        }}
+                        let domX, domY;
 
-                        // Provide activePointer to mock the pointer input accurately
-                        scene.input.activePointer.x = pointer_x;
-                        scene.input.activePointer.y = pointer_y;
-                        scene.input.activePointer.worldX = pointer_x;
-                        scene.input.activePointer.worldY = pointer_y;
-                        // On desktop (main.js) SectionHunt sets up global pointerdown on `this.input`
-                        scene.input.emit('pointerdown', scene.input.activePointer);
+                            // Ask Phaser directly for the exact screen coordinate bounds of the specific egg
+                            const eggId = scene.registry.get('eggData').find(e => e.x === {egg_x} && e.y === {egg_y})?.eggId;
+                            let eggObject = null;
+                            scene.eggs.getChildren().forEach(e => {{ if (e.getData('eggId') === eggId) eggObject = e; }});
 
-                        // For eggs themselves, which may have individual interactives, force collect
-                        scene.eggs.getChildren().forEach(egg => {{
-                            if (egg.getData('eggId') === scene.registry.get('eggData').find(e => e.x === {egg_x} && e.y === {egg_y}).eggId) {{
-                                scene.collectEgg(egg);
-                                egg.destroy();
-                                if (egg.symbolSprite) egg.symbolSprite.destroy();
+                            if (eggObject) {{
+                                const bounds = eggObject.getBounds();
+                                domX = rect.left + bounds.centerX;
+                                domY = rect.top + bounds.centerY;
+
+                                if (!isDesktop) {{
+                                    const lensOffsetX = -97.5 * (scene.gameScale || 1);
+                                    const lensOffsetY = -135 * (scene.gameScale || 1);
+                                    domX -= lensOffsetX;
+                                    domY -= lensOffsetY;
+                                    }} else {{
+                                        // The ONLY reason `bounds.centerX` isn't registering correctly via Playwright's physical mouse
+                                        // is because the `magnifyingGlass.setPosition(pointer.x - 15, pointer.y - 30)` logic
+                                        // in Desktop intercepts it or modifies the global pointer visually.
+                                        // WAIT. We discovered earlier that forcing `input.activePointer.x = pointer_x` and emitting worked.
+                                        // This means `pointer_x` must be EXACTLY `egg_x`.
+                                        // So what is the exact physical DOM pixel that maps to `egg.x`?
+                                        // In RESIZE mode where canvas spans 1280x720, `pointer_x` literally maps 1:1 with `clientX` inside the canvas.
+                                        // Let's try direct translation without offsets or bounds logic.
+                                        domX = rect.left + {egg_x};
+                                        domY = rect.top + {egg_y};
+                                    }}
+                            }} else {{
+                                domX = 0;
+                                domY = 0;
                             }}
-                        }});
+
+                        return {{
+                            x: domX,
+                            y: domY
+                        }};
                     }}
                 """)
+
+                dom_x = dom_coords['x']
+                dom_y = dom_coords['y']
+
+                viewport = page.viewport_size
+                if dom_x < 0 or dom_x > viewport['width'] or dom_y < 0 or dom_y > viewport['height']:
+                    # Cap boundaries instead of failing for minor edge bleeds
+                    dom_x = max(10, min(viewport['width'] - 10, dom_x))
+                    dom_y = max(10, min(viewport['height'] - 10, dom_y))
+                    print(f"WARN: Capped Physical DOM pointer interaction to ({dom_x}, {dom_y})")
+
+                # Move the mouse so the magnifying glass follows and visually frames it, then click.
+                # In Playwright, `tap` implicitly dispatches pointerdown, pointerup.
+                if is_mobile:
+                    page.touchscreen.tap(dom_x, dom_y)
+                else:
+                    page.mouse.move(dom_x, dom_y)
+                    time.sleep(0.2) # Briefly pause like a kid aiming the magnifying glass
+                    page.mouse.click(dom_x, dom_y)
 
                 time.sleep(0.5) # Wait for collection tween/logic
 
