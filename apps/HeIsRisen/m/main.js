@@ -2,7 +2,7 @@
 // Define total eggs as a variable to avoid hardcoding
 const TOTAL_EGGS = 60;
 
-function initializeGameData(registry, cache) {
+function initializeGameData(registry, cache, width = 844, height = 390) {
     const symbolsData = cache.json.get('symbols');
     if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
         // Pre-validate and inject into registry just as originally done in MainMenu
@@ -45,10 +45,7 @@ function initializeGameData(registry, cache) {
         const eggData = [];
         let eggIndex = 0;
 
-        // Use fallback static bounds if window is not available to prevent crashes during headless reset
-        const screenWidth = window.innerWidth || 844;
-        const screenHeight = window.innerHeight || 390;
-        const scale = Math.min(screenWidth / 1280, screenHeight / 720);
+        const scale = Math.min(width / 1280, height / 720);
 
         const sections = mapSections.map((section, index) => {
             const sectionEggs = eggs.slice(eggIndex, eggIndex + eggCounts[index]);
@@ -57,9 +54,9 @@ function initializeGameData(registry, cache) {
             sectionEggs.forEach(eggId => {
                 // Mobile layout viewport calculation with correct lens margin mappings
                 const minX = 50 * scale;
-                const maxX = Math.max(minX, screenWidth - (160 * scale));
+                const maxX = Math.max(minX, width - (160 * scale));
                 const minY = 50 * scale;
-                const maxY = Math.max(minY, screenHeight - (200 * scale));
+                const maxY = Math.max(minY, height - (200 * scale));
 
                 const x = Phaser.Math.Between(minX, maxX);
                 const y = Phaser.Math.Between(minY, maxY);
@@ -569,7 +566,7 @@ class MainMenu extends Phaser.Scene {
 
       // Load and validate symbols and map sections
       if (!this.registry.has('eggData')) {
-          initializeGameData(this.registry, this.cache);
+          initializeGameData(this.registry, this.cache, this.game.config.width, this.game.config.height);
       }
 
       // Debug: Log game dimensions and scale
@@ -577,11 +574,7 @@ class MainMenu extends Phaser.Scene {
 
       // Set camera bounds to match viewport
       this.cameras.main.setBounds(0, 0, this.game.config.width, this.game.config.height);
-      requestAnimationFrame(() => {
-          if (this.cameras && this.cameras.main) {
-              try { this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height); } catch(e) {}
-          }
-      });
+      this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height);
       this.cameras.main.setPosition(0, 0);
 
       // Debug: Log camera position
@@ -889,11 +882,7 @@ class MapScene extends Phaser.Scene {
 
     // Set camera bounds to match viewport
     this.cameras.main.setBounds(0, 0, this.game.config.width, this.game.config.height);
-    requestAnimationFrame(() => {
-        if (this.cameras && this.cameras.main) {
-            try { this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height); } catch(e) {}
-        }
-    });
+    this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height);
     this.cameras.main.setPosition(0, 0);
 
     // NEW: Retrieve existing eggData and sections from registry
@@ -2187,7 +2176,7 @@ class EggZamRoom extends Phaser.Scene {
 
           const triggerRestart = () => {
               if (this.input.setDefaultCursor) this.input.setDefaultCursor('default');
-              initializeGameData(this.registry, this.cache);
+              initializeGameData(this.registry, this.cache, this.game.config.width, this.game.config.height);
               this.scene.start('MapScene');
           };
 
@@ -2388,21 +2377,13 @@ function resizeGame() {
     if (scene.gameScale) scene.gameScale = scale;
     if (scene.cameras && scene.cameras.main) {
       scene.cameras.main.setBounds(0, 0, width, height);
-      requestAnimationFrame(() => {
-          if (scene.cameras && scene.cameras.main) {
-              try { scene.cameras.main.setViewport(0, 0, width, height); } catch(e) {}
-          }
-      });
+      scene.cameras.main.setViewport(0, 0, width, height);
       scene.cameras.main.setPosition(0, 0);
     }
     if (scene.scene.key === 'MainMenu') {
       if (scene.introVideo) {
         scene.introVideo.setPosition(width / 2, height / 2);
-        requestAnimationFrame(() => {
-            if (scene.introVideo && scene.introVideo.active) {
-                try { scene.introVideo.setDisplaySize(width, height); } catch (e) {}
-            }
-        });
+        scene.introVideo.setDisplaySize(width, height);
       }
       if (scene.startBtnContainer) {
         scene.startBtnContainer.setPosition(width / 2, 580 * scale);
