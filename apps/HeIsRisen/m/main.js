@@ -861,7 +861,15 @@ class MainMenu extends Phaser.Scene {
     // Ensure video size is correct once texture loads
     if (this.introVideo && this.introVideo.active && this.introVideo.width > 0) {
         if (Math.abs(this.introVideo.displayWidth - this.game.config.width) > 10) {
-            this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height);
+            if (this.sys.game.renderer && this.sys.game.renderer.gl) {
+                this.time.delayedCall(200, () => {
+                    if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
+                        try { this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height); } catch(e) {}
+                    }
+                });
+            } else {
+                try { this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height); } catch(e) {}
+            }
         }
     }
   }
@@ -2407,7 +2415,16 @@ function resizeGame() {
     if (scene.scene.key === 'MainMenu') {
       if (scene.introVideo) {
         scene.introVideo.setPosition(width / 2, height / 2);
-        scene.introVideo.setDisplaySize(width, height);
+
+        if (scene.sys.game.renderer && scene.sys.game.renderer.gl) {
+            scene.time.delayedCall(200, () => {
+                if (scene.introVideo && scene.introVideo.active && scene.introVideo.texture) {
+                    try { scene.introVideo.setDisplaySize(width, height); } catch(e) {}
+                }
+            });
+        } else {
+            try { scene.introVideo.setDisplaySize(width, height); } catch(e) {}
+        }
       }
       if (scene.startBtnContainer) {
         scene.startBtnContainer.setPosition(width / 2, 580 * scale);
