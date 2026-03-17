@@ -1704,7 +1704,10 @@ class SectionHunt extends Phaser.Scene {
     this.zoomedView.draw(this.renderStamp, this.renderStamp.x, this.renderStamp.y);
 
     // Single pass for visibility update and drawing
-    this.eggs.getChildren().forEach(egg => {
+    // Bolt Optimization: Replace forEach with standard for loop in update to avoid GC overhead
+    const eggsArray = this.eggs.getChildren();
+    for (let i = 0; i < eggsArray.length; i++) {
+      const egg = eggsArray[i];
       if (egg && egg.active) {
           // Update visibility based on LENS visual position
           // If the egg is under the lens (visual), it should be visible in the zoomed view.
@@ -1740,12 +1743,14 @@ class SectionHunt extends Phaser.Scene {
              }
           }
       }
-    });
+    }
 
     // Handle Button Hover and Cursor Swap
     let isHoveringButton = false;
 
-    this.uiButtons.forEach(btn => {
+    // Bolt Optimization: Replace forEach with standard for loop in update
+    for (let i = 0; i < this.uiButtons.length; i++) {
+        const btn = this.uiButtons[i];
         if (btn && btn.active) {
              // Store base scale if not already stored
              if (btn.baseScaleX === undefined) btn.baseScaleX = btn.scaleX;
@@ -1779,7 +1784,7 @@ class SectionHunt extends Phaser.Scene {
                  }
              }
         }
-    });
+    }
 
     if (isHoveringButton) {
         if (this.magnifyingGlass) this.magnifyingGlass.setVisible(false);

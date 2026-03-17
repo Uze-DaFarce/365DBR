@@ -1715,7 +1715,10 @@ class SectionHunt extends Phaser.Scene {
     // Visibility check: If egg is within the visual lens radius (pointer)
     const lensRadiusSq = (lensDiameter / 2) * (lensDiameter / 2);
 
-    this.eggs.getChildren().forEach(egg => {
+    // Bolt Optimization: Replace forEach with standard for loop in update to avoid GC overhead
+    const eggsArray = this.eggs.getChildren();
+    for (let i = 0; i < eggsArray.length; i++) {
+      const egg = eggsArray[i];
       if (egg && egg.active) {
         // Check distance to the POINTER (center of lens view)
         const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
@@ -1750,7 +1753,7 @@ class SectionHunt extends Phaser.Scene {
             }
         }
       }
-    });
+    }
 
     // Robust scaling check for Video in SectionHunt
     if (this.isUsingVideo && this.sectionVideo && this.sectionVideo.active) {
