@@ -313,3 +313,6 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 ## 2026-03-16 - Semantic Wrappers for Full-Screen Apps
 **Learning:** Even fully Canvas-rendered apps (like Phaser games) benefit from `<main>` semantic wrappers and `<noscript>` tags at the HTML level. It provides structure for screen readers and graceful degradation for users without JS without disrupting the game container.
 **Action:** Always wrap `#game` or `#game-container` in `<main>` when scaffolding new Phaser apps in the monorepo, and provide a `<noscript>` styled fallback.
+## 2024-03-17 - [Native feel for Canvas HTML5 Games]
+**Learning:** Adding `user-select: none` and `touch-action: none` (or `-webkit-tap-highlight-color: transparent`) to the CSS body or canvas container of a fullscreen HTML5 game prevents accidental text selection highlights and tap-highlight flashes on mobile devices.
+**Action:** Always apply these CSS rules to HTML5 canvas games to make the game feel like a native app and improve the interactive UX.

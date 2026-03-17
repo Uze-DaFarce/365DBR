@@ -5,6 +5,9 @@ body {
   overflow: hidden; /* Prevent scrollbars */
   width: 100vw;
   height: 100vh;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #game {
