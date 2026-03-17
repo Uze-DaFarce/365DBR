@@ -55,6 +55,7 @@ function initializeGameData(registry, cache) {
             eggIndex += eggCounts[index];
 
             sectionEggs.forEach(eggId => {
+                // Mobile layout viewport calculation with correct lens margin mappings
                 const minX = 50 * scale;
                 const maxX = Math.max(minX, screenWidth - (160 * scale));
                 const minY = 50 * scale;
@@ -68,7 +69,7 @@ function initializeGameData(registry, cache) {
                     section: section.name,
                     x: x,
                     y: y,
-                    symbol: shuffledSymbols[eggId - 1] || null, // Mobile app guarantees 60 index mappings
+                    symbol: shuffledSymbols[eggId - 1] || null, // Guarantees strictly uniform unique symbols mapped from 1..60
                     collected: false
                 });
             });
@@ -462,7 +463,7 @@ class MainMenu extends Phaser.Scene {
     this.load.json('symbols', 'assets/symbols.json');
     this.load.json('map_sections', 'assets/map/map_sections.json'); // NEW: Preload map_sections.json
     this.load.video('intro-video', 'assets/video/HeIsRisen-Intro.mp4');
-    this.load.video('level-complete', 'assets/video/level-complete.mp4');
+    this.load.video('level-complete', 'assets/video/level-complete.webm');
     this.load.image('level-complete-stamp', 'assets/objects/level-complete-stamp.png');
     this.load.image('finger-cursor', 'assets/cursor/pointer-finger-pointer.png');
 
@@ -576,7 +577,11 @@ class MainMenu extends Phaser.Scene {
 
       // Set camera bounds to match viewport
       this.cameras.main.setBounds(0, 0, this.game.config.width, this.game.config.height);
-      this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height);
+      requestAnimationFrame(() => {
+          if (this.cameras && this.cameras.main) {
+              try { this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height); } catch(e) {}
+          }
+      });
       this.cameras.main.setPosition(0, 0);
 
       // Debug: Log camera position
@@ -884,7 +889,11 @@ class MapScene extends Phaser.Scene {
 
     // Set camera bounds to match viewport
     this.cameras.main.setBounds(0, 0, this.game.config.width, this.game.config.height);
-    this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height);
+    requestAnimationFrame(() => {
+        if (this.cameras && this.cameras.main) {
+            try { this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height); } catch(e) {}
+        }
+    });
     this.cameras.main.setPosition(0, 0);
 
     // NEW: Retrieve existing eggData and sections from registry
@@ -1014,18 +1023,11 @@ class MapScene extends Phaser.Scene {
               stampVideo.setOrigin(0.5, 0.5);
               stampVideo.setDepth(2);
               stampVideo.disableInteractive();
-              stampVideo.setBlendMode(Phaser.BlendModes.MULTIPLY);
-              const updateStampSize = () => {
-                  // Offset the video slightly up so it visually matches the stamp image
-                  stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
 
-                  // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
-                  // We must wait for the video metadata to load to get its intrinsic height,
-                  // but we can set a fallback or set scale immediately based on a standard 1080p/720p assumption if needed.
-                  // Wait, Phaser Video objects have a default size of 256x256 before load.
-                  // To be safe, we can apply the scale based on the thumbnail's physical displayHeight.
-                  // Since video height might be 0 initially, we use a fallback of 720 (standard height).
-                  const intrinsicHeight = stampVideo.height || 720;
+              const updateStampSize = () => {
+                  stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
+                  // Use video.videoHeight for webm intrinsic sizes if available, fallback to phaser width or default 720
+                  const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
                   stampVideo.setScale(calculatedScale);
@@ -1037,6 +1039,11 @@ class MapScene extends Phaser.Scene {
 
               const sfxVol = this.registry.get('sfxVolume') !== undefined ? this.registry.get('sfxVolume') : 0.5;
               stampVideo.setVolume(sfxVol);
+
+              stampVideo.on('play', () => {
+                  updateStampSize();
+              });
+
               stampVideo.play();
 
               stampedSections.push(section.name);
@@ -2381,13 +2388,21 @@ function resizeGame() {
     if (scene.gameScale) scene.gameScale = scale;
     if (scene.cameras && scene.cameras.main) {
       scene.cameras.main.setBounds(0, 0, width, height);
-      scene.cameras.main.setViewport(0, 0, width, height);
+      requestAnimationFrame(() => {
+          if (scene.cameras && scene.cameras.main) {
+              try { scene.cameras.main.setViewport(0, 0, width, height); } catch(e) {}
+          }
+      });
       scene.cameras.main.setPosition(0, 0);
     }
     if (scene.scene.key === 'MainMenu') {
       if (scene.introVideo) {
         scene.introVideo.setPosition(width / 2, height / 2);
-        scene.introVideo.setDisplaySize(width, height);
+        requestAnimationFrame(() => {
+            if (scene.introVideo && scene.introVideo.active) {
+                try { scene.introVideo.setDisplaySize(width, height); } catch (e) {}
+            }
+        });
       }
       if (scene.startBtnContainer) {
         scene.startBtnContainer.setPosition(width / 2, 580 * scale);
