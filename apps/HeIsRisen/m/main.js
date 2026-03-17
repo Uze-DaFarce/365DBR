@@ -464,7 +464,7 @@ class MainMenu extends Phaser.Scene {
     this.load.json('symbols', 'assets/symbols.json');
     this.load.json('map_sections', 'assets/map/map_sections.json'); // NEW: Preload map_sections.json
     this.load.video('intro-video', 'assets/video/HeIsRisen-Intro.mp4');
-    this.load.video('level-complete', 'assets/video/level-complete.mp4');
+    this.load.video('level-complete', 'assets/video/level-complete.webm');
     this.load.image('level-complete-stamp', 'assets/objects/level-complete-stamp.png');
     this.load.image('finger-cursor', 'assets/cursor/pointer-finger-pointer.png');
 
@@ -1016,18 +1016,11 @@ class MapScene extends Phaser.Scene {
               stampVideo.setOrigin(0.5, 0.5);
               stampVideo.setDepth(2);
               stampVideo.disableInteractive();
-              stampVideo.setBlendMode(Phaser.BlendModes.MULTIPLY);
-              const updateStampSize = () => {
-                  // Offset the video slightly up so it visually matches the stamp image
-                  stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
 
-                  // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
-                  // We must wait for the video metadata to load to get its intrinsic height,
-                  // but we can set a fallback or set scale immediately based on a standard 1080p/720p assumption if needed.
-                  // Wait, Phaser Video objects have a default size of 256x256 before load.
-                  // To be safe, we can apply the scale based on the thumbnail's physical displayHeight.
-                  // Since video height might be 0 initially, we use a fallback of 720 (standard height).
-                  const intrinsicHeight = stampVideo.height || 720;
+              const updateStampSize = () => {
+                  stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
+                  // Use video.videoHeight for webm intrinsic sizes if available, fallback to phaser width or default 720
+                  const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
                   stampVideo.setScale(calculatedScale);
@@ -1039,6 +1032,11 @@ class MapScene extends Phaser.Scene {
 
               const sfxVol = this.registry.get('sfxVolume') !== undefined ? this.registry.get('sfxVolume') : 0.5;
               stampVideo.setVolume(sfxVol);
+
+              stampVideo.on('play', () => {
+                  updateStampSize();
+              });
+
               stampVideo.play();
 
               stampedSections.push(section.name);
