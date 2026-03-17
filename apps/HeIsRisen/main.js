@@ -403,7 +403,14 @@ class MainMenu extends Phaser.Scene {
     this.load.json('symbols', 'assets/symbols.json');
     this.load.json('map_sections', 'assets/map/map_sections.json');
     this.load.video('intro-video', 'assets/video/HeIsRisen-Intro.mp4');
-    this.load.video('level-complete', 'assets/video/level-complete.webm');
+
+    // Intentional fix for "Framebuffer status: Incomplete Attachment" WebGL crash.
+    // Do NOT preload `level-complete.webm` here. WebM alpha channels frequently cache with
+    // 0x0 intrinsic dimensions in generic desktop/headless browsers.
+    // When the user clicks "Start" and triggers `this.scale.startFullscreen()`, a global `resize` event fires,
+    // forcing Phaser to rebuild framebuffers for ALL cached video textures. A 0x0 texture crashes the entire renderer.
+    // By deferring the load to `MapScene.preload()`, the WebGL cache is empty during the critical `MainMenu` resize.
+
     this.load.image('level-complete-stamp', 'assets/objects/level-complete-stamp.png');
     this.load.image('finger-cursor', 'assets/cursor/pointer-finger-pointer.png');
 
@@ -506,15 +513,11 @@ class MainMenu extends Phaser.Scene {
     // Note: introVideo.width might be 0 initially if not fully loaded metadata
     // We should rely on resize or use displayWidth/displayHeight if set
 
-    const iWidth = introVideo.video?.videoWidth || introVideo.width || 0;
-    const iHeight = introVideo.video?.videoHeight || introVideo.height || 0;
-    if (iWidth > 0 && iHeight > 0) {
-        const scaleX = width / iWidth;
-        const scaleY = height / iHeight;
+    if (introVideo.width > 0) {
+        const scaleX = width / introVideo.width;
+        const scaleY = height / introVideo.height;
         const videoScale = Math.max(scaleX, scaleY);
-        if (!isNaN(videoScale) && isFinite(videoScale) && videoScale > 0) {
-            introVideo.setScale(videoScale);
-        }
+        introVideo.setScale(videoScale);
     } else {
         // Fallback or wait for texture
         // We will rely on resize event which fires or we can force a resize check in update/timeout
@@ -782,16 +785,11 @@ class MainMenu extends Phaser.Scene {
       if (this.introVideo && this.introVideo.active) {
           this.introVideo.setPosition(width/2, height/2);
           // Only scale if we have valid dimensions
-          const iWidth = this.introVideo.video?.videoWidth || this.introVideo.width || 0;
-          const iHeight = this.introVideo.video?.videoHeight || this.introVideo.height || 0;
-          if (iWidth > 0 && iHeight > 0) {
-              const scaleX = width / iWidth;
-              const scaleY = height / iHeight;
+          if (this.introVideo.width > 0 && this.introVideo.height > 0) {
+              const scaleX = width / this.introVideo.width;
+              const scaleY = height / this.introVideo.height;
               const videoScale = Math.max(scaleX, scaleY);
-              // Avoid zero scale which triggers Incomplete Attachment in WebGL
-              if (!isNaN(videoScale) && isFinite(videoScale) && videoScale > 0) {
-                  this.introVideo.setScale(videoScale);
-              }
+              this.introVideo.setScale(videoScale);
           }
       }
 
@@ -821,18 +819,17 @@ class MainMenu extends Phaser.Scene {
        }
 
        // Ensure scaled if dimensions valid
-       const iWidth = this.introVideo.video?.videoWidth || this.introVideo.width || 0;
-       const iHeight = this.introVideo.video?.videoHeight || this.introVideo.height || 0;
-       if (iWidth > 0 && iHeight > 0) {
+       if (this.introVideo.width > 0 && this.introVideo.height > 0) {
            const width = this.scale.width;
            const height = this.scale.height;
-           const scaleX = width / iWidth;
-           const scaleY = height / iHeight;
+           const scaleX = width / this.introVideo.width;
+           const scaleY = height / this.introVideo.height;
            const desiredScale = Math.max(scaleX, scaleY);
 
            // If current scale is default (1) but desired is different, apply it
            // Use a small epsilon to avoid float jitter
-           if (!isNaN(desiredScale) && isFinite(desiredScale) && desiredScale > 0 && Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
+           if (Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
+               console.log(`MainMenu: Applying delayed scale. Video: ${this.introVideo.width}x${this.introVideo.height}, Screen: ${width}x${height}, Scale: ${desiredScale}`);
                this.introVideo.setScale(desiredScale);
            }
        }
@@ -843,6 +840,12 @@ class MainMenu extends Phaser.Scene {
 class MapScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MapScene' });
+  }
+
+  preload() {
+    // The only bulletproof fix for the WebM Framebuffer WebGL crash. Load this right before it's needed
+    // rather than at global initialization where user interaction/resizing destroys the rendering context.
+    this.load.video('level-complete', 'assets/video/level-complete.webm');
   }
 
   create() {
@@ -2281,7 +2284,6 @@ function addTooltip(scene, object, text) {
 // Game configuration
 const config = {
   type: Phaser.AUTO,
-  transparent: true, // Fix WebM framebuffer attachments rendering black backgrounds natively
   scale: {
       mode: Phaser.Scale.RESIZE, // Fill the window
       parent: 'game',
@@ -2289,10 +2291,9 @@ const config = {
       height: '100%'
   },
   render: {
-      // Incomplete Attachment on resize often occurs when the canvas is resized to 0x0
-      // or if there's a WebGL state desync during fullscreen. We explicitly configure gl vars if needed.
-      // But typically, clearing before render solves dirty framebuffers.
-      clearBeforeRender: true
+      // Must be true to allow headless screenshotting of the WebGL Canvas (like in Playwright)
+      // Otherwise the buffer is cleared immediately after being drawn to the screen, resulting in black pngs.
+      preserveDrawingBuffer: true
   },
   scene: [MainMenu, MapScene, SectionHunt, EggZamRoom, MusicScene, UIScene, CursorScene],
   parent: 'game',

@@ -376,7 +376,7 @@ class MainMenu extends Phaser.Scene {
     this.load.json('symbols', 'assets/symbols.json');
     this.load.json('map_sections', 'assets/map/map_sections.json'); // NEW: Preload map_sections.json
     this.load.video('intro-video', 'assets/video/HeIsRisen-Intro.mp4');
-    this.load.video('level-complete', 'assets/video/level-complete.webm');
+    // Mirroring Desktop's WebM framebuffer crash fix by deferring the load to MapScene.
     this.load.image('level-complete-stamp', 'assets/objects/level-complete-stamp.png');
     this.load.image('finger-cursor', 'assets/cursor/pointer-finger-pointer.png');
 
@@ -878,7 +878,8 @@ class MapScene extends Phaser.Scene {
 
   preload() {
     this.load.image('new-map', 'assets/map/new-map.png');
-    // Common assets like 'finger-cursor', 'eggs-ammin-haul', 'score' are preloaded in MainMenu
+    // Load the webm right before it is needed to prevent global WebGL framebuffer crashes
+    this.load.video('level-complete', 'assets/video/level-complete.webm');
   }
 
   create() {
@@ -1017,12 +1018,12 @@ class MapScene extends Phaser.Scene {
 
       if (isCompleted) {
           if (!stampedSections.includes(section.name)) {
-              // FIRST MULTIPLY: Play the video
+              // FIRST TIME COMPLETE: Play the video
               const stampVideo = this.add.video(thumb.x, thumb.y, 'level-complete');
               stampVideo.setOrigin(0.5, 0.5);
               stampVideo.setDepth(2);
               stampVideo.disableInteractive();
-              stampVideo.setBlendMode(Phaser.BlendModes.MULTIPLY);
+              // User Instruction: REMOVE MULTIPLY to test native webm transparency
 
               const updateStampSize = () => {
                   stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
@@ -2223,13 +2224,16 @@ function getViewportDimensions() {
 const { width, height } = getViewportDimensions();
 const config = {
   type: Phaser.AUTO,
-  transparent: true,
   width: width,
   height: height,
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     parent: 'game-container',
+  },
+  render: {
+    // Must be true to allow headless screenshotting of the WebGL Canvas (like in Playwright)
+    preserveDrawingBuffer: true
   },
   scene: [MainMenu, MapScene, SectionHunt, EggZamRoom, MusicScene, UIScene],
   backgroundColor: '#000000',

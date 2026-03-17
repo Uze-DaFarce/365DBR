@@ -34,12 +34,21 @@ def test_level_finish_video(is_mobile=False):
 
     try:
         with sync_playwright() as p:
+            # Add specific args to ensure WebGL/Canvas renders correctly in headless environments
+            launch_args = [
+                '--disable-gpu',
+                '--use-gl=angle',
+                '--use-angle=swiftshader',
+                '--enable-webgl',
+                '--ignore-gpu-blocklist',
+            ]
+
             if is_mobile:
                 iphone = p.devices['iPhone 12']
-                browser = p.chromium.launch(headless=True)
+                browser = p.chromium.launch(headless=True, args=launch_args)
                 context = browser.new_context(**iphone, record_video_dir="verification/video")
             else:
-                browser = p.chromium.launch(headless=True)
+                browser = p.chromium.launch(headless=True, args=launch_args)
                 context = browser.new_context(viewport={'width': 1280, 'height': 720}, record_video_dir="verification/video")
 
             page = context.new_page()
@@ -176,6 +185,9 @@ def test_level_finish_video(is_mobile=False):
 
             print("Level complete. Waiting for completion logic to navigate to MapScene automatically...")
 
+            # Since the completion logic has a dramatic fade and transition, we must wait for it to actually show
+            time.sleep(4)
+
             # Wait specifically for the stamp video to start playing in MapScene
             try:
                 page.wait_for_function("""
@@ -190,23 +202,35 @@ def test_level_finish_video(is_mobile=False):
                 page.evaluate("() => window.game.scene.getScenes(true)[0].scene.start('MapScene')")
                 time.sleep(2)
 
-            time.sleep(1.0) # Wait just a little into the playback
+            time.sleep(1.5) # Wait just a little into the playback
 
             print("Capturing screenshot of the MapScene with the video playing...")
             context_type = "mobile" if is_mobile else "desktop"
-            screenshot_path = f"verification/level_finish_{context_type}.png"
+            screenshot_path = f"verification/level_finish_{context_type}.jpeg"
+
+            # Wait for any active camera fades to finish before capturing screenshot (prevents black screens)
+            page.evaluate("""
+                () => new Promise(resolve => {
+                    const scene = window.game.scene.getScene('MapScene');
+                    if (scene && scene.cameras.main.fadeEffect.isRunning) {
+                        scene.cameras.main.once('camerafadeincomplete', resolve);
+                    } else {
+                        resolve();
+                    }
+                })
+            """)
 
             # Using full page screenshot and wait for rendering fixes black image captures in some headless environments
             # Add an element specific screenshot to guarantee capture
             page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
-            page.evaluate("() => window.dispatchEvent(new Event('resize'))")
             time.sleep(0.5)
 
             try:
-                # Explicitly omit headless alpha issues on linux
-                page.screenshot(path=screenshot_path, type="jpeg")
+                # Capture specifically the canvas element to prevent full_page capturing background HTML over the WebGL context
+                canvas = page.locator("canvas").first
+                canvas.screenshot(path=screenshot_path, type="jpeg")
             except Exception as e:
-                page.screenshot(path=screenshot_path)
+                page.screenshot(path=screenshot_path, full_page=False)
 
             # Wait a few seconds for the video to play out in the recording
             time.sleep(4)
