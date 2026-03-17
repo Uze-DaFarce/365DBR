@@ -796,7 +796,16 @@ class MainMenu extends Phaser.Scene {
               const scaleX = width / this.introVideo.width;
               const scaleY = height / this.introVideo.height;
               const videoScale = Math.max(scaleX, scaleY);
-              this.introVideo.setScale(videoScale);
+
+              if (this.sys.game.renderer && this.sys.game.renderer.gl) {
+                  this.time.delayedCall(200, () => {
+                      if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
+                          try { this.introVideo.setScale(videoScale); } catch(e) {}
+                      }
+                  });
+              } else {
+                  try { this.introVideo.setScale(videoScale); } catch(e) {}
+              }
           }
       }
 
@@ -837,7 +846,18 @@ class MainMenu extends Phaser.Scene {
            // Use a small epsilon to avoid float jitter
            if (Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
                console.log(`MainMenu: Applying delayed scale. Video: ${this.introVideo.width}x${this.introVideo.height}, Screen: ${width}x${height}, Scale: ${desiredScale}`);
-               this.introVideo.setScale(desiredScale);
+
+               // Avoid forcefully changing the scale if the webgl context isn't ready
+               // This prevents the 'Framebuffer status: Incomplete Attachment' crash
+               if (this.sys.game.renderer && this.sys.game.renderer.gl) {
+                   this.time.delayedCall(200, () => {
+                       if (this.introVideo && this.introVideo.active && this.introVideo.texture) {
+                           try { this.introVideo.setScale(desiredScale); } catch(e) {}
+                       }
+                   });
+               } else {
+                   try { this.introVideo.setScale(desiredScale); } catch(e) {}
+               }
            }
        }
     }
