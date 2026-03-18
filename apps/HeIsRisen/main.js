@@ -1319,7 +1319,10 @@ class SectionHunt extends Phaser.Scene {
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50, 75);
     this.tweens.add({
         targets: eggSprite,
-        y: y - 60,
+        y: y - 100,
+        scaleX: eggSprite.scaleX * 1.5,
+        scaleY: eggSprite.scaleY * 1.5,
+        angle: 360,
         alpha: 0,
         duration: 1000,
         ease: 'Power1',
@@ -1331,7 +1334,10 @@ class SectionHunt extends Phaser.Scene {
         const symSprite = this.add.image(x, y, symbolTexture).setDepth(21).setDisplaySize(50, 75);
         this.tweens.add({
             targets: symSprite,
-            y: y - 60,
+            y: y - 100,
+            scaleX: symSprite.scaleX * 1.5,
+            scaleY: symSprite.scaleY * 1.5,
+            angle: 360,
             alpha: 0,
             duration: 1000,
             ease: 'Power1',
@@ -1349,7 +1355,9 @@ class SectionHunt extends Phaser.Scene {
 
     this.tweens.add({
         targets: feedback,
-        y: y - 100,
+        y: y - 120,
+        scaleX: 1.2,
+        scaleY: 1.2,
         alpha: 0,
         duration: 1000,
         ease: 'Power1',
