@@ -472,7 +472,7 @@ class MainMenu extends Phaser.Scene {
     this.load.json('symbols', 'assets/symbols.json');
     this.load.json('map_sections', 'assets/map/map_sections.json');
     this.load.video('intro-video', 'assets/video/HeIsRisen-Intro.mp4');
-    this.load.video('level-complete', 'assets/video/level-complete.webm');
+    this.load.video('level-complete', 'assets/video/level-complete.mp4');
     this.load.image('level-complete-stamp', 'assets/objects/level-complete-stamp.png');
     this.load.image('finger-cursor', 'assets/cursor/pointer-finger-pointer.png');
 
@@ -670,8 +670,16 @@ class MainMenu extends Phaser.Scene {
         }
 
         // Request Fullscreen (Desktop logic)
+        const safeRequestFullscreen = (element) => {
+            if (element.requestFullscreen) {
+                element.requestFullscreen().catch(err => {}); // console.log('Fullscreen failed:', err));
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen().catch(err => {}); // console.log('Fullscreen failed:', err));
+            }
+        };
+
         if (this.scale.fullscreen.available) {
-            try { this.scale.startFullscreen(); } catch (e) {}
+            safeRequestFullscreen(document.documentElement);
         }
 
         // Show Play Button almost immediately (short delay for visual transition)
@@ -988,30 +996,33 @@ class MapScene extends Phaser.Scene {
               stampVideo.setOrigin(0.5, 0.5);
               stampVideo.setDepth(2);
               stampVideo.disableInteractive();
-              // Retain MULTIPLY on desktop as requested, but we should make sure it actually plays and has dimensions.
               stampVideo.setBlendMode(Phaser.BlendModes.MULTIPLY);
 
-              // We must wait for the video metadata to load before scaling reliably, especially for webm which
-              // sometimes defers resolution until the first frame is decoded in headless browsers
               const updateStampSize = () => {
+                  // Offset the video slightly up so it visually matches the stamp image
                   stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
-                  const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
+
+                  // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
+                  // We must wait for the video metadata to load to get its intrinsic height,
+                  // but we can set a fallback or set scale immediately based on a standard 1080p/720p assumption if needed.
+                  // Wait, Phaser Video objects have a default size of 256x256 before load.
+                  // To be safe, we can apply the scale based on the thumbnail's physical displayHeight.
+                  // Since video height might be 0 initially, we use a fallback of 720 (standard height).
+                  const intrinsicHeight = stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
                   stampVideo.setScale(calculatedScale);
               };
               updateStampSize();
 
+              // Fallback: If metadata loads later, ensure it resizes correctly
+              stampVideo.once('metadata', updateStampSize);
+
               if (!this.stamps) this.stamps = [];
               this.stamps.push({ video: stampVideo, thumb: thumb });
 
               const sfxVol = this.registry.get('sfxVolume') !== undefined ? this.registry.get('sfxVolume') : 0.5;
               stampVideo.setVolume(sfxVol);
-
-              stampVideo.on('play', () => {
-                  updateStampSize();
-              });
-
               stampVideo.play();
 
               stampedSections.push(section.name);
