@@ -2269,6 +2269,7 @@ function getViewportDimensions() {
 const { width, height } = getViewportDimensions();
 const config = {
   type: Phaser.AUTO,
+  transparent: true,
   width: width,
   height: height,
   scale: {
