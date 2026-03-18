@@ -671,7 +671,22 @@ class MainMenu extends Phaser.Scene {
 
         // Request Fullscreen (Desktop logic)
         if (this.scale.fullscreen.available) {
-            this.scale.startFullscreen();
+            const attemptFullscreen = () => {
+                let allReady = true;
+                if (this.introVideo && this.introVideo.video && this.introVideo.video.videoWidth === 0) allReady = false;
+
+                // We MUST also wait for preloaded .webm videos in the cache to resolve their dimensions,
+                // otherwise WebGLRenderer will crash on 'Framebuffer status: Incomplete Attachment' during the resize event.
+                const levelComplete = this.cache.video.get('level-complete');
+                if (levelComplete && levelComplete.videoWidth === 0) allReady = false;
+
+                if (allReady) {
+                    try { this.scale.startFullscreen(); } catch (e) {}
+                } else {
+                    this.time.delayedCall(50, attemptFullscreen);
+                }
+            };
+            attemptFullscreen();
         }
 
         // Show Play Button almost immediately (short delay for visual transition)
@@ -798,19 +813,24 @@ class MainMenu extends Phaser.Scene {
       const height = gameSize.height;
 
       if (this.cameras && this.cameras.main) {
-          this.cameras.main.setViewport(0, 0, width, height);
+          // Use requestAnimationFrame to defer the viewport update until after the WebGL context
+          // has completely re-allocated the framebuffers for the new window size.
+          // This prevents the 'Framebuffer status: Incomplete Attachment' crash.
+          requestAnimationFrame(() => {
+              if (this.cameras && this.cameras.main) {
+                  try { this.cameras.main.setViewport(0, 0, width, height); } catch (e) {}
+              }
+          });
       }
 
       if (this.introVideo && this.introVideo.active) {
           this.introVideo.setPosition(width/2, height/2);
-          // Only scale if we have valid dimensions and avoid 0/NaN scale which causes WebGL Framebuffer crashes
+          // Only scale if we have valid dimensions
           if (this.introVideo.width > 0 && this.introVideo.height > 0) {
               const scaleX = width / this.introVideo.width;
               const scaleY = height / this.introVideo.height;
               const videoScale = Math.max(scaleX, scaleY);
-              if (videoScale > 0 && !isNaN(videoScale)) {
-                  this.introVideo.setScale(videoScale);
-              }
+              this.introVideo.setScale(videoScale);
           }
       }
 
@@ -1001,13 +1021,10 @@ class MapScene extends Phaser.Scene {
               // sometimes defers resolution until the first frame is decoded in headless browsers
               const updateStampSize = () => {
                   stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
-                  const videoHasDims = stampVideo.video && stampVideo.video.videoHeight > 0;
-                  if (videoHasDims) {
-                      const intrinsicHeight = stampVideo.video.videoHeight;
-                      const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
-                      const calculatedScale = targetHeight / intrinsicHeight;
-                      if (calculatedScale > 0 && !isNaN(calculatedScale)) stampVideo.setScale(calculatedScale);
-                  }
+                  const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
+                  const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
+                  const calculatedScale = targetHeight / intrinsicHeight;
+                  stampVideo.setScale(calculatedScale);
               };
               updateStampSize();
 
@@ -1097,7 +1114,11 @@ class MapScene extends Phaser.Scene {
 
   updateLayout(width, height) {
       if (this.cameras && this.cameras.main) {
-          this.cameras.main.setViewport(0, 0, width, height);
+          requestAnimationFrame(() => {
+              if (this.cameras && this.cameras.main) {
+                  try { this.cameras.main.setViewport(0, 0, width, height); } catch (e) {}
+              }
+          });
       }
 
       // Calculate scale to COVER based on native map size, not forced 1280x720
@@ -1155,13 +1176,9 @@ class MapScene extends Phaser.Scene {
                   item.video.setPosition(item.thumb.x, item.thumb.y + offsetY);
 
                   // Cover thumbnail height + 25%, maintaining intrinsic stamp ratio
-                  const hasDims = item.video.type === 'Video' ? (item.video.video && item.video.video.videoHeight > 0) : (item.video.height > 0);
-                  if (hasDims) {
-                      const intrinsicHeight = item.video.type === 'Video' ? item.video.video.videoHeight : item.video.height;
-                      const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
-                      const calcScale = targetHeight / intrinsicHeight;
-                      if (calcScale > 0 && !isNaN(calcScale)) item.video.setScale(calcScale);
-                  }
+                  const intrinsicHeight = item.video.height || 720;
+                  const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
+                  item.video.setScale(targetHeight / intrinsicHeight);
               }
           });
       }
@@ -1589,7 +1606,11 @@ class SectionHunt extends Phaser.Scene {
       const height = gameSize.height;
 
       if (this.cameras && this.cameras.main) {
-          this.cameras.main.setViewport(0, 0, width, height);
+          requestAnimationFrame(() => {
+              if (this.cameras && this.cameras.main) {
+                  try { this.cameras.main.setViewport(0, 0, width, height); } catch (e) {}
+              }
+          });
       }
 
       const scaleX = width / 1280;
@@ -1603,9 +1624,7 @@ class SectionHunt extends Phaser.Scene {
 
       if (this.isUsingVideo && this.sectionVideo) {
           this.sectionVideo.setPosition(width/2, height/2);
-          if (this.sectionVideo.video && this.sectionVideo.video.videoWidth > 0 && scale > 0 && !isNaN(scale)) {
-              this.sectionVideo.setDisplaySize(1280 * scale, 720 * scale);
-          }
+          this.sectionVideo.setDisplaySize(1280 * scale, 720 * scale);
       } else if (this.sectionImage) {
           this.sectionImage.setPosition(width/2, height/2);
           this.sectionImage.setDisplaySize(1280 * scale, 720 * scale);
@@ -1769,7 +1788,7 @@ class SectionHunt extends Phaser.Scene {
 
     // Robust scaling check for Video in SectionHunt
     if (this.isUsingVideo && this.sectionVideo && this.sectionVideo.active) {
-        if (this.sectionVideo.video && this.sectionVideo.video.videoWidth > 0) {
+        if (this.sectionVideo.width > 0 && this.sectionVideo.height > 0) {
              // Check if scale matches Cover requirement
              const width = this.scale.width;
              const height = this.scale.height;
@@ -1778,7 +1797,7 @@ class SectionHunt extends Phaser.Scene {
              const targetScale = Math.max(scaleX, scaleY);
              const targetDisplayW = 1280 * targetScale;
 
-             if (targetScale > 0 && !isNaN(targetScale) && Math.abs(this.sectionVideo.displayWidth - targetDisplayW) > 5) {
+             if (Math.abs(this.sectionVideo.displayWidth - targetDisplayW) > 5) {
                  // console.log(`SectionHunt: Fixing video scale. Screen: ${width}x${height}, TargetW: ${targetDisplayW}`);
                  this.sectionVideo.setDisplaySize(1280 * targetScale, 720 * targetScale);
                  this.sectionVideo.setPosition(width/2, height/2);
