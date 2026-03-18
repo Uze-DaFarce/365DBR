@@ -1312,8 +1312,8 @@ class SectionHunt extends Phaser.Scene {
     this.tweens.add({
         targets: eggSprite,
         y: y - 100,
-        scaleX: 1.5,
-        scaleY: 1.5,
+        scaleX: eggSprite.scaleX * 1.5,
+        scaleY: eggSprite.scaleY * 1.5,
         angle: 360,
         alpha: 0,
         duration: 1000,
@@ -1327,8 +1327,8 @@ class SectionHunt extends Phaser.Scene {
         this.tweens.add({
             targets: symSprite,
             y: y - 100,
-            scaleX: 1.5,
-            scaleY: 1.5,
+            scaleX: symSprite.scaleX * 1.5,
+            scaleY: symSprite.scaleY * 1.5,
             angle: 360,
             alpha: 0,
             duration: 1000,
