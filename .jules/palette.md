@@ -317,6 +317,6 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 **Learning:** Adding `user-select: none` and `touch-action: none` (or `-webkit-tap-highlight-color: transparent`) to the CSS body or canvas container of a fullscreen HTML5 game prevents accidental text selection highlights and tap-highlight flashes on mobile devices.
 **Action:** Always apply these CSS rules to HTML5 canvas games to make the game feel like a native app and improve the interactive UX.
 
-## 2026-03-18 - Screen Reader Instructions for Canvas Games
-**Learning:** Canvas-based applications (like Phaser games) act as a "black box" to screen readers by default. While `aria-label` gives the game a title, users are left without context on how to actually interact with the game via keyboard.
-**Action:** Always provide hidden textual instructions (e.g., via a `.sr-only` class) and associate them with the main game container using `aria-describedby`. This ensures screen reader users are immediately informed of critical keyboard shortcuts (like Space/Enter for clicks) upon focusing the game.
+## 2026-03-18 - Juicy Core Loops
+**Learning:** When a game revolves around a single core action repeated dozens of times (like collecting 60 eggs), a basic fade-out feedback makes the game feel flat and unrewarding. Kids respond strongly to "juiciness"—exaggerated feedback on their actions.
+**Action:** Enhance primary collection interactions with multiple simultaneous, playful tweens (e.g., scaling up to 1.5x with a 360-degree rotation while floating upwards). These micro-UX changes make the core loop deeply satisfying without requiring new art assets.

@@ -185,7 +185,26 @@ def test_collect_eggs_in_level(is_mobile=False):
                     time.sleep(0.2) # Briefly pause like a kid aiming the magnifying glass
                     page.mouse.click(dom_x, dom_y)
 
-                time.sleep(0.5) # Wait for collection tween/logic
+                time.sleep(0.1) # Briefly pause to let the collection tween start
+
+                # Check if there is an active tween making an element rotate/scale
+                # Since we added juicy pop feedback, we should verify it is active
+                has_juicy_tween = page.evaluate(f"""
+                    () => {{
+                        const scene = window.game.scene.getScene('SectionHunt');
+                        const tweens = scene.tweens.getTweens();
+                        // Look for a tween targeting an eggSprite or symSprite (image)
+                        // that is animating the angle to 360
+                        return tweens.some(t => t.data.some(d => d.key === 'angle' && d.end === 360));
+                    }}
+                """)
+
+                if not has_juicy_tween:
+                     print("WARN: Did not detect the juicy 360-degree rotation tween on collection feedback!")
+                else:
+                     print("SUCCESS: Juicy feedback tween detected!")
+
+                time.sleep(0.4) # Wait for remainder of collection tween/logic
 
             # 5. Verify the "Great Job Detective" message appears
             print("6. Verifying level complete...")
