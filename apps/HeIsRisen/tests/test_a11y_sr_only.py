@@ -20,6 +20,10 @@ def test_desktop_a11y_sr_only(browser_context):
     # Wait for the MainMenu scene to be active to ensure game is loaded
     wait_for_scene(page, 'MainMenu')
 
+    # Bypass audio context splash screen
+    page.locator('canvas').first.click(force=True)
+    page.wait_for_timeout(1500)
+
     # Verify the sr-only div exists
     sr_div = page.locator("#game-instructions")
     assert sr_div.count() == 1, "The #game-instructions div should exist"
@@ -36,6 +40,11 @@ def test_desktop_a11y_sr_only(browser_context):
     canvas_container = page.locator("#game")
     assert canvas_container.get_attribute("aria-describedby") == "game-instructions", "Canvas container is missing aria-describedby"
 
+    # Save a visual screenshot for manual verification
+    import os
+    os.makedirs("verification", exist_ok=True)
+    page.screenshot(path="verification/desktop_a11y_sr_only.png")
+
     context.close()
 
 def test_mobile_a11y_sr_only(browser_context):
@@ -46,6 +55,10 @@ def test_mobile_a11y_sr_only(browser_context):
 
     # Wait for the MainMenu scene to be active
     wait_for_scene(page, 'MainMenu')
+
+    # Bypass audio context splash screen
+    page.locator('canvas').first.click(force=True)
+    page.wait_for_timeout(1500)
 
     # Verify the sr-only div exists
     sr_div = page.locator("#game-instructions")
@@ -61,5 +74,8 @@ def test_mobile_a11y_sr_only(browser_context):
     # Verify the canvas container has aria-describedby
     canvas_container = page.locator("#game-container")
     assert canvas_container.get_attribute("aria-describedby") == "game-instructions", "Mobile canvas container is missing aria-describedby"
+
+    # Save a visual screenshot for manual verification
+    page.screenshot(path="verification/mobile_a11y_sr_only.png")
 
     context.close()
