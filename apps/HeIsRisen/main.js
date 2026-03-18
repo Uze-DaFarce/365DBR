@@ -1011,7 +1011,7 @@ class MapScene extends Phaser.Scene {
               // We must wait for the video metadata to load before scaling reliably, especially for webm which
               // sometimes defers resolution until the first frame is decoded in headless browsers
               const updateStampSize = () => {
-                  stampVideo.setPosition(thumb.x, thumb.y - 40 * thumb.scaleY);
+                  stampVideo.setPosition(thumb.x, thumb.y);
                   const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
@@ -1064,7 +1064,7 @@ class MapScene extends Phaser.Scene {
               stampImg.setOrigin(0.5, 0.5);
               stampImg.setDepth(2);
               stampImg.disableInteractive();
-                  const updateStampSize = () => {
+              const updateStampSize = () => {
                   stampImg.setPosition(thumb.x, thumb.y);
 
                   // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
@@ -1958,16 +1958,16 @@ class EggZamRoom extends Phaser.Scene {
             fontSize: `${48 * uiScale}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
         }).setOrigin(0.5);
 
-        const eggImg = this.add.image(-bgWidth/2 + 90 * uiScale, -bgHeight/2 + 90 * uiScale, `egg-${eggId}`).setDisplaySize(100 * uiScale, 125 * uiScale);
-        const symbolImgSmall = this.add.image(-bgWidth/2 + 90 * uiScale, -bgHeight/2 + 90 * uiScale, data.filename).setDisplaySize(100 * uiScale, 125 * uiScale);
+        const eggImg = this.add.image(-bgWidth/2 + 50 * uiScale, -bgHeight/2 + 50 * uiScale, `egg-${eggId}`).setDisplaySize(100 * uiScale, 125 * uiScale);
+        const symbolImgSmall = this.add.image(-bgWidth/2 + 50 * uiScale, -bgHeight/2 + 50 * uiScale, data.filename).setDisplaySize(100 * uiScale, 125 * uiScale);
 
-        const guessDisplay = this.add.text(bgWidth/2 - 40 * uiScale, -bgHeight/2 + 60 * uiScale, `Your Guess:\n${guessText}`, {
-            fontSize: `${32 * uiScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
+        const guessDisplay = this.add.text(bgWidth/2 - 120 * uiScale, -bgHeight/2 + 40 * uiScale, `Your Guess:\n${guessText}`, {
+            fontSize: `${24 * uiScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
         }).setOrigin(0.5, 0.5);
 
         // Result Text (Correct/Incorrect) moved under the guess
-        const resultText = this.add.text(bgWidth/2 - 40 * uiScale, -bgHeight/2 + 130 * uiScale, isCorrect ? "Correct!" : "Incorrect!", {
-            fontSize: `${36 * uiScale}px`,
+        const resultText = this.add.text(bgWidth/2 - 120 * uiScale, -bgHeight/2 + 90 * uiScale, isCorrect ? "Correct!" : "Incorrect!", {
+            fontSize: `${28 * uiScale}px`,
             fill: isCorrect ? '#008000' : '#d32f2f',
             fontStyle: 'bold',
             fontFamily: 'Comic Sans MS',
@@ -1980,22 +1980,54 @@ class EggZamRoom extends Phaser.Scene {
             wordWrap: { width: bgWidth - 80 * uiScale, useAdvancedWrap: true }, align: 'center'
         }).setOrigin(0.5);
 
-        const scriptText = this.add.text(0, bgHeight/2 - 120 * uiScale, data.scripture, {
-            fontSize: `${24 * uiScale}px`, fill: '#0000ee', fontStyle: 'italic', fontFamily: 'Comic Sans MS',
-            wordWrap: { width: bgWidth - 80 * uiScale, useAdvancedWrap: true }, align: 'center'
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-        scriptText.on('pointerdown', (p, x, y, event) => {
-            event.stopPropagation();
-            const link = parseScriptureLink(data.scripture);
-            if (link) window.open(link, '_blank', 'noopener');
+        // Create an array to hold all scripture text objects and commas
+        const scriptureElements = [];
+        const scriptures = data.scripture.split(',').map(s => s.trim());
+        let totalWidth = 0;
+        const tempText = this.add.text(0, 0, '', {
+            fontSize: `${24 * uiScale}px`, fontStyle: 'italic', fontFamily: 'Comic Sans MS'
         });
+
+        scriptures.forEach((scripture, index) => {
+            tempText.setText(scripture);
+            totalWidth += tempText.width;
+            if (index < scriptures.length - 1) {
+                tempText.setText(', ');
+                totalWidth += tempText.width;
+            }
+        });
+
+        let currentX = -totalWidth / 2;
+
+        scriptures.forEach((scripture, index) => {
+            const verseText = this.add.text(currentX, bgHeight/2 - 120 * uiScale, scripture, {
+                fontSize: `${24 * uiScale}px`, fill: '#0000ee', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
+            }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
+
+            verseText.on('pointerdown', (p, x, y, event) => {
+                event.stopPropagation();
+                const link = parseScriptureLink(scripture);
+                if (link) window.open(link, '_blank', 'noopener');
+            });
+
+            scriptureElements.push(verseText);
+            currentX += verseText.width;
+
+            if (index < scriptures.length - 1) {
+                const commaText = this.add.text(currentX, bgHeight/2 - 120 * uiScale, ', ', {
+                    fontSize: `${24 * uiScale}px`, fill: '#000', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
+                }).setOrigin(0, 0.5);
+                scriptureElements.push(commaText);
+                currentX += commaText.width;
+            }
+        });
+        tempText.destroy();
 
         const continueText = this.add.text(0, bgHeight/2 - 40 * uiScale, "[ Click anywhere to continue ]", {
             fontSize: `${20 * uiScale}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
         }).setOrigin(0.5);
 
-        this.explanationText.add([bg, title, eggImg, symbolImgSmall, guessDisplay, resultText, expText, scriptText, continueText]);
+        this.explanationText.add([bg, title, eggImg, symbolImgSmall, guessDisplay, resultText, expText, ...scriptureElements, continueText]);
 
         this.explanationText.setScale(0);
         this.tweens.add({ targets: this.explanationText, scaleX: 1, scaleY: 1, duration: 300, ease: 'Back.out' });
@@ -2017,13 +2049,13 @@ class EggZamRoom extends Phaser.Scene {
 
     leftBottleZone.on('pointerdown', () => {
       if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
-        showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Christian');
+        showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
       }
     });
 
     rightBottleZone.on('pointerdown', () => {
       if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
-        showExplanation(this.currentEgg.symbolData.category === 'Pagan', 'Worldly');
+        showExplanation(this.currentEgg.symbolData.category === 'Pagan', 'Eggs-tra Stinky');
       }
     });
 
@@ -2073,21 +2105,29 @@ class EggZamRoom extends Phaser.Scene {
           panelBg.fillRoundedRect(0, 0, panelWidth, panelHeight, 20 * scale);
           panelBg.strokeRoundedRect(0, 0, panelWidth, panelHeight, 20 * scale);
 
-          const titleText = this.add.text(panelWidth / 2, 30 * scale, 'Final EggZamination!', {
+          const titleText = this.add.text(20 * scale, 30 * scale, 'Final EggZam!', {
               fontSize: `${32 * scale}px`,
               fill: '#8b4513',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
-          }).setOrigin(0.5);
+          }).setOrigin(0, 0.5);
 
-          const holyText = this.add.text(panelWidth / 2, 75 * scale, `EggSelent (Holy) Eggs: ${holyEggs} / 30`, {
+          const currentScore = this.registry.get('currentScore') || 0;
+          const scoreTextLabel = this.add.text(panelWidth - 20 * scale, 30 * scale, `Score: ${currentScore}`, {
+              fontSize: `${32 * scale}px`,
+              fill: '#8b4513',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS'
+          }).setOrigin(1, 0.5);
+
+          const holyText = this.add.text(panelWidth / 2, 75 * scale, `Egg-cellent Eggs: ${holyEggs} / 30`, {
               fontSize: `${24 * scale}px`,
               fill: '#008000',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0.5);
 
-          const worldlyText = this.add.text(panelWidth / 2, 115 * scale, `Eggstra-Stinky (Worldly) Eggs: ${worldlyEggs} / 30`, {
+          const worldlyText = this.add.text(panelWidth / 2, 115 * scale, `Eggs-tra Stinky Eggs: ${worldlyEggs} / 30`, {
               fontSize: `${24 * scale}px`,
               fill: '#d32f2f',
               fontStyle: 'bold',
@@ -2144,7 +2184,7 @@ class EggZamRoom extends Phaser.Scene {
           this.input.keyboard.once('keydown-SPACE', triggerRestart);
           this.input.keyboard.once('keydown-ENTER', triggerRestart);
 
-          summaryContainer.add([panelBg, titleText, holyText, worldlyText, totalText, playBtnContainer]);
+          summaryContainer.add([panelBg, titleText, scoreTextLabel, holyText, worldlyText, totalText, playBtnContainer]);
         }
 
         return;
@@ -2281,7 +2321,7 @@ function parseScriptureLink(scriptureText) {
     };
 
     // Regex to extract Book, Chapter, and Verse. Handles "1 Peter 2:4-5" or "John 3:16"
-    const match = scriptureText.match(/^(\d?\s*[A-Za-z\s]+)\s+(\d+):(\d+)/);
+    const match = scriptureText.match(/^(\d?\s*[A-Za-z\s]+)\s+(\d+):([\d-]+)/);
     if (match) {
         const rawBook = match[1].trim().toLowerCase();
         const chapter = match[2];
