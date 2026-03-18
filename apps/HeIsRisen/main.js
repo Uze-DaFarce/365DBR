@@ -670,8 +670,12 @@ class MainMenu extends Phaser.Scene {
         }
 
         // Request Fullscreen (Desktop logic)
-        if (this.scale.fullscreen.available) {
-            this.scale.startFullscreen();
+        // Memory Directive: Bypass Phaser's internal scaling wrapper to prevent WebGL Framebuffer crash on desktop.
+        const gameElement = document.getElementById('game');
+        if (gameElement && gameElement.requestFullscreen) {
+            gameElement.requestFullscreen().catch(err => {
+                console.warn(`Fullscreen request failed: ${err.message}`);
+            });
         }
 
         // Show Play Button almost immediately (short delay for visual transition)
@@ -1005,7 +1009,9 @@ class MapScene extends Phaser.Scene {
                   const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
-                  stampVideo.setScale(calculatedScale);
+                  if (calculatedScale > 0 && isFinite(calculatedScale)) {
+                      stampVideo.setScale(calculatedScale);
+                  }
               };
               updateStampSize();
 
@@ -1033,7 +1039,10 @@ class MapScene extends Phaser.Scene {
                   // Cover thumbnail height + 25%, maintaining intrinsic stamp ratio
                   const intrinsicHeight = stampImg.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
-                  stampImg.setScale(targetHeight / intrinsicHeight);
+                  const calculatedScale = targetHeight / intrinsicHeight;
+                  if (calculatedScale > 0 && isFinite(calculatedScale)) {
+                      stampImg.setScale(calculatedScale);
+                  }
                   stampImg.disableInteractive();
                   // Replace in resize array so window resizing still works
                   const idx = this.stamps.findIndex(s => s.video === stampVideo);
@@ -1056,7 +1065,9 @@ class MapScene extends Phaser.Scene {
                   const intrinsicHeight = stampImg.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
-                  stampImg.setScale(calculatedScale);
+                  if (calculatedScale > 0 && isFinite(calculatedScale)) {
+                      stampImg.setScale(calculatedScale);
+                  }
               };
               updateStampSize();
 
@@ -1159,7 +1170,10 @@ class MapScene extends Phaser.Scene {
                   // Cover thumbnail height + 25%, maintaining intrinsic stamp ratio
                   const intrinsicHeight = item.video.height || 720;
                   const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
-                  item.video.setScale(targetHeight / intrinsicHeight);
+                  const calculatedScale = targetHeight / intrinsicHeight;
+                  if (calculatedScale > 0 && isFinite(calculatedScale)) {
+                      item.video.setScale(calculatedScale);
+                  }
               }
           });
       }
