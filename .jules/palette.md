@@ -317,3 +317,7 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 ## 2026-03-22 - In-game Popups and Keyboard Parity
 **Learning:** Dismissal of temporary, interactive in-game overlays (like the explanation text popup in EggZamRoom) via mouse clicks (`pointerdown` on background) traps keyboard and screen reader users, who rely on standard keys (Escape, Space, Enter) to close dialogs.
 **Action:** Always map `Escape`, `Space`, and `Enter` key events (via `input.keyboard.on`) to the same close/dismiss callback used by the pointer events for any dynamically generated popup overlay, and ensure you `input.keyboard.off` the events when destroying the popup to prevent memory leaks or double-firing.
+
+## 2026-03-22 - Global Ignore and Test Script Pollution
+**Learning:** Adding `*.png` or `*.webm` globally to `.gitignore` to avoid tracking test artifacts is disastrous for a game repository because it ignores actual game assets. Furthermore, creating temporary test scripts in a new `verification/` folder or root pollutes the workspace and wastes effort, rather than improving the existing suite.
+**Action:** Never globally ignore media extensions in `.gitignore`. Instead, configure test tools to output to specific ignored directories (like `test-results/`), and always append/improve existing test scripts in the dedicated `tests/` folders rather than creating one-off verification scripts.
