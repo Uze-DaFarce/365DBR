@@ -1,7 +1,7 @@
 from playwright.sync_api import Page, expect, sync_playwright
 
 def verify_feature(page: Page):
-  page.goto("http://localhost:8080/HeIsRisen/index.html")
+  page.goto("http://localhost:8080/apps/HeIsRisen/index.html")
   page.wait_for_timeout(500)
 
   # Check that the intro video element is available
@@ -54,7 +54,7 @@ def verify_feature(page: Page):
   page.wait_for_timeout(2000)
 
   # Go back to MapScene
-  page.goto("http://localhost:8080/HeIsRisen/index.html")
+  page.goto("http://localhost:8080/apps/HeIsRisen/index.html")
   page.wait_for_timeout(500)
 
   page.screenshot(path="/home/jules/verification/verification.png")
