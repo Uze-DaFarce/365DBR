@@ -2278,7 +2278,6 @@ const config = {
     parent: 'game-container',
   },
   scene: [MainMenu, MapScene, SectionHunt, EggZamRoom, MusicScene, UIScene],
-  backgroundColor: '#000000',
 };
 
 const game = new Phaser.Game(config);
