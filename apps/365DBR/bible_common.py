@@ -1,7 +1,5 @@
 import json
 import os
-import urllib.parse
-import pathlib
 
 # =============================================================================
 # CONSTANTS (From generate_readings.py)
@@ -246,39 +244,10 @@ def validate_safe_relative_path(path):
     """
     Validates that a relative path is safe and does not contain
     directory traversal characters (e.g. "..").
-    It permits forward slashes and backslashes, but prevents absolute paths
-    and URL-encoded traversal attempts.
+    It permits forward slashes and backslashes.
     """
-    if not isinstance(path, str):
+    if ".." in path:
         return False
-
-    # Prevent null byte injection
-    if '\x00' in path:
-        return False
-
-    # URL decode to catch %2e%2e
-    decoded_path = urllib.parse.unquote(path)
-
-    # Catch basic traversal
-    if ".." in decoded_path:
-        return False
-
-    # Prevent absolute paths or root references explicitly
-    if decoded_path.startswith('/') or decoded_path.startswith('\\'):
-        return False
-
-    # Prevent Windows drive letter access (e.g., C:/) regardless of the host OS
-    if len(decoded_path) >= 2 and decoded_path[1] == ':':
-        return False
-
-    # Use pathlib to catch any edge cases where it parses as absolute
-    try:
-        p = pathlib.Path(decoded_path)
-        if p.is_absolute():
-            return False
-    except Exception:
-        return False
-
     return True
 
 def get_books_in_range(range_str):
