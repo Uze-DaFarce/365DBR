@@ -1,0 +1,8 @@
+<<<<<<< SEARCH
+  scene: [MainMenu, MapScene, SectionHunt, EggZamRoom, MusicScene, UIScene],
+  backgroundColor: '#000000',
+};
+=======
+  scene: [MainMenu, MapScene, SectionHunt, EggZamRoom, MusicScene, UIScene]
+};
+>>>>>>> REPLACE
