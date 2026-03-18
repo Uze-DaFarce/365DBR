@@ -81,6 +81,11 @@
 **Learning:** Testing against static, stale sample data (like `0101` and `0102` directories left in the repo) hides edge cases and produces false positives. The `check_data_integrity.py` script previously had no simple mechanism to sample production JSONs randomly or efficiently check wide swaths of the plan when `--days` was limited to sequential starts.
 **Action:** Enhanced `check_data_integrity.py` with a `--random` flag that allows it to select a random subset of days to verify against the API, increasing testing depth, breadth, and grounding verification strictly in the reality of production data rather than local mocks.
 
+## 2026-03-18 - [Preventing Reverse Tabnabbing on Ecosystem Links]
+**Vulnerability:** The application contained links pointing to the parent domain (`mt-sin.ai`) opening in a new tab via `window.open(link, '_blank')`. Opening links without `noopener` leaves the window open to reverse tabnabbing via the `window.opener` object.
+**Learning:** While `noopener,noreferrer` is the gold standard for truly external links, applying `noreferrer` to links pointing to another application within the same ecosystem (like `mt-sin.ai/365DBR`) can break internal analytics and routing that rely on the `Referer` header.
+**Prevention:** Use `noopener` alone when linking to trusted internal/ecosystem sites via `window.open(link, '_blank', 'noopener')` to prevent reverse tabnabbing while preserving necessary referer headers. Reserve `noopener,noreferrer` strictly for untrusted or third-party outgoing links.
+
 ## 2026-03-18 - [Frontend Verification Media Scoping]
 **Learning:** The `frontend_verification_complete` tool silently fails to post images/media to the user chat if the file paths point outside the repository's root workspace directory (e.g., `/home/jules/verification/`). Additionally, using `read_media_file` only injects the image into the agent's context and does NOT show it to the user.
 **Action:** Always save or move verification media into the repository root (or a relative folder inside the repo) before calling `frontend_verification_complete`. Ensure to clean up these artifacts afterward to avoid workspace pollution.
