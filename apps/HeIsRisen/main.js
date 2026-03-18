@@ -1965,12 +1965,7 @@ class EggZamRoom extends Phaser.Scene {
         this.explanationText.setScale(0);
         this.tweens.add({ targets: this.explanationText, scaleX: 1, scaleY: 1, duration: 300, ease: 'Back.out' });
 
-        const closeExplanation = () => {
-            if (this.input.keyboard) {
-                this.input.keyboard.off('keydown-SPACE', closeExplanation);
-                this.input.keyboard.off('keydown-ENTER', closeExplanation);
-                this.input.keyboard.off('keydown-ESC', closeExplanation);
-            }
+        bg.on('pointerdown', () => {
             this.tweens.add({
                 targets: this.explanationText, scaleX: 0, scaleY: 0, duration: 200, ease: 'Back.in',
                 onComplete: () => {
@@ -1982,14 +1977,7 @@ class EggZamRoom extends Phaser.Scene {
                     this.displayRandomEggInfo(offsetX, offsetY, uiScale);
                 }
             });
-        };
-
-        bg.on('pointerdown', closeExplanation);
-        if (this.input.keyboard) {
-            this.input.keyboard.on('keydown-SPACE', closeExplanation);
-            this.input.keyboard.on('keydown-ENTER', closeExplanation);
-            this.input.keyboard.on('keydown-ESC', closeExplanation);
-        }
+        });
     };
 
     leftBottleZone.on('pointerdown', () => {
