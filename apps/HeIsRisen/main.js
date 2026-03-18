@@ -999,8 +999,6 @@ class MapScene extends Phaser.Scene {
               stampVideo.setOrigin(0.5, 0.5);
               stampVideo.setDepth(2);
               stampVideo.disableInteractive();
-              // Retain MULTIPLY on desktop as requested, but we should make sure it actually plays and has dimensions.
-              stampVideo.setBlendMode(Phaser.BlendModes.MULTIPLY);
 
               // We must wait for the video metadata to load before scaling reliably, especially for webm which
               // sometimes defers resolution until the first frame is decoded in headless browsers
@@ -2363,6 +2361,7 @@ function addTooltip(scene, object, text) {
 // Game configuration
 const config = {
   type: Phaser.AUTO,
+  transparent: true,
   scale: {
       mode: Phaser.Scale.RESIZE, // Fill the window
       parent: 'game',
