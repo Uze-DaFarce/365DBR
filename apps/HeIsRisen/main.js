@@ -1601,7 +1601,10 @@ class SectionHunt extends Phaser.Scene {
 
         const captureRadiusSq = 50 * 50; // Lens capture radius
 
-        this.eggs.getChildren().forEach(egg => {
+        // ⚡ Bolt Optimization: Use a fast for loop instead of forEach to prevent closure allocations
+        const children = this.eggs.getChildren();
+        for (let i = 0, len = children.length; i < len; i++) {
+            const egg = children[i];
             if (egg.active) {
                 // Check if egg is under the mouse (center of lens)
                 const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
@@ -1612,7 +1615,7 @@ class SectionHunt extends Phaser.Scene {
                      this.updateScore();
                 }
             }
-        });
+        }
     });
 
     this.scale.on('resize', this.resize, this);
@@ -1774,7 +1777,10 @@ class SectionHunt extends Phaser.Scene {
     // Visibility check: If egg is within the visual lens radius (pointer)
     const lensRadiusSq = (lensDiameter / 2) * (lensDiameter / 2);
 
-    this.eggs.getChildren().forEach(egg => {
+    // ⚡ Bolt Optimization: Replace forEach with high-performance for loop in update loop
+    const children = this.eggs.getChildren();
+    for (let i = 0, len = children.length; i < len; i++) {
+      const egg = children[i];
       if (egg && egg.active) {
         // Check distance to the POINTER (center of lens view)
         const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
@@ -1809,7 +1815,7 @@ class SectionHunt extends Phaser.Scene {
             }
         }
       }
-    });
+    }
 
     // Robust scaling check for Video in SectionHunt
     if (this.isUsingVideo && this.sectionVideo && this.sectionVideo.active) {
