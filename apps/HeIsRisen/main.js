@@ -1011,7 +1011,9 @@ class MapScene extends Phaser.Scene {
               // We must wait for the video metadata to load before scaling reliably, especially for webm which
               // sometimes defers resolution until the first frame is decoded in headless browsers
               const updateStampSize = () => {
-                  stampVideo.setPosition(thumb.x, thumb.y);
+                  // User requested 30px down (instead of previous 40 or 0) on desktop
+                  const offset = 30 * (this.bgScale || 1);
+                  stampVideo.setPosition(thumb.x, thumb.y + offset);
                   const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
@@ -1065,7 +1067,9 @@ class MapScene extends Phaser.Scene {
               stampImg.setDepth(2);
               stampImg.disableInteractive();
               const updateStampSize = () => {
-                  stampImg.setPosition(thumb.x, thumb.y);
+                  // User requested 30px offset on desktop
+                  const offset = 30 * (this.bgScale || 1);
+                  stampImg.setPosition(thumb.x, thumb.y + offset);
 
                   // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
                   const intrinsicHeight = stampImg.height || 720;
@@ -1962,19 +1966,21 @@ class EggZamRoom extends Phaser.Scene {
         bg.setInteractive(new Phaser.Geom.Rectangle(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight), Phaser.Geom.Rectangle.Contains);
 
         // Header Elements
-        const title = this.add.text(0, -bgHeight/2 + 60 * uiScale, data.name || "Symbol", {
+        // Title moved ~12px left
+        const title = this.add.text(-12 * uiScale, -bgHeight/2 + 60 * uiScale, data.name || "Symbol", {
             fontSize: `${48 * uiScale}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
         }).setOrigin(0.5);
 
         const eggImg = this.add.image(-bgWidth/2 + 50 * uiScale, -bgHeight/2 + 50 * uiScale, `egg-${eggId}`).setDisplaySize(100 * uiScale, 125 * uiScale);
         const symbolImgSmall = this.add.image(-bgWidth/2 + 50 * uiScale, -bgHeight/2 + 50 * uiScale, data.filename).setDisplaySize(100 * uiScale, 125 * uiScale);
 
-        const guessDisplay = this.add.text(bgWidth/2 - 120 * uiScale, -bgHeight/2 + 40 * uiScale, `Your Guess:\n${guessText}`, {
+        // Your Guess moved ~12px right
+        const guessDisplay = this.add.text(bgWidth/2 - 108 * uiScale, -bgHeight/2 + 40 * uiScale, `Your Guess:\n${guessText}`, {
             fontSize: `${24 * uiScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
         }).setOrigin(0.5, 0.5);
 
-        // Result Text (Correct/Incorrect) moved under the guess
-        const resultText = this.add.text(bgWidth/2 - 120 * uiScale, -bgHeight/2 + 90 * uiScale, isCorrect ? "Correct!" : "Incorrect!", {
+        // Result Text (Correct/Incorrect) moved under the guess (and matched the 12px right shift)
+        const resultText = this.add.text(bgWidth/2 - 108 * uiScale, -bgHeight/2 + 90 * uiScale, isCorrect ? "Correct!" : "Incorrect!", {
             fontSize: `${28 * uiScale}px`,
             fill: isCorrect ? '#008000' : '#d32f2f',
             fontStyle: 'bold',
@@ -2120,13 +2126,14 @@ class EggZamRoom extends Phaser.Scene {
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0, 0.5);
 
-          const currentScore = this.registry.get('currentScore') || 0;
-          const scoreTextLabel = this.add.text(panelWidth - 20 * scale, 30 * scale, `Score: ${currentScore}`, {
-              fontSize: `${32 * scale}px`,
-              fill: '#8b4513',
-              fontStyle: 'bold',
-              fontFamily: 'Comic Sans MS'
-          }).setOrigin(1, 0.5);
+          // User requested removing score from desktop if it is not implemented (which it isn't on desktop version)
+          // const currentScore = this.registry.get('currentScore') || 0;
+          // const scoreTextLabel = this.add.text(panelWidth - 20 * scale, 30 * scale, `Score: ${currentScore}`, {
+          //     fontSize: `${32 * scale}px`,
+          //     fill: '#8b4513',
+          //     fontStyle: 'bold',
+          //     fontFamily: 'Comic Sans MS'
+          // }).setOrigin(1, 0.5);
 
           const holyText = this.add.text(panelWidth / 2, 75 * scale, `Egg-cellent Eggs: ${holyEggs} / 30`, {
               fontSize: `${24 * scale}px`,
@@ -2192,7 +2199,7 @@ class EggZamRoom extends Phaser.Scene {
           this.input.keyboard.once('keydown-SPACE', triggerRestart);
           this.input.keyboard.once('keydown-ENTER', triggerRestart);
 
-          summaryContainer.add([panelBg, titleText, scoreTextLabel, holyText, worldlyText, totalText, playBtnContainer]);
+          summaryContainer.add([panelBg, titleText, holyText, worldlyText, totalText, playBtnContainer]);
         }
 
         return;
@@ -2207,7 +2214,8 @@ class EggZamRoom extends Phaser.Scene {
     if (this.currentEgg) {
       const { eggId, symbolData } = this.currentEgg;
       const eggPosX = offsetX + 630 * scale;
-      const eggPosY = offsetY + 350 * scale;
+      // User requested egg to move down ~10px on desktop
+      const eggPosY = offsetY + 360 * scale;
       const symbolPosX = eggPosX;
       const symbolPosY = eggPosY;
 

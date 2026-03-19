@@ -1025,7 +1025,9 @@ class MapScene extends Phaser.Scene {
               stampVideo.disableInteractive();
 
               const updateStampSize = () => {
-                  stampVideo.setPosition(thumb.x, thumb.y);
+                  // User requested 30px offset on mobile as well
+                  const offset = 30 * (this.bgScale || 1);
+                  stampVideo.setPosition(thumb.x, thumb.y + offset);
                   // Use video.videoHeight for webm intrinsic sizes if available, fallback to phaser width or default 720
                   const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
@@ -1075,7 +1077,9 @@ class MapScene extends Phaser.Scene {
               stampImg.setDepth(2);
               stampImg.disableInteractive();
               const updateStampSize = () => {
-                  stampImg.setPosition(thumb.x, thumb.y);
+                  // User requested 30px offset on mobile as well
+                  const offset = 30 * (this.bgScale || 1);
+                  stampImg.setPosition(thumb.x, thumb.y + offset);
 
                   // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
                   const intrinsicHeight = stampImg.height || 720;
@@ -1705,23 +1709,30 @@ class SectionHunt extends Phaser.Scene {
     }
 
     // Calculate target scale directly without redundant matrix operations
-    // 1. Base scale to fit screen
-    const baseScaleX = this.game.config.width / this.renderStamp.width;
-    const baseScaleY = this.game.config.height / this.renderStamp.height;
+    // 1. Base scale to fit screen (use displayWidth/displayHeight if texture exists, but fallback to known bg scale)
+    const baseScaleX = this.bgScale || (this.game.config.width / this.renderStamp.width);
+    const baseScaleY = this.bgScale || (this.game.config.height / this.renderStamp.height);
 
-    // 2. Apply zoom
+    // Also extract the image offsets. In mobile, the image origin is 0.5, 0.5 and it is placed at game.config.width/2, height/2.
+    // That means it is centered. To find its top-left on screen, we subtract half its display size.
+    let bgOffsetX = 0;
+    let bgOffsetY = 0;
+    if (this.sectionImage && this.sectionImage.active) {
+         bgOffsetX = this.sectionImage.x - (this.sectionImage.displayWidth / 2);
+         bgOffsetY = this.sectionImage.y - (this.sectionImage.displayHeight / 2);
+    }
+
+    // 2. Apply zoom. The `zoomedView` RenderTexture expects coordinates and scales that represent the final pixels.
     this.renderStamp.setScale(baseScaleX * zoom, baseScaleY * zoom);
 
     // Set origin to top-left so we can position it correctly
     this.renderStamp.setOrigin(0, 0);
 
-    // Since renderStamp scales the raw texture up by (baseScale * zoom),
-    // mapping screen coordinates (-scrollX, -scrollY) into the render texture
-    // requires multiplying by the zoom factor. We don't need to divide/multiply by baseScale
-    // because scrollX/Y are screen-space coords and we want to shift the SCREEN-SCALED image.
-    // So to shift it by scrollX screen pixels, we just shift by -scrollX * zoom.
-    const drawX = -scrollX * zoom;
-    const drawY = -scrollY * zoom;
+    // We must account for these offsets so the drawn background matches the visual layout.
+    // If the background starts at (bgOffsetX, bgOffsetY) on screen,
+    // then the rendering coordinate needs to shift by those offsets multiplied by zoom.
+    const drawX = (bgOffsetX - scrollX) * zoom;
+    const drawY = (bgOffsetY - scrollY) * zoom;
 
     this.zoomedView.draw(this.renderStamp, drawX, drawY);
 
@@ -1923,7 +1934,8 @@ class EggZamRoom extends Phaser.Scene {
     const correctY = isDesktop ? 150 * this.gameScale : 146 * this.gameScale;
     // Scale text up slightly more on mobile for readability
     const scoreFontSize = isDesktop ? 32 : 54;
-    const correctFontSize = isDesktop ? 24 : 42;
+    // Shrink the correct text font size so it fits inside the scoreboard
+    const correctFontSize = isDesktop ? 24 : 32;
     this.scoreText = this.add.text(100 * this.gameScale, scoreY, `${foundEggsCount}/${TOTAL_EGGS}`, {
       fontSize: `${scoreFontSize * this.gameScale}px`,
       fill: '#000',
@@ -2181,19 +2193,23 @@ class EggZamRoom extends Phaser.Scene {
           panelBg.fillRoundedRect(0, 0, panelWidth, panelHeight, 20 * this.gameScale);
           panelBg.strokeRoundedRect(0, 0, panelWidth, panelHeight, 20 * this.gameScale);
 
+          // User requested score and title to be different colors, sizes, and layout to prevent overlap
           const titleText = this.add.text(20 * this.gameScale, 40 * this.gameScale, 'Final EggZam!', {
-              fontSize: `${(isDesktop ? 32 : 40) * this.gameScale}px`,
+              fontSize: `${(isDesktop ? 32 : 36) * this.gameScale}px`,
               fill: '#8b4513',
               fontStyle: 'bold',
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0, 0.5);
 
           const currentScore = this.registry.get('currentScore') || 0;
-          const scoreTextLabel = this.add.text(panelWidth - 20 * this.gameScale, 40 * this.gameScale, `Score: ${currentScore}`, {
-              fontSize: `${(isDesktop ? 32 : 40) * this.gameScale}px`,
-              fill: '#8b4513',
+          // Use a carriage return and slightly smaller font on mobile, different color so they are distinct
+          const scoreDisplay = isDesktop ? `Score: ${currentScore}` : `Score:\n${currentScore}`;
+          const scoreTextLabel = this.add.text(panelWidth - 20 * this.gameScale, 40 * this.gameScale, scoreDisplay, {
+              fontSize: `${(isDesktop ? 32 : 28) * this.gameScale}px`,
+              fill: isDesktop ? '#8b4513' : '#d32f2f',
               fontStyle: 'bold',
-              fontFamily: 'Comic Sans MS'
+              fontFamily: 'Comic Sans MS',
+              align: 'right'
           }).setOrigin(1, 0.5);
 
           const holyText = this.add.text(panelWidth / 2, 100 * this.gameScale, `Egg-cellent Eggs: ${holyEggs} / 30`, {
@@ -2269,7 +2285,8 @@ class EggZamRoom extends Phaser.Scene {
       const assetScale = isDesktop ? this.gameScale : this.gameScale * 2;
 
       const windowCenterX = 196 * assetScale;
-      const windowBottomY = 190 * assetScale;
+      // User requested egg to move down 6-10px to not overlap top border
+      const windowBottomY = 200 * assetScale;
       const eggHeight = 125 * assetScale;
       const symbolHeight = 125 * assetScale;
 
