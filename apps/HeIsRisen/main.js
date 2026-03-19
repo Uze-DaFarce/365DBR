@@ -111,9 +111,17 @@ class CursorScene extends Phaser.Scene {
 class MusicScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MusicScene' });
-    this.musicVolume = localStorage.getItem('musicVolume') !== null ? parseFloat(localStorage.getItem('musicVolume')) : 0.5;
-    this.ambientVolume = localStorage.getItem('ambientVolume') !== null ? parseFloat(localStorage.getItem('ambientVolume')) : 0.5;
-    this.sfxVolume = localStorage.getItem('sfxVolume') !== null ? parseFloat(localStorage.getItem('sfxVolume')) : 0.5;
+
+    const getSafeVol = (key) => {
+      const val = localStorage.getItem(key);
+      if (val === null) return 0.5;
+      const parsed = parseFloat(val);
+      return (isNaN(parsed) || parsed < 0 || parsed > 1) ? 0.5 : parsed;
+    };
+
+    this.musicVolume = getSafeVol('musicVolume');
+    this.ambientVolume = getSafeVol('ambientVolume');
+    this.sfxVolume = getSafeVol('sfxVolume');
   }
 
   create() {
@@ -635,13 +643,16 @@ class MainMenu extends Phaser.Scene {
     // Cursor handled by CursorScene
 
     // Initialize volume registry (Load from localStorage if available)
-    const savedMusic = localStorage.getItem('musicVolume');
-    const savedAmbient = localStorage.getItem('ambientVolume');
-    const savedSfx = localStorage.getItem('sfxVolume');
+    const getSafeVol = (key) => {
+      const val = localStorage.getItem(key);
+      if (val === null) return 0.5;
+      const parsed = parseFloat(val);
+      return (isNaN(parsed) || parsed < 0 || parsed > 1) ? 0.5 : parsed;
+    };
 
-    if (!this.registry.has('musicVolume')) this.registry.set('musicVolume', savedMusic !== null ? parseFloat(savedMusic) : 0.5);
-    if (!this.registry.has('ambientVolume')) this.registry.set('ambientVolume', savedAmbient !== null ? parseFloat(savedAmbient) : 0.5);
-    if (!this.registry.has('sfxVolume')) this.registry.set('sfxVolume', savedSfx !== null ? parseFloat(savedSfx) : 0.5);
+    if (!this.registry.has('musicVolume')) this.registry.set('musicVolume', getSafeVol('musicVolume'));
+    if (!this.registry.has('ambientVolume')) this.registry.set('ambientVolume', getSafeVol('ambientVolume'));
+    if (!this.registry.has('sfxVolume')) this.registry.set('sfxVolume', getSafeVol('sfxVolume'));
 
     // Launch UI Scene
     if (!this.scene.get('UIScene').scene.isActive()) {

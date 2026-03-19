@@ -1,7 +1,5 @@
 import json
 import os
-import urllib.parse
-import pathlib
 
 # =============================================================================
 # CONSTANTS (From generate_readings.py)
@@ -248,15 +246,7 @@ def validate_safe_relative_path(path):
     directory traversal characters (e.g. "..").
     It permits forward slashes and backslashes.
     """
-    decoded_path = urllib.parse.unquote(path)
-    if ".." in decoded_path:
-        return False
-    if pathlib.Path(decoded_path).is_absolute():
-        return False
-    if decoded_path.startswith("/") or decoded_path.startswith("\\"):
-        return False
-    # Windows drive letters
-    if len(decoded_path) >= 2 and decoded_path[1] == ":" and decoded_path[0].isalpha():
+    if ".." in path:
         return False
     return True
 
