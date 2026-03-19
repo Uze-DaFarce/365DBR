@@ -68,6 +68,18 @@ function initializeGameData(registry, cache) {
     registry.set('foundEggs', []);
     registry.set('stampedSections', []);
     registry.set('correctCategorizations', 0);
+    registry.set('currentScore', 0);
+
+    try {
+        let loadedScore = parseInt(localStorage.getItem('highScore'));
+        if (isNaN(loadedScore) || loadedScore < 0) {
+            loadedScore = 0;
+        }
+        registry.set('highScore', loadedScore);
+    } catch (e) {
+        console.warn('LocalStorage access failed:', e);
+        registry.set('highScore', 0);
+    }
 }
 
 class CursorScene extends Phaser.Scene {
@@ -1269,6 +1281,19 @@ class SectionHunt extends Phaser.Scene {
           this.registry.set('eggData', eggDataArray);
       }
 
+
+      let currentScore = this.registry.get('currentScore');
+      currentScore += 10;
+      if (foundEggs.length === TOTAL_EGGS) {
+        currentScore += 100;
+      }
+      this.registry.set('currentScore', currentScore);
+      const highScore = this.registry.get('highScore');
+      if (currentScore > highScore) {
+        this.registry.set('highScore', currentScore);
+        localStorage.setItem('highScore', currentScore);
+      }
+
       this.updateScore();
 
       if (this.hintTimer) {
@@ -1970,6 +1995,16 @@ class EggZamRoom extends Phaser.Scene {
             const correctCount = this.registry.get('correctCategorizations') + 1;
             this.registry.set('correctCategorizations', correctCount);
             this.correctText.setText(`Correct: ${correctCount}`);
+
+            let currentScore = this.registry.get('currentScore');
+            currentScore += 5;
+            this.registry.set('currentScore', currentScore);
+            const highScore = this.registry.get('highScore');
+            if (currentScore > highScore) {
+              this.registry.set('highScore', currentScore);
+              localStorage.setItem('highScore', currentScore);
+            }
+
             this.currentEgg.categorized = true;
         } else {
             if (musicScene) {
@@ -2154,14 +2189,14 @@ class EggZamRoom extends Phaser.Scene {
               fontFamily: 'Comic Sans MS'
           }).setOrigin(0, 0.5);
 
-          // User requested removing score from desktop if it is not implemented (which it isn't on desktop version)
-          // const currentScore = this.registry.get('currentScore') || 0;
-          // const scoreTextLabel = this.add.text(panelWidth - 20 * scale, 30 * scale, `Score: ${currentScore}`, {
-          //     fontSize: `${32 * scale}px`,
-          //     fill: '#8b4513',
-          //     fontStyle: 'bold',
-          //     fontFamily: 'Comic Sans MS'
-          // }).setOrigin(1, 0.5);
+          const currentScore = this.registry.get('currentScore') || 0;
+          const scoreTextLabel = this.add.text(panelWidth - 20 * scale, 30 * scale, `Score: ${currentScore}`, {
+              fontSize: `${32 * scale}px`,
+              fill: '#8b4513',
+              fontStyle: 'bold',
+              fontFamily: 'Comic Sans MS',
+              align: 'right'
+          }).setOrigin(1, 0.5);
 
           const holyText = this.add.text(panelWidth / 2, 75 * scale, `Egg-cellent Eggs: ${holyEggs} / 30`, {
               fontSize: `${24 * scale}px`,
