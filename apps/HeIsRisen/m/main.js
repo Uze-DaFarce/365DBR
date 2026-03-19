@@ -793,7 +793,10 @@ class MainMenu extends Phaser.Scene {
                       this.scene.launch('MusicScene');
                   }
 
-                  this.sound.play('drive1', { volume: 0.5 });
+                  const musicScene = this.scene.get('MusicScene');
+                  if (musicScene) {
+                      musicScene.playSFX('drive1');
+                  }
                   this.scene.start('MapScene');
               }
           });
@@ -910,7 +913,10 @@ class MapScene extends Phaser.Scene {
     if (!this.scene.get('MusicScene').scene.isActive()) {
       this.scene.launch('MusicScene');
     }
-    this.sound.play('drive2', { volume: 0.5 });
+    const musicScene = this.scene.get('MusicScene');
+    if (musicScene) {
+        musicScene.playSFX('drive2');
+    }
 
     // Add map image, fill the viewport proportionally based on native size
     this.mapImage = this.add.image(this.game.config.width/2, this.game.config.height/2, 'new-map')
@@ -1178,7 +1184,10 @@ class SectionHunt extends Phaser.Scene {
     };
     // console.log('SectionHunt: Collecting egg with symbolData:', eggInfo.symbolData);
     if (!foundEggs.some(e => e.eggId === eggInfo.eggId)) {
-      this.sound.play('collect');
+      const musicScene = this.scene.get('MusicScene');
+      if (musicScene) {
+          musicScene.playSFX('collect');
+      }
 
       // Get symbol texture if available
       let symbolTexture = null;
@@ -1561,7 +1570,10 @@ class SectionHunt extends Phaser.Scene {
         });
     });
 
-    this.sound.play('drive2', { volume: 0.5 });
+    const musicScene = this.scene.get('MusicScene');
+    if (musicScene) {
+        musicScene.playSFX('drive2');
+    }
     this.scoreImage = this.add.image(0, 0, 'score')
       .setOrigin(0, 0)
       .setDisplaySize(200 * scale, 200 * scale)
@@ -1981,8 +1993,11 @@ class EggZamRoom extends Phaser.Scene {
     addZoneHover(this.rightBottleZone);
 
     const showExplanation = (isCorrect, guessText) => {
+        const musicScene = this.scene.get('MusicScene');
         if (isCorrect) {
-            this.sound.play('success');
+            if (musicScene) {
+                musicScene.playSFX('success');
+            }
             const correctCount = this.registry.get('correctCategorizations') + 1;
             this.registry.set('correctCategorizations', correctCount);
             this.correctText.setText(`Correct: ${correctCount}`);
@@ -1996,7 +2011,9 @@ class EggZamRoom extends Phaser.Scene {
             }
             this.currentEgg.categorized = true;
         } else {
-            this.sound.play('error');
+            if (musicScene) {
+                musicScene.playSFX('error');
+            }
         }
 
         if (this.explanationText) this.explanationText.destroy();
@@ -2399,7 +2416,7 @@ function addButtonInteraction(scene, button, soundKey = 'success') {
     if (musicScene && musicScene.scene.isActive()) {
         musicScene.playSFX(soundKey);
     } else if (soundKey && scene.sound.get(soundKey)) {
-        scene.sound.play(soundKey, { volume: 0.5 });
+        scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
     }
 
     if (button.baseScaleX === undefined || !scene.tweens.isTweening(button)) {
