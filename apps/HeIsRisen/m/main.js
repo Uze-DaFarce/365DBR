@@ -1664,11 +1664,11 @@ class SectionHunt extends Phaser.Scene {
 
       // New offsets for reverted size (150x187.5 display size, 0.75x of doubled)
       // Visual lens center is approx (-97.5 * scale, -135 * scale) relative to handle tip
-      const lensOffsetX = -97.5 * scale;
-      const lensOffsetY = -135 * scale;
-
-      const lensX = pointer.x + lensOffsetX;
-      const lensY = pointer.y + lensOffsetY;
+      // The user requested the zoomed view to show what is visually under the FINGER (pointer.x, pointer.y),
+      // because that's where they are pointing. Therefore, the harvest/collection area
+      // should also be centered exactly on the pointer, rather than the visual offset of the glass handle.
+      const lensX = pointer.x;
+      const lensY = pointer.y;
       const captureRadius = 80 * scale; // Slightly larger than visual radius (75)
       const captureRadiusSq = captureRadius * captureRadius;
 
@@ -1740,8 +1740,8 @@ class SectionHunt extends Phaser.Scene {
 
     // Calculate target scale directly without redundant matrix operations
     // 1. Base scale to fit screen (use displayWidth/displayHeight if texture exists, but fallback to known bg scale)
-    const baseScaleX = this.bgScale || (this.game.config.width / this.renderStamp.width);
-    const baseScaleY = this.bgScale || (this.game.config.height / this.renderStamp.height);
+    const baseScaleX = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayWidth / this.renderStamp.width) : (this.game.config.width / this.renderStamp.width);
+    const baseScaleY = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayHeight / this.renderStamp.height) : (this.game.config.height / this.renderStamp.height);
 
     // 2. Apply zoom. The `zoomedView` RenderTexture expects coordinates and scales that represent the final pixels.
     this.renderStamp.setScale(baseScaleX * zoom, baseScaleY * zoom);
