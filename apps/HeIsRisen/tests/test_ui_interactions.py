@@ -7,10 +7,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import test_helpers as th
 
 def run_ui_interaction_test(is_mobile=False):
-    print(f"\n=== Testing UI Interactions & Micro-UX ({'Mobile' if is_mobile else 'Desktop'}) ===")
+    context_type = "mobile" if is_mobile else "desktop"
+    print(f"\n=== Testing UI Interactions & Micro-UX ({context_type.capitalize()}) ===")
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     app_dir = os.path.join(script_dir, "..")
+    verification_dir = os.path.join(script_dir, "..", "..", "..", "verification")
+    os.makedirs(verification_dir, exist_ok=True)
 
     server_process = th.start_server(app_dir)
 
@@ -62,6 +65,10 @@ def run_ui_interaction_test(is_mobile=False):
             """)
             time.sleep(1)
 
+            screenshot_open = os.path.join(verification_dir, f"settings_open_{context_type}.png")
+            page.screenshot(path=screenshot_open)
+            print(f"Captured screenshot: {screenshot_open}")
+
             # 3. Test Slider Interaction (Drag to change volume)
             print("Testing visual slider interactions for Ambient and SFX Volume...")
 
@@ -90,6 +97,10 @@ def run_ui_interaction_test(is_mobile=False):
             """)
             time.sleep(0.5)
 
+            screenshot_slider = os.path.join(verification_dir, f"settings_slider_drag_{context_type}.png")
+            page.screenshot(path=screenshot_slider)
+            print(f"Captured screenshot: {screenshot_slider}")
+
             new_ambient = page.evaluate("() => window.game.scene.scenes[0].registry.get('ambientVolume')")
             new_sfx = page.evaluate("() => window.game.scene.scenes[0].registry.get('sfxVolume')")
 
@@ -111,6 +122,10 @@ def run_ui_interaction_test(is_mobile=False):
 
             # Wait to allow the 150ms delay to finish before asserting
             time.sleep(0.5)
+
+            screenshot_closed = os.path.join(verification_dir, f"settings_closed_{context_type}.png")
+            page.screenshot(path=screenshot_closed)
+            print(f"Captured screenshot: {screenshot_closed}")
 
             # Ensure menu is closed (modal background is gone)
             menu_open = page.evaluate("""
@@ -135,6 +150,10 @@ def run_ui_interaction_test(is_mobile=False):
             """)
             time.sleep(2) # Wait for video/endgame logic
 
+            screenshot_endgame = os.path.join(verification_dir, f"endgame_screen_{context_type}.png")
+            page.screenshot(path=screenshot_endgame)
+            print(f"Captured screenshot: {screenshot_endgame}")
+
             # Click "Play Again" button in EndGame Scene
             print("Testing 'Play Again' button interaction...")
             played_again = page.evaluate("""
@@ -151,6 +170,10 @@ def run_ui_interaction_test(is_mobile=False):
             """)
 
             time.sleep(0.5) # Wait for 150ms transition delay
+
+            screenshot_restarted = os.path.join(verification_dir, f"game_restarted_{context_type}.png")
+            page.screenshot(path=screenshot_restarted)
+            print(f"Captured screenshot: {screenshot_restarted}")
 
             # Verification logic for play again
             print("SUCCESS: UI interactions completed without blocking the game thread.")
