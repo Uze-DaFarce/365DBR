@@ -1332,13 +1332,13 @@ class SectionHunt extends Phaser.Scene {
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50, 75);
     this.tweens.add({
         targets: eggSprite,
-        y: y - 150,
-        scaleX: eggSprite.scaleX * 2,
-        scaleY: eggSprite.scaleY * 2,
+        y: y - 100,
+        scaleX: eggSprite.scaleX * 1.5,
+        scaleY: eggSprite.scaleY * 1.5,
         angle: 360,
         alpha: 0,
-        duration: 1200,
-        ease: 'Sine.easeOut',
+        duration: 1000,
+        ease: 'Power1',
         onComplete: () => eggSprite.destroy()
     });
 
@@ -1347,13 +1347,13 @@ class SectionHunt extends Phaser.Scene {
         const symSprite = this.add.image(x, y, symbolTexture).setDepth(21).setDisplaySize(50, 75);
         this.tweens.add({
             targets: symSprite,
-            y: y - 150,
-            scaleX: symSprite.scaleX * 2,
-            scaleY: symSprite.scaleY * 2,
+            y: y - 100,
+            scaleX: symSprite.scaleX * 1.5,
+            scaleY: symSprite.scaleY * 1.5,
             angle: 360,
             alpha: 0,
-            duration: 1200,
-            ease: 'Sine.easeOut',
+            duration: 1000,
+            ease: 'Power1',
             onComplete: () => symSprite.destroy()
         });
     }
@@ -1368,12 +1368,12 @@ class SectionHunt extends Phaser.Scene {
 
     this.tweens.add({
         targets: feedback,
-        y: y - 180,
-        scaleX: 1.5,
-        scaleY: 1.5,
+        y: y - 120,
+        scaleX: 1.2,
+        scaleY: 1.2,
         alpha: 0,
-        duration: 1200,
-        ease: 'Sine.easeOut',
+        duration: 1000,
+        ease: 'Power1',
         onComplete: () => feedback.destroy()
     });
   }
@@ -1838,6 +1838,111 @@ class SectionHunt extends Phaser.Scene {
 }
 
 class EggZamRoom extends Phaser.Scene {
+
+  playGoodEggAnimation(eggImage, symbolImage, onCompleteCallback) {
+    const startX = eggImage.x;
+    const startY = eggImage.y;
+    const targetY = startY - 80;
+
+    const halo = this.add.image(startX, targetY - 40, 'halo').setDepth(2).setAlpha(0).setScale(0.5);
+
+    // Sparkles Emitter
+    const sparkles = this.add.particles(0, 0, 'sparkle', {
+        x: startX,
+        y: targetY,
+        speed: { min: -100, max: 100 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 1, end: 0 },
+        alpha: { start: 1, end: 0 },
+        lifespan: 1000,
+        frequency: 100,
+        blendMode: 'ADD'
+    }).setDepth(4);
+
+    this.tweens.add({
+        targets: [eggImage, symbolImage].filter(img => img),
+        y: targetY,
+        duration: 800,
+        ease: 'Cubic.easeOut',
+        onComplete: () => {
+            this.tweens.add({
+                targets: halo,
+                alpha: 1,
+                scaleX: 1.5,
+                scaleY: 1.5,
+                duration: 500,
+                yoyo: true,
+                repeat: 1
+            });
+            this.tweens.add({
+                targets: [eggImage, symbolImage].filter(img => img),
+                angle: 360,
+                duration: 1000,
+                ease: 'Sine.easeInOut',
+                onComplete: () => {
+                    sparkles.stop();
+                    this.time.delayedCall(1000, () => {
+                        halo.destroy();
+                        sparkles.destroy();
+                        if (onCompleteCallback) onCompleteCallback();
+                    });
+                }
+            });
+        }
+    });
+  }
+
+  playBadEggAnimation(eggImage, symbolImage, onCompleteCallback) {
+    const startX = eggImage.x;
+    const startY = eggImage.y;
+
+    const musicScene = this.scene.get('MusicScene');
+    if (musicScene) {
+        // Lower pitched error sound to simulate a gross fart
+        const errorSound = this.sound.add('error', { volume: this.registry.get('sfxVolume') ?? 0.5, rate: 0.5 });
+        errorSound.play();
+    }
+
+    const gasParticles = this.add.particles(0, 0, 'green-gas', {
+        x: startX,
+        y: startY,
+        speed: { min: -50, max: 50 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 1, end: 3 },
+        alpha: { start: 0.8, end: 0 },
+        lifespan: 2000,
+        frequency: 50,
+        blendMode: 'SCREEN'
+    }).setDepth(4);
+
+    // Wobble
+    this.tweens.add({
+        targets: [eggImage, symbolImage].filter(img => img),
+        angle: { from: -15, to: 15 },
+        duration: 100,
+        yoyo: true,
+        repeat: 5,
+        onComplete: () => {
+            // Shoot out the window
+            this.tweens.add({
+                targets: [eggImage, symbolImage].filter(img => img),
+                x: this.cameras.main.width + 200,
+                y: -100,
+                angle: 720,
+                duration: 800,
+                ease: 'Back.in',
+                onComplete: () => {
+                    gasParticles.stop();
+                    this.time.delayedCall(1000, () => {
+                        gasParticles.destroy();
+                        if (onCompleteCallback) onCompleteCallback();
+                    });
+                }
+            });
+        }
+    });
+  }
+
   constructor() {
     super({ key: 'EggZamRoom' });
     this.displayedEggImage = null;
@@ -1951,26 +2056,28 @@ class EggZamRoom extends Phaser.Scene {
     addZoneHover(rightBottleZone);
 
     const showExplanation = (isCorrect, guessText) => {
-        const musicScene = this.scene.get('MusicScene');
-        if (isCorrect) {
-            if (musicScene) {
-                musicScene.playSFX('success');
-            }
-            const correctCount = this.registry.get('correctCategorizations') + 1;
-            this.registry.set('correctCategorizations', correctCount);
-            this.correctText.setText(`Correct: ${correctCount}`);
-            this.currentEgg.categorized = true;
-        } else {
-            if (musicScene) {
-                musicScene.playSFX('error');
-            }
-        }
-
-        if (this.explanationText) this.explanationText.destroy();
         const data = this.currentEgg.symbolData;
         const eggId = this.currentEgg.eggId;
 
-        this.explanationText = this.add.container(offsetX + 640 * uiScale, offsetY + 360 * uiScale).setDepth(100);
+        const executeExplanationPopup = () => {
+            const musicScene = this.scene.get('MusicScene');
+            if (isCorrect) {
+                if (musicScene) {
+                    musicScene.playSFX('success');
+                }
+                const correctCount = this.registry.get('correctCategorizations') + 1;
+                this.registry.set('correctCategorizations', correctCount);
+                this.correctText.setText(`Correct: ${correctCount}`);
+                this.currentEgg.categorized = true;
+            } else {
+                if (musicScene) {
+                    musicScene.playSFX('error');
+                }
+            }
+
+            if (this.explanationText) this.explanationText.destroy();
+
+            this.explanationText = this.add.container(offsetX + 640 * uiScale, offsetY + 360 * uiScale).setDepth(100);
 
         const bgWidth = 800 * uiScale;
         const bgHeight = 600 * uiScale;
@@ -2076,6 +2183,19 @@ class EggZamRoom extends Phaser.Scene {
                 }
             });
         });
+        };
+
+        if (isCorrect) {
+            if (data.category === 'Christian') {
+                this.playGoodEggAnimation(this.displayedEggImage, this.displayedSymbolImage, executeExplanationPopup);
+            } else if (data.category === 'Pagan') {
+                this.playBadEggAnimation(this.displayedEggImage, this.displayedSymbolImage, executeExplanationPopup);
+            } else {
+                executeExplanationPopup();
+            }
+        } else {
+            executeExplanationPopup();
+        }
     };
 
     leftBottleZone.on('pointerdown', () => {
@@ -2240,34 +2360,11 @@ class EggZamRoom extends Phaser.Scene {
         this.displayedEggImage = this.add.image(eggPosX, eggPosY, `egg-${eggId}`)
           .setDisplaySize(100 * scale, 125 * scale)
           .setDepth(3);
-
-        const baseScaleX = this.displayedEggImage.scaleX;
-        const baseScaleY = this.displayedEggImage.scaleY;
-        this.displayedEggImage.setScale(0);
-        this.tweens.add({
-            targets: this.displayedEggImage,
-            scaleX: baseScaleX,
-            scaleY: baseScaleY,
-            duration: 500,
-            ease: 'Back.out'
-        });
       }
       if (symbolData && symbolData.filename && this.textures.exists(symbolData.filename)) {
         this.displayedSymbolImage = this.add.image(symbolPosX, symbolPosY, symbolData.filename)
           .setDisplaySize(100 * scale, 125 * scale)
           .setDepth(3);
-
-        const baseScaleX = this.displayedSymbolImage.scaleX;
-        const baseScaleY = this.displayedSymbolImage.scaleY;
-        this.displayedSymbolImage.setScale(0);
-        this.tweens.add({
-            targets: this.displayedSymbolImage,
-            scaleX: baseScaleX,
-            scaleY: baseScaleY,
-            duration: 500,
-            delay: 150,
-            ease: 'Back.out'
-        });
       }
     }
   }

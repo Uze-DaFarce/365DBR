@@ -320,7 +320,3 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 ## 2026-03-18 - Juicy Core Loops
 **Learning:** When a game revolves around a single core action repeated dozens of times (like collecting 60 eggs), a basic fade-out feedback makes the game feel flat and unrewarding. Kids respond strongly to "juiciness"—exaggerated feedback on their actions.
 **Action:** Enhance primary collection interactions with multiple simultaneous, playful tweens (e.g., scaling up to 1.5x with a 360-degree rotation while floating upwards). These micro-UX changes make the core loop deeply satisfying without requiring new art assets.
-
-## 2026-03-19 - [Core Loop Juiciness: Paired Pop-ins]
-**Learning:** Staggered pop-in animations for paired visual elements (like an egg and its associated symbol) create a more delightful 'reveal' effect than having them appear simultaneously. Extending the float distance and duration of collection feedback sprites makes the interaction feel more rewarding.
-**Action:** Use `Back.out` easing for pop-ins with a small delay (e.g., 150ms) between paired elements, and use `Sine.easeOut` with extended distances for floating success feedback to make core loop actions feel "juicy".

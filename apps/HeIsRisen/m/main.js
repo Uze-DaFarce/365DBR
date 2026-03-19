@@ -1298,13 +1298,13 @@ class SectionHunt extends Phaser.Scene {
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50 * scale, 75 * scale);
     this.tweens.add({
         targets: eggSprite,
-        y: y - (150 * scale),
-        scaleX: eggSprite.scaleX * 2,
-        scaleY: eggSprite.scaleY * 2,
+        y: y - (100 * scale),
+        scaleX: eggSprite.scaleX * 1.5,
+        scaleY: eggSprite.scaleY * 1.5,
         angle: 360,
         alpha: 0,
-        duration: 1200,
-        ease: 'Sine.easeOut',
+        duration: 1000,
+        ease: 'Power1',
         onComplete: () => eggSprite.destroy()
     });
 
@@ -1313,13 +1313,13 @@ class SectionHunt extends Phaser.Scene {
         const symSprite = this.add.image(x, y, symbolTexture).setDepth(21).setDisplaySize(50 * scale, 75 * scale);
         this.tweens.add({
             targets: symSprite,
-            y: y - (150 * scale),
-            scaleX: symSprite.scaleX * 2,
-            scaleY: symSprite.scaleY * 2,
+            y: y - (100 * scale),
+            scaleX: symSprite.scaleX * 1.5,
+            scaleY: symSprite.scaleY * 1.5,
             angle: 360,
             alpha: 0,
-            duration: 1200,
-            ease: 'Sine.easeOut',
+            duration: 1000,
+            ease: 'Power1',
             onComplete: () => symSprite.destroy()
         });
     }
@@ -1334,12 +1334,12 @@ class SectionHunt extends Phaser.Scene {
 
     this.tweens.add({
         targets: feedback,
-        y: y - (180 * scale),
-        scaleX: 1.5,
-        scaleY: 1.5,
+        y: y - (120 * scale),
+        scaleX: 1.2,
+        scaleY: 1.2,
         alpha: 0,
-        duration: 1200,
-        ease: 'Sine.easeOut',
+        duration: 1000,
+        ease: 'Power1',
         onComplete: () => feedback.destroy()
     });
   }
@@ -1846,6 +1846,114 @@ class SectionHunt extends Phaser.Scene {
 }
 
 class EggZamRoom extends Phaser.Scene {
+
+  playGoodEggAnimation(eggImage, symbolImage, onCompleteCallback) {
+    const scale = this.gameScale;
+    const isDesktop = this.sys.game.device.os.desktop;
+    const assetScale = isDesktop ? scale : scale * 2;
+    const startX = eggImage.x;
+    const startY = eggImage.y;
+    const targetY = startY - (80 * assetScale);
+
+    const halo = this.add.image(startX, targetY - (40 * assetScale), 'halo').setDepth(2).setAlpha(0).setScale(0.5 * assetScale);
+
+    // Sparkles Emitter
+    const sparkles = this.add.particles(0, 0, 'sparkle', {
+        x: startX,
+        y: targetY,
+        speed: { min: -100 * assetScale, max: 100 * assetScale },
+        angle: { min: 0, max: 360 },
+        scale: { start: 1 * assetScale, end: 0 },
+        alpha: { start: 1, end: 0 },
+        lifespan: 1000,
+        frequency: 100,
+        blendMode: 'ADD'
+    }).setDepth(4);
+
+    this.tweens.add({
+        targets: [eggImage, symbolImage].filter(img => img),
+        y: targetY,
+        duration: 800,
+        ease: 'Cubic.easeOut',
+        onComplete: () => {
+            this.tweens.add({
+                targets: halo,
+                alpha: 1,
+                scaleX: 1.5 * assetScale,
+                scaleY: 1.5 * assetScale,
+                duration: 500,
+                yoyo: true,
+                repeat: 1
+            });
+            this.tweens.add({
+                targets: [eggImage, symbolImage].filter(img => img),
+                angle: 360,
+                duration: 1000,
+                ease: 'Sine.easeInOut',
+                onComplete: () => {
+                    sparkles.stop();
+                    this.time.delayedCall(1000, () => {
+                        halo.destroy();
+                        sparkles.destroy();
+                        if (onCompleteCallback) onCompleteCallback();
+                    });
+                }
+            });
+        }
+    });
+  }
+
+  playBadEggAnimation(eggImage, symbolImage, onCompleteCallback) {
+    const scale = this.gameScale;
+    const isDesktop = this.sys.game.device.os.desktop;
+    const assetScale = isDesktop ? scale : scale * 2;
+    const startX = eggImage.x;
+    const startY = eggImage.y;
+
+    const musicScene = this.scene.get('MusicScene');
+    if (musicScene) {
+        const errorSound = this.sound.add('error', { volume: this.registry.get('sfxVolume') ?? 0.5, rate: 0.5 });
+        errorSound.play();
+    }
+
+    const gasParticles = this.add.particles(0, 0, 'green-gas', {
+        x: startX,
+        y: startY,
+        speed: { min: -50 * assetScale, max: 50 * assetScale },
+        angle: { min: 0, max: 360 },
+        scale: { start: 1 * assetScale, end: 3 * assetScale },
+        alpha: { start: 0.8, end: 0 },
+        lifespan: 2000,
+        frequency: 50,
+        blendMode: 'SCREEN'
+    }).setDepth(4);
+
+    this.tweens.add({
+        targets: [eggImage, symbolImage].filter(img => img),
+        angle: { from: -15, to: 15 },
+        duration: 100,
+        yoyo: true,
+        repeat: 5,
+        onComplete: () => {
+            this.tweens.add({
+                targets: [eggImage, symbolImage].filter(img => img),
+                x: this.cameras.main.width + (200 * assetScale),
+                y: -100 * assetScale,
+                angle: 720,
+                duration: 800,
+                ease: 'Back.in',
+                onComplete: () => {
+                    gasParticles.stop();
+                    this.time.delayedCall(1000, () => {
+                        gasParticles.destroy();
+                        if (onCompleteCallback) onCompleteCallback();
+                    });
+                }
+            });
+        }
+    });
+  }
+
   constructor() {
     super({ key: 'EggZamRoom' });
     this.displayedEggImage = null;
@@ -1993,37 +2101,39 @@ class EggZamRoom extends Phaser.Scene {
     addZoneHover(this.rightBottleZone);
 
     const showExplanation = (isCorrect, guessText) => {
-        const musicScene = this.scene.get('MusicScene');
-        if (isCorrect) {
-            if (musicScene) {
-                musicScene.playSFX('success');
-            }
-            const correctCount = this.registry.get('correctCategorizations') + 1;
-            this.registry.set('correctCategorizations', correctCount);
-            this.correctText.setText(`Correct: ${correctCount}`);
-            let currentScore = this.registry.get('currentScore');
-            currentScore += 5;
-            this.registry.set('currentScore', currentScore);
-            const highScore = this.registry.get('highScore');
-            if (currentScore > highScore) {
-              this.registry.set('highScore', currentScore);
-              localStorage.setItem('highScore', currentScore);
-            }
-            this.currentEgg.categorized = true;
-        } else {
-            if (musicScene) {
-                musicScene.playSFX('error');
-            }
-        }
-
-        if (this.explanationText) this.explanationText.destroy();
         const data = this.currentEgg.symbolData;
         const eggId = this.currentEgg.eggId;
         const scale = this.gameScale;
         const isDesktop = this.sys.game.device.os.desktop;
         const assetScale = isDesktop ? scale : scale * 1.5;
 
-        this.explanationText = this.add.container(width / 2, height / 2).setDepth(100);
+        const executeExplanationPopup = () => {
+            const musicScene = this.scene.get('MusicScene');
+            if (isCorrect) {
+                if (musicScene) {
+                    musicScene.playSFX('success');
+                }
+                const correctCount = this.registry.get('correctCategorizations') + 1;
+                this.registry.set('correctCategorizations', correctCount);
+                this.correctText.setText(`Correct: ${correctCount}`);
+                let currentScore = this.registry.get('currentScore');
+                currentScore += 5;
+                this.registry.set('currentScore', currentScore);
+                const highScore = this.registry.get('highScore');
+                if (currentScore > highScore) {
+                  this.registry.set('highScore', currentScore);
+                  localStorage.setItem('highScore', currentScore);
+                }
+                this.currentEgg.categorized = true;
+            } else {
+                if (musicScene) {
+                    musicScene.playSFX('error');
+                }
+            }
+
+            if (this.explanationText) this.explanationText.destroy();
+
+            this.explanationText = this.add.container(width / 2, height / 2).setDepth(100);
 
         const bgWidth = Math.min(width * 0.95, 800 * assetScale);
         const bgHeight = Math.min(height * 0.95, 600 * assetScale);
@@ -2127,6 +2237,19 @@ class EggZamRoom extends Phaser.Scene {
                 }
             });
         });
+        };
+
+        if (isCorrect) {
+            if (data.category === 'Christian') {
+                this.playGoodEggAnimation(this.displayedEggImage, this.displayedSymbolImage, executeExplanationPopup);
+            } else if (data.category === 'Pagan') {
+                this.playBadEggAnimation(this.displayedEggImage, this.displayedSymbolImage, executeExplanationPopup);
+            } else {
+                executeExplanationPopup();
+            }
+        } else {
+            executeExplanationPopup();
+        }
     };
 
     this.leftBottleZone.on('pointerdown', () => {
@@ -2307,35 +2430,12 @@ class EggZamRoom extends Phaser.Scene {
           .setOrigin(0.5, 0.5)
           .setDisplaySize(100 * assetScale, 125 * assetScale)
           .setDepth(3);
-
-        const baseScaleX = this.displayedEggImage.scaleX;
-        const baseScaleY = this.displayedEggImage.scaleY;
-        this.displayedEggImage.setScale(0);
-        this.tweens.add({
-            targets: this.displayedEggImage,
-            scaleX: baseScaleX,
-            scaleY: baseScaleY,
-            duration: 500,
-            ease: 'Back.out'
-        });
       }
       if (symbolData && symbolData.filename && this.textures.exists(symbolData.filename)) {
         this.displayedSymbolImage = this.add.image(symbolPosX, symbolPosY, symbolData.filename)
           .setOrigin(0.5, 0.5)
           .setDisplaySize(100 * assetScale, 125 * assetScale)
           .setDepth(3);
-
-        const baseScaleX = this.displayedSymbolImage.scaleX;
-        const baseScaleY = this.displayedSymbolImage.scaleY;
-        this.displayedSymbolImage.setScale(0);
-        this.tweens.add({
-            targets: this.displayedSymbolImage,
-            scaleX: baseScaleX,
-            scaleY: baseScaleY,
-            duration: 500,
-            delay: 150,
-            ease: 'Back.out'
-        });
       }
     }
   }
