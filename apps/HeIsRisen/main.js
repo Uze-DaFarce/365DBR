@@ -737,7 +737,7 @@ class MainMenu extends Phaser.Scene {
                 }
                 const musicScene = this.scene.get('MusicScene');
                 if (musicScene) {
-                    this.sound.play('drive1', { volume: 0.5 });
+                    musicScene.playSFX('drive1');
                 }
                 this.scene.start('MapScene');
             }
@@ -892,7 +892,10 @@ class MapScene extends Phaser.Scene {
     if (!this.scene.get('MusicScene').scene.isActive()) {
       this.scene.launch('MusicScene');
     }
-    this.sound.play('drive2', { volume: 0.5 });
+    const musicScene = this.scene.get('MusicScene');
+    if (musicScene) {
+      musicScene.playSFX('drive2');
+    }
 
     this.mapImage = this.add.image(width/2, height/2, 'new-map');
     this.updateLayout(width, height);
@@ -986,7 +989,10 @@ class MapScene extends Phaser.Scene {
       });
 
       thumb.on('pointerdown', () => {
-        this.sound.play('drive1', { volume: 0.5 });
+        const musicScene = this.scene.get('MusicScene');
+        if (musicScene) {
+            musicScene.playSFX('drive1');
+        }
         this.scene.start('SectionHunt', { sectionName: section.name });
       });
 
@@ -1233,7 +1239,10 @@ class SectionHunt extends Phaser.Scene {
     const globalEggData = eggDataArray.find(e => e.eggId === eggData.eggId);
 
     if (!foundEggs.some(e => e.eggId === eggData.eggId)) {
-      this.sound.play('collect');
+      const musicScene = this.scene.get('MusicScene');
+      if (musicScene) {
+          musicScene.playSFX('collect');
+      }
 
       let symbolTexture = null;
       if (egg.symbolSprite && egg.symbolSprite.active) {
@@ -1533,7 +1542,10 @@ class SectionHunt extends Phaser.Scene {
     addButtonInteraction(this, this.eggsAmminHaul, 'menu-click');
     addTooltip(this, this.eggsAmminHaul, 'View Collection');
 
-    this.sound.play('drive2', { volume: 0.5 });
+    const musicScene = this.scene.get('MusicScene');
+    if (musicScene) {
+        musicScene.playSFX('drive2');
+    }
 
     this.scoreImage = this.add.image(0, 0, 'score').setOrigin(0, 0).setDisplaySize(200 * uiScale, 200 * uiScale).setDepth(4).setScrollFactor(0);
     const foundEggs = this.registry.get('foundEggs').length;
@@ -1939,14 +1951,19 @@ class EggZamRoom extends Phaser.Scene {
     addZoneHover(rightBottleZone);
 
     const showExplanation = (isCorrect, guessText) => {
+        const musicScene = this.scene.get('MusicScene');
         if (isCorrect) {
-            this.sound.play('success');
+            if (musicScene) {
+                musicScene.playSFX('success');
+            }
             const correctCount = this.registry.get('correctCategorizations') + 1;
             this.registry.set('correctCategorizations', correctCount);
             this.correctText.setText(`Correct: ${correctCount}`);
             this.currentEgg.categorized = true;
         } else {
-            this.sound.play('error');
+            if (musicScene) {
+                musicScene.playSFX('error');
+            }
         }
 
         if (this.explanationText) this.explanationText.destroy();
@@ -2280,6 +2297,8 @@ function addButtonInteraction(scene, button, soundKey = 'success') {
     const musicScene = scene.scene.get('MusicScene');
     if (musicScene && musicScene.scene.isActive()) {
         musicScene.playSFX(soundKey);
+    } else if (soundKey && scene.sound.get(soundKey)) {
+        scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
     }
 
     if (button.baseScaleX === undefined) {
