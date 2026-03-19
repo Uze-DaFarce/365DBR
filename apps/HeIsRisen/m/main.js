@@ -1025,8 +1025,8 @@ class MapScene extends Phaser.Scene {
               stampVideo.disableInteractive();
 
               const updateStampSize = () => {
-                  // User requested 30px offset on mobile as well
-                  const offset = 30 * (this.bgScale || 1);
+                  // User requested -10px offset on mobile (previously -40)
+                  const offset = -10 * (this.bgScale || 1);
                   stampVideo.setPosition(thumb.x, thumb.y + offset);
                   // Use video.videoHeight for webm intrinsic sizes if available, fallback to phaser width or default 720
                   const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
@@ -1077,8 +1077,8 @@ class MapScene extends Phaser.Scene {
               stampImg.setDepth(2);
               stampImg.disableInteractive();
               const updateStampSize = () => {
-                  // User requested 30px offset on mobile as well
-                  const offset = 30 * (this.bgScale || 1);
+                  // User requested -10px offset on mobile (previously -40)
+                  const offset = -10 * (this.bgScale || 1);
                   stampImg.setPosition(thumb.x, thumb.y + offset);
 
                   // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
