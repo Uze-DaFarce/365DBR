@@ -2263,10 +2263,17 @@ class EggZamRoom extends Phaser.Scene {
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
           playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
 
+          playBtnContainer.baseScaleX = 1;
+          playBtnContainer.baseScaleY = 1;
+
+          addButtonInteraction(this, playBtnContainer, 'menu-click');
+
           const triggerRestart = () => {
-              if (this.input.setDefaultCursor) this.input.setDefaultCursor('default');
-              initializeGameData(this.registry, this.cache);
-              this.scene.start('MapScene');
+              this.time.delayedCall(150, () => {
+                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('default');
+                  initializeGameData(this.registry, this.cache);
+                  this.scene.start('MapScene');
+              });
           };
 
           playBtnContainer.on('pointerdown', triggerRestart);

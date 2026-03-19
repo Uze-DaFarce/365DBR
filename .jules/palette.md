@@ -320,3 +320,9 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 ## 2026-03-18 - Juicy Core Loops
 **Learning:** When a game revolves around a single core action repeated dozens of times (like collecting 60 eggs), a basic fade-out feedback makes the game feel flat and unrewarding. Kids respond strongly to "juiciness"—exaggerated feedback on their actions.
 **Action:** Enhance primary collection interactions with multiple simultaneous, playful tweens (e.g., scaling up to 1.5x with a 360-degree rotation while floating upwards). These micro-UX changes make the core loop deeply satisfying without requiring new art assets.
+
+## 2026-03-19 - Tactile Feedback Requires Delay
+**Learning:**
+When upgrading buttons that trigger immediate scene transitions (like Restart or Close buttons) to use standard tactile feedback tweens (e.g., `addButtonInteraction`), the immediate callback execution cuts off the visual and auditory feedback. The interaction feels broken because the scene unloads before the tween or audio finishes.
+**Action:**
+Whenever adding `addButtonInteraction` to a button that transitions or unloads the scene, always wrap the callback logic in a `this.time.delayedCall(150, () => { ... })` to allow the user to see and hear the satisfying "pop" and "click" before the screen changes.
