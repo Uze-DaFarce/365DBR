@@ -1011,8 +1011,8 @@ class MapScene extends Phaser.Scene {
               // We must wait for the video metadata to load before scaling reliably, especially for webm which
               // sometimes defers resolution until the first frame is decoded in headless browsers
               const updateStampSize = () => {
-                  // User requested -10px offset on desktop (previously it was -40)
-                  const offset = -10 * (this.bgScale || 1);
+                  // User requested 0px offset on desktop (previously it was -40)
+                  const offset = 0 * (this.bgScale || 1);
                   stampVideo.setPosition(thumb.x, thumb.y + offset);
                   const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
@@ -1067,8 +1067,8 @@ class MapScene extends Phaser.Scene {
               stampImg.setDepth(2);
               stampImg.disableInteractive();
               const updateStampSize = () => {
-                  // User requested -10px offset on desktop (previously it was -40)
-                  const offset = -10 * (this.bgScale || 1);
+                  // User requested 0px offset on desktop (previously it was -40)
+                  const offset = 0 * (this.bgScale || 1);
                   stampImg.setPosition(thumb.x, thumb.y + offset);
 
                   // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
