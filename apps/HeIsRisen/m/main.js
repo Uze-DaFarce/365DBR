@@ -1658,7 +1658,10 @@ class SectionHunt extends Phaser.Scene {
       const captureRadiusSq = captureRadius * captureRadius;
 
       // Check all eggs
-      this.eggs.getChildren().forEach(egg => {
+      // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations on pointerdown
+      const children = this.eggs.getChildren();
+      for (let i = 0, len = children.length; i < len; i++) {
+        const egg = children[i];
         if (egg.active && !egg.getData('collected')) { // collected check might be redundant if we destroy, but safe
            // Bolt Optimization: Squared distance check using LENS position
            // Tapping the screen harvests the egg under the visual lens window.
@@ -1671,7 +1674,7 @@ class SectionHunt extends Phaser.Scene {
                if (egg.symbolSprite) egg.symbolSprite.destroy();
            }
         }
-      });
+      }
     });
   }
 
@@ -1739,7 +1742,10 @@ class SectionHunt extends Phaser.Scene {
     this.zoomedView.draw(this.renderStamp, drawX, drawY);
 
     // Single pass for visibility update and drawing
-    this.eggs.getChildren().forEach(egg => {
+    // ⚡ Bolt Optimization: Replace forEach with fast for loop in update loop
+    const children = this.eggs.getChildren();
+    for (let i = 0, len = children.length; i < len; i++) {
+      const egg = children[i];
       if (egg && egg.active) {
           // Update visibility based on LENS visual position
           // If the egg is under the lens (visual), it should be visible in the zoomed view.
@@ -1775,12 +1781,14 @@ class SectionHunt extends Phaser.Scene {
              }
           }
       }
-    });
+    }
 
     // Handle Button Hover and Cursor Swap
     let isHoveringButton = false;
 
-    this.uiButtons.forEach(btn => {
+    // ⚡ Bolt Optimization: Replace forEach with fast for loop
+    for (let i = 0, len = this.uiButtons.length; i < len; i++) {
+        const btn = this.uiButtons[i];
         if (btn && btn.active) {
              // Store base scale if not already stored
              if (btn.baseScaleX === undefined) btn.baseScaleX = btn.scaleX;
@@ -1814,7 +1822,7 @@ class SectionHunt extends Phaser.Scene {
                  }
              }
         }
-    });
+    }
 
     if (isHoveringButton) {
         if (this.magnifyingGlass) this.magnifyingGlass.setVisible(false);
