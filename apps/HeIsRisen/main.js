@@ -1332,13 +1332,13 @@ class SectionHunt extends Phaser.Scene {
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50, 75);
     this.tweens.add({
         targets: eggSprite,
-        y: y - 100,
-        scaleX: eggSprite.scaleX * 1.5,
-        scaleY: eggSprite.scaleY * 1.5,
+        y: y - 150,
+        scaleX: eggSprite.scaleX * 2,
+        scaleY: eggSprite.scaleY * 2,
         angle: 360,
         alpha: 0,
-        duration: 1000,
-        ease: 'Power1',
+        duration: 1200,
+        ease: 'Sine.easeOut',
         onComplete: () => eggSprite.destroy()
     });
 
@@ -1347,13 +1347,13 @@ class SectionHunt extends Phaser.Scene {
         const symSprite = this.add.image(x, y, symbolTexture).setDepth(21).setDisplaySize(50, 75);
         this.tweens.add({
             targets: symSprite,
-            y: y - 100,
-            scaleX: symSprite.scaleX * 1.5,
-            scaleY: symSprite.scaleY * 1.5,
+            y: y - 150,
+            scaleX: symSprite.scaleX * 2,
+            scaleY: symSprite.scaleY * 2,
             angle: 360,
             alpha: 0,
-            duration: 1000,
-            ease: 'Power1',
+            duration: 1200,
+            ease: 'Sine.easeOut',
             onComplete: () => symSprite.destroy()
         });
     }
@@ -1368,12 +1368,12 @@ class SectionHunt extends Phaser.Scene {
 
     this.tweens.add({
         targets: feedback,
-        y: y - 120,
-        scaleX: 1.2,
-        scaleY: 1.2,
+        y: y - 180,
+        scaleX: 1.5,
+        scaleY: 1.5,
         alpha: 0,
-        duration: 1000,
-        ease: 'Power1',
+        duration: 1200,
+        ease: 'Sine.easeOut',
         onComplete: () => feedback.destroy()
     });
   }
@@ -2240,11 +2240,34 @@ class EggZamRoom extends Phaser.Scene {
         this.displayedEggImage = this.add.image(eggPosX, eggPosY, `egg-${eggId}`)
           .setDisplaySize(100 * scale, 125 * scale)
           .setDepth(3);
+
+        const baseScaleX = this.displayedEggImage.scaleX;
+        const baseScaleY = this.displayedEggImage.scaleY;
+        this.displayedEggImage.setScale(0);
+        this.tweens.add({
+            targets: this.displayedEggImage,
+            scaleX: baseScaleX,
+            scaleY: baseScaleY,
+            duration: 500,
+            ease: 'Back.out'
+        });
       }
       if (symbolData && symbolData.filename && this.textures.exists(symbolData.filename)) {
         this.displayedSymbolImage = this.add.image(symbolPosX, symbolPosY, symbolData.filename)
           .setDisplaySize(100 * scale, 125 * scale)
           .setDepth(3);
+
+        const baseScaleX = this.displayedSymbolImage.scaleX;
+        const baseScaleY = this.displayedSymbolImage.scaleY;
+        this.displayedSymbolImage.setScale(0);
+        this.tweens.add({
+            targets: this.displayedSymbolImage,
+            scaleX: baseScaleX,
+            scaleY: baseScaleY,
+            duration: 500,
+            delay: 150,
+            ease: 'Back.out'
+        });
       }
     }
   }
