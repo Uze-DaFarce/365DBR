@@ -1693,10 +1693,10 @@ class SectionHunt extends Phaser.Scene {
     const viewWidth = diameter / zoom;
     const viewHeight = diameter / zoom;
 
-    // Crucial Change: The zoomed view should show what is visually under the LENS (lensX, lensY),
-    // not directly under the finger (pointer).
-    const scrollX = lensX - viewWidth / 2;
-    const scrollY = lensY - viewHeight / 2;
+    // Crucial Change: The user requested the zoomed view to show what is visually under the FINGER (pointer.x, pointer.y),
+    // because that's where they are pointing, even though the magnifying glass is visually offset so their hand doesn't block it.
+    const scrollX = pointer.x - viewWidth / 2;
+    const scrollY = pointer.y - viewHeight / 2;
 
     this.zoomedView.clear();
 
@@ -1713,26 +1713,16 @@ class SectionHunt extends Phaser.Scene {
     const baseScaleX = this.bgScale || (this.game.config.width / this.renderStamp.width);
     const baseScaleY = this.bgScale || (this.game.config.height / this.renderStamp.height);
 
-    // Also extract the image offsets. In mobile, the image origin is 0.5, 0.5 and it is placed at game.config.width/2, height/2.
-    // That means it is centered. To find its top-left on screen, we subtract half its display size.
-    let bgOffsetX = 0;
-    let bgOffsetY = 0;
-    if (this.sectionImage && this.sectionImage.active) {
-         bgOffsetX = this.sectionImage.x - (this.sectionImage.displayWidth / 2);
-         bgOffsetY = this.sectionImage.y - (this.sectionImage.displayHeight / 2);
-    }
-
     // 2. Apply zoom. The `zoomedView` RenderTexture expects coordinates and scales that represent the final pixels.
     this.renderStamp.setScale(baseScaleX * zoom, baseScaleY * zoom);
 
     // Set origin to top-left so we can position it correctly
     this.renderStamp.setOrigin(0, 0);
 
-    // We must account for these offsets so the drawn background matches the visual layout.
-    // If the background starts at (bgOffsetX, bgOffsetY) on screen,
-    // then the rendering coordinate needs to shift by those offsets multiplied by zoom.
-    const drawX = (bgOffsetX - scrollX) * zoom;
-    const drawY = (bgOffsetY - scrollY) * zoom;
+    // To shift the scaled image left/up, we take that screen-space offset and multiply it by `zoom`.
+    // Background is pinned at 0,0 on mobile (no bgOffset needed).
+    const drawX = -scrollX * zoom;
+    const drawY = -scrollY * zoom;
 
     this.zoomedView.draw(this.renderStamp, drawX, drawY);
 
@@ -2029,19 +2019,19 @@ class EggZamRoom extends Phaser.Scene {
         bg.setInteractive(new Phaser.Geom.Rectangle(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight), Phaser.Geom.Rectangle.Contains);
 
         // Header Elements
-        const title = this.add.text(0, -bgHeight/2 + 60 * assetScale, data.name || "Symbol", {
+        const title = this.add.text(-12 * assetScale, -bgHeight/2 + 60 * assetScale, data.name || "Symbol", {
             fontSize: `${36 * assetScale}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
         }).setOrigin(0.5);
 
         const eggImg = this.add.image(-bgWidth/2 + 50 * assetScale, -bgHeight/2 + 50 * assetScale, `egg-${eggId}`).setDisplaySize(100 * assetScale, 125 * assetScale);
         const symbolImgSmall = this.add.image(-bgWidth/2 + 50 * assetScale, -bgHeight/2 + 50 * assetScale, data.filename).setDisplaySize(100 * assetScale, 125 * assetScale);
 
-        const guessDisplay = this.add.text(bgWidth/2 - 120 * assetScale, -bgHeight/2 + 40 * assetScale, `Your Guess:\n${guessText}`, {
+        const guessDisplay = this.add.text(bgWidth/2 - 28 * assetScale, -bgHeight/2 + 40 * assetScale, `Your Guess:\n${guessText}`, {
             fontSize: `${24 * assetScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
         }).setOrigin(0.5, 0.5);
 
         // Result Text
-        const resultText = this.add.text(bgWidth/2 - 120 * assetScale, -bgHeight/2 + 90 * assetScale, isCorrect ? "Correct!" : "Incorrect!", {
+        const resultText = this.add.text(bgWidth/2 - 28 * assetScale, -bgHeight/2 + 90 * assetScale, isCorrect ? "Correct!" : "Incorrect!", {
             fontSize: `${28 * assetScale}px`,
             fill: isCorrect ? '#008000' : '#d32f2f',
             fontStyle: 'bold',
@@ -2285,15 +2275,15 @@ class EggZamRoom extends Phaser.Scene {
       const assetScale = isDesktop ? this.gameScale : this.gameScale * 2;
 
       const windowCenterX = 196 * assetScale;
-      // User requested egg to move down 6-10px to not overlap top border
-      const windowBottomY = 200 * assetScale;
+      const windowBottomY = 190 * assetScale;
       const eggHeight = 125 * assetScale;
       const symbolHeight = 125 * assetScale;
 
       const eggPosX = this.examiner.x + windowCenterX;
-      const eggPosY = this.examiner.y + windowBottomY - (eggHeight / 2);
+      // User requested egg to move down ~6-10px to not overlap top border
+      const eggPosY = this.examiner.y + windowBottomY - (eggHeight / 2) + (10 * assetScale);
       const symbolPosX = this.examiner.x + windowCenterX;
-      const symbolPosY = this.examiner.y + windowBottomY - (symbolHeight / 2);
+      const symbolPosY = this.examiner.y + windowBottomY - (symbolHeight / 2) + (10 * assetScale);
 
       if (this.textures.exists(`egg-${eggId}`)) {
         this.displayedEggImage = this.add.image(eggPosX, eggPosY, `egg-${eggId}`)
@@ -2683,14 +2673,15 @@ function resizeGame() {
         const windowCenterX = 196 * assetScale;
         const windowBottomY = 190 * assetScale;
         const eggHeight = 125 * assetScale;
-        scene.displayedEggImage.setPosition(scene.examiner.x + windowCenterX, scene.examiner.y + windowBottomY - (eggHeight / 2));
+        // User requested egg to move down ~6-10px to not overlap top border
+        scene.displayedEggImage.setPosition(scene.examiner.x + windowCenterX, scene.examiner.y + windowBottomY - (eggHeight / 2) + (10 * assetScale));
         scene.displayedEggImage.setDisplaySize(100 * assetScale, 125 * assetScale);
       }
       if (scene.displayedSymbolImage) {
         const windowCenterX = 196 * assetScale;
         const windowBottomY = 190 * assetScale;
         const symbolHeight = 125 * assetScale;
-        scene.displayedSymbolImage.setPosition(scene.examiner.x + windowCenterX, scene.examiner.y + windowBottomY - (symbolHeight / 2));
+        scene.displayedSymbolImage.setPosition(scene.examiner.x + windowCenterX, scene.examiner.y + windowBottomY - (symbolHeight / 2) + (10 * assetScale));
         scene.displayedSymbolImage.setDisplaySize(100 * assetScale, 125 * assetScale);
       }
       if (scene.noEggsText) {

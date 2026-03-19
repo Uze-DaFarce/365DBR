@@ -180,6 +180,22 @@ def test_collect_eggs_in_level(is_mobile=False):
                 # In Playwright, `tap` implicitly dispatches pointerdown, pointerup.
                 if is_mobile:
                     page.touchscreen.tap(dom_x, dom_y)
+                    # Let's also forcefully emit on the lens if it misses (sometimes screen scaling is weird in headless mobile)
+                    page.evaluate(f"""() => {{
+                        const scene = window.game.scene.getScene('SectionHunt');
+                        if (scene && scene.input && scene.input.activePointer) {{
+                            // In the new logic, lens center is offset. To click exactly on the egg, the pointer must be offset.
+                            const scale = scene.gameScale || scene.bgScale || 1;
+                            const lensOffsetX = -97.5 * scale;
+                            const lensOffsetY = -135 * scale;
+                            // Set pointer so lensX == egg.x
+                            scene.input.activePointer.x = {egg_x} - lensOffsetX;
+                            scene.input.activePointer.y = {egg_y} - lensOffsetY;
+                            scene.input.activePointer.worldX = {egg_x} - lensOffsetX;
+                            scene.input.activePointer.worldY = {egg_y} - lensOffsetY;
+                            scene.input.emit('pointerdown', scene.input.activePointer);
+                        }}
+                    }}""")
                 else:
                     page.mouse.move(dom_x, dom_y)
                     time.sleep(0.2) # Briefly pause like a kid aiming the magnifying glass

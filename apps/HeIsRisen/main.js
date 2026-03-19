@@ -1975,12 +1975,12 @@ class EggZamRoom extends Phaser.Scene {
         const symbolImgSmall = this.add.image(-bgWidth/2 + 50 * uiScale, -bgHeight/2 + 50 * uiScale, data.filename).setDisplaySize(100 * uiScale, 125 * uiScale);
 
         // Your Guess moved ~12px right
-        const guessDisplay = this.add.text(bgWidth/2 - 108 * uiScale, -bgHeight/2 + 40 * uiScale, `Your Guess:\n${guessText}`, {
+        const guessDisplay = this.add.text(bgWidth/2 - 28 * uiScale, -bgHeight/2 + 40 * uiScale, `Your Guess:\n${guessText}`, {
             fontSize: `${24 * uiScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
         }).setOrigin(0.5, 0.5);
 
         // Result Text (Correct/Incorrect) moved under the guess (and matched the 12px right shift)
-        const resultText = this.add.text(bgWidth/2 - 108 * uiScale, -bgHeight/2 + 90 * uiScale, isCorrect ? "Correct!" : "Incorrect!", {
+        const resultText = this.add.text(bgWidth/2 - 28 * uiScale, -bgHeight/2 + 90 * uiScale, isCorrect ? "Correct!" : "Incorrect!", {
             fontSize: `${28 * uiScale}px`,
             fill: isCorrect ? '#008000' : '#d32f2f',
             fontStyle: 'bold',
