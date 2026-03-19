@@ -94,9 +94,17 @@ function initializeGameData(registry, cache) {
 class MusicScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MusicScene' });
-    this.musicVolume = localStorage.getItem('musicVolume') !== null ? parseFloat(localStorage.getItem('musicVolume')) : 0.5;
-    this.ambientVolume = localStorage.getItem('ambientVolume') !== null ? parseFloat(localStorage.getItem('ambientVolume')) : 0.5;
-    this.sfxVolume = localStorage.getItem('sfxVolume') !== null ? parseFloat(localStorage.getItem('sfxVolume')) : 0.5;
+
+    const getSafeVol = (key) => {
+      const val = localStorage.getItem(key);
+      if (val === null) return 0.5;
+      const parsed = parseFloat(val);
+      return (isNaN(parsed) || parsed < 0 || parsed > 1) ? 0.5 : parsed;
+    };
+
+    this.musicVolume = getSafeVol('musicVolume');
+    this.ambientVolume = getSafeVol('ambientVolume');
+    this.sfxVolume = getSafeVol('sfxVolume');
   }
 
   create() {
@@ -560,7 +568,11 @@ class MainMenu extends Phaser.Scene {
       this.registry.set('currentScore', 0);
 
       try {
-          this.registry.set('highScore', parseInt(localStorage.getItem('highScore')) || 0);
+          let loadedScore = parseInt(localStorage.getItem('highScore'));
+          if (isNaN(loadedScore) || loadedScore < 0) {
+              loadedScore = 0;
+          }
+          this.registry.set('highScore', loadedScore);
       } catch (e) {
           console.warn('LocalStorage access failed:', e);
           this.registry.set('highScore', 0);
@@ -630,13 +642,16 @@ class MainMenu extends Phaser.Scene {
       // 4. User Tap "Play Now" -> Start Game
 
     // Initialize volume registry early (Load from localStorage if available)
-    const savedMusic = localStorage.getItem('musicVolume');
-    const savedAmbient = localStorage.getItem('ambientVolume');
-    const savedSfx = localStorage.getItem('sfxVolume');
+    const getSafeVol = (key) => {
+      const val = localStorage.getItem(key);
+      if (val === null) return 0.5;
+      const parsed = parseFloat(val);
+      return (isNaN(parsed) || parsed < 0 || parsed > 1) ? 0.5 : parsed;
+    };
 
-    if (!this.registry.has('musicVolume')) this.registry.set('musicVolume', savedMusic !== null ? parseFloat(savedMusic) : 0.5);
-    if (!this.registry.has('ambientVolume')) this.registry.set('ambientVolume', savedAmbient !== null ? parseFloat(savedAmbient) : 0.5);
-    if (!this.registry.has('sfxVolume')) this.registry.set('sfxVolume', savedSfx !== null ? parseFloat(savedSfx) : 0.5);
+    if (!this.registry.has('musicVolume')) this.registry.set('musicVolume', getSafeVol('musicVolume'));
+    if (!this.registry.has('ambientVolume')) this.registry.set('ambientVolume', getSafeVol('ambientVolume'));
+    if (!this.registry.has('sfxVolume')) this.registry.set('sfxVolume', getSafeVol('sfxVolume'));
 
       // Launch UI Scene immediately (hidden initially)
       if (!this.scene.get('UIScene').scene.isActive()) {
