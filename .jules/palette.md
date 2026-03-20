@@ -326,3 +326,7 @@ Added a global JavaScript event listener for all `a[href^="#"]` links that:
 When upgrading buttons that trigger immediate scene transitions (like Restart or Close buttons) to use standard tactile feedback tweens (e.g., `addButtonInteraction`), the immediate callback execution cuts off the visual and auditory feedback. The interaction feels broken because the scene unloads before the tween or audio finishes.
 **Action:**
 Whenever adding `addButtonInteraction` to a button that transitions or unloads the scene, always wrap the callback logic in a `this.time.delayedCall(150, () => { ... })` to allow the user to see and hear the satisfying "pop" and "click" before the screen changes.
+
+## 2026-03-20 - Empty State Calls to Action
+**Learning:** Presenting a static "All items categorized" empty state when the user is only partially through the game creates a "dead end" in the flow. Users may mistakenly believe they have finished the entire game rather than just their current batch.
+**Action:** Always provide explicit, contextual Calls to Action (CTAs) in empty states (e.g., "Return to the map to find more") so the user clearly understands what to do next to continue the core game loop.
