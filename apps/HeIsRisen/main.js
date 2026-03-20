@@ -911,23 +911,22 @@ class MapScene extends Phaser.Scene {
     }
 
     if (!this.textures.exists('sparkle')) {
-        const sparkleGraphics = this.make.graphics({x:0, y:0, add:false});
-        sparkleGraphics.fillStyle(0xffffff, 1);
-
-        // Draw a simple 4-point sparkle (diamond/cross shape) using paths
-        sparkleGraphics.beginPath();
-        sparkleGraphics.moveTo(10, 0);   // Top
-        sparkleGraphics.lineTo(12, 8);   // Top-Right Inner
-        sparkleGraphics.lineTo(20, 10);  // Right
-        sparkleGraphics.lineTo(12, 12);  // Bottom-Right Inner
-        sparkleGraphics.lineTo(10, 20);  // Bottom
-        sparkleGraphics.lineTo(8, 12);   // Bottom-Left Inner
-        sparkleGraphics.lineTo(0, 10);   // Left
-        sparkleGraphics.lineTo(8, 8);    // Top-Left Inner
-        sparkleGraphics.closePath();
-        sparkleGraphics.fillPath();
-
-        sparkleGraphics.generateTexture('sparkle', 20, 20);
+        // Use Phaser.GameObjects.Star and generate a texture from it
+        const starObject = this.make.star({
+            x: 10,
+            y: 10,
+            points: 4,
+            innerRadius: 2,
+            outerRadius: 10,
+            fillColor: 0xffffff,
+            add: false
+        });
+        // We need a graphics object or render texture to bake it into a reusable cache texture for particles
+        const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
+        renderTexture.draw(starObject, 10, 10);
+        renderTexture.saveTexture('sparkle');
+        renderTexture.destroy();
+        starObject.destroy();
     }
 
     if (!this.textures.exists('green-gas')) {
