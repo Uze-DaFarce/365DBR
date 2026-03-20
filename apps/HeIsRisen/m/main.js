@@ -1740,8 +1740,13 @@ class SectionHunt extends Phaser.Scene {
 
     // Calculate target scale directly without redundant matrix operations
     // 1. Base scale to fit screen (use displayWidth/displayHeight if texture exists, but fallback to known bg scale)
-    const baseScaleX = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayWidth / this.renderStamp.width) : (this.bgScale || (this.game.config.width / this.renderStamp.width));
-    const baseScaleY = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayHeight / this.renderStamp.height) : (this.bgScale || (this.game.config.height / this.renderStamp.height));
+    // CRITICAL FIX: Get the ACTUAL width and height of the texture we are drawing, because this.renderStamp.width
+    // may still hold the dimensions of the fallback image (1280x720) even when rendering a video (1920x1080).
+    const actualBgWidth = (this.sectionImage && this.sectionImage.active && this.sectionImage.texture) ? this.sectionImage.texture.source[0].width : this.renderStamp.width;
+    const actualBgHeight = (this.sectionImage && this.sectionImage.active && this.sectionImage.texture) ? this.sectionImage.texture.source[0].height : this.renderStamp.height;
+
+    const baseScaleX = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayWidth / actualBgWidth) : (this.bgScale || (this.game.config.width / actualBgWidth));
+    const baseScaleY = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayHeight / actualBgHeight) : (this.bgScale || (this.game.config.height / actualBgHeight));
 
     // 2. Apply zoom. The `zoomedView` RenderTexture expects coordinates and scales that represent the final pixels.
     this.renderStamp.setScale(baseScaleX * zoom, baseScaleY * zoom);
