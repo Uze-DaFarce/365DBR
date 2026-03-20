@@ -2898,6 +2898,9 @@ window.addEventListener('load', () => {
   if (!canvas) return;
 
   const handleTouch = (e) => {
+    // Prevent infinite loops from intercepting our own synthetic dispatched events
+    if (!e.isTrusted) return;
+
     // Only intercept if we are actively rotating via CSS in portrait mode on small screens
     const isPortrait = window.innerHeight > window.innerWidth;
     const isSmallScreen = Math.min(window.innerWidth, window.innerHeight) < 1000;
