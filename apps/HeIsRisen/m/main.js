@@ -2017,6 +2017,44 @@ class EggZamRoom extends Phaser.Scene {
 
   create() {
     this.input.setDefaultCursor('none');
+
+    // Generate missing particle textures dynamically
+    if (!this.textures.exists('halo')) {
+        const haloGraphics = this.make.graphics({x:0, y:0, add:false});
+        haloGraphics.fillStyle(0xffff00, 0.4);
+        haloGraphics.fillCircle(50, 50, 50);
+        haloGraphics.fillStyle(0xffff00, 0.8);
+        haloGraphics.fillCircle(50, 50, 40);
+        haloGraphics.generateTexture('halo', 100, 100);
+    }
+
+    if (!this.textures.exists('sparkle')) {
+        const sparkleGraphics = this.make.graphics({x:0, y:0, add:false});
+        sparkleGraphics.fillStyle(0xffffff, 1);
+
+        // Draw a simple 4-point sparkle (diamond/cross shape) using paths
+        sparkleGraphics.beginPath();
+        sparkleGraphics.moveTo(10, 0);   // Top
+        sparkleGraphics.lineTo(12, 8);   // Top-Right Inner
+        sparkleGraphics.lineTo(20, 10);  // Right
+        sparkleGraphics.lineTo(12, 12);  // Bottom-Right Inner
+        sparkleGraphics.lineTo(10, 20);  // Bottom
+        sparkleGraphics.lineTo(8, 12);   // Bottom-Left Inner
+        sparkleGraphics.lineTo(0, 10);   // Left
+        sparkleGraphics.lineTo(8, 8);    // Top-Left Inner
+        sparkleGraphics.closePath();
+        sparkleGraphics.fillPath();
+
+        sparkleGraphics.generateTexture('sparkle', 20, 20);
+    }
+
+    if (!this.textures.exists('green-gas')) {
+        const gasGraphics = this.make.graphics({x:0, y:0, add:false});
+        gasGraphics.fillStyle(0x00ff00, 0.5);
+        gasGraphics.fillCircle(15, 15, 15);
+        gasGraphics.generateTexture('green-gas', 30, 30);
+    }
+
     const width = this.game.config.width;
     const height = this.game.config.height;
     const scaleX = width / 1280;
