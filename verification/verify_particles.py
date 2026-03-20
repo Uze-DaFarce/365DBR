@@ -34,9 +34,11 @@ def test_particles():
         # Force transition to EggZamRoom directly via Phaser API
         page.evaluate("window.game.scene.getScene('MainMenu').scene.start('EggZamRoom')")
 
-        # Wait for EggZamRoom to be active
+        # Wait for EggZamRoom to be active AND visibly rendering
         page.wait_for_function("window.game.scene.getScene('EggZamRoom') && window.game.scene.getScene('EggZamRoom').scene.isActive()", timeout=10000)
-        page.wait_for_timeout(1000)
+
+        # Wait 3 seconds to let assets load and the examiner render
+        page.wait_for_timeout(3000)
 
         # Click the left bottle zone to trigger playGoodEggAnimation (Christian)
         # Center of Left Bottle Zone = 540, 540
@@ -45,8 +47,8 @@ def test_particles():
         page.mouse.up()
 
         # The animation takes 800ms to lift the egg, then sparks/halo appear.
-        # Wait until we are right in the middle of the sparkle particle emission
-        page.wait_for_timeout(1000)
+        # Wait 1.1s to be right in the middle of the sparkle particle emission
+        page.wait_for_timeout(1100)
 
         page.screenshot(path="verification/eggjam_particle_good.png")
 
