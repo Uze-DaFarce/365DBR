@@ -900,6 +900,42 @@ class MapScene extends Phaser.Scene {
   create() {
     this.input.setDefaultCursor('none');
 
+    // Generate missing particle textures dynamically
+    if (!this.textures.exists('halo')) {
+        const haloGraphics = this.make.graphics({x:0, y:0, add:false});
+        haloGraphics.fillStyle(0xffff00, 0.4);
+        haloGraphics.fillCircle(50, 50, 50);
+        haloGraphics.fillStyle(0xffff00, 0.8);
+        haloGraphics.fillCircle(50, 50, 40);
+        haloGraphics.generateTexture('halo', 100, 100);
+    }
+
+    if (!this.textures.exists('sparkle')) {
+        // Use Phaser.GameObjects.Star and generate a texture from it
+        const starObject = this.make.star({
+            x: 10,
+            y: 10,
+            points: 4,
+            innerRadius: 2,
+            outerRadius: 10,
+            fillColor: 0xffffff,
+            add: false
+        });
+        // We need a graphics object or render texture to bake it into a reusable cache texture for particles
+        const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
+        renderTexture.draw(starObject, 10, 10);
+        renderTexture.saveTexture('sparkle');
+        renderTexture.destroy();
+        starObject.destroy();
+    }
+
+    if (!this.textures.exists('green-gas')) {
+        const gasGraphics = this.make.graphics({x:0, y:0, add:false});
+        gasGraphics.fillStyle(0x00ff00, 0.5);
+        gasGraphics.fillCircle(15, 15, 15);
+        gasGraphics.generateTexture('green-gas', 30, 30);
+    }
+
     // Scale logic
     const width = this.scale.width;
     const height = this.scale.height;
