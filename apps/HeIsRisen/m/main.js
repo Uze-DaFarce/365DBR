@@ -1740,8 +1740,8 @@ class SectionHunt extends Phaser.Scene {
 
     // Calculate target scale directly without redundant matrix operations
     // 1. Base scale to fit screen (use displayWidth/displayHeight if texture exists, but fallback to known bg scale)
-    const baseScaleX = this.bgScale || (this.game.config.width / this.renderStamp.width);
-    const baseScaleY = this.bgScale || (this.game.config.height / this.renderStamp.height);
+    const baseScaleX = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayWidth / this.renderStamp.width) : (this.bgScale || (this.game.config.width / this.renderStamp.width));
+    const baseScaleY = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayHeight / this.renderStamp.height) : (this.bgScale || (this.game.config.height / this.renderStamp.height));
 
     // 2. Apply zoom. The `zoomedView` RenderTexture expects coordinates and scales that represent the final pixels.
     this.renderStamp.setScale(baseScaleX * zoom, baseScaleY * zoom);
@@ -1751,8 +1751,10 @@ class SectionHunt extends Phaser.Scene {
 
     // To shift the scaled image left/up, we take that screen-space offset and multiply it by `zoom`.
     // Background is pinned at 0,0 on mobile (no bgOffset needed).
-    const drawX = -scrollX * zoom;
-    const drawY = -scrollY * zoom;
+    // The previous math lacked the baseScale alignment to translate logical pixels to raw texture coordinates.
+    // We scale the logical scroll offset by the display scale factor, then apply the zoom.
+    const drawX = -scrollX * baseScaleX * zoom;
+    const drawY = -scrollY * baseScaleY * zoom;
 
     this.zoomedView.draw(this.renderStamp, drawX, drawY);
 
@@ -1783,7 +1785,7 @@ class SectionHunt extends Phaser.Scene {
              this.renderStamp.setFlipY(egg.flipY);
              this.renderStamp.setOrigin(0.5, 0.5);
              this.renderStamp.setScale(egg.scaleX * zoom, egg.scaleY * zoom);
-             this.zoomedView.draw(this.renderStamp, (egg.x - scrollX) * zoom, (egg.y - scrollY) * zoom);
+             this.zoomedView.draw(this.renderStamp, (egg.x - scrollX) * baseScaleX * zoom, (egg.y - scrollY) * baseScaleY * zoom);
 
              // Draw Symbol using renderStamp
              if (egg.symbolSprite && egg.symbolSprite.active && egg.symbolSprite.visible) {
@@ -1792,7 +1794,7 @@ class SectionHunt extends Phaser.Scene {
                  this.renderStamp.setFlipX(egg.symbolSprite.flipX);
                  this.renderStamp.setFlipY(egg.symbolSprite.flipY);
                  this.renderStamp.setScale(egg.symbolSprite.scaleX * zoom, egg.symbolSprite.scaleY * zoom);
-                 this.zoomedView.draw(this.renderStamp, (egg.symbolSprite.x - scrollX) * zoom, (egg.symbolSprite.y - scrollY) * zoom);
+                 this.zoomedView.draw(this.renderStamp, (egg.symbolSprite.x - scrollX) * baseScaleX * zoom, (egg.symbolSprite.y - scrollY) * baseScaleY * zoom);
              }
           }
       }
@@ -2486,10 +2488,17 @@ function getViewportDimensions() {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   let width, height;
   if (isMobile) {
-    width = screen.width;
-    height = screen.height;
-    if (width < height) {
-      [width, height] = [height, width];
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    // Force landscape dimensions if device is in portrait mode
+    if (height > width) {
+      if (width < 1000) {
+        // Small screens (< 1000px): CSS rotates the view 90 degrees.
+        // Phaser needs the swapped landscape dimensions.
+        [width, height] = [height, width];
+      }
+      // Large screens (>= 1000px): Do nothing, let Phaser letterbox 16:9 naturally.
     }
   } else {
     width = window.innerWidth;
@@ -2508,6 +2517,9 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     parent: 'game-container',
+  },
+  input: {
+    activePointers: 3 // Needed for reliable touch
   },
   scene: [MainMenu, MapScene, SectionHunt, EggZamRoom, MusicScene, UIScene],
 };
@@ -2867,12 +2879,85 @@ function resizeGame() {
 
 game.events.on('ready', () => {
   resizeGame();
-  window.addEventListener('resize', resizeGame);
-  window.addEventListener('orientationchange', resizeGame);
+
+  // Wait a small tick after orientation change to get accurate window dimensions
+  const debouncedResize = () => {
+    setTimeout(resizeGame, 100);
+  };
+  window.addEventListener('resize', debouncedResize);
+  window.addEventListener('orientationchange', debouncedResize);
 });
 
 // Auto-focus the game container for screen readers and keyboard accessibility
 window.addEventListener('load', () => {
   const gameContainer = document.getElementById('game-container');
   if (gameContainer) gameContainer.focus();
+
+  // Handle Safari CSS rotation input mapping for portrait phones
+  const canvas = document.querySelector('canvas');
+  if (!canvas) return;
+
+  const handleTouch = (e) => {
+    // Prevent infinite loops from intercepting our own synthetic dispatched events
+    if (!e.isTrusted) return;
+
+    // Only intercept if we are actively rotating via CSS in portrait mode on small screens
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const isSmallScreen = Math.min(window.innerWidth, window.innerHeight) < 1000;
+
+    // Check if the browser natively supports screen orientation lock (usually false on iOS Safari without fullscreen)
+    let isLocked = false;
+    try {
+      if (screen.orientation && screen.orientation.type && screen.orientation.type.includes('landscape')) {
+         isLocked = true;
+      }
+    } catch(err) {}
+
+    if (isPortrait && isSmallScreen && !isLocked) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const touches = Array.from(e.changedTouches).map(touch => {
+        // Map portrait screen coordinates to rotated landscape canvas coordinates
+        // Visual Rotation is: transform: rotate(90deg) translateY(-100%);
+        // This means physical Top-Left (0,0) becomes Canvas Top-Right.
+        // Screen X becomes Canvas Y
+        // Screen Y becomes Canvas Inverse X
+
+        const physicalX = touch.clientX;
+        const physicalY = touch.clientY;
+        const physicalWidth = window.innerWidth;
+
+        const mappedX = physicalY;
+        const mappedY = physicalWidth - physicalX;
+
+        return new Touch({
+          identifier: touch.identifier,
+          target: canvas,
+          clientX: mappedX,
+          clientY: mappedY,
+          screenX: mappedX,
+          screenY: mappedY,
+          pageX: mappedX,
+          pageY: mappedY
+        });
+      });
+
+      const syntheticEvent = new TouchEvent(e.type, {
+        cancelable: true,
+        bubbles: true,
+        touches: e.type === 'touchend' ? [] : touches,
+        targetTouches: e.type === 'touchend' ? [] : touches,
+        changedTouches: touches
+      });
+
+      canvas.dispatchEvent(syntheticEvent);
+    }
+  };
+
+  // Use capture phase to intercept before Phaser's default handlers
+  gameContainer.addEventListener('touchstart', handleTouch, { capture: true, passive: false });
+  gameContainer.addEventListener('touchmove', handleTouch, { capture: true, passive: false });
+  gameContainer.addEventListener('touchend', handleTouch, { capture: true, passive: false });
+  gameContainer.addEventListener('touchcancel', handleTouch, { capture: true, passive: false });
 });
