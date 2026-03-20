@@ -375,34 +375,26 @@ class UIScene extends Phaser.Scene {
     closeBtn.setSize(closeSize, closeSize);
     closeBtn.setInteractive(new Phaser.Geom.Circle(0, 0, closeSize / 2), Phaser.Geom.Circle.Contains);
 
-    // Hover effects
+    closeBtn.baseScaleX = 1;
+    closeBtn.baseScaleY = 1;
+
+    addButtonInteraction(this, closeBtn, 'menu-click');
+
     closeBtn.on('pointerover', () => {
         this.input.setDefaultCursor('pointer');
-        this.tweens.add({
-            targets: closeBtn,
-            scaleX: 1.1,
-            scaleY: 1.1,
-            duration: 100,
-            ease: 'Sine.easeInOut'
-        });
     });
 
     closeBtn.on('pointerout', () => {
         this.input.setDefaultCursor('default');
-        this.tweens.add({
-            targets: closeBtn,
-            scaleX: 1.0,
-            scaleY: 1.0,
-            duration: 100,
-            ease: 'Sine.easeInOut'
-        });
     });
 
     closeBtn.on('pointerdown', () => {
-        this.settingsContainer.setVisible(false);
-        this.gearIcon.setVisible(true);
-        this.gearIcon.setScale(1);
-        this.input.setDefaultCursor('none');
+        this.time.delayedCall(150, () => {
+            this.settingsContainer.setVisible(false);
+            this.gearIcon.setVisible(true);
+            this.gearIcon.setScale(1);
+            this.input.setDefaultCursor('none');
+        });
     });
     this.settingsContainer.add(closeBtn);
 
@@ -453,8 +445,14 @@ class UIScene extends Phaser.Scene {
     handleContainer.on('drag', (p, x) => updateVolume(x));
     trackHitArea.on('pointerdown', (p) => updateVolume(p.worldX));
 
-    handleContainer.on('pointerover', () => { handleContainer.setScale(1.3); this.input.setDefaultCursor('pointer'); });
-    handleContainer.on('pointerout', () => { handleContainer.setScale(1); this.input.setDefaultCursor('default'); });
+    handleContainer.on('pointerover', () => {
+        this.input.setDefaultCursor('pointer');
+        this.tweens.add({ targets: handleContainer, scaleX: 1.3, scaleY: 1.3, duration: 100, ease: 'Back.out' });
+    });
+    handleContainer.on('pointerout', () => {
+        this.input.setDefaultCursor('default');
+        this.tweens.add({ targets: handleContainer, scaleX: 1, scaleY: 1, duration: 100, ease: 'Back.out' });
+    });
   }
 
   openSettings() {
@@ -2384,20 +2382,25 @@ class EggZamRoom extends Phaser.Scene {
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
           playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
 
+          playBtnContainer.baseScaleX = 1;
+          playBtnContainer.baseScaleY = 1;
+
+          addButtonInteraction(this, playBtnContainer, 'menu-click');
+
           playBtnContainer.on('pointerover', () => {
               this.input.setDefaultCursor('pointer');
-              playBtnContainer.setScale(1.05);
           });
 
           playBtnContainer.on('pointerout', () => {
               this.input.setDefaultCursor('default');
-              playBtnContainer.setScale(1);
           });
 
           const triggerRestart = () => {
-              this.input.setDefaultCursor('default');
-              initializeGameData(this.registry, this.cache);
-              this.scene.start('MapScene');
+              this.time.delayedCall(150, () => {
+                  this.input.setDefaultCursor('default');
+                  initializeGameData(this.registry, this.cache);
+                  this.scene.start('MapScene');
+              });
           };
 
           playBtnContainer.on('pointerdown', triggerRestart);
