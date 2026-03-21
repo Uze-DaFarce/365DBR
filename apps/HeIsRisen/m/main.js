@@ -2045,16 +2045,8 @@ class EggZamRoom extends Phaser.Scene {
     }
 
     if (!this.textures.exists('sparkle')) {
-        // Use Phaser.GameObjects.Star and generate a texture from it
-        const starObject = this.make.star({
-            x: 10,
-            y: 10,
-            points: 4,
-            innerRadius: 2,
-            outerRadius: 10,
-            fillColor: 0xffffff,
-            add: false
-        });
+        // Use Phaser.GameObjects.Star and generate a texture from it safely
+        const starObject = new Phaser.GameObjects.Star(this, 10, 10, 4, 2, 10, 0xffffff);
         const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
         renderTexture.draw(starObject, 10, 10);
         renderTexture.saveTexture('sparkle');
