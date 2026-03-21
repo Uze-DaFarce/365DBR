@@ -1429,9 +1429,6 @@ class SectionHunt extends Phaser.Scene {
       }
       // console.log(`SectionHunt: Collected egg-${eggInfo.eggId} with symbol:`, eggInfo.symbolData ? eggInfo.symbolData.name : 'none', `Score: ${currentScore}`);
       const foundEggsCount = foundEggs.length;
-      if (this.scoreText) {
-        this.scoreText.setText(`${foundEggsCount}/${TOTAL_EGGS}`);
-      }
 
       saveGameState(this.registry);
 
