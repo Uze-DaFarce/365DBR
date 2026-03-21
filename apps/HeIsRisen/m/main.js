@@ -1872,9 +1872,9 @@ class SectionHunt extends Phaser.Scene {
       for (let i = children.length - 1; i >= 0; i--) {
         const egg = children[i];
         if (egg && egg.active && !egg.getData('collected')) { // collected check might be redundant if we destroy, but safe
-           // Bolt Optimization: Squared distance check using LENS position
-           // Tapping the screen harvests the egg under the visual lens window.
-           const distSq = Phaser.Math.Distance.Squared(lensX, lensY, egg.x, egg.y);
+           // Bolt Optimization: Squared distance check using POINTER position (where the finger is)
+           // Tapping the screen harvests the egg under the finger.
+           const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
 
            // Increased capture radius logic for easier finding
            if (distSq < captureRadiusSq) {
