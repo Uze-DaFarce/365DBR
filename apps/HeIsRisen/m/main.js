@@ -2,6 +2,13 @@
 // Define total eggs as a variable to avoid hardcoding
 const TOTAL_EGGS = 60;
 
+function announceToScreenReader(message) {
+    const announcer = document.getElementById('aria-announcer');
+    if (announcer) {
+        announcer.textContent = message;
+    }
+}
+
 function initializeGameData(registry, cache) {
     const symbolsData = cache.json.get('symbols');
     if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
@@ -1238,6 +1245,7 @@ class SectionHunt extends Phaser.Scene {
 
       this.showCollectionFeedback(egg.x, egg.y, egg.texture.key, symbolTexture);
       foundEggs.push(eggInfo);
+      announceToScreenReader(`Egg found! You have ${foundEggs.length} out of ${TOTAL_EGGS} eggs.`);
       this.registry.set('foundEggs', foundEggs);
       if (eggData) {
         eggData.collected = true;
