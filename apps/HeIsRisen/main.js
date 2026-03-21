@@ -2309,6 +2309,7 @@ class EggZamRoom extends Phaser.Scene {
           fontFamily: 'Comic Sans MS',
           stroke: '#fff',
           strokeThickness: 3 * scale,
+          align: 'center',
           wordWrap: { width: 480 * scale, useAdvancedWrap: true }
         }).setOrigin(0, 0);
 
