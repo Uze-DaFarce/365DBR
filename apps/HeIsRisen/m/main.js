@@ -1687,9 +1687,10 @@ class SectionHunt extends Phaser.Scene {
       // Check all eggs
       // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations on pointerdown
       const children = this.eggs.getChildren();
-      for (let i = 0, len = children.length; i < len; i++) {
+      // ⚡ Iterate backwards because destroying an object mutates the children array
+      for (let i = children.length - 1; i >= 0; i--) {
         const egg = children[i];
-        if (egg.active && !egg.getData('collected')) { // collected check might be redundant if we destroy, but safe
+        if (egg && egg.active && !egg.getData('collected')) { // collected check might be redundant if we destroy, but safe
            // Bolt Optimization: Squared distance check using LENS position
            // Tapping the screen harvests the egg under the visual lens window.
            const distSq = Phaser.Math.Distance.Squared(lensX, lensY, egg.x, egg.y);
@@ -1787,7 +1788,7 @@ class SectionHunt extends Phaser.Scene {
     // Single pass for visibility update and drawing
     // ⚡ Bolt Optimization: Replace forEach with fast for loop in update loop
     const children = this.eggs.getChildren();
-    for (let i = 0, len = children.length; i < len; i++) {
+    for (let i = children.length - 1; i >= 0; i--) {
       const egg = children[i];
       if (egg && egg.active) {
           // Update visibility based on FINGER (pointer) visual position for the LENS
