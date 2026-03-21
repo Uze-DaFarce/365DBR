@@ -221,6 +221,19 @@ class MusicScene extends Phaser.Scene {
     // Schedule random ambient sound to play periodically
     this.scheduleAmbientSound();
 
+    // Global UI update listeners for static elements that shouldn't be polled in update loops
+    this.registry.events.on('changedata', (parent, key, data) => {
+        if (key === 'foundEggs') {
+            const scenesWithScore = ['MapScene', 'SectionHunt', 'EggZamRoom'];
+            scenesWithScore.forEach(sceneKey => {
+                const scene = this.scene.get(sceneKey);
+                if (scene && scene.sys.isActive() && scene.scoreText) {
+                    scene.scoreText.setText(`${data.length}/${TOTAL_EGGS}`);
+                }
+            });
+        }
+    });
+
     // Listen for volume changes via Registry
     this.registry.events.on('changedata', (parent, key, data) => {
       if (key === 'musicVolume') {
@@ -1123,9 +1136,14 @@ class MapScene extends Phaser.Scene {
 
     if (!this.textures.exists('green-gas')) {
         const gasGraphics = this.make.graphics({x:0, y:0, add:false});
-        gasGraphics.fillStyle(0x00ff00, 0.5);
-        gasGraphics.fillCircle(15, 15, 15);
-        gasGraphics.generateTexture('green-gas', 30, 30);
+        // Create a softer, larger radial gradient-like gas puff by stacking low-opacity circles
+        gasGraphics.fillStyle(0x55aa00, 0.1);
+        gasGraphics.fillCircle(30, 30, 30);
+        gasGraphics.fillStyle(0x449900, 0.2);
+        gasGraphics.fillCircle(30, 30, 20);
+        gasGraphics.fillStyle(0x338800, 0.3);
+        gasGraphics.fillCircle(30, 30, 10);
+        gasGraphics.generateTexture('green-gas', 60, 60);
     }
 
     // Scale logic
@@ -1823,8 +1841,6 @@ class SectionHunt extends Phaser.Scene {
         strokeThickness: 6 * uiScale
     }).setDepth(5);
 
-    this.lastFoundCount = foundEggs;
-
     // Fixed size Render Texture for Magnifier (Lens)
     const lensDiameter = 100;
     this.zoomedView = this.add.renderTexture(0, 0, lensDiameter, lensDiameter).setDepth(6).setScrollFactor(0);
@@ -1868,9 +1884,10 @@ class SectionHunt extends Phaser.Scene {
 
         // ⚡ Bolt Optimization: Use a fast for loop instead of forEach to prevent closure allocations
         const children = this.eggs.getChildren();
-        for (let i = 0, len = children.length; i < len; i++) {
+        // ⚡ Iterate backwards because destroying an object mutates the children array
+        for (let i = children.length - 1; i >= 0; i--) {
             const egg = children[i];
-            if (egg.active) {
+            if (egg && egg.active) {
                 // Check if egg is under the mouse (center of lens)
                 const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
                 if (distSq < captureRadiusSq) {
@@ -1890,8 +1907,7 @@ class SectionHunt extends Phaser.Scene {
   }
 
   updateScore() {
-      const foundEggs = this.registry.get('foundEggs').length;
-      if (this.scoreText) this.scoreText.setText(`${foundEggs}/${TOTAL_EGGS}`);
+      // Defer to centralized changedata listener in MusicScene/Main
   }
 
   resize(gameSize) {
@@ -2044,7 +2060,7 @@ class SectionHunt extends Phaser.Scene {
 
     // ⚡ Bolt Optimization: Replace forEach with high-performance for loop in update loop
     const children = this.eggs.getChildren();
-    for (let i = 0, len = children.length; i < len; i++) {
+    for (let i = children.length - 1; i >= 0; i--) {
       const egg = children[i];
       if (egg && egg.active) {
         // Check distance to the POINTER (center of lens view)
@@ -2177,13 +2193,15 @@ class EggZamRoom extends Phaser.Scene {
     const gasParticles = this.add.particles(0, 0, 'green-gas', {
         x: startX,
         y: startY,
-        speed: { min: -50, max: 50 },
+        speed: { min: 20, max: 100 },
         angle: { min: 0, max: 360 },
-        scale: { start: 1, end: 3 },
-        alpha: { start: 0.8, end: 0 },
-        lifespan: 2000,
-        frequency: 50,
-        blendMode: 'SCREEN'
+        scale: { start: 1, end: 8 }, // Huge scale to blur the edges
+        alpha: { start: 0.9, end: 0 },
+        lifespan: 3000,
+        frequency: 30, // Faster emission
+        blendMode: 'NORMAL', // Normal mode helps hide the underlying particles making it look like a dense cloud
+        rotate: { min: -10, max: 10 },
+        gravityY: -20, // Slowly float upwards
     }).setDepth(4);
 
     // Wobble
@@ -2285,7 +2303,6 @@ class EggZamRoom extends Phaser.Scene {
       stroke: '#fff',
       strokeThickness: 6 * uiScale
     }).setDepth(5);
-    this.lastFoundCount = foundEggsCount;
 
     if (!this.registry.has('correctCategorizations')) {
       this.registry.set('correctCategorizations', 0);
@@ -2330,31 +2347,6 @@ class EggZamRoom extends Phaser.Scene {
     addTooltip(this, rightBottleZone, 'Categorize as Eggs-tra Stinky');
 
     const showExplanation = (isCorrect, guessText) => {
-        const musicScene = this.scene.get('MusicScene');
-        if (isCorrect) {
-            if (musicScene) {
-                musicScene.playSFX('success');
-            }
-            const correctCount = this.registry.get('correctCategorizations') + 1;
-            this.registry.set('correctCategorizations', correctCount);
-            this.correctText.setText(`Correct: ${correctCount}`);
-
-            let currentScore = this.registry.get('currentScore');
-            currentScore += 5;
-            this.registry.set('currentScore', currentScore);
-            const highScore = this.registry.get('highScore');
-            if (currentScore > highScore) {
-              this.registry.set('highScore', currentScore);
-              localStorage.setItem('highScore', currentScore);
-            }
-
-            this.currentEgg.categorized = true;
-        } else {
-            if (musicScene) {
-                musicScene.playSFX('error');
-            }
-        }
-
         if (this.explanationText) this.explanationText.destroy();
         const data = this.currentEgg.symbolData;
         const eggId = this.currentEgg.eggId;
@@ -2368,6 +2360,16 @@ class EggZamRoom extends Phaser.Scene {
                 const correctCount = this.registry.get('correctCategorizations') + 1;
                 this.registry.set('correctCategorizations', correctCount);
                 this.correctText.setText(`Correct: ${correctCount}`);
+
+                let currentScore = this.registry.get('currentScore');
+                currentScore += 5;
+                this.registry.set('currentScore', currentScore);
+                const highScore = this.registry.get('highScore');
+                if (currentScore > highScore) {
+                  this.registry.set('highScore', currentScore);
+                  localStorage.setItem('highScore', currentScore);
+                }
+
                 this.currentEgg.categorized = true;
                 saveGameState(this.registry);
             } else {
@@ -2681,11 +2683,6 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   update() {
-    const foundEggsCount = this.registry.get('foundEggs').length;
-    if (this.scoreText && this.lastFoundCount !== foundEggsCount) {
-      this.scoreText.setText(`${foundEggsCount}/${TOTAL_EGGS}`);
-      this.lastFoundCount = foundEggsCount;
-    }
   }
 }
 

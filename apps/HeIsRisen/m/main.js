@@ -193,6 +193,19 @@ class MusicScene extends Phaser.Scene {
     // Schedule random ambient sound to play periodically
     this.scheduleAmbientSound();
 
+    // Global UI update listeners for static elements that shouldn't be polled in update loops
+    this.registry.events.on('changedata', (parent, key, data) => {
+        if (key === 'foundEggs') {
+            const scenesWithScore = ['MapScene', 'SectionHunt', 'EggZamRoom'];
+            scenesWithScore.forEach(sceneKey => {
+                const scene = this.scene.get(sceneKey);
+                if (scene && scene.sys.isActive() && scene.scoreText) {
+                    scene.scoreText.setText(`${data.length}/${TOTAL_EGGS}`);
+                }
+            });
+        }
+    });
+
     // Listen for volume changes via Registry
     this.registry.events.on('changedata', (parent, key, data) => {
       if (key === 'musicVolume') {
@@ -1428,7 +1441,6 @@ class SectionHunt extends Phaser.Scene {
         localStorage.setItem('highScore', currentScore);
       }
       // console.log(`SectionHunt: Collected egg-${eggInfo.eggId} with symbol:`, eggInfo.symbolData ? eggInfo.symbolData.name : 'none', `Score: ${currentScore}`);
-      const foundEggsCount = foundEggs.length;
 
       saveGameState(this.registry);
 
@@ -1778,7 +1790,6 @@ class SectionHunt extends Phaser.Scene {
       stroke: '#fff',
       strokeThickness: 6 * scale
     }).setOrigin(0.5).setDepth(5);
-    this.lastFoundCount = foundEggs; // Bolt Optimization
 
     const diameter = 150 * scale;
     this.zoomedView = this.add.renderTexture(0, 0, diameter, diameter)
@@ -1846,9 +1857,10 @@ class SectionHunt extends Phaser.Scene {
       // Check all eggs
       // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations on pointerdown
       const children = this.eggs.getChildren();
-      for (let i = 0, len = children.length; i < len; i++) {
+      // ⚡ Iterate backwards because destroying an object mutates the children array
+      for (let i = children.length - 1; i >= 0; i--) {
         const egg = children[i];
-        if (egg.active && !egg.getData('collected')) { // collected check might be redundant if we destroy, but safe
+        if (egg && egg.active && !egg.getData('collected')) { // collected check might be redundant if we destroy, but safe
            // Bolt Optimization: Squared distance check using LENS position
            // Tapping the screen harvests the egg under the visual lens window.
            const distSq = Phaser.Math.Distance.Squared(lensX, lensY, egg.x, egg.y);
@@ -1946,7 +1958,7 @@ class SectionHunt extends Phaser.Scene {
     // Single pass for visibility update and drawing
     // ⚡ Bolt Optimization: Replace forEach with fast for loop in update loop
     const children = this.eggs.getChildren();
-    for (let i = 0, len = children.length; i < len; i++) {
+    for (let i = children.length - 1; i >= 0; i--) {
       const egg = children[i];
       if (egg && egg.active) {
           // Update visibility based on FINGER (pointer) visual position for the LENS
@@ -2053,12 +2065,6 @@ class SectionHunt extends Phaser.Scene {
         if (this.maskGraphics) this.maskGraphics.setVisible(true);
         if (this.fingerCursor) this.fingerCursor.setVisible(false);
     }
-
-    const foundEggsCount = this.registry.get('foundEggs').length;
-    if (this.lastFoundCount !== foundEggsCount) {
-        this.scoreText.setText(`${foundEggsCount}/${TOTAL_EGGS}`);
-        this.lastFoundCount = foundEggsCount;
-    }
   }
 }
 
@@ -2137,13 +2143,15 @@ class EggZamRoom extends Phaser.Scene {
     const gasParticles = this.add.particles(0, 0, 'green-gas', {
         x: startX,
         y: startY,
-        speed: { min: -50 * assetScale, max: 50 * assetScale },
+        speed: { min: 20 * assetScale, max: 100 * assetScale },
         angle: { min: 0, max: 360 },
-        scale: { start: 1 * assetScale, end: 3 * assetScale },
-        alpha: { start: 0.8, end: 0 },
-        lifespan: 2000,
-        frequency: 50,
-        blendMode: 'SCREEN'
+        scale: { start: 1 * assetScale, end: 8 * assetScale }, // Huge scale to blur the edges
+        alpha: { start: 0.9, end: 0 },
+        lifespan: 3000,
+        frequency: 30, // Faster emission
+        blendMode: 'NORMAL', // Normal mode helps hide the underlying particles making it look like a dense cloud
+        rotate: { min: -10, max: 10 },
+        gravityY: -20 * assetScale, // Slowly float upwards
     }).setDepth(4);
 
     this.tweens.add({
@@ -2228,9 +2236,14 @@ class EggZamRoom extends Phaser.Scene {
 
     if (!this.textures.exists('green-gas')) {
         const gasGraphics = this.make.graphics({x:0, y:0, add:false});
-        gasGraphics.fillStyle(0x00ff00, 0.5);
-        gasGraphics.fillCircle(15, 15, 15);
-        gasGraphics.generateTexture('green-gas', 30, 30);
+        // Create a softer, larger radial gradient-like gas puff by stacking low-opacity circles
+        gasGraphics.fillStyle(0x55aa00, 0.1);
+        gasGraphics.fillCircle(30, 30, 30);
+        gasGraphics.fillStyle(0x449900, 0.2);
+        gasGraphics.fillCircle(30, 30, 20);
+        gasGraphics.fillStyle(0x338800, 0.3);
+        gasGraphics.fillCircle(30, 30, 10);
+        gasGraphics.generateTexture('green-gas', 60, 60);
     }
 
     const width = this.game.config.width;
@@ -2300,7 +2313,6 @@ class EggZamRoom extends Phaser.Scene {
       stroke: '#fff',
       strokeThickness: (isDesktop ? 6 : 8) * this.gameScale
     }).setOrigin(0.5).setDepth(5);
-    this.lastFoundCount = foundEggsCount; // Bolt Optimization
 
     if (!this.registry.has('correctCategorizations')) {
       this.registry.set('correctCategorizations', 0);
@@ -2696,11 +2708,6 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   update() {
-    const foundEggsCount = this.registry.get('foundEggs').length;
-    if (this.scoreText && this.lastFoundCount !== foundEggsCount) {
-      this.scoreText.setText(`${foundEggsCount}/${TOTAL_EGGS}`);
-      this.lastFoundCount = foundEggsCount;
-    }
     if (this.fingerCursor) {
       this.fingerCursor.setPosition(this.input.x, this.input.y);
     }

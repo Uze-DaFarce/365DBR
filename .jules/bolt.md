@@ -100,3 +100,7 @@
 ## 2026-03-19 - Closure Allocations in Hot Paths
 **Learning:** In Phaser 3 games, executing array methods that require lambda function closures (like `.forEach()`) inside high-frequency paths such as the 60fps `update()` loop or pointer-move/pointer-down handlers causes significant closure allocations on every frame. This creates constant garbage collection pressure, which can result in noticeable stutter or frame drops, particularly on underpowered mobile devices.
 **Action:** Replace `.forEach()` closures with high-performance standard `for` loops (e.g., `for (let i = 0, len = arr.length; i < len; i++)`) in all hot execution paths, including `update()` loops and frequent input handlers, to eliminate closure allocations.
+
+## 2026-03-21 - Redundant Registry Polling in Phaser Update Loops
+**Learning:** Continuously polling the Phaser registry (e.g. `this.registry.get('foundEggs').length`) inside `update()` loops (running at 60fps) just to check if UI text needs updating is an inefficient anti-pattern. If the underlying data structure only changes on explicit events (like `collectEgg` or initialization), the UI should be updated explicitly in those specific handlers or via `changedata` events, entirely avoiding the 60fps array length lookup and property comparison.
+**Action:** Always map static UI updates directly to explicit action handlers or registry event listeners, and completely remove redundant state-polling logic from the 60fps `update()` loops to reduce main thread pressure.
