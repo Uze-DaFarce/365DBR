@@ -217,6 +217,13 @@ def run_audio_system_test(is_mobile=False):
 
             # Safety check visual test
             th.assert_not_blank_screen(page, "Screen went blank during audio tests.")
+
+            # Explicitly capture visual proof of the state for user review
+            # We save it locally so the agent can load it and display it inline
+            proof_path = f"visual_proof_{'mobile' if is_mobile else 'desktop'}.png"
+            page.screenshot(path=proof_path)
+            print(f"Captured Visual Proof at {proof_path}")
+
             print("SUCCESS: Audio system tests passed.")
 
             browser.close()

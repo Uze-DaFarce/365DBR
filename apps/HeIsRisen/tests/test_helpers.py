@@ -8,7 +8,7 @@ from PIL import Image
 def start_server(app_dir):
     """Starts a local http-server in the specified directory."""
     server_process = subprocess.Popen(
-        ["python3", "-m", "http.server", "8080"],
+        ["npx", "http-server", "-p", "8080", "-c-1"],
         cwd=app_dir,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
