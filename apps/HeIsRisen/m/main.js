@@ -1509,7 +1509,7 @@ class SectionHunt extends Phaser.Scene {
 
     sectionEggs.forEach(eggData => {
       const egg = this.add.image(eggData.x, eggData.y, `egg-${eggData.eggId}`)
-        .setInteractive()
+        // .setInteractive() // Removed per Bolt Optimization
         .setDepth(5)
         .setDisplaySize(50 * scale, 75 * scale)
         .setAlpha(0);
@@ -1532,28 +1532,7 @@ class SectionHunt extends Phaser.Scene {
         // console.log(`SectionHunt: No symbol for egg-${eggData.eggId}`);
         egg.symbolSprite = null;
       }
-      egg.on('pointerdown', () => {
-        // console.log(`SectionHunt: Click on egg-${eggData.eggId} at (${egg.x}, ${egg.y})`);
-        const pointer = this.input.activePointer;
-        if (egg.getBounds().contains(pointer.worldX, pointer.worldY)) {
-          // console.log(`SectionHunt: Bounds check PASSED for egg-${eggData.eggId}`);
-          // ⚡ Bolt Optimization: Use squared distance to avoid expensive Math.sqrt calls during pointerdown events
-          const distSq = Phaser.Math.Distance.Squared(pointer.worldX, pointer.worldY, egg.x, egg.y);
-          const threshold = 150 * scale;
-          if (distSq < threshold * threshold) {
-            // console.log(`SectionHunt: Distance check PASSED for egg-${eggData.eggId}, collecting!`);
-            this.collectEgg(egg);
-            egg.destroy();
-            if (egg.symbolSprite) {
-              egg.symbolSprite.destroy();
-            }
-          } else {
-            // console.log(`SectionHunt: Distance check FAILED for egg-${eggData.eggId}. Dist: ${distance}`);
-          }
-        } else {
-          // console.log(`SectionHunt: Bounds check FAILED for egg-${eggData.eggId}`);
-        }
-      });
+      // Note: We removed the individual click handler on egg to use global lens click logic
       this.eggs.add(egg);
     });
 
