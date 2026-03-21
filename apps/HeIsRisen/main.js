@@ -152,6 +152,19 @@ class MusicScene extends Phaser.Scene {
     // Schedule random ambient sound to play periodically
     this.scheduleAmbientSound();
 
+    // Global UI update listeners for static elements that shouldn't be polled in update loops
+    this.registry.events.on('changedata', (parent, key, data) => {
+        if (key === 'foundEggs') {
+            const scenesWithScore = ['MapScene', 'SectionHunt', 'EggZamRoom'];
+            scenesWithScore.forEach(sceneKey => {
+                const scene = this.scene.get(sceneKey);
+                if (scene && scene.sys.isActive() && scene.scoreText) {
+                    scene.scoreText.setText(`${data.length}/${TOTAL_EGGS}`);
+                }
+            });
+        }
+    });
+
     // Listen for volume changes via Registry
     this.registry.events.on('changedata', (parent, key, data) => {
       if (key === 'musicVolume') {
@@ -1647,8 +1660,6 @@ class SectionHunt extends Phaser.Scene {
         strokeThickness: 6 * uiScale
     }).setDepth(5);
 
-    this.lastFoundCount = foundEggs;
-
     // Fixed size Render Texture for Magnifier (Lens)
     const lensDiameter = 100;
     this.zoomedView = this.add.renderTexture(0, 0, lensDiameter, lensDiameter).setDepth(6).setScrollFactor(0);
@@ -1714,8 +1725,7 @@ class SectionHunt extends Phaser.Scene {
   }
 
   updateScore() {
-      const foundEggs = this.registry.get('foundEggs').length;
-      if (this.scoreText) this.scoreText.setText(`${foundEggs}/${TOTAL_EGGS}`);
+      // Defer to centralized changedata listener in MusicScene/Main
   }
 
   resize(gameSize) {
@@ -2109,7 +2119,6 @@ class EggZamRoom extends Phaser.Scene {
       stroke: '#fff',
       strokeThickness: 6 * uiScale
     }).setDepth(5);
-    this.lastFoundCount = foundEggsCount;
 
     if (!this.registry.has('correctCategorizations')) {
       this.registry.set('correctCategorizations', 0);
@@ -2503,11 +2512,6 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   update() {
-    const foundEggsCount = this.registry.get('foundEggs').length;
-    if (this.scoreText && this.lastFoundCount !== foundEggsCount) {
-      this.scoreText.setText(`${foundEggsCount}/${TOTAL_EGGS}`);
-      this.lastFoundCount = foundEggsCount;
-    }
   }
 }
 

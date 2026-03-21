@@ -123,6 +123,19 @@ class MusicScene extends Phaser.Scene {
     // Schedule random ambient sound to play periodically
     this.scheduleAmbientSound();
 
+    // Global UI update listeners for static elements that shouldn't be polled in update loops
+    this.registry.events.on('changedata', (parent, key, data) => {
+        if (key === 'foundEggs') {
+            const scenesWithScore = ['MapScene', 'SectionHunt', 'EggZamRoom'];
+            scenesWithScore.forEach(sceneKey => {
+                const scene = this.scene.get(sceneKey);
+                if (scene && scene.sys.isActive() && scene.scoreText) {
+                    scene.scoreText.setText(`${data.length}/${TOTAL_EGGS}`);
+                }
+            });
+        }
+    });
+
     // Listen for volume changes via Registry
     this.registry.events.on('changedata', (parent, key, data) => {
       if (key === 'musicVolume') {
@@ -1261,11 +1274,6 @@ class SectionHunt extends Phaser.Scene {
         localStorage.setItem('highScore', currentScore);
       }
       // console.log(`SectionHunt: Collected egg-${eggInfo.eggId} with symbol:`, eggInfo.symbolData ? eggInfo.symbolData.name : 'none', `Score: ${currentScore}`);
-      const foundEggsCount = foundEggs.length;
-      if (this.scoreText) {
-        this.scoreText.setText(`${foundEggsCount}/${TOTAL_EGGS}`);
-      }
-
       this.checkLevelComplete();
     } else {
       // console.log(`SectionHunt: Egg-${eggInfo.eggId} already collected, skipping`);
@@ -1612,7 +1620,6 @@ class SectionHunt extends Phaser.Scene {
       stroke: '#fff',
       strokeThickness: 6 * scale
     }).setOrigin(0.5).setDepth(5);
-    this.lastFoundCount = foundEggs; // Bolt Optimization
 
     const diameter = 150 * scale;
     this.zoomedView = this.add.renderTexture(0, 0, diameter, diameter)
@@ -1887,12 +1894,6 @@ class SectionHunt extends Phaser.Scene {
         if (this.maskGraphics) this.maskGraphics.setVisible(true);
         if (this.fingerCursor) this.fingerCursor.setVisible(false);
     }
-
-    const foundEggsCount = this.registry.get('foundEggs').length;
-    if (this.lastFoundCount !== foundEggsCount) {
-        this.scoreText.setText(`${foundEggsCount}/${TOTAL_EGGS}`);
-        this.lastFoundCount = foundEggsCount;
-    }
   }
 }
 
@@ -2134,7 +2135,6 @@ class EggZamRoom extends Phaser.Scene {
       stroke: '#fff',
       strokeThickness: (isDesktop ? 6 : 8) * this.gameScale
     }).setOrigin(0.5).setDepth(5);
-    this.lastFoundCount = foundEggsCount; // Bolt Optimization
 
     if (!this.registry.has('correctCategorizations')) {
       this.registry.set('correctCategorizations', 0);
@@ -2528,11 +2528,6 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   update() {
-    const foundEggsCount = this.registry.get('foundEggs').length;
-    if (this.scoreText && this.lastFoundCount !== foundEggsCount) {
-      this.scoreText.setText(`${foundEggsCount}/${TOTAL_EGGS}`);
-      this.lastFoundCount = foundEggsCount;
-    }
     if (this.fingerCursor) {
       this.fingerCursor.setPosition(this.input.x, this.input.y);
     }
