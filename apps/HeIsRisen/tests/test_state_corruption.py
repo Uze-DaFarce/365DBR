@@ -88,6 +88,12 @@ def run_state_corruption_test(is_mobile=False):
 
             print("SUCCESS: State corruption was safely rejected and game defaulted to stable values.")
 
+            # Capture visual proof
+            os.makedirs("verification", exist_ok=True)
+            screenshot_path = f"verification/state_corruption_{context_type}.png"
+            page.screenshot(path=screenshot_path)
+            print(f"Captured screenshot proof at: {screenshot_path}")
+
             browser.close()
     finally:
         server_process.terminate()
