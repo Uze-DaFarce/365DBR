@@ -120,7 +120,7 @@ class MusicScene extends Phaser.Scene {
       // console.log('MusicScene: Background music resumed');
     }
 
-    // Schedule ambient1 to play randomly every 1-3 minutes
+    // Schedule random ambient sound to play periodically
     this.scheduleAmbientSound();
 
     // Listen for volume changes via Registry
@@ -150,11 +150,15 @@ class MusicScene extends Phaser.Scene {
   }
 
   scheduleAmbientSound() {
-    const delay = Phaser.Math.Between(60000, 180000); // 1-3 minutes in ms
-    // console.log(`MusicScene: Scheduling ambient1 in ${delay}ms`);
+    const delay = Phaser.Math.Between(10000, 80000); // 10-80 seconds in ms
     this.time.delayedCall(delay, () => {
-      this.sound.play('ambient1', { volume: this.ambientVolume });
-      this.scheduleAmbientSound(); // Reschedule
+      const randomAmbient = `ambient${Phaser.Math.Between(1, 10)}`;
+      const ambientSound = this.sound.add(randomAmbient, { volume: this.ambientVolume });
+      ambientSound.once('complete', () => {
+        ambientSound.destroy();
+        this.scheduleAmbientSound(); // Reschedule after it finishes
+      });
+      ambientSound.play();
     });
   }
 
@@ -481,6 +485,16 @@ class MainMenu extends Phaser.Scene {
     this.load.audio('success', 'assets/audio/success.wav');
     this.load.audio('error', 'assets/audio/error.wav');
     this.load.audio('ambient1', 'assets/audio/ambient1.mp3');
+    this.load.audio('ambient2', 'assets/audio/ambient2.mp3');
+    this.load.audio('ambient3', 'assets/audio/ambient3.mp3');
+    this.load.audio('ambient4', 'assets/audio/ambient4.mp3');
+    this.load.audio('ambient5', 'assets/audio/ambient5.mp3');
+    this.load.audio('ambient6', 'assets/audio/ambient6.mp3');
+    this.load.audio('ambient7', 'assets/audio/ambient7.mp3');
+    this.load.audio('ambient8', 'assets/audio/ambient8.mp3');
+    this.load.audio('ambient9', 'assets/audio/ambient9.mp3');
+    this.load.audio('ambient10', 'assets/audio/ambient10.mp3');
+    this.load.audio('fart', 'assets/audio/fart.mp3');
     this.load.audio('menu-click', 'assets/audio/menu-click.mp3');
     this.load.audio('drive1', 'assets/audio/drive1.mp3');
     this.load.audio('drive2', 'assets/audio/drive2.mp3');
@@ -1958,19 +1972,20 @@ class EggZamRoom extends Phaser.Scene {
 
     const musicScene = this.scene.get('MusicScene');
     if (musicScene) {
-        const errorSound = this.sound.add('error', { volume: this.registry.get('sfxVolume') ?? 0.5, rate: 0.5 });
-        errorSound.play();
+        // Fart sound for eggs-tra stinky eggs
+        const fartSound = this.sound.add('fart', { volume: this.registry.get('sfxVolume') ?? 0.5 });
+        fartSound.play();
     }
 
     const gasParticles = this.add.particles(0, 0, 'green-gas', {
         x: startX,
         y: startY,
-        speed: { min: -50 * assetScale, max: 50 * assetScale },
+        speed: { min: -100 * assetScale, max: 100 * assetScale },
         angle: { min: 0, max: 360 },
         scale: { start: 1 * assetScale, end: 3 * assetScale },
         alpha: { start: 0.8, end: 0 },
-        lifespan: 2000,
-        frequency: 50,
+        lifespan: 4000,
+        frequency: 25,
         blendMode: 'SCREEN'
     }).setDepth(4);
 
