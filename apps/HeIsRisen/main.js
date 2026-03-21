@@ -1536,6 +1536,7 @@ class SectionHunt extends Phaser.Scene {
         const y = this.bgOffsetY + (eggData.y * scale);
 
         const egg = this.add.image(x, y, `egg-${eggData.eggId}`)
+          // ⚡ Bolt Optimization: Removing individual listeners to rely on global pointerdown
           .setDepth(5)
           .setDisplaySize(50, 75)
           .setAlpha(0); // Invisible until magnified
