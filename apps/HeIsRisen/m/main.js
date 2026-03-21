@@ -850,7 +850,7 @@ class MainMenu extends Phaser.Scene {
 
       mainBtnContainer.setSize(buttonWidth, buttonHeight);
       // Massive hit area for easier tapping
-      mainBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth, -buttonHeight * 1.5, buttonWidth * 2, buttonHeight * 3), Phaser.Geom.Rectangle.Contains);
+      mainBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
       startBtnContainer.add(mainBtnContainer);
 
       let newGameBtnContainer = null;
@@ -874,7 +874,7 @@ class MainMenu extends Phaser.Scene {
           newGameBtnContainer.add(newBtnText);
 
           newGameBtnContainer.setSize(buttonWidth, buttonHeight);
-          newGameBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth, -buttonHeight * 1.5, buttonWidth * 2, buttonHeight * 3), Phaser.Geom.Rectangle.Contains);
+          newGameBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
           startBtnContainer.add(newGameBtnContainer);
       }
 
@@ -1005,7 +1005,11 @@ class MainMenu extends Phaser.Scene {
 
       mainBtnContainer.on('pointerdown', () => startGame(false));
       if (newGameBtnContainer) {
-          newGameBtnContainer.on('pointerdown', () => startGame(true));
+          newGameBtnContainer.on('pointerdown', () => {
+              if (window.confirm("Your current game will be reset, are you sure?")) {
+                  startGame(true);
+              }
+          });
       }
 
       // Explicitly add window listener for robust keyboard support on initial screen
