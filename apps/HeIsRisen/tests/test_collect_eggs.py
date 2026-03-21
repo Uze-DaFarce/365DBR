@@ -369,6 +369,7 @@ def run_collect_eggs_in_level(is_mobile=False):
             """)
 
             if text_exists:
+                page.screenshot(path=f"verification/{'mobile' if is_mobile else 'desktop'}_collect_success.png")
                 print("SUCCESS: 'Great Job Detective' message found!")
             else:
                 print("FAIL: Completion message not found!")
