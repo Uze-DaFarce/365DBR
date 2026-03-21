@@ -89,3 +89,9 @@
 ## 2026-03-18 - [Frontend Verification Media Scoping]
 **Learning:** The `frontend_verification_complete` tool silently fails to post images/media to the user chat if the file paths point outside the repository's root workspace directory (e.g., `/home/jules/verification/`). Additionally, using `read_media_file` only injects the image into the agent's context and does NOT show it to the user.
 **Action:** Always save or move verification media into the repository root (or a relative folder inside the repo) before calling `frontend_verification_complete`. Ensure to clean up these artifacts afterward to avoid workspace pollution.
+
+## 2026-03-20 - Game State Vulnerabilities
+
+**Learning:** The live frontend applications (`HeIsRisen/main.js` and `m/main.js`) successfully handle corrupted `localStorage` inputs (such as `NaN`, `undefined`, or out-of-bounds volume values) without crashing. They use bounds-checking and `isNaN` fallbacks, parsing strings with `parseInt` and `parseFloat`, gracefully falling back to safe default values.
+
+**Action:** Built `test_state_corruption.py` and `test_game_state.py` in `apps/HeIsRisen/tests/` using Playwright to dynamically inject corrupted and valid `localStorage` objects before Phaser initialization to ensure data resilience is continuously verified.
