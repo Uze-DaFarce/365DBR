@@ -181,7 +181,19 @@ class MusicScene extends Phaser.Scene {
   scheduleAmbientSound() {
     const delay = Phaser.Math.Between(10000, 80000); // 10-80 seconds in ms
     this.time.delayedCall(delay, () => {
-      const randomAmbient = `ambient${Phaser.Math.Between(1, 10)}`;
+      let randomAmbient = `ambient${Phaser.Math.Between(1, 10)}`;
+
+      // Fallback to ambient1 if the randomly selected ambient track hasn't loaded yet into cache
+      if (!this.cache.audio.exists(randomAmbient)) {
+          if (this.cache.audio.exists('ambient1')) {
+              randomAmbient = 'ambient1';
+          } else {
+              // If even ambient1 isn't loaded yet, just try again next loop
+              this.scheduleAmbientSound();
+              return;
+          }
+      }
+
       const ambientSound = this.sound.add(randomAmbient, { volume: this.ambientVolume });
       ambientSound.once('complete', () => {
         ambientSound.destroy();
