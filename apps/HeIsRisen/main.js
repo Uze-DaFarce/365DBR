@@ -2123,6 +2123,9 @@ class EggZamRoom extends Phaser.Scene {
     addZoneHover(leftBottleZone);
     addZoneHover(rightBottleZone);
 
+    addTooltip(this, leftBottleZone, 'Categorize as Egg-cellent');
+    addTooltip(this, rightBottleZone, 'Categorize as Eggs-tra Stinky');
+
     const showExplanation = (isCorrect, guessText) => {
         const musicScene = this.scene.get('MusicScene');
         if (isCorrect) {
@@ -2324,13 +2327,17 @@ class EggZamRoom extends Phaser.Scene {
       } else {
         this.currentEgg = null;
         if (this.noEggsText) this.noEggsText.destroy();
-        this.noEggsText = this.add.text(offsetX + 420 * scale, offsetY + 220 * scale, "All eggs have been categorized!", {
+        const ctaText = foundEggs.length < TOTAL_EGGS
+            ? "All collected eggs categorized!\nReturn to the map to find more."
+            : "All eggs categorized!\nHappy Easter!";
+        this.noEggsText = this.add.text(offsetX + 420 * scale, offsetY + 220 * scale, ctaText, {
           fontSize: `${28 * scale}px`,
           fill: '#000',
           fontStyle: 'bold',
           fontFamily: 'Comic Sans MS',
           stroke: '#fff',
           strokeThickness: 3 * scale,
+          align: 'center',
           wordWrap: { width: 480 * scale, useAdvancedWrap: true }
         }).setOrigin(0, 0);
 
