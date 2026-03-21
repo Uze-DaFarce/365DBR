@@ -2163,31 +2163,6 @@ class EggZamRoom extends Phaser.Scene {
     addTooltip(this, rightBottleZone, 'Categorize as Eggs-tra Stinky');
 
     const showExplanation = (isCorrect, guessText) => {
-        const musicScene = this.scene.get('MusicScene');
-        if (isCorrect) {
-            if (musicScene) {
-                musicScene.playSFX('success');
-            }
-            const correctCount = this.registry.get('correctCategorizations') + 1;
-            this.registry.set('correctCategorizations', correctCount);
-            this.correctText.setText(`Correct: ${correctCount}`);
-
-            let currentScore = this.registry.get('currentScore');
-            currentScore += 5;
-            this.registry.set('currentScore', currentScore);
-            const highScore = this.registry.get('highScore');
-            if (currentScore > highScore) {
-              this.registry.set('highScore', currentScore);
-              localStorage.setItem('highScore', currentScore);
-            }
-
-            this.currentEgg.categorized = true;
-        } else {
-            if (musicScene) {
-                musicScene.playSFX('error');
-            }
-        }
-
         if (this.explanationText) this.explanationText.destroy();
         const data = this.currentEgg.symbolData;
         const eggId = this.currentEgg.eggId;
@@ -2201,6 +2176,16 @@ class EggZamRoom extends Phaser.Scene {
                 const correctCount = this.registry.get('correctCategorizations') + 1;
                 this.registry.set('correctCategorizations', correctCount);
                 this.correctText.setText(`Correct: ${correctCount}`);
+
+                let currentScore = this.registry.get('currentScore');
+                currentScore += 5;
+                this.registry.set('currentScore', currentScore);
+                const highScore = this.registry.get('highScore');
+                if (currentScore > highScore) {
+                  this.registry.set('highScore', currentScore);
+                  localStorage.setItem('highScore', currentScore);
+                }
+
                 this.currentEgg.categorized = true;
             } else {
                 if (musicScene) {
