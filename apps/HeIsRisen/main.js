@@ -1708,9 +1708,10 @@ class SectionHunt extends Phaser.Scene {
 
         // ⚡ Bolt Optimization: Use a fast for loop instead of forEach to prevent closure allocations
         const children = this.eggs.getChildren();
-        for (let i = 0, len = children.length; i < len; i++) {
+        // ⚡ Iterate backwards because destroying an object mutates the children array
+        for (let i = children.length - 1; i >= 0; i--) {
             const egg = children[i];
-            if (egg.active) {
+            if (egg && egg.active) {
                 // Check if egg is under the mouse (center of lens)
                 const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
                 if (distSq < captureRadiusSq) {
@@ -1883,7 +1884,7 @@ class SectionHunt extends Phaser.Scene {
 
     // ⚡ Bolt Optimization: Replace forEach with high-performance for loop in update loop
     const children = this.eggs.getChildren();
-    for (let i = 0, len = children.length; i < len; i++) {
+    for (let i = children.length - 1; i >= 0; i--) {
       const egg = children[i];
       if (egg && egg.active) {
         // Check distance to the POINTER (center of lens view)
