@@ -95,3 +95,7 @@
 **Learning:** The live frontend applications (`HeIsRisen/main.js` and `m/main.js`) successfully handle corrupted `localStorage` inputs (such as `NaN`, `undefined`, or out-of-bounds volume values) without crashing. They use bounds-checking and `isNaN` fallbacks, parsing strings with `parseInt` and `parseFloat`, gracefully falling back to safe default values.
 
 **Action:** Built `test_state_corruption.py` and `test_game_state.py` in `apps/HeIsRisen/tests/` using Playwright to dynamically inject corrupted and valid `localStorage` objects before Phaser initialization to ensure data resilience is continuously verified.
+
+## 2026-03-21 - [HeIsRisen localStorage State Corruption Resilience]
+**Learning:** The HeIsRisen game `localStorage` state parsers (`getSafeVol` and `parseInt(highScore)`) gracefully handle malicious and malformed edge cases including `-Infinity`, `NaN`, `"{}"`, and empty string injection. The Phaser registry defaults appropriately back to 0.5 for volumes and 0 for scores without crashing the Web Audio API or game state loop.
+**Action:** Expanded the test suite `apps/HeIsRisen/tests/test_state_corruption.py` to assert edge-case boundaries actively instead of simple out-of-bounds inputs, confirming the logic correctly defaults to 0.5. Also verified `test_production_future_data.py` exists and successfully validates production API data.

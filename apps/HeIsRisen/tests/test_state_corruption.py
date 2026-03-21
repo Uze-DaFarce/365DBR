@@ -43,10 +43,10 @@ def run_state_corruption_test(is_mobile=False):
 
             page.evaluate("""
                 () => {
-                    localStorage.setItem('highScore', 'NaN');
-                    localStorage.setItem('musicVolume', '2.5'); // Out of bounds
-                    localStorage.setItem('ambientVolume', '-0.5'); // Out of bounds
-                    localStorage.setItem('sfxVolume', 'undefined'); // Corrupted
+                    localStorage.setItem('highScore', '-Infinity'); // Edge case negative infinity
+                    localStorage.setItem('musicVolume', 'NaN'); // Not a number
+                    localStorage.setItem('ambientVolume', '{}'); // Stringified object
+                    localStorage.setItem('sfxVolume', ' '); // Empty/whitespace string
                 }
             """)
 
@@ -83,8 +83,8 @@ def run_state_corruption_test(is_mobile=False):
                 raise AssertionError(f"Ambient volume not bounded safely: {ambient_vol}")
             if sfx_vol > 1.0 or sfx_vol < 0.0:
                 raise AssertionError(f"SFX volume not bounded safely: {sfx_vol}")
-            if sfx_vol != 0.5:
-                 print(f"WARN: SFX volume should default to 0.5 when corrupted with 'undefined', but got {sfx_vol}")
+            if sfx_vol != 0.5 or ambient_vol != 0.5 or music_vol != 0.5:
+                 raise AssertionError(f"Volumes should default to 0.5 when corrupted, but got Music:{music_vol}, Ambient:{ambient_vol}, SFX:{sfx_vol}")
 
             print("SUCCESS: State corruption was safely rejected and game defaulted to stable values.")
 
