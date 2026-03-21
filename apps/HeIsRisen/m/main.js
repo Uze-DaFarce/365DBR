@@ -1971,13 +1971,15 @@ class EggZamRoom extends Phaser.Scene {
     const gasParticles = this.add.particles(0, 0, 'green-gas', {
         x: startX,
         y: startY,
-        speed: { min: -50 * assetScale, max: 50 * assetScale },
+        speed: { min: 20 * assetScale, max: 100 * assetScale },
         angle: { min: 0, max: 360 },
-        scale: { start: 1 * assetScale, end: 3 * assetScale },
-        alpha: { start: 0.8, end: 0 },
-        lifespan: 2000,
-        frequency: 50,
-        blendMode: 'SCREEN'
+        scale: { start: 1 * assetScale, end: 8 * assetScale }, // Huge scale to blur the edges
+        alpha: { start: 0.9, end: 0 },
+        lifespan: 3000,
+        frequency: 30, // Faster emission
+        blendMode: 'NORMAL', // Normal mode helps hide the underlying particles making it look like a dense cloud
+        rotate: { min: -10, max: 10 },
+        gravityY: -20 * assetScale, // Slowly float upwards
     }).setDepth(4);
 
     this.tweens.add({
@@ -2062,9 +2064,14 @@ class EggZamRoom extends Phaser.Scene {
 
     if (!this.textures.exists('green-gas')) {
         const gasGraphics = this.make.graphics({x:0, y:0, add:false});
-        gasGraphics.fillStyle(0x00ff00, 0.5);
-        gasGraphics.fillCircle(15, 15, 15);
-        gasGraphics.generateTexture('green-gas', 30, 30);
+        // Create a softer, larger radial gradient-like gas puff by stacking low-opacity circles
+        gasGraphics.fillStyle(0x55aa00, 0.1);
+        gasGraphics.fillCircle(30, 30, 30);
+        gasGraphics.fillStyle(0x449900, 0.2);
+        gasGraphics.fillCircle(30, 30, 20);
+        gasGraphics.fillStyle(0x338800, 0.3);
+        gasGraphics.fillCircle(30, 30, 10);
+        gasGraphics.generateTexture('green-gas', 60, 60);
     }
 
     const width = this.game.config.width;
