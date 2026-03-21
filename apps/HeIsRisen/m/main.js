@@ -2,7 +2,68 @@
 // Define total eggs as a variable to avoid hardcoding
 const TOTAL_EGGS = 60;
 
-function initializeGameData(registry, cache) {
+function saveGameState(registry) {
+    const state = {
+        eggData: registry.get('eggData'),
+        sections: registry.get('sections'),
+        foundEggs: registry.get('foundEggs'),
+        stampedSections: registry.get('stampedSections'),
+        correctCategorizations: registry.get('correctCategorizations'),
+        currentScore: registry.get('currentScore')
+    };
+    try {
+        localStorage.setItem('heIsRisenGameState', JSON.stringify(state));
+    } catch (e) {
+        console.warn('Failed to save game state to localStorage', e);
+    }
+}
+
+function initializeGameData(registry, cache, forceNew = false) {
+    if (!forceNew) {
+        try {
+            const savedStateStr = localStorage.getItem('heIsRisenGameState');
+            if (savedStateStr) {
+                const savedState = JSON.parse(savedStateStr);
+                if (savedState && savedState.eggData && savedState.sections) {
+                    registry.set('eggData', savedState.eggData);
+                    registry.set('sections', savedState.sections);
+                    registry.set('foundEggs', savedState.foundEggs || []);
+                    registry.set('stampedSections', savedState.stampedSections || []);
+                    registry.set('correctCategorizations', savedState.correctCategorizations || 0);
+                    registry.set('currentScore', savedState.currentScore || 0);
+
+                    // Always ensure highScore is loaded/initialized correctly
+                    try {
+                        let loadedScore = parseInt(localStorage.getItem('highScore'));
+                        if (isNaN(loadedScore) || loadedScore < 0) {
+                            loadedScore = 0;
+                        }
+                        registry.set('highScore', loadedScore);
+                    } catch (e) {
+                        registry.set('highScore', 0);
+                    }
+
+                    // We also need to restore symbols from cache just in case the scene needs them
+                    const symbolsData = cache.json.get('symbols');
+                    if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+                        const validSymbols = symbolsData.symbols.filter(s => {
+                            return s && typeof s === 'object' &&
+                                   typeof s.filename === 'string' &&
+                                   !s.filename.includes('..') &&
+                                   /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
+                        });
+                        symbolsData.symbols = validSymbols;
+                        registry.set('symbols', symbolsData);
+                    }
+                    return; // Successfully loaded from save
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to load saved game state, starting fresh.', e);
+        }
+    }
+
+    // Normal fresh initialization logic below...
     const symbolsData = cache.json.get('symbols');
     if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
         // Pre-validate and inject into registry just as originally done in MainMenu
@@ -87,6 +148,9 @@ function initializeGameData(registry, cache) {
     registry.set('foundEggs', []);
     registry.set('stampedSections', []);
     registry.set('correctCategorizations', 0);
+    registry.set('currentScore', 0);
+
+    saveGameState(registry);
 }
 
 // Define all scene classes first
@@ -96,10 +160,16 @@ class MusicScene extends Phaser.Scene {
     super({ key: 'MusicScene' });
 
     const getSafeVol = (key) => {
-      const val = localStorage.getItem(key);
-      if (val === null) return 0.5;
-      const parsed = parseFloat(val);
-      return (isNaN(parsed) || parsed < 0 || parsed > 1) ? 0.5 : parsed;
+      let val = localStorage.getItem(key);
+      let parsed = parseFloat(val);
+      if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+          const backupVal = localStorage.getItem(key + '_backup');
+          parsed = parseFloat(backupVal);
+          if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+              return 0.5;
+          }
+      }
+      return parsed;
     };
 
     this.musicVolume = getSafeVol('musicVolume');
@@ -158,6 +228,7 @@ class MusicScene extends Phaser.Scene {
     this.registry.events.on('changedata', (parent, key, data) => {
         if (['musicVolume', 'ambientVolume', 'sfxVolume'].includes(key)) {
             localStorage.setItem(key, data);
+            localStorage.setItem(key + '_backup', data);
         }
     });
   }
@@ -394,6 +465,54 @@ class UIScene extends Phaser.Scene {
     this.createSlider('Music', contentTop + spacing * 0.5, screenWidth / 2, 'music', trackWidth);
     this.createSlider('Ambient', contentTop + spacing * 1.5, screenWidth / 2, 'ambient', trackWidth);
     this.createSlider('SFX', contentTop + spacing * 2.5, screenWidth / 2, 'sfx', trackWidth);
+
+    // Start New Game Button
+    const resetBtnContainer = this.add.container(screenWidth / 2, y + height - 40);
+    const resetBg = this.add.graphics();
+    resetBg.fillStyle(0xff4444, 1);
+    resetBg.fillRoundedRect(-100, -20, 200, 40, 10);
+    resetBg.lineStyle(2, 0xffffff, 1);
+    resetBg.strokeRoundedRect(-100, -20, 200, 40, 10);
+
+    const resetText = this.add.text(0, 0, 'START NEW GAME', {
+        fontSize: '18px',
+        fontFamily: 'Comic Sans MS',
+        fill: '#ffffff',
+        fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    resetBtnContainer.add([resetBg, resetText]);
+    resetBtnContainer.setSize(200, 40);
+    resetBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-100, -20, 200, 40), Phaser.Geom.Rectangle.Contains);
+
+    resetBtnContainer.baseScaleX = 1;
+    resetBtnContainer.baseScaleY = 1;
+    addButtonInteraction(this, resetBtnContainer, 'menu-click');
+
+    resetBtnContainer.on('pointerdown', () => {
+        if (window.confirm("Your current game will be reset, are you sure?")) {
+            localStorage.removeItem('heIsRisenGameState');
+            const mainScene = this.scene.get('MainMenu');
+            if (mainScene) {
+                initializeGameData(mainScene.registry, mainScene.cache, true);
+            }
+
+            // Stop active gameplay scenes and restart
+            if (this.scene.isActive('MapScene')) this.scene.stop('MapScene');
+            if (this.scene.isActive('SectionHunt')) this.scene.stop('SectionHunt');
+            if (this.scene.isActive('EggZamRoom')) this.scene.stop('EggZamRoom');
+
+            this.scene.launch('MapScene');
+
+            // Close settings
+            this.time.delayedCall(150, () => {
+                this.settingsContainer.setVisible(false);
+                if (this.gearIcon) this.gearIcon.setVisible(true);
+                if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+            });
+        }
+    });
+    this.settingsContainer.add(resetBtnContainer);
   }
 
   createSlider(label, y, centerX, type, trackWidth = 200) {
@@ -682,10 +801,16 @@ class MainMenu extends Phaser.Scene {
 
     // Initialize volume registry early (Load from localStorage if available)
     const getSafeVol = (key) => {
-      const val = localStorage.getItem(key);
-      if (val === null) return 0.5;
-      const parsed = parseFloat(val);
-      return (isNaN(parsed) || parsed < 0 || parsed > 1) ? 0.5 : parsed;
+      let val = localStorage.getItem(key);
+      let parsed = parseFloat(val);
+      if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+          const backupVal = localStorage.getItem(key + '_backup');
+          parsed = parseFloat(backupVal);
+          if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+              return 0.5;
+          }
+      }
+      return parsed;
     };
 
     if (!this.registry.has('musicVolume')) this.registry.set('musicVolume', getSafeVol('musicVolume'));
@@ -706,35 +831,66 @@ class MainMenu extends Phaser.Scene {
           strokeThickness: 6
       }).setOrigin(0.5).setDepth(100);
 
-      // "Play Now" Button Container (Initially Hidden)
+      // "Play Now" / "Continue" Button Container (Initially Hidden)
       const buttonWidth = 400;
-      const buttonHeight = 100;
+      const buttonHeight = 80;
       const btnX = this.game.config.width / 2;
       const btnY = 580 * scale;
+      const hasSaveState = localStorage.getItem('heIsRisenGameState') !== null;
 
       const startBtnContainer = this.add.container(btnX, btnY).setVisible(false).setDepth(101);
       this.startBtnContainer = startBtnContainer;
+
+      let btnTextString = hasSaveState ? 'CONTINUE THE HUNT!' : 'PLAY NOW';
+      const mainBtnContainer = this.add.container(0, hasSaveState ? -50 : 0);
 
       const btnBg = this.add.graphics();
       btnBg.fillStyle(0xff0000, 1);
       btnBg.fillRoundedRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, buttonHeight / 2);
       btnBg.lineStyle(4, 0xffffff, 1);
       btnBg.strokeRoundedRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, buttonHeight / 2);
-      startBtnContainer.add(btnBg);
+      mainBtnContainer.add(btnBg);
 
-      const btnText = this.add.text(0, 0, 'PLAY NOW', {
-        fontSize: `40px`,
+      const btnText = this.add.text(0, 0, btnTextString, {
+        fontSize: hasSaveState ? `28px` : `40px`,
         fill: '#ffffff',
         fontStyle: 'bold',
         fontFamily: 'Comic Sans MS',
         stroke: '#000000',
         strokeThickness: 4
       }).setOrigin(0.5);
-      startBtnContainer.add(btnText);
+      mainBtnContainer.add(btnText);
 
-      startBtnContainer.setSize(buttonWidth, buttonHeight);
+      mainBtnContainer.setSize(buttonWidth, buttonHeight);
       // Massive hit area for easier tapping
-      startBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth, -buttonHeight * 2, buttonWidth * 2, buttonHeight * 4), Phaser.Geom.Rectangle.Contains);
+      mainBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+      startBtnContainer.add(mainBtnContainer);
+
+      let newGameBtnContainer = null;
+      if (hasSaveState) {
+          newGameBtnContainer = this.add.container(0, 50);
+          const newBtnBg = this.add.graphics();
+          newBtnBg.fillStyle(0x0000ff, 1);
+          newBtnBg.fillRoundedRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, buttonHeight / 2);
+          newBtnBg.lineStyle(4, 0xffffff, 1);
+          newBtnBg.strokeRoundedRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, buttonHeight / 2);
+          newGameBtnContainer.add(newBtnBg);
+
+          const newBtnText = this.add.text(0, 0, 'START NEW GAME', {
+            fontSize: `28px`,
+            fill: '#ffffff',
+            fontStyle: 'bold',
+            fontFamily: 'Comic Sans MS',
+            stroke: '#000000',
+            strokeThickness: 4
+          }).setOrigin(0.5);
+          newGameBtnContainer.add(newBtnText);
+
+          newGameBtnContainer.setSize(buttonWidth, buttonHeight);
+          newGameBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+          startBtnContainer.add(newGameBtnContainer);
+      }
+
       startBtnContainer.setScale(scale);
 
       // State Management
@@ -825,11 +981,15 @@ class MainMenu extends Phaser.Scene {
       this.input.once('pointerdown', handleGlobalTap);
 
       // Play Now Handler
-      const startGame = () => {
+      const startGame = (forceNew = false) => {
           if (introState !== 'ready_to_play') return;
 
           // Prevent multiple calls
           introState = 'starting';
+
+          if (forceNew) {
+              initializeGameData(this.registry, this.cache, true);
+          }
 
           // Fade out video audio
           this.tweens.add({
@@ -856,7 +1016,14 @@ class MainMenu extends Phaser.Scene {
           });
       };
 
-      startBtnContainer.on('pointerdown', startGame);
+      mainBtnContainer.on('pointerdown', () => startGame(false));
+      if (newGameBtnContainer) {
+          newGameBtnContainer.on('pointerdown', () => {
+              if (window.confirm("Your current game will be reset, are you sure?")) {
+                  startGame(true);
+              }
+          });
+      }
 
       // Explicitly add window listener for robust keyboard support on initial screen
       const globalKeyHandler = (e) => {
@@ -864,7 +1031,7 @@ class MainMenu extends Phaser.Scene {
               if (introState === 'waiting_for_interaction') {
                   handleGlobalTap();
               } else if (introState === 'ready_to_play') {
-                  startGame();
+                  startGame(false);
               }
           }
       };
@@ -1274,6 +1441,9 @@ class SectionHunt extends Phaser.Scene {
         localStorage.setItem('highScore', currentScore);
       }
       // console.log(`SectionHunt: Collected egg-${eggInfo.eggId} with symbol:`, eggInfo.symbolData ? eggInfo.symbolData.name : 'none', `Score: ${currentScore}`);
+
+      saveGameState(this.registry);
+
       this.checkLevelComplete();
     } else {
       // console.log(`SectionHunt: Egg-${eggInfo.eggId} already collected, skipping`);
@@ -2213,6 +2383,7 @@ class EggZamRoom extends Phaser.Scene {
                   localStorage.setItem('highScore', currentScore);
                 }
                 this.currentEgg.categorized = true;
+                saveGameState(this.registry);
             } else {
                 if (musicScene) {
                     musicScene.playSFX('error');
@@ -2482,7 +2653,8 @@ class EggZamRoom extends Phaser.Scene {
           const triggerRestart = () => {
               this.time.delayedCall(150, () => {
                   if (this.input.setDefaultCursor) this.input.setDefaultCursor('default');
-                  initializeGameData(this.registry, this.cache);
+                  localStorage.removeItem('heIsRisenGameState');
+                  initializeGameData(this.registry, this.cache, true);
                   this.scene.start('MapScene');
               });
           };

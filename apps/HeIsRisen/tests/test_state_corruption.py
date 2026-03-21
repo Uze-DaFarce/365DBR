@@ -43,10 +43,13 @@ def run_state_corruption_test(is_mobile=False):
 
             page.evaluate("""
                 () => {
-                    localStorage.setItem('highScore', 'NaN');
-                    localStorage.setItem('musicVolume', '2.5'); // Out of bounds
-                    localStorage.setItem('ambientVolume', '-0.5'); // Out of bounds
-                    localStorage.setItem('sfxVolume', 'undefined'); // Corrupted
+                    localStorage.setItem('highScore', '-Infinity'); // Edge case negative infinity
+                    localStorage.setItem('musicVolume', 'NaN'); // Not a number
+                    localStorage.setItem('musicVolume_backup', '0.8'); // Valid backup
+                    localStorage.setItem('ambientVolume', '{}'); // Stringified object
+                    localStorage.setItem('ambientVolume_backup', 'not_a_number'); // Invalid backup
+                    localStorage.setItem('sfxVolume', ' '); // Empty/whitespace string
+                    // No sfxVolume_backup set
                 }
             """)
 
@@ -83,10 +86,14 @@ def run_state_corruption_test(is_mobile=False):
                 raise AssertionError(f"Ambient volume not bounded safely: {ambient_vol}")
             if sfx_vol > 1.0 or sfx_vol < 0.0:
                 raise AssertionError(f"SFX volume not bounded safely: {sfx_vol}")
-            if sfx_vol != 0.5:
-                 print(f"WARN: SFX volume should default to 0.5 when corrupted with 'undefined', but got {sfx_vol}")
 
-            print("SUCCESS: State corruption was safely rejected and game defaulted to stable values.")
+            # Expect music to fallback to valid backup (0.8)
+            # Expect ambient to fallback to 0.5 because backup is invalid
+            # Expect sfx to fallback to 0.5 because backup is missing
+            if music_vol != 0.8 or ambient_vol != 0.5 or sfx_vol != 0.5:
+                 raise AssertionError(f"Volumes should fallback properly, but got Music:{music_vol}, Ambient:{ambient_vol}, SFX:{sfx_vol}")
+
+            print("SUCCESS: State corruption was safely rejected and game defaulted to stable values (or valid backups).")
 
             # Capture visual proof
             os.makedirs("verification", exist_ok=True)
