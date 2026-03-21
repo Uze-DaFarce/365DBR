@@ -2,13 +2,6 @@
 // Define total eggs as a variable to avoid hardcoding
 const TOTAL_EGGS = 60;
 
-function announceToScreenReader(message) {
-    const announcer = document.getElementById('aria-announcer');
-    if (announcer) {
-        announcer.textContent = message;
-    }
-}
-
 function initializeGameData(registry, cache) {
     const symbolsData = cache.json.get('symbols');
     if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
@@ -1245,7 +1238,6 @@ class SectionHunt extends Phaser.Scene {
 
       this.showCollectionFeedback(egg.x, egg.y, egg.texture.key, symbolTexture);
       foundEggs.push(eggInfo);
-      announceToScreenReader(`Egg found! You have ${foundEggs.length} out of ${TOTAL_EGGS} eggs.`);
       this.registry.set('foundEggs', foundEggs);
       if (eggData) {
         eggData.collected = true;
@@ -1469,6 +1461,17 @@ class SectionHunt extends Phaser.Scene {
         this.sectionImage.setVolume(ambientVol * 0.25);
         this.sectionImage.play(true);
         this.isUsingVideo = true;
+
+        // Smart Audio Looping: Mute audio after first play, unmute every 5th loop
+        this.sectionImage.loopCount = 0;
+        this.sectionImage.on('loop', () => {
+             this.sectionImage.loopCount++;
+             if (this.sectionImage.loopCount % 5 !== 0) {
+                 this.sectionImage.setMute(true);
+             } else {
+                 this.sectionImage.setMute(false);
+             }
+        });
 
         const updateAmbientVolume = (parent, key, data) => {
              if (key === 'ambientVolume' && this.sectionImage && this.sectionImage.active && this.isUsingVideo) {
