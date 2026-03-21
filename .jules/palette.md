@@ -331,11 +331,6 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-20 - Empty State Calls to Action
 **Learning:** Presenting a static "All items categorized" empty state when the user is only partially through the game creates a "dead end" in the flow. Users may mistakenly believe they have finished the entire game rather than just their current batch.
 **Action:** Always provide explicit, contextual Calls to Action (CTAs) in empty states (e.g., "Return to the map to find more") so the user clearly understands what to do next to continue the core game loop.
-=======
-<<<<<<< SEARCH
-=======
 ## 2026-03-21 - [Smart Audio Looping for Repetitive Video]
 **Learning:** In Phaser 3, when a video or audio object is configured to loop (e.g., `play(true)`), it emits the `'loop'` event upon repeating, not the `'complete'` event.
 **Action:** Implemented a smart audio looping feature by binding to `.on('loop', ...)` that mutes background videos after the first play and unmutes them every 5th loop, preventing audio fatigue from short clips.
->>>>>>> REPLACE
->>>>>>> .jules/palette.md.patch
