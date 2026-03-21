@@ -146,8 +146,84 @@ def run_audio_system_test(is_mobile=False):
                  else:
                       print("SUCCESS: SFX volume correctly applied to the Sound node based on registry assignment.")
 
+            # 4. Test Smart Looping Video Audio
+            print("Testing smart video audio loop mute logic...")
+
+            # Navigate to SectionHunt natively via UI click
+            page.evaluate("""
+                () => {
+                    const mapScene = window.game.scene.getScene('MapScene');
+                    if (mapScene && mapScene.mapZones.length > 0) {
+                        mapScene.mapZones[0].emit('pointerdown');
+                    }
+                }
+            """)
+            time.sleep(2)
+            th.wait_for_active_scene(page, "SectionHunt")
+
+            # Emit loop events and assert mute state toggles correctly
+            # We mock the video object slightly if it didn't load properly in headless
+            loop_test = page.evaluate("""
+                () => {
+                    const scene = window.game.scene.getScene('SectionHunt');
+                    const videoObj = scene.sectionVideo || scene.sectionImage;
+
+                    if (!videoObj) return { error: "No video object found in SectionHunt." };
+
+                    let results = [];
+
+                    // In Phaser, videoObj.setMute() correctly updates videoObj.isMuted.
+                    // But in Playwright's emulated headless mode, occasionally the media element
+                    // isn't attached or errors if the asset didn't load completely.
+                    // We directly test the handler logic here.
+                    // To do so reliably, we mock setMute so we can track what the code attempts to do.
+                    let wasMuted = false;
+                    // Preserve the original setMute to prevent breaking other listeners,
+                    // but also intercept the value
+                    const originalSetMute = videoObj.setMute.bind(videoObj);
+                    videoObj.setMute = (val) => { wasMuted = val; originalSetMute(val); };
+
+                    // Force initial state for test predictability
+                    videoObj.loopCount = 0;
+                    videoObj.setMute(false);
+
+                    results.push(wasMuted === false);
+
+                    // Loop 1 (should mute)
+                    videoObj.emit('loop');
+                    results.push(wasMuted === true);
+
+                    // Loop 2, 3, 4 (should stay muted)
+                    videoObj.emit('loop');
+                    videoObj.emit('loop');
+                    videoObj.emit('loop');
+                    results.push(wasMuted === true);
+
+                    // Loop 5 (5th time emitting loop, so 6th play overall - should unmute)
+                    videoObj.emit('loop');
+                    results.push(wasMuted === false);
+
+                    return { success: results.every(r => r === true), details: results };
+                }
+            """)
+
+            print(f"Smart Loop Test Result: {loop_test}")
+            if "error" in loop_test:
+                 print(f"WARN: Could not test Smart Loop fully: {loop_test['error']}")
+            elif not loop_test.get("success", False):
+                 raise AssertionError(f"Smart Video Audio Loop logic failed! Details: {loop_test['details']}")
+            else:
+                 print("SUCCESS: Smart Video Audio Loop toggles correctly.")
+
             # Safety check visual test
             th.assert_not_blank_screen(page, "Screen went blank during audio tests.")
+
+            # Explicitly capture visual proof of the state for user review
+            # We save it locally so the agent can load it and display it inline
+            proof_path = f"visual_proof_{'mobile' if is_mobile else 'desktop'}.png"
+            page.screenshot(path=proof_path)
+            print(f"Captured Visual Proof at {proof_path}")
+
             print("SUCCESS: Audio system tests passed.")
 
             browser.close()

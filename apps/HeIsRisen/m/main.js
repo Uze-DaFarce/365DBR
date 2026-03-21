@@ -1640,6 +1640,17 @@ class SectionHunt extends Phaser.Scene {
         this.sectionImage.play(true);
         this.isUsingVideo = true;
 
+        // Smart Audio Looping: Mute audio after first play, unmute every 5th loop
+        this.sectionImage.loopCount = 0;
+        this.sectionImage.on('loop', () => {
+             this.sectionImage.loopCount++;
+             if (this.sectionImage.loopCount % 5 !== 0) {
+                 this.sectionImage.setMute(true);
+             } else {
+                 this.sectionImage.setMute(false);
+             }
+        });
+
         const updateAmbientVolume = (parent, key, data) => {
              if (key === 'ambientVolume' && this.sectionImage && this.sectionImage.active && this.isUsingVideo) {
                  this.sectionImage.setVolume(data * 0.25);
