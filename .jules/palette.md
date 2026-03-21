@@ -330,3 +330,6 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-20 - Empty State Calls to Action
 **Learning:** Presenting a static "All items categorized" empty state when the user is only partially through the game creates a "dead end" in the flow. Users may mistakenly believe they have finished the entire game rather than just their current batch.
 **Action:** Always provide explicit, contextual Calls to Action (CTAs) in empty states (e.g., "Return to the map to find more") so the user clearly understands what to do next to continue the core game loop.
+## 2026-03-21 - Farticle Gas Effect Tuning
+**Learning:** Using simple `SCREEN` blend mode and low scaling on solid circles for a gas/smoke effect creates obvious, distinct dots. To simulate realistic gas dynamically, layer multiple low-opacity radial circles in the generated texture, set the blend mode to `NORMAL` (to hide particles behind one another, adding density), and massively increase the particle scale while letting them slowly float upwards via gravity.
+**Action:** When asked to generate gas or smoke effects, use large, low-opacity layered radial textures with `NORMAL` blend mode and upward gravity.
