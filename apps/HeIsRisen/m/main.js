@@ -1717,6 +1717,11 @@ class SectionHunt extends Phaser.Scene {
     this.zoomedView.setPosition(lensX, lensY);
     this.maskGraphics.setPosition(lensX, lensY);
 
+    // Position the magnifying glass graphic to perfectly align its handle tip with the pointer,
+    // and its visual lens ring with lensX/lensY.
+    // The image's origin is (1, 1), so setting it to pointer.x, pointer.y locks the tip to the finger.
+    this.magnifyingGlass.setPosition(pointer.x, pointer.y);
+
     const magnifierRadius = 75 * scale;
     const zoom = 2;
     const diameter = 150 * scale;
@@ -1725,41 +1730,45 @@ class SectionHunt extends Phaser.Scene {
 
     // Crucial Change: The user requested the zoomed view to show what is visually under the FINGER (pointer.x, pointer.y),
     // because that's where they are pointing, even though the magnifying glass is visually offset so their hand doesn't block it.
-    const scrollX = pointer.x - viewWidth / 2;
-    const scrollY = pointer.y - viewHeight / 2;
+
+    // Calculate the scale ratio of the active background to properly project pointer coordinates
+    let baseScaleX = 1;
+    let baseScaleY = 1;
+
+    if (this.sectionImage && this.sectionImage.active) {
+         if (this.renderStamp.texture.key !== this.sectionImage.texture.key) {
+             this.renderStamp.setTexture(this.sectionImage.texture.key);
+         }
+         this.renderStamp.setFrame(this.sectionImage.frame.name);
+
+         const actualBgWidth = this.renderStamp.width;
+         const actualBgHeight = this.renderStamp.height;
+
+         baseScaleX = this.sectionImage.displayWidth / actualBgWidth;
+         baseScaleY = this.sectionImage.displayHeight / actualBgHeight;
+    } else {
+         if (this.renderStamp.texture.key !== this.sectionName) {
+             this.renderStamp.setTexture(this.sectionName);
+         }
+         baseScaleX = this.bgScale || (this.game.config.width / this.renderStamp.width);
+         baseScaleY = this.bgScale || (this.game.config.height / this.renderStamp.height);
+    }
 
     this.zoomedView.clear();
 
-    // Draw background using renderStamp to avoid dirtying scene object
-    if (this.sectionImage && this.sectionImage.active) {
-         this.renderStamp.texture = this.sectionImage.texture;
-         this.renderStamp.frame = this.sectionImage.frame;
-    } else {
-         this.renderStamp.setTexture(this.sectionName);
-    }
-
-    // Calculate target scale directly without redundant matrix operations
-    // 1. Base scale to fit screen (use displayWidth/displayHeight if texture exists, but fallback to known bg scale)
-    // CRITICAL FIX: Get the ACTUAL width and height of the texture we are drawing, because this.renderStamp.width
-    // may still hold the dimensions of the fallback image (1280x720) even when rendering a video (1920x1080).
-    const actualBgWidth = (this.sectionImage && this.sectionImage.active && this.sectionImage.texture) ? this.sectionImage.texture.source[0].width : this.renderStamp.width;
-    const actualBgHeight = (this.sectionImage && this.sectionImage.active && this.sectionImage.texture) ? this.sectionImage.texture.source[0].height : this.renderStamp.height;
-
-    const baseScaleX = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayWidth / actualBgWidth) : (this.bgScale || (this.game.config.width / actualBgWidth));
-    const baseScaleY = (this.sectionImage && this.sectionImage.active) ? (this.sectionImage.displayHeight / actualBgHeight) : (this.bgScale || (this.game.config.height / actualBgHeight));
-
     // 2. Apply zoom. The `zoomedView` RenderTexture expects coordinates and scales that represent the final pixels.
     this.renderStamp.setScale(baseScaleX * zoom, baseScaleY * zoom);
-
-    // Set origin to top-left so we can position it correctly
     this.renderStamp.setOrigin(0, 0);
 
-    // To shift the scaled image left/up, we take that screen-space offset and multiply it by `zoom`.
-    // Background is pinned at 0,0 on mobile (no bgOffset needed).
-    // The previous math lacked the baseScale alignment to translate logical pixels to raw texture coordinates.
-    // We scale the logical scroll offset by the display scale factor, then apply the zoom.
-    const drawX = -scrollX * baseScaleX * zoom;
-    const drawY = -scrollY * baseScaleY * zoom;
+    // To map the exact pixel under pointer.x, pointer.y to the center of the zoom window (radius):
+    // The background is scaled up by `zoom` *relative to the screen coordinates*.
+    // So the pixel at `pointer.x` on the screen becomes `pointer.x * zoom` on the scaled background.
+    // We want `pointer.x * zoom` to land at the center of the RenderTexture, which is `viewWidth / 2 * zoom`.
+    // Center of RenderTexture = (diameter / 2) = (viewWidth * zoom / 2) = radius.
+    // The math is: drawX + (pointer.x * zoom) = radius  =>  drawX = radius - (pointer.x * zoom)
+    const radius = diameter / 2;
+    const drawX = radius - (pointer.x * zoom);
+    const drawY = radius - (pointer.y * zoom);
 
     this.zoomedView.draw(this.renderStamp, drawX, drawY);
 
@@ -1769,14 +1778,12 @@ class SectionHunt extends Phaser.Scene {
     for (let i = 0, len = children.length; i < len; i++) {
       const egg = children[i];
       if (egg && egg.active) {
-          // Update visibility based on LENS visual position
-          // If the egg is under the lens (visual), it should be visible in the zoomed view.
+          // Update visibility based on FINGER (pointer) visual position for the LENS
+          // The hit area has expanded significantly, so the eggs should appear when hovered
+          const distToPointerSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
+          const magnifierRadiusSq = radius * radius; // Standard magnifying glass coverage
 
-          // Bolt Optimization: Use squared distance to avoid sqrt calculation in loop
-          const distToLensSq = Phaser.Math.Distance.Squared(lensX, lensY, egg.x, egg.y);
-          const magnifierRadiusSq = magnifierRadius * magnifierRadius;
-
-          const alpha = distToLensSq < magnifierRadiusSq ? 1 : 0;
+          const alpha = distToPointerSq < magnifierRadiusSq ? 1 : 0;
           egg.setAlpha(alpha);
           if (egg.symbolSprite) {
             egg.symbolSprite.setAlpha(alpha);
@@ -1790,7 +1797,13 @@ class SectionHunt extends Phaser.Scene {
              this.renderStamp.setFlipY(egg.flipY);
              this.renderStamp.setOrigin(0.5, 0.5);
              this.renderStamp.setScale(egg.scaleX * zoom, egg.scaleY * zoom);
-             this.zoomedView.draw(this.renderStamp, (egg.x - scrollX) * baseScaleX * zoom, (egg.y - scrollY) * baseScaleY * zoom);
+
+             // Same offset logic: pointer.x on the screen is mapped to `radius`.
+             // So `egg.x` on the screen is mapped to `radius + (egg.x - pointer.x) * zoom`.
+             const eggDrawX = radius + (egg.x - pointer.x) * zoom;
+             const eggDrawY = radius + (egg.y - pointer.y) * zoom;
+
+             this.zoomedView.draw(this.renderStamp, eggDrawX, eggDrawY);
 
              // Draw Symbol using renderStamp
              if (egg.symbolSprite && egg.symbolSprite.active && egg.symbolSprite.visible) {
@@ -1799,7 +1812,10 @@ class SectionHunt extends Phaser.Scene {
                  this.renderStamp.setFlipX(egg.symbolSprite.flipX);
                  this.renderStamp.setFlipY(egg.symbolSprite.flipY);
                  this.renderStamp.setScale(egg.symbolSprite.scaleX * zoom, egg.symbolSprite.scaleY * zoom);
-                 this.zoomedView.draw(this.renderStamp, (egg.symbolSprite.x - scrollX) * baseScaleX * zoom, (egg.symbolSprite.y - scrollY) * baseScaleY * zoom);
+
+                 const symDrawX = radius + (egg.symbolSprite.x - pointer.x) * zoom;
+                 const symDrawY = radius + (egg.symbolSprite.y - pointer.y) * zoom;
+                 this.zoomedView.draw(this.renderStamp, symDrawX, symDrawY);
              }
           }
       }
@@ -1860,7 +1876,7 @@ class SectionHunt extends Phaser.Scene {
         if (this.magnifyingGlass) {
              this.magnifyingGlass.setVisible(true);
              this.magnifyingGlass.setDisplaySize(150 * scale, 187.5 * scale);
-             this.magnifyingGlass.setPosition(pointer.x, pointer.y);
+             // position is now handled smoothly at the top of update()
         }
         if (this.zoomedView) this.zoomedView.setVisible(true);
         if (this.maskGraphics) this.maskGraphics.setVisible(true);
@@ -2029,16 +2045,8 @@ class EggZamRoom extends Phaser.Scene {
     }
 
     if (!this.textures.exists('sparkle')) {
-        // Use Phaser.GameObjects.Star and generate a texture from it
-        const starObject = this.make.star({
-            x: 10,
-            y: 10,
-            points: 4,
-            innerRadius: 2,
-            outerRadius: 10,
-            fillColor: 0xffffff,
-            add: false
-        });
+        // Use Phaser.GameObjects.Star and generate a texture from it safely
+        const starObject = new Phaser.GameObjects.Star(this, 10, 10, 4, 2, 10, 0xffffff);
         const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
         renderTexture.draw(starObject, 10, 10);
         renderTexture.saveTexture('sparkle');
