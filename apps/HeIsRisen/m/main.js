@@ -1971,12 +1971,12 @@ class EggZamRoom extends Phaser.Scene {
     const gasParticles = this.add.particles(0, 0, 'green-gas', {
         x: startX,
         y: startY,
-        speed: { min: -100 * assetScale, max: 100 * assetScale },
+        speed: { min: -50 * assetScale, max: 50 * assetScale },
         angle: { min: 0, max: 360 },
         scale: { start: 1 * assetScale, end: 3 * assetScale },
         alpha: { start: 0.8, end: 0 },
-        lifespan: 4000,
-        frequency: 25,
+        lifespan: 2000,
+        frequency: 50,
         blendMode: 'SCREEN'
     }).setDepth(4);
 
