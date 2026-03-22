@@ -64,12 +64,23 @@ function createConfirmModal(scene, message, onConfirm, onCancel) {
 
     container.add([overlay, modalBg, messageText, yesBtn, noBtn]);
 
+    const resizeHandler = (gameSize) => {
+        const newWidth = gameSize.width;
+        const newHeight = gameSize.height;
+        container.setPosition(newWidth / 2, newHeight / 2);
+        overlay.setSize(newWidth, newHeight);
+    };
+
+    scene.scale.on('resize', resizeHandler);
+
     yesBtn.on('pointerdown', () => {
+        scene.scale.off('resize', resizeHandler);
         container.destroy();
         if (onConfirm) onConfirm();
     });
 
     noBtn.on('pointerdown', () => {
+        scene.scale.off('resize', resizeHandler);
         container.destroy();
         if (onCancel) onCancel();
     });
