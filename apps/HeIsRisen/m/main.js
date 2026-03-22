@@ -356,6 +356,42 @@ class UIScene extends Phaser.Scene {
     gearContainer.baseScaleY = gearContainer.scaleY;
 
     gearContainer.on('pointerdown', () => {
+        // Prioritize egg collection in SectionHunt
+        const sectionHunt = this.scene.get('SectionHunt');
+        if (sectionHunt && sectionHunt.scene.isActive()) {
+            const pointer = this.input.activePointer;
+            const scale = sectionHunt.gameScale;
+
+            // Re-calculate the clamped lensX/lensY exactly as done in SectionHunt update()
+            const lensOffsetX = -97.5 * scale;
+            const lensOffsetY = -135 * scale;
+            const rawLensX = pointer.x + lensOffsetX;
+            const rawLensY = pointer.y + lensOffsetY;
+            const lensRadius = 75 * scale;
+            const lensX = Phaser.Math.Clamp(rawLensX, lensRadius, this.game.config.width - lensRadius);
+            const lensY = Phaser.Math.Clamp(rawLensY, lensRadius, this.game.config.height - lensRadius);
+
+            const captureRadius = 80 * scale;
+            const captureRadiusSq = captureRadius * captureRadius;
+
+            let eggCollected = false;
+            const children = sectionHunt.eggs.getChildren();
+            for (let i = children.length - 1; i >= 0; i--) {
+                const egg = children[i];
+                if (egg && egg.active && !egg.getData('collected')) {
+                    const distSq = Phaser.Math.Distance.Squared(lensX, lensY, egg.x, egg.y);
+                    if (distSq < captureRadiusSq) {
+                        sectionHunt.collectEgg(egg);
+                        egg.destroy();
+                        if (egg.symbolSprite) egg.symbolSprite.destroy();
+                        eggCollected = true;
+                    }
+                }
+            }
+            // If we successfully collected an egg, intercept the click and DO NOT open settings
+            if (eggCollected) return;
+        }
+
         this.tweens.add({
             targets: gearContainer,
             scaleX: gearContainer.baseScaleX * 0.9,
@@ -1860,8 +1896,12 @@ class SectionHunt extends Phaser.Scene {
       const lensOffsetX = -97.5 * scale;
       const lensOffsetY = -135 * scale;
 
-      const lensX = pointer.x + lensOffsetX;
-      const lensY = pointer.y + lensOffsetY;
+      const rawLensX = pointer.x + lensOffsetX;
+      const rawLensY = pointer.y + lensOffsetY;
+
+      const lensRadius = 75 * scale;
+      const lensX = Phaser.Math.Clamp(rawLensX, lensRadius, this.game.config.width - lensRadius);
+      const lensY = Phaser.Math.Clamp(rawLensY, lensRadius, this.game.config.height - lensRadius);
       const captureRadius = 80 * scale; // Slightly larger than visual radius (75)
       const captureRadiusSq = captureRadius * captureRadius;
 
@@ -1897,8 +1937,13 @@ class SectionHunt extends Phaser.Scene {
     const lensOffsetX = -97.5 * scale;
     const lensOffsetY = -135 * scale;
 
-    const lensX = pointer.x + lensOffsetX;
-    const lensY = pointer.y + lensOffsetY;
+    const rawLensX = pointer.x + lensOffsetX;
+    const rawLensY = pointer.y + lensOffsetY;
+
+    // 1. Clamp physical lens position so the visual ring stays on screen
+    const lensRadius = 75 * scale;
+    const lensX = Phaser.Math.Clamp(rawLensX, lensRadius, this.game.config.width - lensRadius);
+    const lensY = Phaser.Math.Clamp(rawLensY, lensRadius, this.game.config.height - lensRadius);
 
     // Ensure video size is correct once texture loads
     if (this.sectionImage && this.sectionImage.active && this.sectionImage.width > 0) {
@@ -1914,7 +1959,11 @@ class SectionHunt extends Phaser.Scene {
     // Position the magnifying glass graphic to perfectly align its handle tip with the pointer,
     // and its visual lens ring with lensX/lensY.
     // The image's origin is (1, 1), so setting it to pointer.x, pointer.y locks the tip to the finger.
-    this.magnifyingGlass.setPosition(pointer.x, pointer.y);
+    // However, since lensX/lensY are now clamped, we must reverse-calculate the handle tip position
+    // so the physical graphic perfectly aligns its visual lens ring with the clamped coordinates.
+    const clampedTipX = lensX - lensOffsetX;
+    const clampedTipY = lensY - lensOffsetY;
+    this.magnifyingGlass.setPosition(clampedTipX, clampedTipY);
 
     const magnifierRadius = 75 * scale;
     const zoom = 2;
@@ -1961,8 +2010,33 @@ class SectionHunt extends Phaser.Scene {
     // Center of RenderTexture = (diameter / 2) = (viewWidth * zoom / 2) = radius.
     // The math is: drawX + (pointer.x * zoom) = radius  =>  drawX = radius - (pointer.x * zoom)
     const radius = diameter / 2;
-    const drawX = radius - (pointer.x * zoom);
-    const drawY = radius - (pointer.y * zoom);
+
+    // Calculate the scaled dimensions of the background
+    const scaledBgWidth = this.renderStamp.width * baseScaleX * zoom;
+    const scaledBgHeight = this.renderStamp.height * baseScaleY * zoom;
+
+    // 2. Clamp the internal projection so the edge of the renderStamp is never pulled inside the lens
+    // The background is drawn at (drawX, drawY).
+    // It cannot be drawn further right than 0 (which would show the left edge).
+    // It cannot be drawn further left than (diameter - scaledBgWidth) (which would show the right edge).
+    const minDrawX = Math.min(0, diameter - scaledBgWidth);
+    const maxDrawX = 0;
+    const minDrawY = Math.min(0, diameter - scaledBgHeight);
+    const maxDrawY = 0;
+
+    const rawDrawX = radius - (pointer.x * zoom);
+    const rawDrawY = radius - (pointer.y * zoom);
+
+    const drawX = Phaser.Math.Clamp(rawDrawX, minDrawX, maxDrawX);
+    const drawY = Phaser.Math.Clamp(rawDrawY, minDrawY, maxDrawY);
+
+    // Calculate clamped pointer offsets for drawing the eggs and symbols
+    // correctly relative to the clamped background projection.
+    // Normally, the egg projection is: radius + (egg.x - pointer.x) * zoom
+    // Since drawX = rawDrawX = radius - (pointer.x * zoom) when unclamped,
+    // this means pointer.x * zoom = radius - drawX.
+    // So the egg projection is: drawX + (egg.x * zoom).
+    // This maps seamlessly to the clamped drawX and drawY!
 
     this.zoomedView.draw(this.renderStamp, drawX, drawY);
 
@@ -1992,10 +2066,10 @@ class SectionHunt extends Phaser.Scene {
              this.renderStamp.setOrigin(0.5, 0.5);
              this.renderStamp.setScale(egg.scaleX * zoom, egg.scaleY * zoom);
 
-             // Same offset logic: pointer.x on the screen is mapped to `radius`.
-             // So `egg.x` on the screen is mapped to `radius + (egg.x - pointer.x) * zoom`.
-             const eggDrawX = radius + (egg.x - pointer.x) * zoom;
-             const eggDrawY = radius + (egg.y - pointer.y) * zoom;
+             // Offset logic: since the background is drawn at (drawX, drawY),
+             // the egg (which is at egg.x on the unscaled screen) must be drawn at drawX + (egg.x * zoom).
+             const eggDrawX = drawX + (egg.x * zoom);
+             const eggDrawY = drawY + (egg.y * zoom);
 
              this.zoomedView.draw(this.renderStamp, eggDrawX, eggDrawY);
 
@@ -2007,8 +2081,8 @@ class SectionHunt extends Phaser.Scene {
                  this.renderStamp.setFlipY(egg.symbolSprite.flipY);
                  this.renderStamp.setScale(egg.symbolSprite.scaleX * zoom, egg.symbolSprite.scaleY * zoom);
 
-                 const symDrawX = radius + (egg.symbolSprite.x - pointer.x) * zoom;
-                 const symDrawY = radius + (egg.symbolSprite.y - pointer.y) * zoom;
+                 const symDrawX = drawX + (egg.symbolSprite.x * zoom);
+                 const symDrawY = drawY + (egg.symbolSprite.y * zoom);
                  this.zoomedView.draw(this.renderStamp, symDrawX, symDrawY);
              }
           }
