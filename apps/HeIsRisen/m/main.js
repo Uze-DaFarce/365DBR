@@ -930,8 +930,8 @@ class MainMenu extends Phaser.Scene {
       // "Play Now" / "Continue" Button Container (Initially Hidden)
       const buttonWidth = 400;
       const buttonHeight = 80;
-      const btnX = width / 2;
-      const btnY = height - (100 * scale);
+      const btnX = this.game.config.width / 2;
+      const btnY = this.game.config.height - (100 * scale);
       const hasSaveState = localStorage.getItem('heIsRisenGameState') !== null;
 
       const startBtnContainer = this.add.container(btnX, btnY).setVisible(false).setDepth(101);
