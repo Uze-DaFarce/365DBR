@@ -2943,7 +2943,10 @@ function resizeGame() {
   const scaleY = height / 720;
   const scale = Math.min(scaleX, scaleY);
 
-  game.scene.getScenes(true).forEach(scene => {
+  // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations during resize
+  const scenes = game.scene.getScenes(true);
+  for (let s_idx = 0; s_idx < scenes.length; s_idx++) {
+    const scene = scenes[s_idx];
     if (scene.gameScale) scene.gameScale = scale;
     if (scene.cameras && scene.cameras.main) {
       scene.cameras.main.setBounds(0, 0, width, height);
@@ -2990,7 +2993,9 @@ function resizeGame() {
         scene.mapImage.setScale(mapScale);
       }
       if (scene.mapSections) {
-        scene.mapSections.forEach(section => {
+        // ⚡ Bolt Optimization: Replace forEach with fast for loop
+        for (let m_idx = 0; m_idx < scene.mapSections.length; m_idx++) {
+          const section = scene.mapSections[m_idx];
           if (section.zone) {
             const centerX = section.coords.x;
             const centerY = section.coords.y;
@@ -3021,10 +3026,12 @@ function resizeGame() {
             section.zone.baseScaleX = section.zone.scaleX;
             section.zone.baseScaleY = section.zone.scaleY;
           }
-        });
+        }
 
         if (scene.stamps) {
-            scene.stamps.forEach(item => {
+            // ⚡ Bolt Optimization: Replace forEach with fast for loop
+            for (let st_idx = 0; st_idx < scene.stamps.length; st_idx++) {
+                const item = scene.stamps[st_idx];
                 if (item.video && item.video.active && item.thumb && item.thumb.active) {
                     // Only apply the 40px upward offset to the stampVideo (Phaser.Video), not the final stampImg
                     const isVideo = item.video.type === 'Video';
@@ -3036,7 +3043,7 @@ function resizeGame() {
                   const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
                   item.video.setScale(targetHeight / intrinsicHeight);
                 }
-            });
+            }
         }
       }
       if (scene.eggsAmminHaul) {
@@ -3066,14 +3073,17 @@ function resizeGame() {
         scene.sectionImage.setDisplaySize(width, height);
       }
       if (scene.eggs) {
-        scene.eggs.getChildren().forEach(egg => {
+        // ⚡ Bolt Optimization: Replace forEach with fast for loop
+        const eggs = scene.eggs.getChildren();
+        for (let e_idx = eggs.length - 1; e_idx >= 0; e_idx--) {
+          const egg = eggs[e_idx];
           if (egg && egg.active) {
             egg.setDisplaySize(50 * scale, 75 * scale);
             if (egg.symbolSprite) {
               egg.symbolSprite.setDisplaySize(50 * scale, 75 * scale);
             }
           }
-        });
+        }
       }
       if (scene.eggZitButton) {
         scene.eggZitButton.setPosition(0, 200 * scale);
@@ -3189,7 +3199,7 @@ function resizeGame() {
       }
       if (scene.fingerCursor) scene.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
     }
-  });
+  }
 }
 
 game.events.on('ready', () => {

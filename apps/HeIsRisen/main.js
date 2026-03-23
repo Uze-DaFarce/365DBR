@@ -1415,7 +1415,9 @@ class MapScene extends Phaser.Scene {
 
       // Update Zones
       if (this.mapZones) {
-          this.mapZones.forEach(thumb => {
+          // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations during layout update
+          for (let m_idx = 0; m_idx < this.mapZones.length; m_idx++) {
+              const thumb = this.mapZones[m_idx];
               const d = thumb.sectionData.coords;
               const centerX = d.x;
               const centerY = d.y;
@@ -1439,11 +1441,13 @@ class MapScene extends Phaser.Scene {
 
               // Update base scale for hover animations AFTER scaling
               thumb.baseScale = thumb.scaleX;
-          });
+          }
       }
 
       if (this.stamps) {
-          this.stamps.forEach(item => {
+          // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations during layout update
+          for (let st_idx = 0; st_idx < this.stamps.length; st_idx++) {
+              const item = this.stamps[st_idx];
               if (item.video && item.video.active && item.thumb && item.thumb.active) {
                   // Only apply the 40px upward offset to the stampVideo (Phaser.Video), not the final stampImg
                   const isVideo = item.video.type === 'Video';
@@ -1458,7 +1462,7 @@ class MapScene extends Phaser.Scene {
                       item.video.setScale(calculatedScale);
                   }
               }
-          });
+          }
       }
 
       // UI Elements - Scale with MIN to stay on screen and proportional
