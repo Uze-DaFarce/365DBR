@@ -50,6 +50,9 @@ def run_state_corruption_test(is_mobile=False):
                     localStorage.setItem('ambientVolume_backup', 'not_a_number'); // Invalid backup
                     localStorage.setItem('sfxVolume', ' '); // Empty/whitespace string
                     // No sfxVolume_backup set
+
+                    // Tamper with the main game state
+                    localStorage.setItem('heIsRisenGameState', '{ invalid json: ] ] }');
                 }
             """)
 

@@ -99,3 +99,7 @@
 ## 2026-03-21 - [HeIsRisen localStorage State Corruption Resilience]
 **Learning:** The HeIsRisen game `localStorage` state parsers (`getSafeVol` and `parseInt(highScore)`) gracefully handle malicious and malformed edge cases including `-Infinity`, `NaN`, `"{}"`, and empty string injection. The Phaser registry defaults appropriately back to 0.5 for volumes and 0 for scores without crashing the Web Audio API or game state loop.
 **Action:** Expanded the test suite `apps/HeIsRisen/tests/test_state_corruption.py` to assert edge-case boundaries actively instead of simple out-of-bounds inputs, confirming the logic correctly defaults to 0.5. Also verified `test_production_future_data.py` exists and successfully validates production API data.
+
+## 2026-03-23 - [Sentinel] Resiliency against Corrupted JSON in Game State
+**Learning:** JSON.parse throws exceptions on malformed local storage data, causing the whole game state loading sequence to crash and blocking the fallback to default states, and potentially soft-locking the game entirely if left unchecked.
+**Action:** Wrapped JSON.parse in a try-catch block for the `heIsRisenGameState` and added corrupted JSON testing into the `test_state_corruption.py` test suite.

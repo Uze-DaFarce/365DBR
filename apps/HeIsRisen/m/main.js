@@ -23,8 +23,13 @@ function initializeGameData(registry, cache, forceNew = false) {
         try {
             const savedStateStr = localStorage.getItem('heIsRisenGameState');
             if (savedStateStr) {
-                const savedState = JSON.parse(savedStateStr);
-                if (savedState && savedState.eggData && savedState.sections) {
+                let savedState = null;
+                try {
+                    savedState = JSON.parse(savedStateStr);
+                } catch (e) {
+                    console.warn('Invalid saved game state in localStorage', e);
+                }
+                if (savedState && typeof savedState === 'object' && savedState.eggData && savedState.sections) {
                     registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
                     registry.set('foundEggs', savedState.foundEggs || []);
