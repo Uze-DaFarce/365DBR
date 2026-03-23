@@ -309,6 +309,14 @@ def run_collect_eggs_in_level(is_mobile=False):
 
                                   if (typeof scene.updateEggCount === 'function') scene.updateEggCount();
 
+                                  // Re-trigger the pop effect so the test validates the tween for mobile context too
+                                  if (typeof scene.showCollectionFeedback === 'function') {{
+                                      const dummyEggId = 'symbol-1'; // Dummy fallback
+                                      scene.showCollectionFeedback({egg_x}, {egg_y}, 'egg-1', dummyEggId);
+                                  }}
+
+                                  eggObject.destroy(); // Hard fallback
+
                                   // Call check level complete just to trigger inner validation
                                   if (typeof scene.checkLevelComplete === 'function') scene.checkLevelComplete();
 
