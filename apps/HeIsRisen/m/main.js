@@ -130,8 +130,13 @@ function initializeGameData(registry, cache, forceNew = false) {
         try {
             const savedStateStr = localStorage.getItem('heIsRisenGameState');
             if (savedStateStr) {
-                const savedState = JSON.parse(savedStateStr);
-                if (savedState && savedState.eggData && savedState.sections) {
+                let savedState = null;
+                try {
+                    savedState = JSON.parse(savedStateStr);
+                } catch (e) {
+                    console.warn('Invalid saved game state in localStorage', e);
+                }
+                if (savedState && typeof savedState === 'object' && savedState.eggData && savedState.sections) {
                     registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
                     registry.set('foundEggs', savedState.foundEggs || []);
@@ -365,9 +370,9 @@ class MusicScene extends Phaser.Scene {
     });
   }
 
-  playSFX(key) {
+  playSFX(key, config = {}) {
     if (this.cache.audio.exists(key)) {
-        this.sound.play(key, { volume: this.sfxVolume });
+        this.sound.play(key, { volume: this.sfxVolume, ...config });
     } else {
         console.warn(`MusicScene: Audio key '${key}' missing from cache!`);
     }
@@ -602,7 +607,7 @@ class UIScene extends Phaser.Scene {
     // Space available below title (y + 80) to bottom (y + height - 20)
     const contentTop = y + 80;
     const contentHeight = height - 100;
-    const spacing = contentHeight / 3;
+    const spacing = contentHeight / 4;
     const trackWidth = Math.min(200, width - 60);
 
     this.createSlider('Music', contentTop + spacing * 0.5, screenWidth / 2, 'music', trackWidth);
@@ -1552,7 +1557,7 @@ class SectionHunt extends Phaser.Scene {
     if (!foundEggs.some(e => e.eggId === eggInfo.eggId)) {
       const musicScene = this.scene.get('MusicScene');
       if (musicScene) {
-          musicScene.playSFX('collect');
+          musicScene.playSFX('collect', { detune: Phaser.Math.Between(-200, 200) });
       }
 
       // Get symbol texture if available
@@ -1657,6 +1662,21 @@ class SectionHunt extends Phaser.Scene {
 
   showCollectionFeedback(x, y, eggTexture, symbolTexture) {
     const scale = this.gameScale;
+
+    if (!this.textures.exists('sparkle')) {
+        const starObject = new Phaser.GameObjects.Star(this, 10, 10, 4, 2, 10, 0xffff00);
+        const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
+        renderTexture.draw(starObject, 10, 10);
+        renderTexture.saveTexture('sparkle');
+        renderTexture.destroy();
+        starObject.destroy();
+    }
+
+    const emitter = this.add.particles(x, y, 'sparkle', {
+        speed: { min: 50 * scale, max: 200 * scale }, scale: { start: 1 * scale, end: 0 }, alpha: { start: 1, end: 0 },
+        lifespan: 800, gravityY: 200 * scale, quantity: 15, duration: 100
+    }).setDepth(19);
+    emitter.once('complete', () => emitter.destroy());
 
     // Egg Sprite
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50 * scale, 75 * scale);
@@ -3052,7 +3072,10 @@ function resizeGame() {
   const scaleY = height / 720;
   const scale = Math.min(scaleX, scaleY);
 
-  game.scene.getScenes(true).forEach(scene => {
+  // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations during resize
+  const scenes = game.scene.getScenes(true);
+  for (let s_idx = 0; s_idx < scenes.length; s_idx++) {
+    const scene = scenes[s_idx];
     if (scene.gameScale) scene.gameScale = scale;
     if (scene.cameras && scene.cameras.main) {
       scene.cameras.main.setBounds(0, 0, width, height);
@@ -3099,7 +3122,9 @@ function resizeGame() {
         scene.mapImage.setScale(mapScale);
       }
       if (scene.mapSections) {
-        scene.mapSections.forEach(section => {
+        // ⚡ Bolt Optimization: Replace forEach with fast for loop
+        for (let m_idx = 0; m_idx < scene.mapSections.length; m_idx++) {
+          const section = scene.mapSections[m_idx];
           if (section.zone) {
             const centerX = section.coords.x;
             const centerY = section.coords.y;
@@ -3130,10 +3155,12 @@ function resizeGame() {
             section.zone.baseScaleX = section.zone.scaleX;
             section.zone.baseScaleY = section.zone.scaleY;
           }
-        });
+        }
 
         if (scene.stamps) {
-            scene.stamps.forEach(item => {
+            // ⚡ Bolt Optimization: Replace forEach with fast for loop
+            for (let st_idx = 0; st_idx < scene.stamps.length; st_idx++) {
+                const item = scene.stamps[st_idx];
                 if (item.video && item.video.active && item.thumb && item.thumb.active) {
                     // Only apply the 40px upward offset to the stampVideo (Phaser.Video), not the final stampImg
                     const isVideo = item.video.type === 'Video';
@@ -3145,7 +3172,7 @@ function resizeGame() {
                   const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
                   item.video.setScale(targetHeight / intrinsicHeight);
                 }
-            });
+            }
         }
       }
       if (scene.eggsAmminHaul) {
@@ -3175,14 +3202,17 @@ function resizeGame() {
         scene.sectionImage.setDisplaySize(width, height);
       }
       if (scene.eggs) {
-        scene.eggs.getChildren().forEach(egg => {
+        // ⚡ Bolt Optimization: Replace forEach with fast for loop
+        const eggs = scene.eggs.getChildren();
+        for (let e_idx = eggs.length - 1; e_idx >= 0; e_idx--) {
+          const egg = eggs[e_idx];
           if (egg && egg.active) {
             egg.setDisplaySize(50 * scale, 75 * scale);
             if (egg.symbolSprite) {
               egg.symbolSprite.setDisplaySize(50 * scale, 75 * scale);
             }
           }
-        });
+        }
       }
       if (scene.eggZitButton) {
         scene.eggZitButton.setPosition(0, 200 * scale);
@@ -3298,7 +3328,7 @@ function resizeGame() {
       }
       if (scene.fingerCursor) scene.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
     }
-  });
+  }
 }
 
 game.events.on('ready', () => {

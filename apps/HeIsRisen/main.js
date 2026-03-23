@@ -129,8 +129,13 @@ function initializeGameData(registry, cache, forceNew = false) {
         try {
             const savedStateStr = localStorage.getItem('heIsRisenGameState');
             if (savedStateStr) {
-                const savedState = JSON.parse(savedStateStr);
-                if (savedState && savedState.eggData && savedState.sections) {
+                let savedState = null;
+                try {
+                    savedState = JSON.parse(savedStateStr);
+                } catch (e) {
+                    console.warn('Invalid saved game state in localStorage', e);
+                }
+                if (savedState && typeof savedState === 'object' && savedState.eggData && savedState.sections) {
                     registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
                     registry.set('foundEggs', savedState.foundEggs || []);
@@ -393,12 +398,12 @@ class MusicScene extends Phaser.Scene {
     });
   }
 
-  playSFX(key) {
+  playSFX(key, config = {}) {
     // Simply play the sound. If not in cache, Phaser will warn internally,
     // but usually 'add' isn't needed for one-shot SFX if loaded.
     // If it's not added yet, we can try adding it, but play() usually handles it if the key exists.
     if (this.cache.audio.exists(key)) {
-        this.sound.play(key, { volume: this.sfxVolume });
+        this.sound.play(key, { volume: this.sfxVolume, ...config });
     } else {
         console.warn(`MusicScene: Audio key '${key}' missing from cache!`);
     }
@@ -1524,7 +1529,9 @@ class MapScene extends Phaser.Scene {
 
       // Update Zones
       if (this.mapZones) {
-          this.mapZones.forEach(thumb => {
+          // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations during layout update
+          for (let m_idx = 0; m_idx < this.mapZones.length; m_idx++) {
+              const thumb = this.mapZones[m_idx];
               const d = thumb.sectionData.coords;
               const centerX = d.x;
               const centerY = d.y;
@@ -1548,11 +1555,13 @@ class MapScene extends Phaser.Scene {
 
               // Update base scale for hover animations AFTER scaling
               thumb.baseScale = thumb.scaleX;
-          });
+          }
       }
 
       if (this.stamps) {
-          this.stamps.forEach(item => {
+          // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations during layout update
+          for (let st_idx = 0; st_idx < this.stamps.length; st_idx++) {
+              const item = this.stamps[st_idx];
               if (item.video && item.video.active && item.thumb && item.thumb.active) {
                   // Only apply the 40px upward offset to the stampVideo (Phaser.Video), not the final stampImg
                   const isVideo = item.video.type === 'Video';
@@ -1567,7 +1576,7 @@ class MapScene extends Phaser.Scene {
                       item.video.setScale(calculatedScale);
                   }
               }
-          });
+          }
       }
 
       // UI Elements - Scale with MIN to stay on screen and proportional
@@ -1617,7 +1626,7 @@ class SectionHunt extends Phaser.Scene {
     if (!foundEggs.some(e => e.eggId === eggData.eggId)) {
       const musicScene = this.scene.get('MusicScene');
       if (musicScene) {
-          musicScene.playSFX('collect');
+          musicScene.playSFX('collect', { detune: Phaser.Math.Between(-200, 200) });
       }
 
       let symbolTexture = null;
@@ -1719,6 +1728,21 @@ class SectionHunt extends Phaser.Scene {
   }
 
   showCollectionFeedback(x, y, eggTexture, symbolTexture) {
+    if (!this.textures.exists('sparkle')) {
+        const starObject = new Phaser.GameObjects.Star(this, 10, 10, 4, 2, 10, 0xffff00);
+        const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
+        renderTexture.draw(starObject, 10, 10);
+        renderTexture.saveTexture('sparkle');
+        renderTexture.destroy();
+        starObject.destroy();
+    }
+
+    const emitter = this.add.particles(x, y, 'sparkle', {
+        speed: { min: 50, max: 200 }, scale: { start: 1, end: 0 }, alpha: { start: 1, end: 0 },
+        lifespan: 800, gravityY: 200, quantity: 15, duration: 100
+    }).setDepth(19);
+    emitter.once('complete', () => emitter.destroy());
+
     // Show Egg Sprite
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50, 75);
     this.tweens.add({
