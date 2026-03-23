@@ -1549,6 +1549,20 @@ class SectionHunt extends Phaser.Scene {
   showCollectionFeedback(x, y, eggTexture, symbolTexture) {
     const scale = this.gameScale;
 
+    if (!this.textures.exists('sparkle')) {
+        const starObject = new Phaser.GameObjects.Star(this, 10, 10, 4, 2, 10, 0xffff00);
+        const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
+        renderTexture.draw(starObject, 10, 10);
+        renderTexture.saveTexture('sparkle');
+        starObject.destroy();
+    }
+
+    const emitter = this.add.particles(x, y, 'sparkle', {
+        speed: { min: 50 * scale, max: 200 * scale }, scale: { start: 1 * scale, end: 0 }, alpha: { start: 1, end: 0 },
+        lifespan: 800, gravityY: 200 * scale, quantity: 15, duration: 100
+    }).setDepth(19);
+    emitter.once('complete', () => emitter.destroy());
+
     // Egg Sprite
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50 * scale, 75 * scale);
     this.tweens.add({
@@ -2315,7 +2329,6 @@ class EggZamRoom extends Phaser.Scene {
         const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
         renderTexture.draw(starObject, 10, 10);
         renderTexture.saveTexture('sparkle');
-        renderTexture.destroy();
         starObject.destroy();
     }
 
