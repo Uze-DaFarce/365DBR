@@ -495,7 +495,7 @@ class UIScene extends Phaser.Scene {
     // Space available below title (y + 80) to bottom (y + height - 20)
     const contentTop = y + 80;
     const contentHeight = height - 100;
-    const spacing = contentHeight / 3;
+    const spacing = contentHeight / 4;
     const trackWidth = Math.min(200, width - 60);
 
     this.createSlider('Music', contentTop + spacing * 0.5, screenWidth / 2, 'music', trackWidth);
