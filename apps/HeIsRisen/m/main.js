@@ -660,7 +660,10 @@ class MainMenu extends Phaser.Scene {
     this.load.json('symbols', 'assets/symbols.json');
     this.load.json('map_sections', 'assets/map/map_sections.json'); // NEW: Preload map_sections.json
     this.load.video('intro-video', 'assets/video/HeIsRisen-Intro.mp4');
-    this.load.video('level-complete', 'assets/video/level-complete.webm');
+
+    // Load the new optimized sprite sheet and JSON atlas for the transparent animation
+    this.load.atlas('level-complete', 'assets/video/level-complete.png', 'assets/video/level-complete.json');
+
     this.load.image('level-complete-stamp', 'assets/objects/level-complete-stamp.png');
     this.load.image('finger-cursor', 'assets/cursor/pointer-finger-pointer.png');
 
@@ -1286,56 +1289,74 @@ class MapScene extends Phaser.Scene {
 
       if (isCompleted) {
           if (!stampedSections.includes(section.name)) {
-              // FIRST TIME COMPLETE: Play the video
-              const stampVideo = this.add.video(thumb.x, thumb.y, 'level-complete');
-              stampVideo.setOrigin(0.5, 0.5);
-              stampVideo.setDepth(2);
-              stampVideo.disableInteractive();
+              // FIRST TIME COMPLETE: Play the transparent animation from the sprite sheet
+              if (!this.anims.exists('level-complete-anim')) {
+                  // Dynamically get all frame names from the atlas, filtering out the default '__BASE'
+                  let frameNames = this.textures.get('level-complete').getFrameNames();
+                  frameNames = frameNames.filter(name => name !== '__BASE').sort();
+
+                  const frames = frameNames.map(name => ({ key: 'level-complete', frame: name }));
+
+                  this.anims.create({
+                      key: 'level-complete-anim',
+                      frames: frames,
+                      frameRate: 12,
+                      repeat: 0 // Play once
+                  });
+              }
+
+              // Create a Sprite for the animation
+              const stampAnim = this.add.sprite(thumb.x, thumb.y, 'level-complete');
+              stampAnim.setOrigin(0.5, 0.5);
+              stampAnim.setDepth(2);
+              stampAnim.disableInteractive();
 
               const updateStampSize = () => {
-                  // User requested 0px offset on mobile (previously -40)
-                  const offset = 0 * (this.bgScale || 1);
-                  stampVideo.setPosition(thumb.x, thumb.y + offset);
-                  // Use video.videoHeight for webm intrinsic sizes if available, fallback to phaser width or default 720
-                  const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
+                  // Shift the stamp upward by ~5px to align perfectly with the final image frame
+                  const offset = -5 * (this.bgScale || 1);
+                  stampAnim.setPosition(thumb.x, thumb.y + offset);
+
+                  // Calculate the scale based on the ANIMATION's intrinsic source height.
+                  // Since the user cropped the animation frames to save space (e.g., 400px),
+                  // we cannot use the 720px static stamp height to calculate this multiplier.
+                  const intrinsicHeight = stampAnim.height || 400;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
-                  stampVideo.setScale(calculatedScale);
+                  stampAnim.setScale(calculatedScale);
               };
               updateStampSize();
 
               if (!this.stamps) this.stamps = [];
-              this.stamps.push({ video: stampVideo, thumb: thumb });
+              this.stamps.push({ anim: stampAnim, thumb: thumb });
 
-              const sfxVol = this.registry.get('sfxVolume') !== undefined ? this.registry.get('sfxVolume') : 0.5;
-              stampVideo.setVolume(sfxVol);
-
-              stampVideo.on('play', () => {
-                  updateStampSize();
-              });
-
-              stampVideo.play();
+              // Play the animation
+              stampAnim.play('level-complete-anim');
 
               stampedSections.push(section.name);
               this.registry.set('stampedSections', stampedSections);
 
-              // Swap to image when video finishes to free memory
-              stampVideo.on('complete', () => {
+              // Swap to image when animation finishes to free memory
+              stampAnim.on('animationcomplete', () => {
                   const stampImg = this.add.image(thumb.x, thumb.y, 'level-complete-stamp');
+                  stampImg.setOrigin(0.5, 0.5);
                   stampImg.setDepth(2);
 
-                  // Apply the identical scale multiplier that the thumbnail is using
-                  // Cover thumbnail height + 25%, maintaining intrinsic stamp ratio
-                  const intrinsicHeight = stampImg.height || 720;
+                  // Apply the exact same offset (-5px) and scale multiplier
+                  const offset = -5 * (this.bgScale || 1);
+                  stampImg.setPosition(thumb.x, thumb.y + offset);
+
+                  const staticStampTexture = this.textures.get('level-complete-stamp').getSourceImage();
+                  const intrinsicHeight = staticStampTexture.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   stampImg.setScale(targetHeight / intrinsicHeight);
                   stampImg.disableInteractive();
+
                   // Replace in resize array so window resizing still works
-                  const idx = this.stamps.findIndex(s => s.video === stampVideo);
+                  const idx = this.stamps.findIndex(s => s.anim === stampAnim);
                   if (idx !== -1) {
-                      this.stamps[idx] = { video: stampImg, thumb: thumb };
+                      this.stamps[idx] = { anim: stampImg, thumb: thumb };
                   }
-                  stampVideo.destroy();
+                  stampAnim.destroy();
               });
 
           } else {
@@ -1344,13 +1365,15 @@ class MapScene extends Phaser.Scene {
               stampImg.setOrigin(0.5, 0.5);
               stampImg.setDepth(2);
               stampImg.disableInteractive();
+
               const updateStampSize = () => {
-                  // User requested 10px offset on mobile (previously -40)
-                  const offset = 10 * (this.bgScale || 1);
+                  // User requested 10px offset on mobile (previously -40), changing to -5px to match animation
+                  const offset = -5 * (this.bgScale || 1);
                   stampImg.setPosition(thumb.x, thumb.y + offset);
 
                   // Scale the stamp so its height covers the thumbnail's height + 25%, maintaining its intrinsic aspect ratio
-                  const intrinsicHeight = stampImg.height || 720;
+                  const staticStampTexture = this.textures.get('level-complete-stamp').getSourceImage();
+                  const intrinsicHeight = staticStampTexture.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
                   stampImg.setScale(calculatedScale);
@@ -1358,8 +1381,8 @@ class MapScene extends Phaser.Scene {
               updateStampSize();
 
               if (!this.stamps) this.stamps = [];
-              // We use "video: stampImg" so the generic resize loop works identically
-              this.stamps.push({ video: stampImg, thumb: thumb });
+              // We use "anim: stampImg" so the generic resize loop works identically
+              this.stamps.push({ anim: stampImg, thumb: thumb });
           }
       }
       section.zone = thumb; // keep reference for resize
@@ -3030,16 +3053,22 @@ function resizeGame() {
 
         if (scene.stamps) {
             scene.stamps.forEach(item => {
-                if (item.video && item.video.active && item.thumb && item.thumb.active) {
-                    // Only apply the 40px upward offset to the stampVideo (Phaser.Video), not the final stampImg
-                    const isVideo = item.video.type === 'Video';
-                    const offsetY = isVideo ? -40 * item.thumb.scaleY : 0;
-                    item.video.setPosition(item.thumb.x, item.thumb.y + offsetY);
+                if (item.anim && item.anim.active && item.thumb && item.thumb.active) {
+                    // Apply the consistent -5px upward offset for both animation and static stamp
+                    const offsetY = -5 * (scene.bgScale || 1);
+                    item.anim.setPosition(item.thumb.x, item.thumb.y + offsetY);
 
-                    // Cover thumbnail height + 25%, maintaining intrinsic stamp ratio
-                  const intrinsicHeight = item.video.height || 720;
-                  const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
-                  item.video.setScale(targetHeight / intrinsicHeight);
+                    // Determine intrinsic height dynamically based on whether this is the animation
+                    // sprite (which might be cropped to 400px) or the static image (720px).
+                    let intrinsicHeight = item.anim.height || 720;
+
+                    if (item.anim.texture.key === 'level-complete-stamp') {
+                        const staticStampTexture = scene.textures.get('level-complete-stamp').getSourceImage();
+                        intrinsicHeight = staticStampTexture.height || 720;
+                    }
+
+                    const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
+                    item.anim.setScale(targetHeight / intrinsicHeight);
                 }
             });
         }

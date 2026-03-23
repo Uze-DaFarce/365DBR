@@ -1,0 +1,39 @@
+
+> app@1.0.0 start /app
+> http-server ./apps -o --cors
+
+Starting up http-server, serving ./apps
+
+http-server version: 14.1.1
+
+http-server settings:
+CORS: true
+Cache: 3600 seconds
+Connection Timeout: 120 seconds
+Directory Listings: visible
+AutoIndex: visible
+Serve GZIP Files: false
+Serve Brotli Files: false
+Default File Extension: none
+
+Available on:
+  http://127.0.0.1:8080
+  http://192.168.0.2:8080
+Hit CTRL-C to stop the server
+Open: http://127.0.0.1:8080
+
+[2026-03-23T23:16:22.153Z]  "GET /" "Lynx/2.9.0 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/3.8.3"
+(node:3632) [DEP0066] DeprecationWarning: OutgoingMessage.prototype._headers is deprecated
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[2026-03-23T23:16:35.581Z]  "GET /apps/HeIsRisen/index.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36"
+[2026-03-23T23:16:35.583Z]  "GET /apps/HeIsRisen/index.html" Error (404): "Not found"
+[2026-03-23T23:16:35.809Z]  "GET /apps/HeIsRisen/index.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36"
+[2026-03-23T23:16:35.810Z]  "GET /apps/HeIsRisen/index.html" Error (404): "Not found"
+[2026-03-23T23:23:59.454Z]  "GET /apps/HeIsRisen/index.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36"
+[2026-03-23T23:23:59.459Z]  "GET /apps/HeIsRisen/index.html" Error (404): "Not found"
+[2026-03-23T23:23:59.512Z]  "GET /apps/HeIsRisen/index.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36"
+[2026-03-23T23:23:59.513Z]  "GET /apps/HeIsRisen/index.html" Error (404): "Not found"
+[2026-03-23T23:37:55.989Z]  "GET /apps/HeIsRisen/index.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36"
+[2026-03-23T23:37:55.991Z]  "GET /apps/HeIsRisen/index.html" Error (404): "Not found"
+[2026-03-23T23:37:56.031Z]  "GET /apps/HeIsRisen/index.html" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36"
+[2026-03-23T23:37:56.032Z]  "GET /apps/HeIsRisen/index.html" Error (404): "Not found"
