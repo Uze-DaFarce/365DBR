@@ -333,3 +333,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-21 - Farticle Gas Effect Tuning
 **Learning:** Using simple `SCREEN` blend mode and low scaling on solid circles for a gas/smoke effect creates obvious, distinct dots. To simulate realistic gas dynamically, layer multiple low-opacity radial circles in the generated texture, set the blend mode to `NORMAL` (to hide particles behind one another, adding density), and massively increase the particle scale while letting them slowly float upwards via gravity.
 **Action:** When asked to generate gas or smoke effects, use large, low-opacity layered radial textures with `NORMAL` blend mode and upward gravity.
+
+## 2026-03-23 - Audio Pitch Variation for Repetitive Actions
+**Learning:** Playing the exact same audio file repeatedly during core loops (like collecting 60 eggs) quickly causes audio fatigue and annoyance.
+**Action:** Always add a slight pitch variation (e.g., `detune: Phaser.Math.Between(-200, 200)`) when triggering highly repetitive interaction sounds (like 'collect') to make the audio experience feel dynamic and reduce listener fatigue.

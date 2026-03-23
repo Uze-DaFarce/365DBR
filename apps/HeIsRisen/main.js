@@ -291,12 +291,12 @@ class MusicScene extends Phaser.Scene {
     });
   }
 
-  playSFX(key) {
+  playSFX(key, config = {}) {
     // Simply play the sound. If not in cache, Phaser will warn internally,
     // but usually 'add' isn't needed for one-shot SFX if loaded.
     // If it's not added yet, we can try adding it, but play() usually handles it if the key exists.
     if (this.cache.audio.exists(key)) {
-        this.sound.play(key, { volume: this.sfxVolume });
+        this.sound.play(key, { volume: this.sfxVolume, ...config });
     } else {
         console.warn(`MusicScene: Audio key '${key}' missing from cache!`);
     }
@@ -1513,7 +1513,7 @@ class SectionHunt extends Phaser.Scene {
     if (!foundEggs.some(e => e.eggId === eggData.eggId)) {
       const musicScene = this.scene.get('MusicScene');
       if (musicScene) {
-          musicScene.playSFX('collect');
+          musicScene.playSFX('collect', { detune: Phaser.Math.Between(-200, 200) });
       }
 
       let symbolTexture = null;

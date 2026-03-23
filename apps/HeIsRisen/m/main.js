@@ -263,9 +263,9 @@ class MusicScene extends Phaser.Scene {
     });
   }
 
-  playSFX(key) {
+  playSFX(key, config = {}) {
     if (this.cache.audio.exists(key)) {
-        this.sound.play(key, { volume: this.sfxVolume });
+        this.sound.play(key, { volume: this.sfxVolume, ...config });
     } else {
         console.warn(`MusicScene: Audio key '${key}' missing from cache!`);
     }
@@ -1448,7 +1448,7 @@ class SectionHunt extends Phaser.Scene {
     if (!foundEggs.some(e => e.eggId === eggInfo.eggId)) {
       const musicScene = this.scene.get('MusicScene');
       if (musicScene) {
-          musicScene.playSFX('collect');
+          musicScene.playSFX('collect', { detune: Phaser.Math.Between(-200, 200) });
       }
 
       // Get symbol texture if available
