@@ -2,6 +2,113 @@
 // Define total eggs as a variable to avoid hardcoding
 const TOTAL_EGGS = 60;
 
+function addButtonInteraction(scene, button, sfxKey) {
+    button.baseScaleX = button.scaleX;
+    button.baseScaleY = button.scaleY;
+
+    button.on('pointerover', () => scene.tweens.add({
+        targets: button,
+        scaleX: button.baseScaleX * 1.1,
+        scaleY: button.baseScaleY * 1.1,
+        duration: 100,
+        ease: 'Sine.easeInOut'
+    }));
+
+    button.on('pointerout', () => scene.tweens.add({
+        targets: button,
+        scaleX: button.baseScaleX,
+        scaleY: button.baseScaleY,
+        duration: 100,
+        ease: 'Sine.easeInOut'
+    }));
+
+    button.on('pointerdown', () => {
+        const musicScene = scene.scene.get('MusicScene');
+        if (musicScene && musicScene.scene.isActive()) {
+            musicScene.playSFX(sfxKey);
+        }
+        scene.tweens.add({
+            targets: button,
+            scaleX: button.baseScaleX * 0.9,
+            scaleY: button.baseScaleY * 0.9,
+            duration: 50,
+            yoyo: true,
+            ease: 'Power1'
+        });
+    });
+}
+
+class Confirmation extends Phaser.GameObjects.Container {
+    constructor(scene, x, y, text, onYes, onNo) {
+        super(scene, x, y);
+        this.scene = scene;
+        this.onYes = onYes;
+        this.onNo = onNo;
+
+        const overlay = this.scene.add.rectangle(0, 0, this.scene.cameras.main.width, this.scene.cameras.main.height, 0x000000, 0.7)
+            .setOrigin(0)
+            .setInteractive();
+        this.add(overlay);
+
+        const panel = this.scene.add.rectangle(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2, 400, 200, 0x333333)
+            .setStrokeStyle(4, 0xffffff);
+        this.add(panel);
+
+        const title = this.scene.add.text(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2 - 50, text, {
+            fontSize: '24px',
+            fontFamily: 'Comic Sans MS',
+            fill: '#ffffff'
+        }).setOrigin(0.5);
+        this.add(title);
+
+        const yesBtnContainer = this.scene.add.container(this.scene.cameras.main.width / 2 - 100, this.scene.cameras.main.height / 2 + 50);
+        const yesBg = this.scene.add.graphics();
+        yesBg.fillStyle(0x00ff00, 1);
+        yesBg.fillRoundedRect(-50, -25, 100, 50, 10);
+        yesBg.lineStyle(2, 0xffffff, 1);
+        yesBg.strokeRoundedRect(-50, -25, 100, 50, 10);
+        const yesText = this.scene.add.text(0, 0, 'Yes', {
+            fontSize: '20px',
+            fontFamily: 'Comic Sans MS',
+            fill: '#ffffff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        yesBtnContainer.add([yesBg, yesText]);
+        yesBtnContainer.setSize(100, 50);
+        yesBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        addButtonInteraction(this.scene, yesBtnContainer, 'menu-click');
+        yesBtnContainer.on('pointerdown', () => {
+            if (this.onYes) this.onYes();
+            this.destroy();
+        });
+        this.add(yesBtnContainer);
+
+        const noBtnContainer = this.scene.add.container(this.scene.cameras.main.width / 2 + 100, this.scene.cameras.main.height / 2 + 50);
+        const noBg = this.scene.add.graphics();
+        noBg.fillStyle(0xff0000, 1);
+        noBg.fillRoundedRect(-50, -25, 100, 50, 10);
+        noBg.lineStyle(2, 0xffffff, 1);
+        noBg.strokeRoundedRect(-50, -25, 100, 50, 10);
+        const noText = this.scene.add.text(0, 0, 'No', {
+            fontSize: '20px',
+            fontFamily: 'Comic Sans MS',
+            fill: '#ffffff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        noBtnContainer.add([noBg, noText]);
+        noBtnContainer.setSize(100, 50);
+        noBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        addButtonInteraction(this.scene, noBtnContainer, 'menu-click');
+        noBtnContainer.on('pointerdown', () => {
+            if (this.onNo) this.onNo();
+            this.destroy();
+        });
+        this.add(noBtnContainer);
+
+        this.scene.add.existing(this);
+    }
+}
+
 function saveGameState(registry) {
     const state = {
         eggData: registry.get('eggData'),
@@ -526,7 +633,7 @@ class UIScene extends Phaser.Scene {
     addButtonInteraction(this, resetBtnContainer, 'menu-click');
 
     resetBtnContainer.on('pointerdown', () => {
-        if (window.confirm("Your current game will be reset, are you sure?")) {
+        const confirmation = new Confirmation(this, 0, 0, 'Your current game will be reset,\nare you sure?', () => {
             localStorage.removeItem('heIsRisenGameState');
             const mainScene = this.scene.get('MainMenu');
             if (mainScene) {
@@ -546,7 +653,8 @@ class UIScene extends Phaser.Scene {
                 if (this.gearIcon) this.gearIcon.setVisible(true);
                 if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
             });
-        }
+        });
+        this.settingsContainer.add(confirmation);
     });
     this.settingsContainer.add(resetBtnContainer);
   }
@@ -1055,9 +1163,10 @@ class MainMenu extends Phaser.Scene {
       mainBtnContainer.on('pointerdown', () => startGame(false));
       if (newGameBtnContainer) {
           newGameBtnContainer.on('pointerdown', () => {
-              if (window.confirm("Your current game will be reset, are you sure?")) {
-                  startGame(true);
-              }
+                const confirmation = new Confirmation(this, 0, 0, 'Your current game will be reset,\nare you sure?', () => {
+                    startGame(true);
+                });
+                this.add.existing(confirmation);
           });
       }
 

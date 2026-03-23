@@ -1,0 +1,19 @@
+﻿{"frames": [
+
+{
+	"filename": "level-complete95.png instance 1",
+	"frame": {"x":0,"y":0,"w":400,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":400,"h":400},
+	"sourceSize": {"w":400,"h":400}
+}],
+"meta": {
+	"app": "Adobe Animate",
+	"version": "24.0.12.3",
+	"image": "level-complete.png",
+	"format": "RGB8",
+	"size": {"w":512,"h":512},
+	"scale": "1"
+}
+}
