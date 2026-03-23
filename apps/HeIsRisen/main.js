@@ -1130,6 +1130,7 @@ class MapScene extends Phaser.Scene {
         const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
         renderTexture.draw(starObject, 10, 10);
         renderTexture.saveTexture('sparkle');
+        renderTexture.destroy();
         starObject.destroy();
     }
 
@@ -1614,6 +1615,7 @@ class SectionHunt extends Phaser.Scene {
         const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
         renderTexture.draw(starObject, 10, 10);
         renderTexture.saveTexture('sparkle');
+        renderTexture.destroy();
         starObject.destroy();
     }
 
