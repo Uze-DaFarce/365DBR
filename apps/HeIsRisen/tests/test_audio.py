@@ -35,9 +35,9 @@ def run_audio_system_test(is_mobile=False):
             th.init_global_bypasses(page)
 
             if is_mobile:
-                page.goto("http://127.0.0.1:8080/m/")
+                page.goto("http://127.0.0.1:8000/apps/HeIsRisen/m/")
             else:
-                page.goto("http://127.0.0.1:8080/")
+                page.goto("http://127.0.0.1:8000/apps/HeIsRisen/")
             page.wait_for_load_state('networkidle')
 
             th.wait_for_phaser_init(page)
