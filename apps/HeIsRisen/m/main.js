@@ -75,7 +75,7 @@ class Confirmation extends Phaser.GameObjects.Container {
         }).setOrigin(0.5);
         yesBtnContainer.add([yesBg, yesText]);
         yesBtnContainer.setSize(100, 50);
-        yesBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        yesBtnContainer.setInteractive();
         addButtonInteraction(this.scene, yesBtnContainer, 'menu-click');
         yesBtnContainer.on('pointerdown', () => {
             if (this.onYes) this.onYes();
@@ -97,7 +97,7 @@ class Confirmation extends Phaser.GameObjects.Container {
         }).setOrigin(0.5);
         noBtnContainer.add([noBg, noText]);
         noBtnContainer.setSize(100, 50);
-        noBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        noBtnContainer.setInteractive();
         addButtonInteraction(this.scene, noBtnContainer, 'menu-click');
         noBtnContainer.on('pointerdown', () => {
             if (this.onNo) this.onNo();
@@ -633,7 +633,7 @@ class UIScene extends Phaser.Scene {
 
     resetBtnContainer.add([resetBg, resetText]);
     resetBtnContainer.setSize(200, 40);
-    resetBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-100, -20, 200, 40), Phaser.Geom.Rectangle.Contains);
+    resetBtnContainer.setInteractive();
 
     resetBtnContainer.baseScaleX = 1;
     resetBtnContainer.baseScaleY = 1;
@@ -1015,7 +1015,7 @@ class MainMenu extends Phaser.Scene {
 
       mainBtnContainer.setSize(buttonWidth, buttonHeight);
       // Massive hit area for easier tapping
-      mainBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+      mainBtnContainer.setInteractive();
       startBtnContainer.add(mainBtnContainer);
 
       let newGameBtnContainer = null;
@@ -1039,7 +1039,7 @@ class MainMenu extends Phaser.Scene {
           newGameBtnContainer.add(newBtnText);
 
           newGameBtnContainer.setSize(buttonWidth, buttonHeight);
-          newGameBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+          newGameBtnContainer.setInteractive();
           startBtnContainer.add(newGameBtnContainer);
       }
 
@@ -2891,7 +2891,7 @@ class EggZamRoom extends Phaser.Scene {
 
           playBtnContainer.add([playBtnBg, playBtnText]);
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
-          playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
+          playBtnContainer.setInteractive();
 
           playBtnContainer.baseScaleX = 1;
           playBtnContainer.baseScaleY = 1;
