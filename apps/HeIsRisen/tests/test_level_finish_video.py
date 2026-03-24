@@ -125,45 +125,47 @@ def run_level_finish_video(is_mobile=False):
 
             print("Level complete. Waiting for completion logic to navigate to MapScene automatically...")
 
-            # Wait specifically for the stamp video to start playing in MapScene
+            # Wait specifically for the stamp anim to start playing in MapScene
             try:
                 page.wait_for_function("""
                     () => {
                         const scene = window.game.scene.getScene('MapScene');
                         if (!scene || !scene.stamps) return false;
-                        return scene.stamps.some(s => s.video && s.video.type === 'Video' && s.video.isPlaying);
+                        return scene.stamps.some(s => s.anim && s.anim.anims && s.anim.anims.isPlaying);
                     }
                 """, timeout=10000)
             except Exception as e:
-                print(f"WARN: Timeout waiting for video to play organically: {e}. Forcing navigation.")
+                print(f"WARN: Timeout waiting for animation to play organically: {e}. Forcing navigation.")
                 page.evaluate("() => window.game.scene.getScenes(true)[0].scene.start('MapScene')")
                 time.sleep(2)
 
             time.sleep(1.0) # Wait just a little into the playback
 
-            print("Capturing screenshot of the MapScene with the video playing...")
+            print("Capturing screenshot of the MapScene with the animation playing...")
             context_type = "mobile" if is_mobile else "desktop"
-            screenshot_path = f"verification/level_finish_{context_type}.png"
+            os.makedirs("verification/video", exist_ok=True)
+            screenshot_path = f"verification/level_finish_playing_{context_type}.png"
 
             # Using full page screenshot and wait for rendering fixes black image captures in some headless environments
             # Add an element specific screenshot to guarantee capture
             page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
             page.evaluate("() => window.dispatchEvent(new Event('resize'))")
-            time.sleep(0.5)
+            time.sleep(1.0) # wait a little bit for the stamp animation to play out
 
             try:
-                # Explicitly omit headless alpha issues on linux
                 page.screenshot(path=screenshot_path, type="jpeg")
-
-                # Verify the screenshot we took of the video playing is actually something visually rendering
-                th.assert_not_blank_screen(page, "The level completion video resulted in a blank screen capture.")
+                th.assert_not_blank_screen(page, "The level completion animation resulted in a blank screen capture.")
             except Exception as e:
                 page.screenshot(path=screenshot_path)
-                # Fallback check
-                th.assert_not_blank_screen(page, "The level completion video resulted in a blank screen capture.")
+                th.assert_not_blank_screen(page, "The level completion animation resulted in a blank screen capture.")
 
-            # Wait a few seconds for the video to play out in the recording
-            time.sleep(4)
+            # The animation runs at 12fps for ~8 seconds. Wait until it completes
+            print("Waiting for animation to complete...")
+            time.sleep(8)
+
+            finished_screenshot_path = f"verification/level_finish_static_{context_type}.png"
+            page.screenshot(path=finished_screenshot_path, type="jpeg")
+            print("Captured screenshot of static stamp.")
 
             remaining_eggs = get_eggs_for_section(page, random_section)
 
