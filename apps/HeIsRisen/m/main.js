@@ -493,8 +493,6 @@ class UIScene extends Phaser.Scene {
                 if (egg && egg.active && !egg.getData('collected')) {
                     const distSq = Phaser.Math.Distance.Squared(lensX, lensY, egg.x, egg.y);
                     if (distSq < captureRadiusSq) {
-                        egg.setData('animX', lensX);
-                        egg.setData('animY', lensY);
                         sectionHunt.collectEgg(egg);
                         egg.destroy();
                         if (egg.symbolSprite) egg.symbolSprite.destroy();
@@ -633,7 +631,7 @@ class UIScene extends Phaser.Scene {
 
     resetBtnContainer.add([resetBg, resetText]);
     resetBtnContainer.setSize(200, 40);
-    resetBtnContainer.setInteractive();
+    resetBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-100, -20, 200, 40), Phaser.Geom.Rectangle.Contains);
 
     resetBtnContainer.baseScaleX = 1;
     resetBtnContainer.baseScaleY = 1;
@@ -1014,7 +1012,7 @@ class MainMenu extends Phaser.Scene {
 
       mainBtnContainer.setSize(buttonWidth, buttonHeight);
       // Massive hit area for easier tapping
-      mainBtnContainer.setInteractive();
+      mainBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
       startBtnContainer.add(mainBtnContainer);
 
       let newGameBtnContainer = null;
@@ -1038,7 +1036,7 @@ class MainMenu extends Phaser.Scene {
           newGameBtnContainer.add(newBtnText);
 
           newGameBtnContainer.setSize(buttonWidth, buttonHeight);
-          newGameBtnContainer.setInteractive();
+          newGameBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
           startBtnContainer.add(newGameBtnContainer);
       }
 
@@ -1568,9 +1566,7 @@ class SectionHunt extends Phaser.Scene {
           symbolTexture = egg.symbolSprite.texture.key;
       }
 
-      const animX = egg.getData('animX') !== undefined ? egg.getData('animX') : egg.x;
-      const animY = egg.getData('animY') !== undefined ? egg.getData('animY') : egg.y;
-      this.showCollectionFeedback(animX, animY, egg.texture.key, symbolTexture);
+      this.showCollectionFeedback(egg.x, egg.y, egg.texture.key, symbolTexture);
       foundEggs.push(eggInfo);
       this.registry.set('foundEggs', foundEggs);
       if (eggData) {
@@ -2051,8 +2047,6 @@ class SectionHunt extends Phaser.Scene {
 
            // Increased capture radius logic for easier finding
            if (distSq < captureRadiusSq) {
-               egg.setData('animX', rawLensX);
-               egg.setData('animY', rawLensY);
                this.collectEgg(egg);
                egg.destroy();
                if (egg.symbolSprite) egg.symbolSprite.destroy();
