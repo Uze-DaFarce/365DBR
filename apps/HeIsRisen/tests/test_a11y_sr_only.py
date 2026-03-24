@@ -4,7 +4,11 @@ from playwright.sync_api import sync_playwright
 @pytest.fixture(scope="session")
 def browser_context():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        # Launch with arguments to allow WebGL without a real GPU in headless environments
+        browser = p.chromium.launch(
+            headless=True,
+            args=['--disable-gpu', '--disable-webgl', '--use-gl=swiftshader']
+        )
         yield browser
         browser.close()
 
@@ -40,6 +44,12 @@ def test_desktop_a11y_sr_only(browser_context):
     canvas_container = page.locator("#game")
     assert canvas_container.get_attribute("aria-describedby") == "game-instructions", "Canvas container is missing aria-describedby"
 
+    # Verify the aria-announcer div exists and has aria-live polite
+    aria_announcer = page.locator("#aria-announcer")
+    assert aria_announcer.count() == 1, "The #aria-announcer div should exist"
+    assert aria_announcer.get_attribute("aria-live") == "polite", "#aria-announcer should have aria-live='polite'"
+    assert "sr-only" in aria_announcer.get_attribute("class"), "#aria-announcer should have 'sr-only' class"
+
     # Save a visual screenshot for manual verification
     import os
     os.makedirs("verification", exist_ok=True)
@@ -74,6 +84,12 @@ def test_mobile_a11y_sr_only(browser_context):
     # Verify the canvas container has aria-describedby
     canvas_container = page.locator("#game-container")
     assert canvas_container.get_attribute("aria-describedby") == "game-instructions", "Mobile canvas container is missing aria-describedby"
+
+    # Verify the aria-announcer div exists and has aria-live polite
+    aria_announcer = page.locator("#aria-announcer")
+    assert aria_announcer.count() == 1, "The #aria-announcer div should exist in mobile"
+    assert aria_announcer.get_attribute("aria-live") == "polite", "#aria-announcer should have aria-live='polite' in mobile"
+    assert "sr-only" in aria_announcer.get_attribute("class"), "#aria-announcer should have 'sr-only' class in mobile"
 
     # Save a visual screenshot for manual verification
     page.screenshot(path="verification/mobile_a11y_sr_only.png")

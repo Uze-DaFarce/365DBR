@@ -1,6 +1,16 @@
 // Define all scene classes first
 const TOTAL_EGGS = 60;
 
+function announceToScreenReader(message) {
+    const el = document.getElementById('aria-announcer');
+    if (el) {
+        el.textContent = '';
+        setTimeout(() => {
+            el.textContent = message;
+        }, 50);
+    }
+}
+
 function addButtonInteraction(scene, button, sfxKey) {
     button.baseScaleX = button.scaleX;
     button.baseScaleY = button.scaleY;
@@ -1080,6 +1090,7 @@ class MainMenu extends Phaser.Scene {
                 if (musicScene) {
                     musicScene.playSFX('drive1');
                 }
+                announceToScreenReader('Game started. Select a map to explore.');
                 this.scene.start('MapScene');
             }
         });
@@ -1655,6 +1666,8 @@ class SectionHunt extends Phaser.Scene {
       foundEggs.push(eggData);
       this.registry.set('foundEggs', foundEggs);
 
+      announceToScreenReader('Found an egg!');
+
       if (globalEggData) {
           globalEggData.collected = true;
           this.registry.set('eggData', eggDataArray);
@@ -1691,6 +1704,7 @@ class SectionHunt extends Phaser.Scene {
       const currentSection = sections.find(s => s.name === this.sectionName);
 
       if (foundEggs.length === TOTAL_EGGS) {
+          announceToScreenReader('All 60 Eggs Found! Transporting to the EggZam Room...');
           const clearText = this.add.text(this.scale.width / 2, this.scale.height / 2, "All 60 Eggs Found! Transporting to the EggZam Room...", {
               fontSize: '48px',
               fontFamily: 'Comic Sans MS',
@@ -1717,6 +1731,7 @@ class SectionHunt extends Phaser.Scene {
           const foundIds = foundEggs.map(e => e.eggId);
           const remainingCount = currentSection.eggs.filter(id => !foundIds.includes(id)).length;
           if (remainingCount === 0) {
+              announceToScreenReader('You found all the hidden eggs on this map!');
               const clearText = this.add.text(this.scale.width / 2, this.scale.height / 2, "Great Job Detective!! You found all the hidden eggs on this map, the others are hidden in other maps.", {
                   fontSize: '40px',
                   fontFamily: 'Comic Sans MS',
@@ -2515,6 +2530,7 @@ class EggZamRoom extends Phaser.Scene {
         const executeExplanationPopup = () => {
             const musicScene = this.scene.get('MusicScene');
             if (isCorrect) {
+                announceToScreenReader('Correct!');
                 if (musicScene) {
                     musicScene.playSFX('success');
                 }
@@ -2534,6 +2550,7 @@ class EggZamRoom extends Phaser.Scene {
                 this.currentEgg.categorized = true;
                 saveGameState(this.registry);
             } else {
+                announceToScreenReader('Incorrect!');
                 if (musicScene) {
                     musicScene.playSFX('error');
                 }
