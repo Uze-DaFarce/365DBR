@@ -45,9 +45,10 @@ def run():
         page.wait_for_timeout(1000)
 
         # Click START NEW GAME button but on the far RIGHT side to test the hitbox fix!
-        # Center is 640. Right edge is 640 + 125 = 765. Let's click at 750.
+        # Screen width is 1280, center is 640. Modal height logic: y + height - 50 = 360 + 200 - 50 = 510.
+        # Button width is 250, so right edge is 640 + 125 = 765. Let's click at 750, 510.
         print("Clicking START NEW GAME on the right side...")
-        page.mouse.click(750, 600)
+        page.mouse.click(750, 510)
         page.wait_for_timeout(1000)
 
         page.screenshot(path="apps/HeIsRisen/tests/settings_hitbox_desktop.png")

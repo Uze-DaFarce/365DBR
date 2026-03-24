@@ -1590,7 +1590,10 @@ class SectionHunt extends Phaser.Scene {
           symbolTexture = egg.symbolSprite.texture.key;
       }
 
-      this.showCollectionFeedback(egg.x, egg.y, egg.texture.key, symbolTexture);
+      // Use animX/animY if present for correct visual offset, else fallback to physical x/y
+      const visualX = egg.getData('animX') !== undefined ? egg.getData('animX') : egg.x;
+      const visualY = egg.getData('animY') !== undefined ? egg.getData('animY') : egg.y;
+      this.showCollectionFeedback(visualX, visualY, egg.texture.key, symbolTexture);
       foundEggs.push(eggInfo);
       this.registry.set('foundEggs', foundEggs);
       if (eggData) {
