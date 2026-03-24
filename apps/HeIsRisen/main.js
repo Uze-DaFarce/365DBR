@@ -138,10 +138,20 @@ function initializeGameData(registry, cache, forceNew = false) {
                 if (savedState && typeof savedState === 'object' && savedState.eggData && savedState.sections) {
                     registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
-                    registry.set('foundEggs', savedState.foundEggs || []);
-                    registry.set('stampedSections', savedState.stampedSections || []);
-                    registry.set('correctCategorizations', savedState.correctCategorizations || 0);
-                    registry.set('currentScore', savedState.currentScore || 0);
+
+                    const safeFoundEggs = Array.isArray(savedState.foundEggs) ? savedState.foundEggs : [];
+                    registry.set('foundEggs', safeFoundEggs);
+
+                    const safeStampedSections = Array.isArray(savedState.stampedSections) ? savedState.stampedSections : [];
+                    registry.set('stampedSections', safeStampedSections);
+
+                    let safeCategorizations = parseInt(savedState.correctCategorizations);
+                    if (isNaN(safeCategorizations) || safeCategorizations < 0) safeCategorizations = 0;
+                    registry.set('correctCategorizations', safeCategorizations);
+
+                    let safeCurrentScore = parseInt(savedState.currentScore);
+                    if (isNaN(safeCurrentScore) || safeCurrentScore < 0) safeCurrentScore = 0;
+                    registry.set('currentScore', safeCurrentScore);
 
                     // Always ensure highScore is loaded/initialized correctly
                     try {
