@@ -767,7 +767,7 @@ class MainMenu extends Phaser.Scene {
     this.load.json('symbols', 'assets/symbols.json');
     this.load.json('map_sections', 'assets/map/map_sections.json');
     this.load.video('intro-video', 'assets/video/HeIsRisen-Intro.mp4');
-    this.load.video('level-complete', 'assets/video/level-complete.webm');
+    this.load.atlas('level-complete-atlas', 'assets/video/level-complete.png', 'assets/video/level-complete.json');
     this.load.image('level-complete-stamp', 'assets/objects/level-complete-stamp.png');
     this.load.image('finger-cursor', 'assets/cursor/pointer-finger-pointer.png');
 
@@ -801,6 +801,7 @@ class MainMenu extends Phaser.Scene {
     this.load.audio('menu-click', 'assets/audio/menu-click.mp3');
     this.load.audio('drive1', 'assets/audio/drive1.mp3');
     this.load.audio('drive2', 'assets/audio/drive2.mp3');
+    this.load.audio('level-complete-audio', 'assets/audio/level-complete.mp3');
 
     this.load.on('filecomplete-json-map_sections', (key, type, data) => {
       // console.log(`MainMenu: filecomplete-json-map_sections: Key='${key}', Type='${type}'`);
@@ -1389,46 +1390,64 @@ class MapScene extends Phaser.Scene {
 
       if (isCompleted) {
           if (!stampedSections.includes(section.name)) {
-              // FIRST TIME COMPLETE: Play the video
-              const stampVideo = this.add.video(thumb.x, thumb.y, 'level-complete');
-              stampVideo.setOrigin(0.5, 0.5);
-              stampVideo.setDepth(2);
-              stampVideo.disableInteractive();
+              // FIRST TIME COMPLETE: Play the sprite animation
+              if (!this.anims.exists('level-complete-anim')) {
+                  const frameNames = this.textures.get('level-complete-atlas').getFrameNames().filter(name => name !== '__BASE').sort();
+                  this.anims.create({
+                      key: 'level-complete-anim',
+                      frames: frameNames.map(frame => ({ key: 'level-complete-atlas', frame: frame })),
+                      frameRate: 30,
+                      repeat: 0
+                  });
+              }
 
-              // We must wait for the video metadata to load before scaling reliably, especially for webm which
-              // sometimes defers resolution until the first frame is decoded in headless browsers
+              const stampAnim = this.add.sprite(thumb.x, thumb.y, 'level-complete-atlas');
+              stampAnim.setOrigin(0.5, 0.5);
+              stampAnim.setDepth(2);
+              stampAnim.disableInteractive();
+
+              // IMPORTANT: Play the animation before scaling it so that it gets the dimensions of the first frame
+              // instead of the entire atlas base dimension.
+              stampAnim.play('level-complete-anim');
+
               const updateStampSize = () => {
-                  // User requested 0px offset on desktop (previously it was -40)
                   const offset = 0 * (this.bgScale || 1);
-                  stampVideo.setPosition(thumb.x, thumb.y + offset);
-                  const intrinsicHeight = stampVideo.video.videoHeight || stampVideo.height || 720;
+                  stampAnim.setPosition(thumb.x, thumb.y + offset);
+
+                  // Use the height of the current frame now that it's playing
+                  const intrinsicHeight = stampAnim.height || 720;
                   const targetHeight = (thumb.height * thumb.scaleY) * 1.25;
                   const calculatedScale = targetHeight / intrinsicHeight;
                   if (calculatedScale > 0 && isFinite(calculatedScale)) {
-                      stampVideo.setScale(calculatedScale);
+                      stampAnim.setScale(calculatedScale);
                   }
               };
               updateStampSize();
 
               if (!this.stamps) this.stamps = [];
-              this.stamps.push({ video: stampVideo, thumb: thumb });
+              // We use "video: stampAnim" so the generic resize loop works identically
+              this.stamps.push({ video: stampAnim, thumb: thumb });
 
+              // Play audio
               const sfxVol = this.registry.get('sfxVolume') !== undefined ? this.registry.get('sfxVolume') : 0.5;
-              stampVideo.setVolume(sfxVol);
-
-              stampVideo.on('play', () => {
-                  updateStampSize();
-              });
-
-              stampVideo.play();
+              const soundManager = this.scene.get('MusicScene');
+              if (soundManager) {
+                  soundManager.playSFX('level-complete-audio', { volume: sfxVol });
+              } else {
+                  this.sound.play('level-complete-audio', { volume: sfxVol });
+              }
 
               stampedSections.push(section.name);
               this.registry.set('stampedSections', stampedSections);
 
-              // Swap to image when video finishes to free memory
-              stampVideo.on('complete', () => {
+              // Swap to image when animation finishes to free memory
+              stampAnim.on('animationcomplete', () => {
                   const stampImg = this.add.image(thumb.x, thumb.y, 'level-complete-stamp');
                   stampImg.setDepth(2);
+                  stampImg.setOrigin(0.5, 0.5);
+
+                  const offset = 0 * (this.bgScale || 1);
+                  stampImg.setPosition(thumb.x, thumb.y + offset);
 
                   // Apply the identical scale multiplier that the thumbnail is using
                   // Cover thumbnail height + 25%, maintaining intrinsic stamp ratio
@@ -1439,12 +1458,13 @@ class MapScene extends Phaser.Scene {
                       stampImg.setScale(calculatedScale);
                   }
                   stampImg.disableInteractive();
+
                   // Replace in resize array so window resizing still works
-                  const idx = this.stamps.findIndex(s => s.video === stampVideo);
+                  const idx = this.stamps.findIndex(s => s.video === stampAnim);
                   if (idx !== -1) {
                       this.stamps[idx] = { video: stampImg, thumb: thumb };
                   }
-                  stampVideo.destroy();
+                  stampAnim.destroy();
               });
 
           } else {
@@ -1454,7 +1474,6 @@ class MapScene extends Phaser.Scene {
               stampImg.setDepth(2);
               stampImg.disableInteractive();
               const updateStampSize = () => {
-                  // User requested 0px offset on desktop (previously it was -40)
                   const offset = 0 * (this.bgScale || 1);
                   stampImg.setPosition(thumb.x, thumb.y + offset);
 
@@ -1563,9 +1582,7 @@ class MapScene extends Phaser.Scene {
           for (let st_idx = 0; st_idx < this.stamps.length; st_idx++) {
               const item = this.stamps[st_idx];
               if (item.video && item.video.active && item.thumb && item.thumb.active) {
-                  // Only apply the 40px upward offset to the stampVideo (Phaser.Video), not the final stampImg
-                  const isVideo = item.video.type === 'Video';
-                  const offsetY = isVideo ? -40 * item.thumb.scaleY : 0;
+                  const offsetY = 0;
                   item.video.setPosition(item.thumb.x, item.thumb.y + offsetY);
 
                   // Cover thumbnail height + 25%, maintaining intrinsic stamp ratio
