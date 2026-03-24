@@ -103,3 +103,15 @@
 ## 2026-03-23 - [Sentinel] Resiliency against Corrupted JSON in Game State
 **Learning:** JSON.parse throws exceptions on malformed local storage data, causing the whole game state loading sequence to crash and blocking the fallback to default states, and potentially soft-locking the game entirely if left unchecked.
 **Action:** Wrapped JSON.parse in a try-catch block for the `heIsRisenGameState` and added corrupted JSON testing into the `test_state_corruption.py` test suite.
+
+## 2024-03-24 - Strict Validation on External Inputs (localStorage)
+**Context:** The HeIsRisen games (`main.js` and `m/main.js`) load a JSON object (`heIsRisenGameState`) from `localStorage` to resume state. The parsing block previously ensured `typeof savedState === 'object'` and `savedState.eggData` existed, but blindly loaded internal values into the Phaser `registry` (e.g. `savedState.foundEggs`, `savedState.currentScore`) assuming they had correct types.
+
+**Vulnerability:** This exposed the game state to NaN/Type corruption if localStorage was maliciously tampered with or corrupted on the client side (e.g. setting an array value to a string or setting `currentScore` to a negative number or NaN).
+
+**Fix:** Implemented strict type and bounds validation before hydrating the `registry`.
+- `foundEggs` and `stampedSections` are now explicitly checked via `Array.isArray()`, falling back to `[]`.
+- `correctCategorizations` and `currentScore` are explicitly parsed via `parseInt()` and validated with `isNaN()` and bounded to `>= 0`, falling back to `0`.
+- Expanded `test_state_corruption.py` to inject malicious valid JSON that verifies these type-checks execute gracefully without crashing the game logic or bubbling `NaN` values.
+
+**Learnings:** Always strictly validate all external inputs (including local browser storage like `localStorage`) before trusting their data types within application state, as a single type failure (like passing `"not_an_array"` to a function expecting an Array) can silently break the entire game loop. Fail fast on corruption.

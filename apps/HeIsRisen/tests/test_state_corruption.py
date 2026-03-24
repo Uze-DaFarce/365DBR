@@ -51,8 +51,20 @@ def run_state_corruption_test(is_mobile=False):
                     localStorage.setItem('sfxVolume', ' '); // Empty/whitespace string
                     // No sfxVolume_backup set
 
-                    // Tamper with the main game state
-                    localStorage.setItem('heIsRisenGameState', '{ invalid json: ] ] }');
+                    // Tamper with the main game state with completely invalid JSON
+                    // (Note: The game's try/catch around JSON.parse will catch this and start fresh,
+                    // but we also want to test Type corruption, so we will use a valid-but-malicious JSON below).
+
+                    // Tamper with the main game state with malicious valid JSON (Type corruption)
+                    const maliciousState = {
+                        eggData: [],
+                        sections: [],
+                        foundEggs: "not_an_array", // Should default to []
+                        stampedSections: { this_is: "an_object" }, // Should default to []
+                        correctCategorizations: "NaN_String", // Should default to 0
+                        currentScore: -50 // Should default to 0
+                    };
+                    localStorage.setItem('heIsRisenGameState', JSON.stringify(maliciousState));
                 }
             """)
 
@@ -95,6 +107,21 @@ def run_state_corruption_test(is_mobile=False):
             # Expect sfx to fallback to 0.5 because backup is missing
             if music_vol != 0.8 or ambient_vol != 0.5 or sfx_vol != 0.5:
                  raise AssertionError(f"Volumes should fallback properly, but got Music:{music_vol}, Ambient:{ambient_vol}, SFX:{sfx_vol}")
+
+            # Verify that malicious state with correct types was handled
+            found_eggs = page.evaluate("() => window.game.scene.scenes[0].registry.get('foundEggs')")
+            stamped_sections = page.evaluate("() => window.game.scene.scenes[0].registry.get('stampedSections')")
+            correct_categorizations = page.evaluate("() => window.game.scene.scenes[0].registry.get('correctCategorizations')")
+            current_score = page.evaluate("() => window.game.scene.scenes[0].registry.get('currentScore')")
+
+            if not isinstance(found_eggs, list):
+                raise AssertionError(f"foundEggs is not an array: {found_eggs}")
+            if not isinstance(stamped_sections, list):
+                raise AssertionError(f"stampedSections is not an array: {stamped_sections}")
+            if correct_categorizations != 0:
+                raise AssertionError(f"correctCategorizations failed to fallback to 0. Got: {correct_categorizations}")
+            if current_score != 0:
+                raise AssertionError(f"currentScore failed to fallback to 0. Got: {current_score}")
 
             print("SUCCESS: State corruption was safely rejected and game defaulted to stable values (or valid backups).")
 
