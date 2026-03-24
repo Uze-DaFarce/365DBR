@@ -491,8 +491,10 @@ class UIScene extends Phaser.Scene {
             for (let i = children.length - 1; i >= 0; i--) {
                 const egg = children[i];
                 if (egg && egg.active && !egg.getData('collected')) {
-                    const distSq = Phaser.Math.Distance.Squared(lensX, lensY, egg.x, egg.y);
+              const distSq = Phaser.Math.Distance.Squared(lensX, lensY, egg.x, egg.y);
                     if (distSq < captureRadiusSq) {
+                  egg.setData('animX', lensX);
+                  egg.setData('animY', lensY);
                         sectionHunt.collectEgg(egg);
                         egg.destroy();
                         if (egg.symbolSprite) egg.symbolSprite.destroy();
@@ -1590,7 +1592,11 @@ class SectionHunt extends Phaser.Scene {
           symbolTexture = egg.symbolSprite.texture.key;
       }
 
-      this.showCollectionFeedback(egg.x, egg.y, egg.texture.key, symbolTexture);
+      // Decouple visual effect coordinates (e.g. magnifying glass lens center) from physical location
+      const animX = egg.getData('animX') !== undefined ? egg.getData('animX') : egg.x;
+      const animY = egg.getData('animY') !== undefined ? egg.getData('animY') : egg.y;
+
+      this.showCollectionFeedback(animX, animY, egg.texture.key, symbolTexture);
       foundEggs.push(eggInfo);
       this.registry.set('foundEggs', foundEggs);
       if (eggData) {
@@ -2071,6 +2077,10 @@ class SectionHunt extends Phaser.Scene {
 
            // Increased capture radius logic for easier finding
            if (distSq < captureRadiusSq) {
+               // Decouple the visual animation position from the physical interaction position
+               egg.setData('animX', lensX);
+               egg.setData('animY', lensY);
+
                this.collectEgg(egg);
                egg.destroy();
                if (egg.symbolSprite) egg.symbolSprite.destroy();
