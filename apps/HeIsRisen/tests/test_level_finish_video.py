@@ -39,12 +39,11 @@ def run_level_finish_video(is_mobile=False):
                     user_agent=iphone['user_agent'],
                     device_scale_factor=iphone['device_scale_factor'],
                     is_mobile=iphone['is_mobile'],
-                    has_touch=iphone['has_touch'],
-                    record_video_dir="verification/video"
+                    has_touch=iphone['has_touch']
                 )
             else:
                 browser = p.chromium.launch(headless=True)
-                context = browser.new_context(viewport={'width': 1280, 'height': 720}, record_video_dir="verification/video")
+                context = browser.new_context(viewport={'width': 1280, 'height': 720})
 
             page = context.new_page()
 
@@ -143,7 +142,7 @@ def run_level_finish_video(is_mobile=False):
 
             print("Capturing screenshot of the MapScene with the animation playing...")
             context_type = "mobile" if is_mobile else "desktop"
-            os.makedirs("verification/video", exist_ok=True)
+            os.makedirs("verification", exist_ok=True)
             screenshot_path = f"verification/level_finish_playing_{context_type}.png"
 
             # Using full page screenshot and wait for rendering fixes black image captures in some headless environments

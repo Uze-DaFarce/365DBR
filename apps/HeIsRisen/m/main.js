@@ -2,6 +2,113 @@
 // Define total eggs as a variable to avoid hardcoding
 const TOTAL_EGGS = 60;
 
+function addButtonInteraction(scene, button, sfxKey) {
+    button.baseScaleX = button.scaleX;
+    button.baseScaleY = button.scaleY;
+
+    button.on('pointerover', () => scene.tweens.add({
+        targets: button,
+        scaleX: button.baseScaleX * 1.1,
+        scaleY: button.baseScaleY * 1.1,
+        duration: 100,
+        ease: 'Sine.easeInOut'
+    }));
+
+    button.on('pointerout', () => scene.tweens.add({
+        targets: button,
+        scaleX: button.baseScaleX,
+        scaleY: button.baseScaleY,
+        duration: 100,
+        ease: 'Sine.easeInOut'
+    }));
+
+    button.on('pointerdown', () => {
+        const musicScene = scene.scene.get('MusicScene');
+        if (musicScene && musicScene.scene.isActive()) {
+            musicScene.playSFX(sfxKey);
+        }
+        scene.tweens.add({
+            targets: button,
+            scaleX: button.baseScaleX * 0.9,
+            scaleY: button.baseScaleY * 0.9,
+            duration: 50,
+            yoyo: true,
+            ease: 'Power1'
+        });
+    });
+}
+
+class Confirmation extends Phaser.GameObjects.Container {
+    constructor(scene, x, y, text, onYes, onNo) {
+        super(scene, x, y);
+        this.scene = scene;
+        this.onYes = onYes;
+        this.onNo = onNo;
+
+        const overlay = this.scene.add.rectangle(0, 0, this.scene.cameras.main.width, this.scene.cameras.main.height, 0x000000, 0.7)
+            .setOrigin(0)
+            .setInteractive();
+        this.add(overlay);
+
+        const panel = this.scene.add.rectangle(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2, 400, 200, 0x333333)
+            .setStrokeStyle(4, 0xffffff);
+        this.add(panel);
+
+        const title = this.scene.add.text(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2 - 50, text, {
+            fontSize: '24px',
+            fontFamily: 'Comic Sans MS',
+            fill: '#ffffff'
+        }).setOrigin(0.5);
+        this.add(title);
+
+        const yesBtnContainer = this.scene.add.container(this.scene.cameras.main.width / 2 - 100, this.scene.cameras.main.height / 2 + 50);
+        const yesBg = this.scene.add.graphics();
+        yesBg.fillStyle(0x00ff00, 1);
+        yesBg.fillRoundedRect(-50, -25, 100, 50, 10);
+        yesBg.lineStyle(2, 0xffffff, 1);
+        yesBg.strokeRoundedRect(-50, -25, 100, 50, 10);
+        const yesText = this.scene.add.text(0, 0, 'Yes', {
+            fontSize: '20px',
+            fontFamily: 'Comic Sans MS',
+            fill: '#ffffff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        yesBtnContainer.add([yesBg, yesText]);
+        yesBtnContainer.setSize(100, 50);
+        yesBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        addButtonInteraction(this.scene, yesBtnContainer, 'menu-click');
+        yesBtnContainer.on('pointerdown', () => {
+            if (this.onYes) this.onYes();
+            this.destroy();
+        });
+        this.add(yesBtnContainer);
+
+        const noBtnContainer = this.scene.add.container(this.scene.cameras.main.width / 2 + 100, this.scene.cameras.main.height / 2 + 50);
+        const noBg = this.scene.add.graphics();
+        noBg.fillStyle(0xff0000, 1);
+        noBg.fillRoundedRect(-50, -25, 100, 50, 10);
+        noBg.lineStyle(2, 0xffffff, 1);
+        noBg.strokeRoundedRect(-50, -25, 100, 50, 10);
+        const noText = this.scene.add.text(0, 0, 'No', {
+            fontSize: '20px',
+            fontFamily: 'Comic Sans MS',
+            fill: '#ffffff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        noBtnContainer.add([noBg, noText]);
+        noBtnContainer.setSize(100, 50);
+        noBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        addButtonInteraction(this.scene, noBtnContainer, 'menu-click');
+        noBtnContainer.on('pointerdown', () => {
+            if (this.onNo) this.onNo();
+            this.destroy();
+        });
+        this.add(noBtnContainer);
+
+        this.scene.add.existing(this);
+    }
+}
+
 function saveGameState(registry) {
     const state = {
         eggData: registry.get('eggData'),
@@ -263,9 +370,9 @@ class MusicScene extends Phaser.Scene {
     });
   }
 
-  playSFX(key) {
+  playSFX(key, config = {}) {
     if (this.cache.audio.exists(key)) {
-        this.sound.play(key, { volume: this.sfxVolume });
+        this.sound.play(key, { volume: this.sfxVolume, ...config });
     } else {
         console.warn(`MusicScene: Audio key '${key}' missing from cache!`);
     }
@@ -500,7 +607,7 @@ class UIScene extends Phaser.Scene {
     // Space available below title (y + 80) to bottom (y + height - 20)
     const contentTop = y + 80;
     const contentHeight = height - 100;
-    const spacing = contentHeight / 3;
+    const spacing = contentHeight / 4;
     const trackWidth = Math.min(200, width - 60);
 
     this.createSlider('Music', contentTop + spacing * 0.5, screenWidth / 2, 'music', trackWidth);
@@ -531,7 +638,7 @@ class UIScene extends Phaser.Scene {
     addButtonInteraction(this, resetBtnContainer, 'menu-click');
 
     resetBtnContainer.on('pointerdown', () => {
-        if (window.confirm("Your current game will be reset, are you sure?")) {
+        const confirmation = new Confirmation(this, 0, 0, 'Your current game will be reset,\nare you sure?', () => {
             localStorage.removeItem('heIsRisenGameState');
             const mainScene = this.scene.get('MainMenu');
             if (mainScene) {
@@ -551,7 +658,8 @@ class UIScene extends Phaser.Scene {
                 if (this.gearIcon) this.gearIcon.setVisible(true);
                 if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
             });
-        }
+        });
+        this.settingsContainer.add(confirmation);
     });
     this.settingsContainer.add(resetBtnContainer);
   }
@@ -1063,9 +1171,10 @@ class MainMenu extends Phaser.Scene {
       mainBtnContainer.on('pointerdown', () => startGame(false));
       if (newGameBtnContainer) {
           newGameBtnContainer.on('pointerdown', () => {
-              if (window.confirm("Your current game will be reset, are you sure?")) {
-                  startGame(true);
-              }
+                const confirmation = new Confirmation(this, 0, 0, 'Your current game will be reset,\nare you sure?', () => {
+                    startGame(true);
+                });
+                this.add.existing(confirmation);
           });
       }
 
@@ -1471,7 +1580,7 @@ class SectionHunt extends Phaser.Scene {
     if (!foundEggs.some(e => e.eggId === eggInfo.eggId)) {
       const musicScene = this.scene.get('MusicScene');
       if (musicScene) {
-          musicScene.playSFX('collect');
+          musicScene.playSFX('collect', { detune: Phaser.Math.Between(-200, 200) });
       }
 
       // Get symbol texture if available
@@ -1576,6 +1685,21 @@ class SectionHunt extends Phaser.Scene {
 
   showCollectionFeedback(x, y, eggTexture, symbolTexture) {
     const scale = this.gameScale;
+
+    if (!this.textures.exists('sparkle')) {
+        const starObject = new Phaser.GameObjects.Star(this, 10, 10, 4, 2, 10, 0xffff00);
+        const renderTexture = this.add.renderTexture(0, 0, 20, 20).setVisible(false);
+        renderTexture.draw(starObject, 10, 10);
+        renderTexture.saveTexture('sparkle');
+        renderTexture.destroy();
+        starObject.destroy();
+    }
+
+    const emitter = this.add.particles(x, y, 'sparkle', {
+        speed: { min: 50 * scale, max: 200 * scale }, scale: { start: 1 * scale, end: 0 }, alpha: { start: 1, end: 0 },
+        lifespan: 800, gravityY: 200 * scale, quantity: 15, duration: 100
+    }).setDepth(19);
+    emitter.once('complete', () => emitter.destroy());
 
     // Egg Sprite
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50 * scale, 75 * scale);
@@ -2971,7 +3095,10 @@ function resizeGame() {
   const scaleY = height / 720;
   const scale = Math.min(scaleX, scaleY);
 
-  game.scene.getScenes(true).forEach(scene => {
+  // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations during resize
+  const scenes = game.scene.getScenes(true);
+  for (let s_idx = 0; s_idx < scenes.length; s_idx++) {
+    const scene = scenes[s_idx];
     if (scene.gameScale) scene.gameScale = scale;
     if (scene.cameras && scene.cameras.main) {
       scene.cameras.main.setBounds(0, 0, width, height);
@@ -3018,7 +3145,9 @@ function resizeGame() {
         scene.mapImage.setScale(mapScale);
       }
       if (scene.mapSections) {
-        scene.mapSections.forEach(section => {
+        // ⚡ Bolt Optimization: Replace forEach with fast for loop
+        for (let m_idx = 0; m_idx < scene.mapSections.length; m_idx++) {
+          const section = scene.mapSections[m_idx];
           if (section.zone) {
             const centerX = section.coords.x;
             const centerY = section.coords.y;
@@ -3049,10 +3178,12 @@ function resizeGame() {
             section.zone.baseScaleX = section.zone.scaleX;
             section.zone.baseScaleY = section.zone.scaleY;
           }
-        });
+        }
 
         if (scene.stamps) {
-            scene.stamps.forEach(item => {
+            // ⚡ Bolt Optimization: Replace forEach with fast for loop
+            for (let st_idx = 0; st_idx < scene.stamps.length; st_idx++) {
+                const item = scene.stamps[st_idx];
                 if (item.anim && item.anim.active && item.thumb && item.thumb.active) {
                     // Apply the consistent -5px upward offset for both animation and static stamp
                     const offsetY = -5 * (scene.bgScale || 1);
@@ -3070,7 +3201,7 @@ function resizeGame() {
                     const targetHeight = (item.thumb.height * item.thumb.scaleY) * 1.25;
                     item.anim.setScale(targetHeight / intrinsicHeight);
                 }
-            });
+            }
         }
       }
       if (scene.eggsAmminHaul) {
@@ -3100,14 +3231,17 @@ function resizeGame() {
         scene.sectionImage.setDisplaySize(width, height);
       }
       if (scene.eggs) {
-        scene.eggs.getChildren().forEach(egg => {
+        // ⚡ Bolt Optimization: Replace forEach with fast for loop
+        const eggs = scene.eggs.getChildren();
+        for (let e_idx = eggs.length - 1; e_idx >= 0; e_idx--) {
+          const egg = eggs[e_idx];
           if (egg && egg.active) {
             egg.setDisplaySize(50 * scale, 75 * scale);
             if (egg.symbolSprite) {
               egg.symbolSprite.setDisplaySize(50 * scale, 75 * scale);
             }
           }
-        });
+        }
       }
       if (scene.eggZitButton) {
         scene.eggZitButton.setPosition(0, 200 * scale);
@@ -3223,7 +3357,7 @@ function resizeGame() {
       }
       if (scene.fingerCursor) scene.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
     }
-  });
+  }
 }
 
 game.events.on('ready', () => {
