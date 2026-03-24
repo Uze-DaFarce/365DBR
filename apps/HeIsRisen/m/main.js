@@ -75,7 +75,7 @@ class Confirmation extends Phaser.GameObjects.Container {
         }).setOrigin(0.5);
         yesBtnContainer.add([yesBg, yesText]);
         yesBtnContainer.setSize(100, 50);
-        yesBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        yesBtnContainer.setInteractive();
         addButtonInteraction(this.scene, yesBtnContainer, 'menu-click');
         yesBtnContainer.on('pointerdown', () => {
             if (this.onYes) this.onYes();
@@ -97,7 +97,7 @@ class Confirmation extends Phaser.GameObjects.Container {
         }).setOrigin(0.5);
         noBtnContainer.add([noBg, noText]);
         noBtnContainer.setSize(100, 50);
-        noBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        noBtnContainer.setInteractive();
         addButtonInteraction(this.scene, noBtnContainer, 'menu-click');
         noBtnContainer.on('pointerdown', () => {
             if (this.onNo) this.onNo();
@@ -631,7 +631,7 @@ class UIScene extends Phaser.Scene {
 
     resetBtnContainer.add([resetBg, resetText]);
     resetBtnContainer.setSize(200, 40);
-    resetBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-100, -20, 200, 40), Phaser.Geom.Rectangle.Contains);
+    resetBtnContainer.setInteractive();
 
     resetBtnContainer.baseScaleX = 1;
     resetBtnContainer.baseScaleY = 1;
@@ -1013,7 +1013,7 @@ class MainMenu extends Phaser.Scene {
 
       mainBtnContainer.setSize(buttonWidth, buttonHeight);
       // Massive hit area for easier tapping
-      mainBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+      mainBtnContainer.setInteractive();
       startBtnContainer.add(mainBtnContainer);
 
       let newGameBtnContainer = null;
@@ -1037,7 +1037,7 @@ class MainMenu extends Phaser.Scene {
           newGameBtnContainer.add(newBtnText);
 
           newGameBtnContainer.setSize(buttonWidth, buttonHeight);
-          newGameBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+          newGameBtnContainer.setInteractive();
           startBtnContainer.add(newGameBtnContainer);
       }
 
@@ -1590,7 +1590,10 @@ class SectionHunt extends Phaser.Scene {
           symbolTexture = egg.symbolSprite.texture.key;
       }
 
-      this.showCollectionFeedback(egg.x, egg.y, egg.texture.key, symbolTexture);
+      // Use animX/animY if present for correct visual offset, else fallback to physical x/y
+      const visualX = egg.getData('animX') !== undefined ? egg.getData('animX') : egg.x;
+      const visualY = egg.getData('animY') !== undefined ? egg.getData('animY') : egg.y;
+      this.showCollectionFeedback(visualX, visualY, egg.texture.key, symbolTexture);
       foundEggs.push(eggInfo);
       this.registry.set('foundEggs', foundEggs);
       if (eggData) {
@@ -2058,7 +2061,6 @@ class SectionHunt extends Phaser.Scene {
       const captureRadius = 80 * scale; // Slightly larger than visual radius (75)
       const captureRadiusSq = captureRadius * captureRadius;
 
-      // Check all eggs
       // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations on pointerdown
       const children = this.eggs.getChildren();
       // ⚡ Iterate backwards because destroying an object mutates the children array
@@ -2071,6 +2073,59 @@ class SectionHunt extends Phaser.Scene {
 
            // Increased capture radius logic for easier finding
            if (distSq < captureRadiusSq) {
+               // Calculate the exact visual position of the egg inside the loupe
+               // 1. We know the lens visual center is at lensX, lensY
+               // 2. We know the render texture draws the scaled background offset by drawX, drawY
+               //    drawX = radius - (pointer.x * zoom)
+               //    drawY = radius - (pointer.y * zoom)
+               //    But we need to account for clamped drawX/drawY
+               const zoom = 2;
+               let baseScaleX = 1;
+               let baseScaleY = 1;
+               let bgWidth = 1280;
+               let bgHeight = 720;
+               if (this.sectionImage && this.sectionImage.active) {
+                   // Ensure we have correct width/height depending on video vs fallback image
+                   bgWidth = this.renderStamp.width || this.sectionImage.displayWidth;
+                   bgHeight = this.renderStamp.height || this.sectionImage.displayHeight;
+                   baseScaleX = this.sectionImage.displayWidth / bgWidth;
+                   baseScaleY = this.sectionImage.displayHeight / bgHeight;
+               } else {
+                   baseScaleX = this.bgScale || (this.game.config.width / 1280);
+                   baseScaleY = this.bgScale || (this.game.config.height / 720);
+                   bgWidth = 1280; // Default background size
+                   bgHeight = 720;
+               }
+
+               const diameter = 150 * scale;
+               const radius = diameter / 2;
+               const scaledBgWidth = bgWidth * baseScaleX * zoom;
+               const scaledBgHeight = bgHeight * baseScaleY * zoom;
+
+               const minDrawX = Math.min(0, diameter - scaledBgWidth);
+               const maxDrawX = 0;
+               const minDrawY = Math.min(0, diameter - scaledBgHeight);
+               const maxDrawY = 0;
+
+               const rawDrawX = radius - (pointer.x * zoom);
+               const rawDrawY = radius - (pointer.y * zoom);
+
+               const drawX = Phaser.Math.Clamp(rawDrawX, minDrawX, maxDrawX);
+               const drawY = Phaser.Math.Clamp(rawDrawY, minDrawY, maxDrawY);
+
+               // Egg coordinates inside the render texture (from 0 to 150)
+               const eggDrawX = drawX + (egg.x * zoom);
+               const eggDrawY = drawY + (egg.y * zoom);
+
+               // Map render texture internal coordinates back to screen coordinates
+               // The render texture is centered at lensX, lensY
+               const screenX = lensX - radius + eggDrawX;
+               const screenY = lensY - radius + eggDrawY;
+
+               // Store screen coordinates on egg for showCollectionFeedback
+               egg.setData('animX', screenX);
+               egg.setData('animY', screenY);
+
                this.collectEgg(egg);
                egg.destroy();
                if (egg.symbolSprite) egg.symbolSprite.destroy();
@@ -2881,7 +2936,7 @@ class EggZamRoom extends Phaser.Scene {
 
           playBtnContainer.add([playBtnBg, playBtnText]);
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
-          playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-playBtnWidth/2, -playBtnHeight/2, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
+          playBtnContainer.setInteractive();
 
           playBtnContainer.baseScaleX = 1;
           playBtnContainer.baseScaleY = 1;

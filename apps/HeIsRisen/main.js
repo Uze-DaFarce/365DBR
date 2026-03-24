@@ -74,7 +74,7 @@ class Confirmation extends Phaser.GameObjects.Container {
         }).setOrigin(0.5);
         yesBtnContainer.add([yesBg, yesText]);
         yesBtnContainer.setSize(100, 50);
-        yesBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        yesBtnContainer.setInteractive();
         addButtonInteraction(this.scene, yesBtnContainer, 'menu-click');
         yesBtnContainer.on('pointerdown', () => {
             if (this.onYes) this.onYes();
@@ -96,7 +96,7 @@ class Confirmation extends Phaser.GameObjects.Container {
         }).setOrigin(0.5);
         noBtnContainer.add([noBg, noText]);
         noBtnContainer.setSize(100, 50);
-        noBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-50, -25, 100, 50), Phaser.Geom.Rectangle.Contains);
+        noBtnContainer.setInteractive();
         addButtonInteraction(this.scene, noBtnContainer, 'menu-click');
         noBtnContainer.on('pointerdown', () => {
             if (this.onNo) this.onNo();
@@ -631,7 +631,7 @@ class UIScene extends Phaser.Scene {
 
     resetBtnContainer.add([resetBg, resetText]);
     resetBtnContainer.setSize(250, 50);
-    resetBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-125, -25, 250, 50), Phaser.Geom.Rectangle.Contains);
+    resetBtnContainer.setInteractive();
 
     resetBtnContainer.baseScaleX = 1;
     resetBtnContainer.baseScaleY = 1;
@@ -932,7 +932,7 @@ class MainMenu extends Phaser.Scene {
     mainBtnContainer.add(btnText);
 
     mainBtnContainer.setSize(buttonWidth, buttonHeight);
-    mainBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+      mainBtnContainer.setInteractive();
     startBtnContainer.add(mainBtnContainer);
 
     let newGameBtnContainer = null;
@@ -956,7 +956,7 @@ class MainMenu extends Phaser.Scene {
         newGameBtnContainer.add(newBtnText);
 
         newGameBtnContainer.setSize(buttonWidth, buttonHeight);
-        newGameBtnContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+          newGameBtnContainer.setInteractive();
         startBtnContainer.add(newGameBtnContainer);
     }
 
@@ -1651,7 +1651,10 @@ class SectionHunt extends Phaser.Scene {
           symbolTexture = egg.symbolSprite.texture.key;
       }
 
-      this.showCollectionFeedback(egg.x, egg.y, egg.texture.key, symbolTexture);
+      // Use animX/animY if present for correct visual offset, else fallback to physical x/y
+      const visualX = egg.getData('animX') !== undefined ? egg.getData('animX') : egg.x;
+      const visualY = egg.getData('animY') !== undefined ? egg.getData('animY') : egg.y;
+      this.showCollectionFeedback(visualX, visualY, egg.texture.key, symbolTexture);
       foundEggs.push(eggData);
       this.registry.set('foundEggs', foundEggs);
 
@@ -2052,6 +2055,26 @@ class SectionHunt extends Phaser.Scene {
                 // Check if egg is under the mouse (center of lens)
                 const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
                 if (distSq < captureRadiusSq) {
+                     // In main.js, zoomedView represents the exact pointer position.
+                     // The egg is drawn in the renderTexture with an offset.
+                     const zoom = 2;
+                     const lensDiameter = 100;
+                     const viewWidth = lensDiameter / zoom;
+                     const viewHeight = lensDiameter / zoom;
+
+                     // Calculate where the egg is drawn inside the render texture
+                     const scrollX = pointer.x - viewWidth / 2;
+                     const scrollY = pointer.y - viewHeight / 2;
+                     const eggDrawX = (egg.x - scrollX) * zoom;
+                     const eggDrawY = (egg.y - scrollY) * zoom;
+
+                     // Convert back to screen coordinates
+                     const screenX = pointer.x - (lensDiameter / 2) + eggDrawX;
+                     const screenY = pointer.y - (lensDiameter / 2) + eggDrawY;
+
+                     egg.setData('animX', screenX);
+                     egg.setData('animY', screenY);
+
                      this.collectEgg(egg);
                      egg.destroy();
                      if (egg.symbolSprite) egg.symbolSprite.destroy();
@@ -2782,7 +2805,7 @@ class EggZamRoom extends Phaser.Scene {
 
           playBtnContainer.add([playBtnBg, playBtnText]);
           playBtnContainer.setSize(playBtnWidth, playBtnHeight);
-          playBtnContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, playBtnWidth, playBtnHeight), Phaser.Geom.Rectangle.Contains);
+          playBtnContainer.setInteractive();
 
           playBtnContainer.baseScaleX = 1;
           playBtnContainer.baseScaleY = 1;
