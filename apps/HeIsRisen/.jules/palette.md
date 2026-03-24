@@ -1,0 +1,3 @@
+## 2024-03-24 - [Add Global ARIA Live Announcer]
+**Learning:** Standard DOM accessibility features (like `aria-label` on objects) do not apply to Phaser 3 `<canvas>` game elements. To provide screen reader accessibility for in-game events, inject an invisible `aria-live` region (e.g., `<div id="aria-announcer" class="sr-only" aria-live="polite">`) into the HTML and update its text content dynamically via a global JavaScript helper when game events occur.
+**Action:** When implementing screen reader announcements for Phaser games, add the ARIA live region to the HTML and create a helper function to update its text content.
