@@ -2206,13 +2206,18 @@ class SectionHunt extends Phaser.Scene {
     // Single pass for visibility update and drawing
     // ⚡ Bolt Optimization: Replace forEach with fast for loop in update loop
     const children = this.eggs.getChildren();
+    const px = pointer.x;
+    const py = pointer.y;
+    const magnifierRadiusSq = radius * radius; // ⚡ Bolt Optimization: Hoisted standard magnifying glass coverage calculation
     for (let i = children.length - 1; i >= 0; i--) {
       const egg = children[i];
       if (egg && egg.active) {
           // Update visibility based on FINGER (pointer) visual position for the LENS
           // The hit area has expanded significantly, so the eggs should appear when hovered
-          const distToPointerSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
-          const magnifierRadiusSq = radius * radius; // Standard magnifying glass coverage
+          // ⚡ Bolt Optimization: Inline distance calculation to avoid function call overhead
+          const dx = px - egg.x;
+          const dy = py - egg.y;
+          const distToPointerSq = dx * dx + dy * dy;
 
           const alpha = distToPointerSq < magnifierRadiusSq ? 1 : 0;
           egg.setAlpha(alpha);

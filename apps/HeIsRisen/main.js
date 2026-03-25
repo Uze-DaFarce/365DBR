@@ -2218,11 +2218,16 @@ class SectionHunt extends Phaser.Scene {
 
     // ⚡ Bolt Optimization: Replace forEach with high-performance for loop in update loop
     const children = this.eggs.getChildren();
+    const px = pointer.x;
+    const py = pointer.y;
     for (let i = children.length - 1; i >= 0; i--) {
       const egg = children[i];
       if (egg && egg.active) {
         // Check distance to the POINTER (center of lens view)
-        const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
+        // ⚡ Bolt Optimization: Inline distance calculation to avoid function call overhead
+        const dx = px - egg.x;
+        const dy = py - egg.y;
+        const distSq = dx * dx + dy * dy;
         const alpha = distSq < lensRadiusSq ? 1 : 0;
 
         egg.setAlpha(alpha);
