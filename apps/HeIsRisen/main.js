@@ -5,6 +5,12 @@ function announceToScreenReader(message) {
     const announcer = document.getElementById('sr-announcer');
     if (announcer) {
         announcer.textContent = message;
+        // Clear after a short delay to allow re-announcing the same text
+        setTimeout(() => {
+            if (announcer.textContent === message) {
+                announcer.textContent = '';
+            }
+        }, 1000);
     }
 }
 
@@ -1661,6 +1667,12 @@ class SectionHunt extends Phaser.Scene {
           musicScene.playSFX('collect', { detune: Phaser.Math.Between(-200, 200) });
       }
 
+      announceToScreenReader('Egg found!');
+
+      if (navigator && navigator.vibrate) {
+          navigator.vibrate(50);
+      }
+
       let symbolTexture = null;
       if (egg.symbolSprite && egg.symbolSprite.active) {
           symbolTexture = egg.symbolSprite.texture.key;
@@ -1706,6 +1718,7 @@ class SectionHunt extends Phaser.Scene {
       const currentSection = sections.find(s => s.name === this.sectionName);
 
       if (foundEggs.length === TOTAL_EGGS) {
+          announceToScreenReader('All 60 Eggs Found! Transporting to the EggZam Room...');
           const clearText = this.add.text(this.scale.width / 2, this.scale.height / 2, "All 60 Eggs Found! Transporting to the EggZam Room...", {
               fontSize: '48px',
               fontFamily: 'Comic Sans MS',
@@ -1732,6 +1745,7 @@ class SectionHunt extends Phaser.Scene {
           const foundIds = foundEggs.map(e => e.eggId);
           const remainingCount = currentSection.eggs.filter(id => !foundIds.includes(id)).length;
           if (remainingCount === 0) {
+              announceToScreenReader('Great Job Detective!! You found all the hidden eggs on this map, the others are hidden in other maps.');
               const clearText = this.add.text(this.scale.width / 2, this.scale.height / 2, "Great Job Detective!! You found all the hidden eggs on this map, the others are hidden in other maps.", {
                   fontSize: '40px',
                   fontFamily: 'Comic Sans MS',
@@ -2583,6 +2597,8 @@ class EggZamRoom extends Phaser.Scene {
         const guessDisplay = this.add.text(bgWidth/2 - 28 * uiScale, -bgHeight/2 + 40 * uiScale, `Your Guess:\n${guessText}`, {
             fontSize: `${24 * uiScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
         }).setOrigin(0.5, 0.5);
+
+        announceToScreenReader(isCorrect ? "Correct!" : "Incorrect!");
 
         // Result Text (Correct/Incorrect) moved under the guess (and matched the 12px right shift)
         const resultText = this.add.text(bgWidth/2 - 28 * uiScale, -bgHeight/2 + 90 * uiScale, isCorrect ? "Correct!" : "Incorrect!", {
