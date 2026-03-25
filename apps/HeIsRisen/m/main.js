@@ -205,8 +205,12 @@ function initializeGameData(registry, cache, forceNew = false) {
         registry.set('symbols', symbolsData);
     }
 
-    const mapSections = cache.json.get('map_sections');
-    if (mapSections) {
+    let mapSections = cache.json.get('map_sections');
+    if (!Array.isArray(mapSections)) {
+        console.warn('Security: map_sections.json failed to load or is invalid. Using empty fallback.');
+        mapSections = [];
+    }
+    if (mapSections && mapSections.length > 0) {
         const eggCounts = [];
         let remainingEggs = TOTAL_EGGS;
         const numSections = mapSections.length;
@@ -270,6 +274,8 @@ function initializeGameData(registry, cache, forceNew = false) {
         registry.set('eggData', eggData);
     }
 
+    if (!registry.has('sections')) registry.set('sections', []);
+    if (!registry.has('eggData')) registry.set('eggData', []);
     registry.set('foundEggs', []);
     registry.set('stampedSections', []);
     registry.set('correctCategorizations', 0);
@@ -1289,7 +1295,8 @@ class MapScene extends Phaser.Scene {
     // NEW: Retrieve existing eggData and sections from registry
     const eggData = this.registry.get('eggData');
     const sections = this.registry.get('sections');
-    const mapSections = this.cache.json.get('map_sections') || [];
+    let mapSections = this.cache.json.get('map_sections');
+    if (!Array.isArray(mapSections)) mapSections = [];
     if (!eggData || !sections) {
       console.error('MapScene: eggData or sections missing from registry');
       this.scene.start('MainMenu'); // Fallback to MainMenu
@@ -1584,6 +1591,7 @@ class SectionHunt extends Phaser.Scene {
   }
 
   collectEgg(egg) {
+    announceToScreenReader('Egg collected!');
     const foundEggs = this.registry.get('foundEggs');
     const eggDataArray = this.registry.get('eggData');
     const eggData = eggDataArray.find(e => e.eggId === egg.getData('eggId'));
@@ -1724,8 +1732,8 @@ class SectionHunt extends Phaser.Scene {
     }
 
     const emitter = this.add.particles(x, y, 'sparkle', {
-        speed: { min: 50 * scale, max: 200 * scale }, scale: { start: 1 * scale, end: 0 }, alpha: { start: 1, end: 0 },
-        lifespan: 800, gravityY: 200 * scale, quantity: 15, duration: 100
+        speed: { min: 100 * scale, max: 300 * scale }, scale: { start: 1.5 * scale, end: 0 }, alpha: { start: 1, end: 0 },
+        lifespan: 1000, gravityY: 300 * scale, quantity: 30, duration: 150
     }).setDepth(19);
     emitter.once('complete', () => emitter.destroy());
 
@@ -1733,13 +1741,13 @@ class SectionHunt extends Phaser.Scene {
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50 * scale, 75 * scale);
     this.tweens.add({
         targets: eggSprite,
-        y: y - (100 * scale),
-        scaleX: eggSprite.scaleX * 1.5,
-        scaleY: eggSprite.scaleY * 1.5,
-        angle: 360,
+        y: y - (150 * scale),
+        scaleX: eggSprite.scaleX * 2.0,
+        scaleY: eggSprite.scaleY * 2.0,
+        angle: 720,
         alpha: 0,
-        duration: 1000,
-        ease: 'Power1',
+        duration: 1200,
+        ease: 'Back.easeOut',
         onComplete: () => eggSprite.destroy()
     });
 
@@ -1748,13 +1756,13 @@ class SectionHunt extends Phaser.Scene {
         const symSprite = this.add.image(x, y, symbolTexture).setDepth(21).setDisplaySize(50 * scale, 75 * scale);
         this.tweens.add({
             targets: symSprite,
-            y: y - (100 * scale),
-            scaleX: symSprite.scaleX * 1.5,
-            scaleY: symSprite.scaleY * 1.5,
-            angle: 360,
+            y: y - (150 * scale),
+            scaleX: symSprite.scaleX * 2.0,
+            scaleY: symSprite.scaleY * 2.0,
+            angle: 720,
             alpha: 0,
-            duration: 1000,
-            ease: 'Power1',
+            duration: 1200,
+            ease: 'Back.easeOut',
             onComplete: () => symSprite.destroy()
         });
     }
@@ -1769,12 +1777,12 @@ class SectionHunt extends Phaser.Scene {
 
     this.tweens.add({
         targets: feedback,
-        y: y - (120 * scale),
-        scaleX: 1.2,
-        scaleY: 1.2,
+        y: y - (150 * scale),
+        scaleX: 1.5,
+        scaleY: 1.5,
         alpha: 0,
-        duration: 1000,
-        ease: 'Power1',
+        duration: 1200,
+        ease: 'Back.easeOut',
         onComplete: () => feedback.destroy()
     });
   }
@@ -2227,13 +2235,18 @@ class SectionHunt extends Phaser.Scene {
     // Single pass for visibility update and drawing
     // ⚡ Bolt Optimization: Replace forEach with fast for loop in update loop
     const children = this.eggs.getChildren();
+    const px = pointer.x;
+    const py = pointer.y;
+    const magnifierRadiusSq = radius * radius; // ⚡ Bolt Optimization: Hoisted standard magnifying glass coverage calculation
     for (let i = children.length - 1; i >= 0; i--) {
       const egg = children[i];
       if (egg && egg.active) {
           // Update visibility based on FINGER (pointer) visual position for the LENS
           // The hit area has expanded significantly, so the eggs should appear when hovered
-          const distToPointerSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
-          const magnifierRadiusSq = radius * radius; // Standard magnifying glass coverage
+          // ⚡ Bolt Optimization: Inline distance calculation to avoid function call overhead
+          const dx = px - egg.x;
+          const dy = py - egg.y;
+          const distToPointerSq = dx * dx + dy * dy;
 
           const alpha = distToPointerSq < magnifierRadiusSq ? 1 : 0;
           egg.setAlpha(alpha);

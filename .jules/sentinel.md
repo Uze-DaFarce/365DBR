@@ -103,3 +103,6 @@
 ## 2026-03-23 - [Sentinel] Resiliency against Corrupted JSON in Game State
 **Learning:** JSON.parse throws exceptions on malformed local storage data, causing the whole game state loading sequence to crash and blocking the fallback to default states, and potentially soft-locking the game entirely if left unchecked.
 **Action:** Wrapped JSON.parse in a try-catch block for the `heIsRisenGameState` and added corrupted JSON testing into the `test_state_corruption.py` test suite.
+
+## 2026-03-25 - [Missing Network Data Fallbacks]
+Dynamically loaded external JSON files accessed via `cache.json.get('key')` (like `map_sections.json` or `symbols.json`) will return `undefined` or `null` if the network request fails or is blocked. To prevent fatal frontend crashes, always validate the result (e.g., `Array.isArray(data)`) and provide a safe fallback (e.g., `[]` or `{{}}`) before iterating or accessing properties like `.length`.

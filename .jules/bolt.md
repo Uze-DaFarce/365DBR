@@ -104,3 +104,7 @@
 ## 2026-03-21 - Redundant Registry Polling in Phaser Update Loops
 **Learning:** Continuously polling the Phaser registry (e.g. `this.registry.get('foundEggs').length`) inside `update()` loops (running at 60fps) just to check if UI text needs updating is an inefficient anti-pattern. If the underlying data structure only changes on explicit events (like `collectEgg` or initialization), the UI should be updated explicitly in those specific handlers or via `changedata` events, entirely avoiding the 60fps array length lookup and property comparison.
 **Action:** Always map static UI updates directly to explicit action handlers or registry event listeners, and completely remove redundant state-polling logic from the 60fps `update()` loops to reduce main thread pressure.
+
+## 2026-03-25 - Inlining Math and Hoisting Constants in Hot Paths
+**Learning:** In Phaser 3, executing math utility functions (like `Phaser.Math.Distance.Squared`) inside inner loops within the 60fps `update()` loop introduces unnecessary function call overhead. Additionally, recalculating loop-invariant constants (like squaring a constant radius or extracting `pointer.x` / `pointer.y`) on every iteration multiplies the performance penalty.
+**Action:** Inline simple math calculations (e.g., `dx * dx + dy * dy`) and strictly hoist any loop-invariant property extractions and calculations out of inner `for` loops in hot execution paths.

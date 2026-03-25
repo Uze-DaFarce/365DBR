@@ -357,13 +357,13 @@ def run_collect_eggs_in_level(is_mobile=False):
                         const scene = window.game.scene.getScene('SectionHunt');
                         const tweens = scene.tweens.getTweens();
                         // Look for a tween targeting an eggSprite or symSprite (image)
-                        // that is animating the angle to 360
-                        return tweens.some(t => t.data.some(d => d.key === 'angle' && d.end === 360));
+                        // that is animating the angle to 360 or 720
+                        return tweens.some(t => t.data.some(d => d.key === 'angle' && (d.end === 360 || d.end === 720)));
                     }}
                 """)
 
                 if not has_juicy_tween:
-                     print("WARN: Did not detect the juicy 360-degree rotation tween on collection feedback!")
+                     print("WARN: Did not detect the juicy 360/720-degree rotation tween on collection feedback!")
                 else:
                      print("SUCCESS: Juicy feedback tween detected!")
 
