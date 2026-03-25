@@ -192,8 +192,12 @@ function initializeGameData(registry, cache, forceNew = false) {
         registry.set('symbols', symbolsData);
     }
 
-    const mapSections = cache.json.get('map_sections');
-    if (mapSections) {
+    let mapSections = cache.json.get('map_sections');
+    if (!Array.isArray(mapSections)) {
+        console.warn('Security: map_sections.json failed to load or is invalid. Using empty fallback.');
+        mapSections = [];
+    }
+    if (mapSections && mapSections.length > 0) {
         const eggCounts = [];
         let remainingEggs = TOTAL_EGGS;
         const numSections = mapSections.length;
@@ -257,6 +261,8 @@ function initializeGameData(registry, cache, forceNew = false) {
         registry.set('eggData', eggData);
     }
 
+    if (!registry.has('sections')) registry.set('sections', []);
+    if (!registry.has('eggData')) registry.set('eggData', []);
     registry.set('foundEggs', []);
     registry.set('stampedSections', []);
     registry.set('correctCategorizations', 0);
@@ -1276,7 +1282,8 @@ class MapScene extends Phaser.Scene {
     // NEW: Retrieve existing eggData and sections from registry
     const eggData = this.registry.get('eggData');
     const sections = this.registry.get('sections');
-    const mapSections = this.cache.json.get('map_sections') || [];
+    let mapSections = this.cache.json.get('map_sections');
+    if (!Array.isArray(mapSections)) mapSections = [];
     if (!eggData || !sections) {
       console.error('MapScene: eggData or sections missing from registry');
       this.scene.start('MainMenu'); // Fallback to MainMenu
