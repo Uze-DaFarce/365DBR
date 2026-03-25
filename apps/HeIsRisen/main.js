@@ -1,6 +1,13 @@
 // Define all scene classes first
 const TOTAL_EGGS = 60;
 
+function announceToScreenReader(message) {
+    const announcer = document.getElementById('sr-announcer');
+    if (announcer) {
+        announcer.textContent = message;
+    }
+}
+
 function addButtonInteraction(scene, button, sfxKey) {
     button.baseScaleX = button.scaleX;
     button.baseScaleY = button.scaleY;
@@ -1631,6 +1638,7 @@ class SectionHunt extends Phaser.Scene {
   }
 
   collectEgg(egg) {
+    announceToScreenReader('Egg collected!');
     const foundEggs = this.registry.get('foundEggs');
     const eggDataArray = this.registry.get('eggData');
     const eggData = {
