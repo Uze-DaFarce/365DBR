@@ -49,8 +49,12 @@ def run_missing_network_data_test(is_mobile=False):
 
             try:
                 # Try to interact to see if it crashed
+                # Use mouse click and spacebar to simulate tap and get past intro screens
+                page.mouse.click(100, 100)
                 page.keyboard.press("Space")
                 time.sleep(3)
+                # Click center of screen where Play button is
+                page.mouse.click(640, 580)
                 page.keyboard.press("Space")
                 time.sleep(2)
 

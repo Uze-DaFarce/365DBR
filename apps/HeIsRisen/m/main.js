@@ -261,6 +261,8 @@ function initializeGameData(registry, cache, forceNew = false) {
         registry.set('eggData', eggData);
     }
 
+    if (!registry.has('sections')) registry.set('sections', []);
+    if (!registry.has('eggData')) registry.set('eggData', []);
     registry.set('foundEggs', []);
     registry.set('stampedSections', []);
     registry.set('correctCategorizations', 0);
