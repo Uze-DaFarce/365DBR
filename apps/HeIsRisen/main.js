@@ -1661,6 +1661,10 @@ class SectionHunt extends Phaser.Scene {
 
       announceToScreenReader('Egg found!');
 
+      if (navigator && navigator.vibrate) {
+          navigator.vibrate(50);
+      }
+
       let symbolTexture = null;
       if (egg.symbolSprite && egg.symbolSprite.active) {
           symbolTexture = egg.symbolSprite.texture.key;
