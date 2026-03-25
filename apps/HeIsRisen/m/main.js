@@ -2991,6 +2991,14 @@ const config = {
   transparent: true,
   width: width,
   height: height,
+  disableContextMenu: true,
+  audio: {
+    disableWebAudio: false
+  },
+  fps: {
+      target: 60,
+      forceSetTimeOut: true
+  },
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -3005,6 +3013,12 @@ const config = {
 const game = new Phaser.Game(config);
 window.game = game; // Expose for debugging/verification
 
+// Fix iOS/mobile audio pausing and stuttering issues
+game.events.on('ready', () => {
+    // Disable automatic pausing to keep game running
+    game.events.off('hidden');
+    game.events.off('blur');
+});
 
 /**
  * Parses a scripture string (e.g., "John 3:16" or "1 Peter 2:4") into a URL.

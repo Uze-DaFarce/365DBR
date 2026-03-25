@@ -255,6 +255,9 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
         if (selection && selection.type === 'Range' && selection.toString().length > 0) return;
         const el = document.getElementById(`verse-${vid}`);
         if (el) {
+            const evt = new CustomEvent('verseclicked', { detail: { vid } });
+            window.dispatchEvent(evt);
+
             const rect = el.getBoundingClientRect();
             const absoluteTop = window.scrollY + rect.top;
             const targetY = absoluteTop - 125;
@@ -1188,7 +1191,14 @@ function App() {
 
   // Observer for Scroll Tracking
   useEffect(() => {
-    if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0 || targetScrollVerse) return;
+    const handleVerseClickedEvent = (e) => {
+        setTargetScrollVerse(e.detail.vid);
+    };
+    window.addEventListener('verseclicked', handleVerseClickedEvent);
+
+    if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0 || targetScrollVerse) {
+        return () => window.removeEventListener('verseclicked', handleVerseClickedEvent);
+    }
     const observer = new IntersectionObserver((entries) => {
       // Check if we are at the absolute bottom of the page first to prevent bounce-back
       // Use scrollHeight and Math.ceil/floor tolerance for cross-browser sub-pixel accuracy
@@ -1219,6 +1229,7 @@ function App() {
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
+        window.removeEventListener('verseclicked', handleVerseClickedEvent);
         observer.disconnect();
         window.removeEventListener('scroll', handleScroll);
     };
