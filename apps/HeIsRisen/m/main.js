@@ -2328,6 +2328,11 @@ class EggZamRoom extends Phaser.Scene {
 
     const halo = this.add.image(startX, targetY - (40 * assetScale), 'halo').setDepth(2).setAlpha(0).setScale(0.5 * assetScale);
 
+    const musicScene = this.scene.get('MusicScene');
+    if (musicScene) {
+        musicScene.playSFX('success');
+    }
+
     // Sparkles Emitter
     const sparkles = this.add.particles(0, 0, 'sparkle', {
         x: startX,
@@ -2384,8 +2389,7 @@ class EggZamRoom extends Phaser.Scene {
     const musicScene = this.scene.get('MusicScene');
     if (musicScene) {
         // Fart sound for eggs-tra stinky eggs
-        const fartSound = this.sound.add('fart', { volume: this.registry.get('sfxVolume') ?? 0.5 });
-        fartSound.play();
+        musicScene.playSFX('fart');
     }
 
     const gasParticles = this.add.particles(0, 0, 'green-gas', {
@@ -2761,12 +2765,16 @@ class EggZamRoom extends Phaser.Scene {
 
     this.leftBottleZone.on('pointerdown', () => {
       if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
+        const musicScene = this.scene.get('MusicScene');
+        if (musicScene) musicScene.playSFX('menu-click');
         showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
       }
     });
 
     this.rightBottleZone.on('pointerdown', () => {
       if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
+        const musicScene = this.scene.get('MusicScene');
+        if (musicScene) musicScene.playSFX('menu-click');
         showExplanation(this.currentEgg.symbolData.category === 'Pagan', 'Eggs-tra Stinky');
       }
     });

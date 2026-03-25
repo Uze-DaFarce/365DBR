@@ -1079,7 +1079,8 @@ function App() {
                       } else {
                           // Final scroll using smooth behavior to ensure it lands exactly where intended
                           window.scrollTo({ top: targetY, behavior: 'smooth' });
-                          setTargetScrollVerse(null);
+                          // Increase delay to 800ms before clearing target to allow smooth scrolling physics on mobile to come to a complete rest
+                          setTimeout(() => setTargetScrollVerse(null), 800);
                       }
                   } else if (attempts < 20) {
                       attempts++;
