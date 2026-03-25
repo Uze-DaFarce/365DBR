@@ -1,13 +1,6 @@
 // Define all scene classes first
 const TOTAL_EGGS = 60;
 
-function announceToScreenReader(message) {
-    const announcer = document.getElementById('sr-announcer');
-    if (announcer) {
-        announcer.textContent = message;
-    }
-}
-
 function addButtonInteraction(scene, button, sfxKey) {
     button.baseScaleX = button.scaleX;
     button.baseScaleY = button.scaleY;
@@ -1638,7 +1631,6 @@ class SectionHunt extends Phaser.Scene {
   }
 
   collectEgg(egg) {
-    announceToScreenReader('Egg collected!');
     const foundEggs = this.registry.get('foundEggs');
     const eggDataArray = this.registry.get('eggData');
     const eggData = {
@@ -1763,8 +1755,8 @@ class SectionHunt extends Phaser.Scene {
     }
 
     const emitter = this.add.particles(x, y, 'sparkle', {
-        speed: { min: 50, max: 200 }, scale: { start: 1, end: 0 }, alpha: { start: 1, end: 0 },
-        lifespan: 800, gravityY: 200, quantity: 15, duration: 100
+        speed: { min: 100, max: 300 }, scale: { start: 1.5, end: 0 }, alpha: { start: 1, end: 0 },
+        lifespan: 1000, gravityY: 300, quantity: 30, duration: 150
     }).setDepth(19);
     emitter.once('complete', () => emitter.destroy());
 
@@ -1772,13 +1764,13 @@ class SectionHunt extends Phaser.Scene {
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50, 75);
     this.tweens.add({
         targets: eggSprite,
-        y: y - 100,
-        scaleX: eggSprite.scaleX * 1.5,
-        scaleY: eggSprite.scaleY * 1.5,
-        angle: 360,
+        y: y - 150,
+        scaleX: eggSprite.scaleX * 2.0,
+        scaleY: eggSprite.scaleY * 2.0,
+        angle: 720,
         alpha: 0,
-        duration: 1000,
-        ease: 'Power1',
+        duration: 1200,
+        ease: 'Back.easeOut',
         onComplete: () => eggSprite.destroy()
     });
 
@@ -1787,13 +1779,13 @@ class SectionHunt extends Phaser.Scene {
         const symSprite = this.add.image(x, y, symbolTexture).setDepth(21).setDisplaySize(50, 75);
         this.tweens.add({
             targets: symSprite,
-            y: y - 100,
-            scaleX: symSprite.scaleX * 1.5,
-            scaleY: symSprite.scaleY * 1.5,
-            angle: 360,
+            y: y - 150,
+            scaleX: symSprite.scaleX * 2.0,
+            scaleY: symSprite.scaleY * 2.0,
+            angle: 720,
             alpha: 0,
-            duration: 1000,
-            ease: 'Power1',
+            duration: 1200,
+            ease: 'Back.easeOut',
             onComplete: () => symSprite.destroy()
         });
     }
@@ -1808,12 +1800,12 @@ class SectionHunt extends Phaser.Scene {
 
     this.tweens.add({
         targets: feedback,
-        y: y - 120,
-        scaleX: 1.2,
-        scaleY: 1.2,
+        y: y - 150,
+        scaleX: 1.5,
+        scaleY: 1.5,
         alpha: 0,
-        duration: 1000,
-        ease: 'Power1',
+        duration: 1200,
+        ease: 'Back.easeOut',
         onComplete: () => feedback.destroy()
     });
   }
