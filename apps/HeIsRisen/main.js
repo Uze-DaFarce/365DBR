@@ -2010,7 +2010,7 @@ class SectionHunt extends Phaser.Scene {
     this.maskGraphics = this.add.graphics().fillCircle(0, 0, lensDiameter / 2).setScrollFactor(0);
     this.zoomedView.setMask(this.maskGraphics.createGeometryMask());
 
-    this.magnifyingGlass = this.add.image(0, 0, 'magnifying-glass').setOrigin(0.25, 0.2).setDepth(7).setScrollFactor(0);
+    this.magnifyingGlass = this.add.image(0, 0, 'magnifying-glass').setOrigin(0.25, 0.25).setDepth(7).setScrollFactor(0);
 
     // Render Stamp (reused for drawing video/bg/eggs into lens)
     // Key: if using video, we swap texture dynamically. If image, we set it here.
