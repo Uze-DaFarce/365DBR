@@ -2038,9 +2038,6 @@ class SectionHunt extends Phaser.Scene {
 
     // Global click handler for egg collection within the lens
     this.input.on('pointerdown', (pointer) => {
-        // If clicking UI, ignore
-        if (pointer.y < 200 * uiScale && pointer.x < 200 * uiScale) return; // Approximate UI blocking
-
         const captureRadiusSq = 50 * 50; // Lens capture radius
 
         // ⚡ Bolt Optimization: Use a fast for loop instead of forEach to prevent closure allocations
