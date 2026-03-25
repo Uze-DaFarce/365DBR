@@ -2,6 +2,19 @@
 // Define total eggs as a variable to avoid hardcoding
 const TOTAL_EGGS = 60;
 
+function announceToScreenReader(message) {
+    const announcer = document.getElementById('sr-announcer');
+    if (announcer) {
+        announcer.textContent = message;
+        // Clear after a short delay to allow re-announcing the same text
+        setTimeout(() => {
+            if (announcer.textContent === message) {
+                announcer.textContent = '';
+            }
+        }, 1000);
+    }
+}
+
 function addButtonInteraction(scene, button, sfxKey) {
     button.baseScaleX = button.scaleX;
     button.baseScaleY = button.scaleY;
@@ -1586,6 +1599,8 @@ class SectionHunt extends Phaser.Scene {
           musicScene.playSFX('collect', { detune: Phaser.Math.Between(-200, 200) });
       }
 
+      announceToScreenReader('Egg found!');
+
       // Get symbol texture if available
       let symbolTexture = null;
       if (egg.symbolSprite && egg.symbolSprite.active) {
@@ -1637,6 +1652,7 @@ class SectionHunt extends Phaser.Scene {
       const scale = this.gameScale;
 
       if (foundEggs.length === TOTAL_EGGS) {
+          announceToScreenReader('All 60 Eggs Found! Transporting to the EggZam Room...');
           const clearText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, "All 60 Eggs Found! Transporting to the EggZam Room...", {
               fontSize: `${48 * scale}px`,
               fontFamily: 'Comic Sans MS',
@@ -1663,6 +1679,7 @@ class SectionHunt extends Phaser.Scene {
           const foundIds = foundEggs.map(e => e.eggId);
           const remainingCount = currentSection.eggs.filter(id => !foundIds.includes(id)).length;
           if (remainingCount === 0) {
+              announceToScreenReader('Great Job Detective!! You found all the hidden eggs on this map, the others are hidden in other maps.');
               const clearText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, "Great Job Detective!! You found all the hidden eggs on this map, the others are hidden in other maps.", {
                   fontSize: `${40 * scale}px`,
                   fontFamily: 'Comic Sans MS',
@@ -2663,6 +2680,8 @@ class EggZamRoom extends Phaser.Scene {
         const guessDisplay = this.add.text(bgWidth/2 - 28 * assetScale, -bgHeight/2 + 40 * assetScale, `Your Guess:\n${guessText}`, {
             fontSize: `${24 * assetScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
         }).setOrigin(0.5, 0.5);
+
+        announceToScreenReader(isCorrect ? "Correct!" : "Incorrect!");
 
         // Result Text
         const resultText = this.add.text(bgWidth/2 - 28 * assetScale, -bgHeight/2 + 90 * assetScale, isCorrect ? "Correct!" : "Incorrect!", {

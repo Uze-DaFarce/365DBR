@@ -1,0 +1,3 @@
+## 2024-03-20 - [Add Screen Reader Announcements to Canvas Games]
+**Learning:** HTML5 Canvas games (like Phaser 3) natively trap screen readers because the internal game state is completely hidden from the DOM. Without explicit DOM elements, critical gameplay interactions (like collecting an item or completing a level) are completely invisible to assistive technologies.
+**Action:** Always inject an invisible `aria-live="polite"` DOM element (e.g., `<div id="sr-announcer" class="sr-only" aria-live="polite"></div>`) alongside the canvas element. Update its `textContent` dynamically via JavaScript when critical game events occur to make the canvas experience accessible without disrupting the visual UI.
