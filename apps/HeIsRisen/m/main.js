@@ -118,6 +118,25 @@ class Confirmation extends Phaser.GameObjects.Container {
         });
         this.add(noBtnContainer);
 
+        this.escListener = (e) => {
+            if (e.code === 'Escape') {
+                if (this.onNo) this.onNo();
+                this.destroy();
+            }
+        };
+        this.enterListener = (e) => {
+            if (e.code === 'Enter') {
+                if (this.onYes) this.onYes();
+                this.destroy();
+            }
+        };
+        window.addEventListener('keydown', this.escListener);
+        window.addEventListener('keydown', this.enterListener);
+        this.on('destroy', () => {
+            window.removeEventListener('keydown', this.escListener);
+            window.removeEventListener('keydown', this.enterListener);
+        });
+
         this.scene.add.existing(this);
     }
 }
@@ -442,7 +461,7 @@ class UIScene extends Phaser.Scene {
   repositionUI(width, height) {
     // Reposition gear
     if (this.gearIcon) {
-        this.gearIcon.setPosition(width - 30, 30);
+        this.gearIcon.setPosition(30, height - 30);
     }
 
     // Reposition settings panel
@@ -455,8 +474,8 @@ class UIScene extends Phaser.Scene {
   }
 
   createGearIcon() {
-    const x = this.cameras.main.width - 30;
-    const y = 30;
+    const x = 30;
+    const y = this.cameras.main.height - 30;
 
     // Create a container to hold the background and the cog
     const gearContainer = this.add.container(x, y).setDepth(10); // Keep below cursor
@@ -2680,28 +2699,29 @@ class EggZamRoom extends Phaser.Scene {
         const bgHeight = Math.min(height * 0.95, 600 * assetScale);
 
         const bg = this.add.graphics();
-        bg.fillStyle(0xfff8dc, 0.95);
+        bg.fillStyle(0xfff8dc, 1);
         bg.fillRoundedRect(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight, 20 * assetScale);
         bg.lineStyle(8 * assetScale, 0x8b4513, 1);
         bg.strokeRoundedRect(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight, 20 * assetScale);
+
+        // Block clicks behind the popup
         bg.setInteractive(new Phaser.Geom.Rectangle(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight), Phaser.Geom.Rectangle.Contains);
 
-        // Header Elements
-        const title = this.add.text(-12 * assetScale, -bgHeight/2 + 60 * assetScale, data.name || "Symbol", {
+        // Header Elements (Percentage based Y)
+        const title = this.add.text(0, -bgHeight * 0.40, data.name || "Symbol", {
             fontSize: `${36 * assetScale}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
         }).setOrigin(0.5);
 
-        const eggImg = this.add.image(-bgWidth/2 + 50 * assetScale, -bgHeight/2 + 50 * assetScale, `egg-${eggId}`).setDisplaySize(100 * assetScale, 125 * assetScale);
-        const symbolImgSmall = this.add.image(-bgWidth/2 + 50 * assetScale, -bgHeight/2 + 50 * assetScale, data.filename).setDisplaySize(100 * assetScale, 125 * assetScale);
-
-        const guessDisplay = this.add.text(bgWidth/2 - 28 * assetScale, -bgHeight/2 + 40 * assetScale, `Your Guess:\n${guessText}`, {
+        // Your Guess (Percentage based Y)
+        const guessDisplay = this.add.text(0, -bgHeight * 0.25, `Your Guess:
+${guessText}`, {
             fontSize: `${24 * assetScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
         }).setOrigin(0.5, 0.5);
 
         announceToScreenReader(isCorrect ? "Correct!" : "Incorrect!");
 
-        // Result Text
-        const resultText = this.add.text(bgWidth/2 - 28 * assetScale, -bgHeight/2 + 90 * assetScale, isCorrect ? "Correct!" : "Incorrect!", {
+        // Result Text (Percentage based Y)
+        const resultText = this.add.text(0, -bgHeight * 0.12, isCorrect ? "Correct!" : "Incorrect!", {
             fontSize: `${28 * assetScale}px`,
             fill: isCorrect ? '#008000' : '#d32f2f',
             fontStyle: 'bold',
@@ -2710,12 +2730,13 @@ class EggZamRoom extends Phaser.Scene {
             strokeThickness: 6 * assetScale
         }).setOrigin(0.5, 0.5);
 
-        const expText = this.add.text(0, 0, data.explanation, {
+        // Explanation Text (Percentage based Y)
+        const expText = this.add.text(0, bgHeight * 0.08, data.explanation, {
             fontSize: `${28 * assetScale}px`, fill: '#000', fontFamily: 'Comic Sans MS',
-            wordWrap: { width: bgWidth - 40 * assetScale, useAdvancedWrap: true }, align: 'center'
+            wordWrap: { width: bgWidth * 0.9, useAdvancedWrap: true }, align: 'center'
         }).setOrigin(0.5);
 
-        // Create an array to hold all scripture text objects and commas
+        // Scripture Link (Percentage based Y)
         const scriptureElements = [];
         const scriptures = data.scripture.split(',').map(s => s.trim());
         let totalWidth = 0;
@@ -2735,21 +2756,75 @@ class EggZamRoom extends Phaser.Scene {
         let currentX = -totalWidth / 2;
 
         scriptures.forEach((scripture, index) => {
-            const verseText = this.add.text(currentX, bgHeight/2 - 70 * assetScale, scripture, {
+            const verseText = this.add.text(currentX, bgHeight * 0.28, scripture, {
                 fontSize: `${24 * assetScale}px`, fill: '#0000ee', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
-            }).setOrigin(0, 0.5).setInteractive();
+            }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
 
             verseText.on('pointerdown', (p, x, y, event) => {
                 event.stopPropagation();
                 const link = parseScriptureLink(scripture);
-                if (link) window.open(link, '_blank', 'noopener');
+                if (link) {
+                    const iframeOverlay = document.createElement('div');
+                    iframeOverlay.style.position = 'fixed';
+                    iframeOverlay.style.top = '0';
+                    iframeOverlay.style.left = '0';
+                    iframeOverlay.style.width = '100vw';
+                    iframeOverlay.style.height = '100vh';
+                    iframeOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                    iframeOverlay.style.zIndex = '9999';
+                    iframeOverlay.style.display = 'flex';
+                    iframeOverlay.style.flexDirection = 'column';
+                    iframeOverlay.style.alignItems = 'center';
+                    iframeOverlay.style.justifyContent = 'center';
+
+                    const iframe = document.createElement('iframe');
+                    iframe.src = link;
+                    iframe.style.width = '90%';
+                    iframe.style.height = '85%';
+                    iframe.style.border = '4px solid white';
+                    iframe.style.borderRadius = '10px';
+                    iframe.style.backgroundColor = 'white';
+
+                    const closeBtn = document.createElement('button');
+                    closeBtn.innerHTML = '&#10006; Close';
+                    closeBtn.style.position = 'absolute';
+                    closeBtn.style.top = '2%';
+                    closeBtn.style.right = '5%';
+                    closeBtn.style.padding = '10px 20px';
+                    closeBtn.style.fontSize = '24px';
+                    closeBtn.style.fontWeight = 'bold';
+                    closeBtn.style.color = 'white';
+                    closeBtn.style.backgroundColor = 'red';
+                    closeBtn.style.border = '2px solid white';
+                    closeBtn.style.borderRadius = '10px';
+                    closeBtn.style.cursor = 'pointer';
+                    closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
+
+                    const closeIframe = () => {
+                        document.body.removeChild(iframeOverlay);
+                        window.removeEventListener('keydown', iframeKeyHandler);
+                    };
+
+                    closeBtn.onclick = closeIframe;
+
+                    const iframeKeyHandler = (e) => {
+                        if (e.code === 'Escape' || e.code === 'Enter') {
+                            closeIframe();
+                        }
+                    };
+                    window.addEventListener('keydown', iframeKeyHandler);
+
+                    iframeOverlay.appendChild(closeBtn);
+                    iframeOverlay.appendChild(iframe);
+                    document.body.appendChild(iframeOverlay);
+                }
             });
 
             scriptureElements.push(verseText);
             currentX += verseText.width;
 
             if (index < scriptures.length - 1) {
-                const commaText = this.add.text(currentX, bgHeight/2 - 70 * assetScale, ', ', {
+                const commaText = this.add.text(currentX, bgHeight * 0.28, ', ', {
                     fontSize: `${24 * assetScale}px`, fill: '#000', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
                 }).setOrigin(0, 0.5);
                 scriptureElements.push(commaText);
@@ -2758,28 +2833,82 @@ class EggZamRoom extends Phaser.Scene {
         });
         tempText.destroy();
 
-        const continueText = this.add.text(0, bgHeight/2 - 30 * assetScale, "[ Tap anywhere to continue ]", {
-            fontSize: `${20 * assetScale}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
-        }).setOrigin(0.5);
+        // Footer container (Egg left, Close right)
+        const footerY = bgHeight * 0.40;
 
-        this.explanationText.add([bg, title, eggImg, symbolImgSmall, guessDisplay, resultText, expText, ...scriptureElements, continueText]);
+        // Egg aligned left in footer
+        const eggImg = this.add.image(-bgWidth * 0.15, footerY, `egg-${eggId}`).setDisplaySize(80 * assetScale, 100 * assetScale);
 
-        this.explanationText.setScale(0);
-        this.tweens.add({ targets: this.explanationText, scaleX: 1, scaleY: 1, duration: 300, ease: 'Back.out' });
+        // Symbol image if exists
+        let symbolImgSmall = null;
+        if (data && data.filename && this.textures.exists(data.filename)) {
+            symbolImgSmall = this.add.image(-bgWidth * 0.15, footerY, data.filename).setDisplaySize(80 * assetScale, 100 * assetScale);
+        }
 
-        bg.on('pointerdown', () => {
+        // Massive Red X Close Button aligned right
+        const closeBtnContainer = this.add.container(bgWidth * 0.15, footerY);
+        const closeBtnWidth = 200 * assetScale;
+        const closeBtnHeight = 60 * assetScale;
+
+        const closeBtnBg = this.add.graphics();
+        closeBtnBg.fillStyle(0xff0000, 1);
+        closeBtnBg.lineStyle(4 * assetScale, 0xffffff, 1);
+        closeBtnBg.fillRoundedRect(-closeBtnWidth/2, -closeBtnHeight/2, closeBtnWidth, closeBtnHeight, 15 * assetScale);
+        closeBtnBg.strokeRoundedRect(-closeBtnWidth/2, -closeBtnHeight/2, closeBtnWidth, closeBtnHeight, 15 * assetScale);
+
+        const closeBtnText = this.add.text(0, 0, '✖ Close', {
+            fontSize: `${28 * assetScale}px`,
+            fill: '#ffffff',
+            fontStyle: 'bold',
+            fontFamily: 'Comic Sans MS'
+        }).setOrigin(0.5, 0.5);
+
+        closeBtnContainer.add([closeBtnBg, closeBtnText]);
+        closeBtnContainer.setSize(closeBtnWidth, closeBtnHeight);
+        closeBtnContainer.setInteractive({ useHandCursor: true });
+
+        closeBtnContainer.baseScaleX = 1;
+        closeBtnContainer.baseScaleY = 1;
+
+        addButtonInteraction(this, closeBtnContainer, 'menu-click');
+
+        const dismissPopup = () => {
+            if (!this.explanationText) return;
             this.tweens.add({
                 targets: this.explanationText, scaleX: 0, scaleY: 0, duration: 200, ease: 'Back.in',
                 onComplete: () => {
                     this.explanationText.destroy();
                     this.explanationText = null;
                     if (!isCorrect) {
-                        this.currentEgg = null; // Un-set so it can be re-drawn
+                        this.currentEgg = null;
                     }
                     this.displayRandomEggInfo();
+                    window.removeEventListener('keydown', this.popupKeyHandler);
                 }
             });
+        };
+
+        closeBtnContainer.on('pointerdown', () => {
+            this.time.delayedCall(100, dismissPopup);
         });
+
+        this.popupKeyHandler = (e) => {
+            if (e.code === 'Escape' || e.code === 'Enter') {
+                dismissPopup();
+            }
+        };
+        window.addEventListener('keydown', this.popupKeyHandler);
+
+        const elementsToAdd = [bg, title, guessDisplay, resultText, expText, ...scriptureElements, eggImg];
+        if (symbolImgSmall) elementsToAdd.push(symbolImgSmall);
+        elementsToAdd.push(closeBtnContainer);
+
+        this.explanationText.add(elementsToAdd);
+
+        this.explanationText.setScale(0);
+        this.tweens.add({ targets: this.explanationText, scaleX: 1, scaleY: 1, duration: 300, ease: 'Back.out' });
+
+        // Removed bg click dismiss
         };
 
         if (isCorrect) {
