@@ -1937,20 +1937,22 @@ class SectionHunt extends Phaser.Scene {
             .setDepth(0);
 
         this.sectionVideo.play(true); // Loop
-        this.sectionVideo.setMute(false); // Enable background video audio
+        this.sectionVideo.setMute(false); // iOS quirk: keep muted attr false to avoid global context suspension
         // Initialize volume from Ambient setting (reduced to 25% due to loud video mixing)
         const ambientVol = this.registry.has('ambientVolume') ? this.registry.get('ambientVolume') : 0.5;
         this.sectionVideo.setVolume(ambientVol * 0.25);
         this.sectionVideo.disableInteractive(); // Should not block clicks
 
         // Smart Audio Looping: Mute audio after first play, unmute every 5th loop
+        // Use setVolume(0) instead of setMute(true) to prevent iOS global WebAudio suspension bugs
         this.sectionVideo.loopCount = 0;
         this.sectionVideo.on('loop', () => {
              this.sectionVideo.loopCount++;
              if (this.sectionVideo.loopCount % 5 !== 0) {
-                 this.sectionVideo.setMute(true);
+                 this.sectionVideo.setVolume(0);
              } else {
-                 this.sectionVideo.setMute(false);
+                 const currentAmbientVol = this.registry.has('ambientVolume') ? this.registry.get('ambientVolume') : 0.5;
+                 this.sectionVideo.setVolume(currentAmbientVol * 0.25);
              }
         });
 
