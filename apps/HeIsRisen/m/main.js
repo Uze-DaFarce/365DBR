@@ -2676,8 +2676,8 @@ class EggZamRoom extends Phaser.Scene {
 
             this.explanationText = this.add.container(width / 2, height / 2).setDepth(100);
 
-        const bgWidth = Math.min(width * 0.95, 800 * assetScale);
-        const bgHeight = Math.min(height * 0.95, 600 * assetScale);
+        const bgWidth = width * 0.95;
+        const bgHeight = height * 0.95;
 
         const bg = this.add.graphics();
         bg.fillStyle(0xfff8dc, 0.95);
@@ -2685,24 +2685,39 @@ class EggZamRoom extends Phaser.Scene {
         bg.lineStyle(8 * assetScale, 0x8b4513, 1);
         bg.strokeRoundedRect(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight, 20 * assetScale);
         bg.setInteractive(new Phaser.Geom.Rectangle(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight), Phaser.Geom.Rectangle.Contains);
+        // Do not add pointerdown to the background to avoid accidental dismissal
+
+        // Massive Close Button (calculated early to mirror egg)
+        const closeBtnSize = Math.min(50 * assetScale, bgWidth * 0.1);
+        const closeBtnX = bgWidth/2 - closeBtnSize/2 - 10 * assetScale;
+        const closeBtnY = -bgHeight/2 + closeBtnSize/2 + 10 * assetScale;
 
         // Header Elements
-        const title = this.add.text(-12 * assetScale, -bgHeight/2 + 60 * assetScale, data.name || "Symbol", {
-            fontSize: `${36 * assetScale}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
+        const titleY = -bgHeight/2 + 50 * assetScale;
+        const titleFontSize = Math.min(36 * assetScale, bgWidth * 0.08);
+        const title = this.add.text(0, titleY, data.name || "Symbol", {
+            fontSize: `${titleFontSize}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
         }).setOrigin(0.5);
 
-        const eggImg = this.add.image(-bgWidth/2 + 50 * assetScale, -bgHeight/2 + 50 * assetScale, `egg-${eggId}`).setDisplaySize(100 * assetScale, 125 * assetScale);
-        const symbolImgSmall = this.add.image(-bgWidth/2 + 50 * assetScale, -bgHeight/2 + 50 * assetScale, data.filename).setDisplaySize(100 * assetScale, 125 * assetScale);
+        const imgSize = Math.min(100 * assetScale, bgHeight * 0.2);
+        // Move up and left to mirror the close button
+        const imgX = -bgWidth/2 + closeBtnSize/2 + 10 * assetScale;
+        const imgY = closeBtnY;
+        const eggImg = this.add.image(imgX, imgY, `egg-${eggId}`).setDisplaySize(imgSize, imgSize * 1.25);
+        const symbolImgSmall = this.add.image(imgX, imgY, data.filename).setDisplaySize(imgSize, imgSize * 1.25);
 
-        const guessDisplay = this.add.text(bgWidth/2 - 28 * assetScale, -bgHeight/2 + 40 * assetScale, `Your Guess:\n${guessText}`, {
-            fontSize: `${24 * assetScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
+        const guessFontSize = Math.min(24 * assetScale, bgWidth * 0.05);
+        const guessX = bgWidth/2 - bgWidth * 0.15;
+        const guessDisplay = this.add.text(guessX, titleY - 15 * assetScale, `Your Guess:\n${guessText}`, {
+            fontSize: `${guessFontSize}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
         }).setOrigin(0.5, 0.5);
 
         announceToScreenReader(isCorrect ? "Correct!" : "Incorrect!");
 
         // Result Text
-        const resultText = this.add.text(bgWidth/2 - 28 * assetScale, -bgHeight/2 + 90 * assetScale, isCorrect ? "Correct!" : "Incorrect!", {
-            fontSize: `${28 * assetScale}px`,
+        const resultFontSize = Math.min(28 * assetScale, bgWidth * 0.06);
+        const resultText = this.add.text(guessX, titleY + 30 * assetScale, isCorrect ? "Correct!" : "Incorrect!", {
+            fontSize: `${resultFontSize}px`,
             fill: isCorrect ? '#008000' : '#d32f2f',
             fontStyle: 'bold',
             fontFamily: 'Comic Sans MS',
@@ -2710,17 +2725,19 @@ class EggZamRoom extends Phaser.Scene {
             strokeThickness: 6 * assetScale
         }).setOrigin(0.5, 0.5);
 
+        const expFontSize = Math.min(28 * assetScale, bgWidth * 0.05, bgHeight * 0.06);
         const expText = this.add.text(0, 0, data.explanation, {
-            fontSize: `${28 * assetScale}px`, fill: '#000', fontFamily: 'Comic Sans MS',
-            wordWrap: { width: bgWidth - 40 * assetScale, useAdvancedWrap: true }, align: 'center'
+            fontSize: `${expFontSize}px`, fill: '#000', fontFamily: 'Comic Sans MS',
+            wordWrap: { width: bgWidth * 0.9, useAdvancedWrap: true }, align: 'center'
         }).setOrigin(0.5);
 
         // Create an array to hold all scripture text objects and commas
         const scriptureElements = [];
         const scriptures = data.scripture.split(',').map(s => s.trim());
         let totalWidth = 0;
+        const scriptureFontSize = Math.min(24 * assetScale, bgWidth * 0.045);
         const tempText = this.add.text(0, 0, '', {
-            fontSize: `${24 * assetScale}px`, fontStyle: 'italic', fontFamily: 'Comic Sans MS'
+            fontSize: `${scriptureFontSize}px`, fontStyle: 'italic', fontFamily: 'Comic Sans MS'
         });
 
         scriptures.forEach((scripture, index) => {
@@ -2733,24 +2750,69 @@ class EggZamRoom extends Phaser.Scene {
         });
 
         let currentX = -totalWidth / 2;
+        const scriptureY = bgHeight/2 - 40 * assetScale;
 
         scriptures.forEach((scripture, index) => {
-            const verseText = this.add.text(currentX, bgHeight/2 - 70 * assetScale, scripture, {
-                fontSize: `${24 * assetScale}px`, fill: '#0000ee', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
+            const verseText = this.add.text(currentX, scriptureY, scripture, {
+                fontSize: `${scriptureFontSize}px`, fill: '#0000ee', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
             }).setOrigin(0, 0.5).setInteractive();
 
             verseText.on('pointerdown', (p, x, y, event) => {
                 event.stopPropagation();
                 const link = parseScriptureLink(scripture);
-                if (link) window.open(link, '_blank', 'noopener');
+                if (link) {
+                    const overlay = document.createElement('div');
+                    overlay.style.position = 'absolute';
+                    overlay.style.top = '0';
+                    overlay.style.left = '0';
+                    overlay.style.width = '100vw';
+                    overlay.style.height = '100vh';
+                    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+                    overlay.style.zIndex = '999999';
+                    overlay.style.display = 'flex';
+                    overlay.style.flexDirection = 'column';
+                    overlay.style.alignItems = 'center';
+                    overlay.style.justifyContent = 'center';
+
+                    const closeBtn = document.createElement('button');
+                    closeBtn.innerHTML = '&#10006; CLOSE';
+                    closeBtn.style.position = 'absolute';
+                    closeBtn.style.top = '10px';
+                    closeBtn.style.right = '20px';
+                    closeBtn.style.backgroundColor = '#ff0000';
+                    closeBtn.style.color = '#ffffff';
+                    closeBtn.style.border = '4px solid #ffffff';
+                    closeBtn.style.borderRadius = '10px';
+                    closeBtn.style.padding = '10px 20px';
+                    closeBtn.style.fontSize = '24px';
+                    closeBtn.style.fontWeight = 'bold';
+                    closeBtn.style.cursor = 'pointer';
+                    closeBtn.style.zIndex = '1000000';
+                    closeBtn.onclick = () => {
+                        document.body.removeChild(overlay);
+                    };
+
+                    const iframe = document.createElement('iframe');
+                    iframe.src = link;
+                    iframe.style.width = '95%';
+                    iframe.style.height = '90%';
+                    iframe.style.border = 'none';
+                    iframe.style.marginTop = '60px';
+                    iframe.style.backgroundColor = '#ffffff';
+                    iframe.style.borderRadius = '10px';
+
+                    overlay.appendChild(closeBtn);
+                    overlay.appendChild(iframe);
+                    document.body.appendChild(overlay);
+                }
             });
 
             scriptureElements.push(verseText);
             currentX += verseText.width;
 
             if (index < scriptures.length - 1) {
-                const commaText = this.add.text(currentX, bgHeight/2 - 70 * assetScale, ', ', {
-                    fontSize: `${24 * assetScale}px`, fill: '#000', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
+                const commaText = this.add.text(currentX, scriptureY, ', ', {
+                    fontSize: `${scriptureFontSize}px`, fill: '#000', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
                 }).setOrigin(0, 0.5);
                 scriptureElements.push(commaText);
                 currentX += commaText.width;
@@ -2758,16 +2820,83 @@ class EggZamRoom extends Phaser.Scene {
         });
         tempText.destroy();
 
-        const continueText = this.add.text(0, bgHeight/2 - 30 * assetScale, "[ Tap anywhere to continue ]", {
-            fontSize: `${20 * assetScale}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
-        }).setOrigin(0.5);
+        // Massive Close Button (visuals and zone)
+        const closeBtnBg = this.add.circle(closeBtnX, closeBtnY, closeBtnSize, 0xff0000);
+        closeBtnBg.setStrokeStyle(4 * assetScale, 0xffffff);
 
-        this.explanationText.add([bg, title, eggImg, symbolImgSmall, guessDisplay, resultText, expText, ...scriptureElements, continueText]);
+        const closeBtnText = this.add.text(closeBtnX, closeBtnY, "X", {
+            fontSize: `${closeBtnSize * 1.2}px`, fill: '#ffffff', fontStyle: 'bold', fontFamily: 'Arial'
+        }).setOrigin(0.5, 0.5);
+
+        const closeZone = this.add.zone(closeBtnX, closeBtnY, closeBtnSize * 2.5, closeBtnSize * 2.5)
+            .setInteractive(new Phaser.Geom.Rectangle(-closeBtnSize * 1.25, -closeBtnSize * 1.25, closeBtnSize * 2.5, closeBtnSize * 2.5), Phaser.Geom.Rectangle.Contains);
+
+        this.explanationText.add([bg, title, eggImg, symbolImgSmall, guessDisplay, resultText, expText, ...scriptureElements, closeBtnBg, closeBtnText, closeZone]);
 
         this.explanationText.setScale(0);
         this.tweens.add({ targets: this.explanationText, scaleX: 1, scaleY: 1, duration: 300, ease: 'Back.out' });
 
-        bg.on('pointerdown', () => {
+        const performOpenScripture = () => {
+            const firstScripture = data.scripture.split(',')[0].trim();
+            const link = parseScriptureLink(firstScripture);
+            if (link) {
+                // Remove space listener so it doesn't open multiple times
+                this.input.keyboard.off('keydown-SPACE', performOpenScripture);
+
+                const overlay = document.createElement('div');
+                overlay.style.position = 'absolute';
+                overlay.style.top = '0';
+                overlay.style.left = '0';
+                overlay.style.width = '100vw';
+                overlay.style.height = '100vh';
+                overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+                overlay.style.zIndex = '999999';
+                overlay.style.display = 'flex';
+                overlay.style.flexDirection = 'column';
+                overlay.style.alignItems = 'center';
+                overlay.style.justifyContent = 'center';
+
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '&#10006; CLOSE';
+                closeBtn.style.position = 'absolute';
+                closeBtn.style.top = '10px';
+                closeBtn.style.right = '20px';
+                closeBtn.style.backgroundColor = '#ff0000';
+                closeBtn.style.color = '#ffffff';
+                closeBtn.style.border = '4px solid #ffffff';
+                closeBtn.style.borderRadius = '10px';
+                closeBtn.style.padding = '10px 20px';
+                closeBtn.style.fontSize = '24px';
+                closeBtn.style.fontWeight = 'bold';
+                closeBtn.style.cursor = 'pointer';
+                closeBtn.style.zIndex = '1000000';
+                closeBtn.onclick = () => {
+                    document.body.removeChild(overlay);
+                    // Re-add space listener when iframe closes
+                    this.input.keyboard.once('keydown-SPACE', performOpenScripture);
+                };
+
+                const iframe = document.createElement('iframe');
+                iframe.src = link;
+                iframe.style.width = '95%';
+                iframe.style.height = '90%';
+                iframe.style.border = 'none';
+                iframe.style.marginTop = '60px';
+                iframe.style.backgroundColor = '#ffffff';
+                iframe.style.borderRadius = '10px';
+
+                overlay.appendChild(closeBtn);
+                overlay.appendChild(iframe);
+                document.body.appendChild(overlay);
+            }
+        };
+
+        const performClose = () => {
+            if (!this.explanationText) return;
+            // Clean up keyboard listeners to prevent memory leaks or double triggers
+            this.input.keyboard.off('keydown-ESC', performClose);
+            this.input.keyboard.off('keydown-SPACE', performOpenScripture);
+
             this.tweens.add({
                 targets: this.explanationText, scaleX: 0, scaleY: 0, duration: 200, ease: 'Back.in',
                 onComplete: () => {
@@ -2779,6 +2908,14 @@ class EggZamRoom extends Phaser.Scene {
                     this.displayRandomEggInfo();
                 }
             });
+        };
+
+        this.input.keyboard.once('keydown-ESC', performClose);
+        this.input.keyboard.once('keydown-SPACE', performOpenScripture);
+
+        closeZone.on('pointerdown', (p, x, y, event) => {
+            event.stopPropagation();
+            performClose();
         });
         };
 
