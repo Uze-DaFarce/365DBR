@@ -3258,7 +3258,7 @@ function parseScriptureLink(scriptureText) {
         const bookCode = bookMap[rawBook];
 
         if (bookCode) {
-            return `https://mt-sin.ai/365DBR/bible.html?book=${bookCode}&chapter=${chapter}&verse=${verse}`;
+            return `https://mt-sin.ai/365DBR/bible.html?book=${bookCode}&chapter=${chapter}&verse=${verse}&iframe=true`;
         }
     }
     return null;
