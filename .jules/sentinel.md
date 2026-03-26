@@ -106,3 +106,8 @@
 
 ## 2026-03-25 - [Missing Network Data Fallbacks]
 Dynamically loaded external JSON files accessed via `cache.json.get('key')` (like `map_sections.json` or `symbols.json`) will return `undefined` or `null` if the network request fails or is blocked. To prevent fatal frontend crashes, always validate the result (e.g., `Array.isArray(data)`) and provide a safe fallback (e.g., `[]` or `{{}}`) before iterating or accessing properties like `.length`.
+## 2026-03-26 - [Robust Game State Validation]
+*   Identified that game state loaded from `localStorage` in `HeIsRisen` and `m` apps was vulnerable to type/NaN corruption.
+*   Added strict type checks (`Array.isArray`) for array structures like `eggData`, `sections`, `foundEggs`, and `stampedSections`.
+*   Added bounds checking and `isNaN` parsing for `correctCategorizations` and `currentScore`.
+*   Strengthened `test_state_corruption.py` to aggressively simulate corrupted states and assert successful fallback to defaults.
