@@ -2595,7 +2595,7 @@ class EggZamRoom extends Phaser.Scene {
 
             this.explanationText = this.add.container(offsetX + 640 * uiScale, offsetY + 360 * uiScale).setDepth(100);
 
-        const bgWidth = 800 * uiScale;
+        const bgWidth = 1200 * uiScale;
         const bgHeight = 600 * uiScale;
 
         const bg = this.add.graphics();
@@ -2608,20 +2608,19 @@ class EggZamRoom extends Phaser.Scene {
         bg.setInteractive(new Phaser.Geom.Rectangle(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight), Phaser.Geom.Rectangle.Contains);
 
         // Header Elements (Percentage based Y)
-        const title = this.add.text(0, -bgHeight * 0.40, data.name || "Symbol", {
+        const title = this.add.text(0, -bgHeight * 0.42, data.name || "Symbol", {
             fontSize: `${48 * uiScale}px`, fill: '#8b4513', fontStyle: 'bold', fontFamily: 'Comic Sans MS'
         }).setOrigin(0.5);
 
-        // Your Guess (Percentage based Y)
-        const guessDisplay = this.add.text(0, -bgHeight * 0.25, `Your Guess:
-${guessText}`, {
+        // Your Guess (Percentage based Y) - reduced whitespace and removed newline
+        const guessDisplay = this.add.text(0, -bgHeight * 0.33, `Your Guess: ${guessText}`, {
             fontSize: `${24 * uiScale}px`, fill: '#333', fontStyle: 'bold', fontFamily: 'Comic Sans MS', align: 'center'
         }).setOrigin(0.5, 0.5);
 
         announceToScreenReader(isCorrect ? "Correct!" : "Incorrect!");
 
-        // Result Text (Percentage based Y)
-        const resultText = this.add.text(0, -bgHeight * 0.12, isCorrect ? "Correct!" : "Incorrect!", {
+        // Result Text (Percentage based Y) - reduced whitespace
+        const resultText = this.add.text(0, -bgHeight * 0.25, isCorrect ? "Correct!" : "Incorrect!", {
             fontSize: `${28 * uiScale}px`,
             fill: isCorrect ? '#008000' : '#d32f2f',
             fontStyle: 'bold',
@@ -2630,8 +2629,8 @@ ${guessText}`, {
             strokeThickness: 6 * uiScale
         }).setOrigin(0.5, 0.5);
 
-        // Explanation Text (Percentage based Y)
-        const expText = this.add.text(0, bgHeight * 0.08, data.explanation, {
+        // Explanation Text (Percentage based Y) - moved up due to reduced whitespace
+        const expText = this.add.text(0, -bgHeight * 0.04, data.explanation, {
             fontSize: `${28 * uiScale}px`, fill: '#000', fontFamily: 'Comic Sans MS',
             wordWrap: { width: bgWidth * 0.9, useAdvancedWrap: true }, align: 'center'
         }).setOrigin(0.5);
@@ -2654,9 +2653,10 @@ ${guessText}`, {
         });
 
         let currentX = -totalWidth / 2;
+        const scriptureY = bgHeight * 0.36; // scripture positioned at the bottom of the popup
 
         scriptures.forEach((scripture, index) => {
-            const verseText = this.add.text(currentX, bgHeight * 0.28, scripture, {
+            const verseText = this.add.text(currentX, scriptureY, scripture, {
                 fontSize: `${24 * uiScale}px`, fill: '#0000ee', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
             }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
 
@@ -2679,8 +2679,8 @@ ${guessText}`, {
 
                     const iframe = document.createElement('iframe');
                     iframe.src = link;
-                    iframe.style.width = '90%';
-                    iframe.style.height = '85%';
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
                     iframe.style.border = '4px solid white';
                     iframe.style.borderRadius = '10px';
                     iframe.style.backgroundColor = 'white';
@@ -2688,8 +2688,8 @@ ${guessText}`, {
                     const closeBtn = document.createElement('button');
                     closeBtn.innerHTML = '&#10006; Close';
                     closeBtn.style.position = 'absolute';
-                    closeBtn.style.top = '2%';
-                    closeBtn.style.right = '5%';
+                    closeBtn.style.top = '0%';
+                    closeBtn.style.right = '0%';
                     closeBtn.style.padding = '10px 20px';
                     closeBtn.style.fontSize = '24px';
                     closeBtn.style.fontWeight = 'bold';
@@ -2724,7 +2724,7 @@ ${guessText}`, {
             currentX += verseText.width;
 
             if (index < scriptures.length - 1) {
-                const commaText = this.add.text(currentX, bgHeight * 0.28, ', ', {
+                const commaText = this.add.text(currentX, scriptureY, ', ', {
                     fontSize: `${24 * uiScale}px`, fill: '#000', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
                 }).setOrigin(0, 0.5);
                 scriptureElements.push(commaText);
@@ -2733,39 +2733,52 @@ ${guessText}`, {
         });
         tempText.destroy();
 
-        // Footer container (Egg left, Close right)
-        const footerY = bgHeight * 0.40;
-
-        // Egg aligned left in footer
-        const eggImg = this.add.image(-bgWidth * 0.15, footerY, `egg-${eggId}`).setDisplaySize(80 * uiScale, 100 * uiScale);
+        // Position elements in top corners, aligned equally with nearest borders
+        // The dialog border is at x: -bgWidth/2 to +bgWidth/2, y: -bgHeight/2 to +bgHeight/2
+        // We add an equal inset (e.g. 25px * uiScale) for top, left, and right
+        const cornerInset = -10 * uiScale;
+        const cornerY = -bgHeight/2 + cornerInset;
+        
+        // Egg aligned to Top-Left corner
+        // Origin of image is 0.5, so we shift it down and right by half its size
+        const eggSizeW = 80 * uiScale;
+        const eggSizeH = 100 * uiScale;
+        const eggX = -bgWidth/2 + cornerInset + eggSizeW/2;
+        const eggImg = this.add.image(eggX, cornerY + eggSizeH/2, `egg-${eggId}`).setDisplaySize(eggSizeW, eggSizeH);
 
         // Symbol image if exists
         let symbolImgSmall = null;
         if (data && data.filename && this.textures.exists(data.filename)) {
-            symbolImgSmall = this.add.image(-bgWidth * 0.15, footerY, data.filename).setDisplaySize(80 * uiScale, 100 * uiScale);
+            symbolImgSmall = this.add.image(eggX, cornerY + eggSizeH/2, data.filename).setDisplaySize(eggSizeW, eggSizeH);
         }
 
-        // Massive Red X Close Button aligned right
-        const closeBtnContainer = this.add.container(bgWidth * 0.15, footerY);
-        const closeBtnWidth = 200 * uiScale;
-        const closeBtnHeight = 60 * uiScale;
+        // Massive Red X Close Button aligned to Top-Right corner
+        // Matching the egg size for consistency
+        const closeBtnSize = 80 * uiScale;
+        const closeBtnX = bgWidth/2 - cornerInset - closeBtnSize/2;
+        const closeBtnContainer = this.add.container(closeBtnX, cornerY + closeBtnSize/2);
 
         const closeBtnBg = this.add.graphics();
         closeBtnBg.fillStyle(0xff0000, 1);
-        closeBtnBg.lineStyle(4 * uiScale, 0xffffff, 1);
-        closeBtnBg.fillRoundedRect(-closeBtnWidth/2, -closeBtnHeight/2, closeBtnWidth, closeBtnHeight, 15 * uiScale);
-        closeBtnBg.strokeRoundedRect(-closeBtnWidth/2, -closeBtnHeight/2, closeBtnWidth, closeBtnHeight, 15 * uiScale);
+        closeBtnBg.lineStyle(4 * uiScale, 0x8b4513, 1); // Brown stroke to match dialog
+        // Draw a circle for the X button
+        closeBtnBg.fillCircle(0, 0, closeBtnSize/2);
+        closeBtnBg.strokeCircle(0, 0, closeBtnSize/2);
 
-        const closeBtnText = this.add.text(0, 0, '✖ Close', {
-            fontSize: `${28 * uiScale}px`,
+        const closeBtnText = this.add.text(0, 0, '✖', {
+            fontSize: `${48 * uiScale}px`,
             fill: '#ffffff',
             fontStyle: 'bold',
             fontFamily: 'Comic Sans MS'
         }).setOrigin(0.5, 0.5);
 
         closeBtnContainer.add([closeBtnBg, closeBtnText]);
-        closeBtnContainer.setSize(closeBtnWidth, closeBtnHeight);
-        closeBtnContainer.setInteractive({ useHandCursor: true });
+        // Set interactive area for a circle
+        closeBtnContainer.setSize(closeBtnSize, closeBtnSize);
+        closeBtnContainer.setInteractive(new Phaser.Geom.Circle(0, 0, closeBtnSize/2), Phaser.Geom.Circle.Contains);
+        
+        // Add hand cursor manually as setInteractive config above doesn't support it directly in this shorthand
+        closeBtnContainer.input.cursor = 'pointer';
 
         closeBtnContainer.baseScaleX = 1;
         closeBtnContainer.baseScaleY = 1;
