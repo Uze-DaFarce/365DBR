@@ -2021,7 +2021,11 @@ class SectionHunt extends Phaser.Scene {
     this.eggZitButton = this.add.image(0, 200 * uiScale, 'egg-zit-button').setOrigin(0, 0).setDisplaySize(150 * uiScale, 150 * uiScale)
       .setInteractive()
       .setDepth(4).setScrollFactor(0);
-    this.eggZitButton.on('pointerdown', () => this.scene.start('MapScene'));
+    this.eggZitButton.on('pointerdown', () => {
+        this.time.delayedCall(150, () => {
+            this.scene.start('MapScene');
+        });
+    });
     addButtonInteraction(this, this.eggZitButton, 'drive1');
     addTooltip(this, this.eggZitButton, 'Back to Map');
 
@@ -2497,7 +2501,11 @@ class EggZamRoom extends Phaser.Scene {
       .setOrigin(0, 0)
       .setDisplaySize(150 * uiScale, 131 * uiScale)
       .setInteractive()
-      .on('pointerdown', () => this.scene.start('MapScene'))
+      .on('pointerdown', () => {
+          this.time.delayedCall(150, () => {
+              this.scene.start('MapScene');
+          });
+      })
       .setDepth(4).setScrollFactor(0);
     addButtonInteraction(this, eggZitButton, 'drive1');
     addTooltip(this, eggZitButton, 'Back to Map');
