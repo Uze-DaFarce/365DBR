@@ -167,13 +167,20 @@ function initializeGameData(registry, cache, forceNew = false) {
                 } catch (e) {
                     console.warn('Invalid saved game state in localStorage', e);
                 }
-                if (savedState && typeof savedState === 'object' && savedState.eggData && savedState.sections) {
+                if (savedState && typeof savedState === 'object' && Array.isArray(savedState.eggData) && Array.isArray(savedState.sections)) {
                     registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
-                    registry.set('foundEggs', savedState.foundEggs || []);
-                    registry.set('stampedSections', savedState.stampedSections || []);
-                    registry.set('correctCategorizations', savedState.correctCategorizations || 0);
-                    registry.set('currentScore', savedState.currentScore || 0);
+
+                    registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
+                    registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
+
+                    let loadedCorrect = parseInt(savedState.correctCategorizations);
+                    if (isNaN(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
+                    registry.set('correctCategorizations', loadedCorrect);
+
+                    let loadedScore = parseInt(savedState.currentScore);
+                    if (isNaN(loadedScore) || loadedScore < 0) loadedScore = 0;
+                    registry.set('currentScore', loadedScore);
 
                     // Always ensure highScore is loaded/initialized correctly
                     try {
