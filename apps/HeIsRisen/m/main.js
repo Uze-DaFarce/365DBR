@@ -2002,7 +2002,9 @@ class SectionHunt extends Phaser.Scene {
       .setInteractive()
       .on('pointerdown', () => {
         // console.log('Click on eggZitButton');
-        this.scene.start('MapScene');
+        this.time.delayedCall(150, () => {
+            this.scene.start('MapScene');
+        });
       })
       .setDepth(4)
       .setScrollFactor(0);
@@ -2591,7 +2593,11 @@ class EggZamRoom extends Phaser.Scene {
       .setOrigin(0, 0)
       .setDisplaySize(150 * this.gameScale, 131 * this.gameScale)
       .setInteractive()
-      .on('pointerdown', () => this.scene.start('MapScene'))
+      .on('pointerdown', () => {
+          this.time.delayedCall(150, () => {
+              this.scene.start('MapScene');
+          });
+      })
       .setDepth(4)
       .setScrollFactor(0);
     addButtonInteraction(this, this.eggZitButton, 'drive1');
