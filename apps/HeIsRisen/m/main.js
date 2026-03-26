@@ -2327,8 +2327,14 @@ class SectionHunt extends Phaser.Scene {
              if (btn.baseScaleX === undefined) btn.baseScaleX = btn.scaleX;
              if (btn.baseScaleY === undefined) btn.baseScaleY = btn.scaleY;
 
-             const bounds = btn.getBounds();
-             if (bounds.contains(pointer.x, pointer.y)) {
+                 // ⚡ Bolt Optimization: Avoid expensive getBounds() matrix calculations in 60fps update loop
+                 // Since UI buttons are unrotated and have origin (0, 0), we can use simple AABB math
+                 const left = btn.x;
+                 const top = btn.y;
+                 const right = left + btn.displayWidth;
+                 const bottom = top + btn.displayHeight;
+
+                 if (pointer.x >= left && pointer.x <= right && pointer.y >= top && pointer.y <= bottom) {
                  isHoveringButton = true;
                  if (!btn.isHovered) {
                      btn.isHovered = true;
