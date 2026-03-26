@@ -1877,20 +1877,22 @@ class SectionHunt extends Phaser.Scene {
             .setDepth(0)
             .disableInteractive();
 
-        this.sectionImage.setMute(false);
+        this.sectionImage.setMute(false); // iOS quirk: keep muted attr false to avoid global context suspension
         const ambientVol = this.registry.has('ambientVolume') ? this.registry.get('ambientVolume') : 0.5;
         this.sectionImage.setVolume(ambientVol * 0.25);
         this.sectionImage.play(true);
         this.isUsingVideo = true;
 
         // Smart Audio Looping: Mute audio after first play, unmute every 5th loop
+        // Use setVolume(0) instead of setMute(true) to prevent iOS global WebAudio suspension bugs
         this.sectionImage.loopCount = 0;
         this.sectionImage.on('loop', () => {
              this.sectionImage.loopCount++;
              if (this.sectionImage.loopCount % 5 !== 0) {
-                 this.sectionImage.setMute(true);
+                 this.sectionImage.setVolume(0);
              } else {
-                 this.sectionImage.setMute(false);
+                 const currentAmbientVol = this.registry.has('ambientVolume') ? this.registry.get('ambientVolume') : 0.5;
+                 this.sectionImage.setVolume(currentAmbientVol * 0.25);
              }
         });
 
