@@ -2686,19 +2686,24 @@ class EggZamRoom extends Phaser.Scene {
                     iframe.style.backgroundColor = 'white';
 
                     const closeBtn = document.createElement('button');
-                    closeBtn.innerHTML = '&#10006; Close';
+                    closeBtn.innerHTML = '&#10006;';
                     closeBtn.style.position = 'absolute';
-                    closeBtn.style.top = '0%';
-                    closeBtn.style.right = '0%';
-                    closeBtn.style.padding = '10px 20px';
-                    closeBtn.style.fontSize = '24px';
+                    closeBtn.style.top = '10px';
+                    closeBtn.style.right = '10px';
+                    closeBtn.style.width = '60px';
+                    closeBtn.style.height = '60px';
+                    closeBtn.style.padding = '0';
+                    closeBtn.style.fontSize = '32px';
                     closeBtn.style.fontWeight = 'bold';
                     closeBtn.style.color = 'white';
-                    closeBtn.style.backgroundColor = 'red';
-                    closeBtn.style.border = '2px solid white';
-                    closeBtn.style.borderRadius = '10px';
+                    closeBtn.style.backgroundColor = '#ff0000';
+                    closeBtn.style.border = '4px solid #8b4513';
+                    closeBtn.style.borderRadius = '50%';
                     closeBtn.style.cursor = 'pointer';
                     closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
+                    closeBtn.style.display = 'flex';
+                    closeBtn.style.alignItems = 'center';
+                    closeBtn.style.justifyContent = 'center';
 
                     const closeIframe = () => {
                         document.body.removeChild(iframeOverlay);
@@ -2775,7 +2780,7 @@ class EggZamRoom extends Phaser.Scene {
         closeBtnContainer.add([closeBtnBg, closeBtnText]);
         // Set interactive area for a circle
         closeBtnContainer.setSize(closeBtnSize, closeBtnSize);
-        closeBtnContainer.setInteractive(new Phaser.Geom.Circle(0, 0, closeBtnSize/2), Phaser.Geom.Circle.Contains);
+        closeBtnContainer.setInteractive();
         
         // Add hand cursor manually as setInteractive config above doesn't support it directly in this shorthand
         closeBtnContainer.input.cursor = 'pointer';
