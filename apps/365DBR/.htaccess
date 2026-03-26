@@ -1,13 +1,17 @@
 <IfModule mod_headers.c>
     # 🛡️ Bolt: Enhanced Security Headers
     # Includes GoDaddy/Secureserver compatibility
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://esm.sh https://img1.wsimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://esm.sh https://csp.secureserver.net;"
+    # Sentinel: Allow framing from HeIsRisen production
+    Header always unset Content-Security-Policy
+    Header unset Content-Security-Policy
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://esm.sh https://img1.wsimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://esm.sh https://csp.secureserver.net; frame-ancestors 'self' https://mt-sin.ai;"
 
     # Enable WebAuthn and other features
     Header set Permissions-Policy "geolocation=(self), microphone=(), camera=(), payment=(), usb=(), interest-cohort=(), browsing-topics=(), publickey-credentials-get=(self)"
 
     # Prevent clickjacking
-    Header set X-Frame-Options "SAMEORIGIN"
+    Header always unset X-Frame-Options
+    Header unset X-Frame-Options
 
     # Standard Referrer Policy
     Header set Referrer-Policy "strict-origin-when-cross-origin"
