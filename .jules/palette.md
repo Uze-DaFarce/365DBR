@@ -344,3 +344,6 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2024-03-20 - [Engage the Sense of Touch via Haptic Feedback]
 **Learning:** For mobile and tablet users playing highly repetitive or visually focused games, adding short bursts of haptic feedback (vibration) for key successful interactions (like collecting an item) significantly increases the feeling of reward and tactility for the vast majority of players.
 **Action:** Use `if (navigator && navigator.vibrate) { navigator.vibrate(50); }` to provide a subtle 50ms pulse of tactile feedback upon a successful user interaction, creating a more multi-sensory and engaging micro-UX.
+## 2026-03-27 - [Expand Haptic Feedback to Buttons]
+**Learning:** Adding haptic feedback (`navigator.vibrate`) specifically to interactive buttons, not just core game events, significantly increases the tactile feel of UI components on mobile devices.
+**Action:** Consistently add a subtle haptic burst (e.g., 20ms) inside global interaction handlers like `addButtonInteraction` for pointer events.
