@@ -3241,13 +3241,13 @@ function addButtonInteraction(scene, button, soundKey = 'success') {
     // Try to play sound via MusicScene if available to ensure persistence
     const musicScene = scene.scene.get('MusicScene');
     if (musicScene && musicScene.scene.isActive()) {
-        musicScene.playSFX(soundKey);
+      musicScene.playSFX(soundKey);
     } else if (soundKey && scene.sound.get(soundKey)) {
-        scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
+      scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
     }
 
     if (navigator && navigator.vibrate) {
-        navigator.vibrate(20);
+      navigator.vibrate(20);
     }
 
     if (button.baseScaleX === undefined || !scene.tweens.isTweening(button)) {
