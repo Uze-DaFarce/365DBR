@@ -3,6 +3,36 @@ import subprocess
 import time
 import io
 import sys
+
+def ensure_dependencies():
+    missing = []
+    try:
+        from PIL import Image
+    except ImportError:
+        missing.append('pillow')
+    try:
+        import playwright
+    except ImportError:
+        missing.append('playwright')
+    try:
+        import pytest
+    except ImportError:
+        missing.append('pytest')
+
+    if missing:
+        print(f"Installing missing test dependencies: {', '.join(missing)}...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install"] + missing)
+
+        if 'playwright' in missing:
+            print("Installing Playwright browsers...")
+            subprocess.check_call([sys.executable, "-m", "playwright", "install", "chromium"])
+
+        # Need to reload modules if we just installed them
+        import importlib
+        import site
+        importlib.invalidate_caches()
+
+ensure_dependencies()
 from PIL import Image
 
 def start_server(app_dir):

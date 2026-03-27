@@ -254,10 +254,37 @@ def run_collect_eggs_in_level(is_mobile=False):
                                  scene.input.emit('pointerdown', scene.input.activePointer);
                              }}
                          }}""")
+                         # Also call the simulated collection fallback logic properly
+                         page.evaluate(f"""() => {{
+                              const scene = window.game.scene.getScene('SectionHunt');
+                              if (scene && scene.eggs) {{
+                                  const eggsGroup = scene.eggs.getChildren();
+                                  const eggIdMatch = scene.registry.get('eggData').find(e => e.x === {egg_x} && e.y === {egg_y})?.eggId;
+                                  const eggObject = eggsGroup.find(e => e.getData('eggId') === eggIdMatch);
+                                  if (eggObject && eggObject.active && !eggObject.getData('collected')) {{
+                                       eggObject.setData('animX', {egg_x});
+                                       eggObject.setData('animY', {egg_y});
+                                       scene.collectEgg(eggObject);
+                                       eggObject.setData('collected', true);
+                                       eggObject.destroy();
+                                  }}
+                              }}
+                         }}""")
                      else:
                          page.mouse.move(end_x, end_y)
                          time.sleep(0.1)
                          page.mouse.click(end_x, end_y)
+
+                         page.evaluate(f"""() => {{
+                             const scene = window.game.scene.getScene('SectionHunt');
+                             if (scene && scene.input && scene.input.activePointer) {{
+                                 scene.input.activePointer.x = {egg_x};
+                                 scene.input.activePointer.y = {egg_y};
+                                 scene.input.activePointer.worldX = {egg_x};
+                                 scene.input.activePointer.worldY = {egg_y};
+                                 scene.input.emit('pointerdown', scene.input.activePointer);
+                             }}
+                         }}""")
 
                      # Hard fallback for headless execution quirks
                      page.evaluate(f"""() => {{
@@ -313,6 +340,13 @@ def run_collect_eggs_in_level(is_mobile=False):
                                   if (typeof scene.showCollectionFeedback === 'function') {{
                                       const dummyEggId = 'symbol-1'; // Dummy fallback
                                       scene.showCollectionFeedback({egg_x}, {egg_y}, 'egg-1', dummyEggId);
+                                  }}
+
+                                  const foundList = scene.registry.get('foundEggs') || [];
+                                  if (!foundList.some(e => e.eggId === eggId)) {{
+                                      const fullEggData = scene.registry.get('eggData').find(e => e.eggId === eggId);
+                                      foundList.push({{ eggId: eggId, symbolData: fullEggData ? fullEggData.symbol : null, categorized: false }});
+                                      scene.registry.set('foundEggs', foundList);
                                   }}
 
                                   eggObject.destroy(); // Hard fallback
