@@ -436,23 +436,14 @@ class UIScene extends Phaser.Scene {
     // Add ESC and ENTER key support to toggle settings
     const toggleSettings = () => {
         if (this.settingsContainer && this.settingsContainer.visible) {
-            this.settingsContainer.setVisible(false);
-            if (this.gearIcon) this.gearIcon.setVisible(true);
-            this.input.setDefaultCursor('none');
+            this.closeSettings();
         } else {
             this.openSettings();
         }
     };
-    const closeSettings = () => {
-        if (this.settingsContainer && this.settingsContainer.visible) {
-            this.settingsContainer.setVisible(false);
-            if (this.gearIcon) this.gearIcon.setVisible(true);
-            this.input.setDefaultCursor('none');
-        }
-    };
     if (this.input.keyboard) {
         this.input.keyboard.on('keydown-ESC', toggleSettings);
-        this.input.keyboard.on('keydown-ENTER', closeSettings);
+        this.input.keyboard.on('keydown-ENTER', () => this.closeSettings());
     }
 
     // Listen for resize events to update UI positions
@@ -641,9 +632,7 @@ class UIScene extends Phaser.Scene {
         this.tweens.add({
             targets: closeBtn, scaleX: 0.9, scaleY: 0.9, duration: 50, ease: 'Power1', yoyo: true,
             onComplete: () => {
-                this.settingsContainer.setVisible(false);
-                this.gearIcon.setVisible(true);
-                this.input.setDefaultCursor('none');
+                this.closeSettings();
                 closeBtn.setScale(1); // Reset
             }
         });
@@ -701,9 +690,7 @@ class UIScene extends Phaser.Scene {
 
             // Close settings
             this.time.delayedCall(150, () => {
-                this.settingsContainer.setVisible(false);
-                if (this.gearIcon) this.gearIcon.setVisible(true);
-                if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+                this.closeSettings();
             });
         });
         this.settingsContainer.add(confirmation);
@@ -763,10 +750,41 @@ class UIScene extends Phaser.Scene {
     handle.on('pointerout', () => this.tweens.add({ targets: handle, scale: 1, duration: 100, ease: 'Back.out' }));
   }
 
+  closeSettings() {
+      if (this.settingsContainer && this.settingsContainer.visible) {
+          this.tweens.killTweensOf(this.settingsContainer);
+          this.tweens.add({
+              targets: this.settingsContainer,
+              alpha: 0,
+              duration: 200,
+              ease: 'Power2',
+              onComplete: () => {
+                  this.settingsContainer.setVisible(false);
+                  this.settingsContainer.setAlpha(1); // Reset for next time
+                  if (this.gearIcon) {
+                      this.gearIcon.setVisible(true);
+                      this.gearIcon.setScale(1);
+                  }
+                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+              }
+          });
+      }
+  }
+
   openSettings() {
+    this.tweens.killTweensOf(this.settingsContainer);
+    this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
-    this.gearIcon.setVisible(false);
-    this.input.setDefaultCursor('none');
+    if (this.gearIcon) this.gearIcon.setVisible(false);
+    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+
+    this.tweens.add({
+        targets: this.settingsContainer,
+        alpha: 1,
+        duration: 200,
+        ease: 'Power2'
+    });
+    announceToScreenReader('Settings menu opened. Press Escape to close.');
   }
 }
 
