@@ -1,6 +1,20 @@
 import pytest
 from playwright.sync_api import sync_playwright
 
+import os
+import sys
+import subprocess
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import test_helpers as th
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_server():
+    app_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    server_process = th.start_server(app_dir)
+    yield
+    server_process.terminate()
+
 @pytest.fixture(scope="session")
 def browser_context():
     with sync_playwright() as p:
@@ -15,7 +29,7 @@ def wait_for_scene(page, scene_key):
 def test_desktop_a11y_sr_only(browser_context):
     context = browser_context.new_context(viewport={'width': 1280, 'height': 720})
     page = context.new_page()
-    page.goto("http://localhost:8000/apps/HeIsRisen/index.html")
+    page.goto("http://127.0.0.1:8080/")
 
     # Wait for the MainMenu scene to be active to ensure game is loaded
     wait_for_scene(page, 'MainMenu')
@@ -51,7 +65,7 @@ def test_mobile_a11y_sr_only(browser_context):
     # Landscape orientation for mobile game
     context = browser_context.new_context(viewport={'width': 844, 'height': 390})
     page = context.new_page()
-    page.goto("http://localhost:8000/apps/HeIsRisen/m/index.html")
+    page.goto("http://127.0.0.1:8080/m/")
 
     # Wait for the MainMenu scene to be active
     wait_for_scene(page, 'MainMenu')
