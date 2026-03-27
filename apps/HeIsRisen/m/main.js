@@ -175,21 +175,21 @@ function initializeGameData(registry, cache, forceNew = false) {
                     registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
                     registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
 
-                    let loadedCorrect = Number(savedState.correctCategorizations);
-                    if (isNaN(loadedCorrect) || loadedCorrect < 0 || !isFinite(loadedCorrect)) loadedCorrect = 0;
+                    let loadedCorrect = parseInt(savedState.correctCategorizations);
+                    if (isNaN(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
                     registry.set('correctCategorizations', loadedCorrect);
 
-                    let loadedScore = Number(savedState.currentScore);
-                    if (isNaN(loadedScore) || loadedScore < 0 || !isFinite(loadedScore)) loadedScore = 0;
+                    let loadedScore = parseInt(savedState.currentScore);
+                    if (isNaN(loadedScore) || loadedScore < 0) loadedScore = 0;
                     registry.set('currentScore', loadedScore);
 
                     // Always ensure highScore is loaded/initialized correctly
                     try {
-                        let loadedHighScore = Number(localStorage.getItem('highScore'));
-                        if (isNaN(loadedHighScore) || loadedHighScore < 0 || !isFinite(loadedHighScore)) {
-                            loadedHighScore = 0;
+                        let loadedScore = parseInt(localStorage.getItem('highScore'));
+                        if (isNaN(loadedScore) || loadedScore < 0) {
+                            loadedScore = 0;
                         }
-                        registry.set('highScore', loadedHighScore);
+                        registry.set('highScore', loadedScore);
                     } catch (e) {
                         registry.set('highScore', 0);
                     }
@@ -923,11 +923,11 @@ class MainMenu extends Phaser.Scene {
       this.registry.set('currentScore', 0);
 
       try {
-          let loadedHighScore = Number(localStorage.getItem('highScore'));
-          if (isNaN(loadedHighScore) || loadedHighScore < 0 || !isFinite(loadedHighScore)) {
-              loadedHighScore = 0;
+          let loadedScore = parseInt(localStorage.getItem('highScore'));
+          if (isNaN(loadedScore) || loadedScore < 0) {
+              loadedScore = 0;
           }
-          this.registry.set('highScore', loadedHighScore);
+          this.registry.set('highScore', loadedScore);
       } catch (e) {
           console.warn('LocalStorage access failed:', e);
           this.registry.set('highScore', 0);
