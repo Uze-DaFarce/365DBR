@@ -258,10 +258,26 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
             const evt = new CustomEvent('verseclicked', { detail: { vid } });
             window.dispatchEvent(evt);
 
-            const rect = el.getBoundingClientRect();
-            const absoluteTop = window.scrollY + rect.top;
-            const targetY = absoluteTop - 125;
-            window.scrollTo({ top: targetY, behavior: 'smooth' });
+            const isIframe = window !== window.parent;
+            let targetY;
+
+            if (isIframe) {
+                const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
+                if (focalSlot) {
+                    const rect = focalSlot.getBoundingClientRect();
+                    targetY = window.scrollY + rect.top - 80;
+                } else {
+                    const rect = el.getBoundingClientRect();
+                    targetY = window.scrollY + rect.top - 80;
+                }
+            } else {
+                const rect = el.getBoundingClientRect();
+                const absoluteTop = window.scrollY + rect.top;
+                targetY = absoluteTop - 125;
+            }
+
+            window.dispatchEvent(new CustomEvent('scrolllock'));
+              window.scrollTo({ top: targetY, behavior: 'smooth' });
         }
     };
 
