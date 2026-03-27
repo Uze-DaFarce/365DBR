@@ -111,3 +111,8 @@ Dynamically loaded external JSON files accessed via `cache.json.get('key')` (lik
 *   Added strict type checks (`Array.isArray`) for array structures like `eggData`, `sections`, `foundEggs`, and `stampedSections`.
 *   Added bounds checking and `isNaN` parsing for `correctCategorizations` and `currentScore`.
 *   Strengthened `test_state_corruption.py` to aggressively simulate corrupted states and assert successful fallback to defaults.
+## 2026-03-26 - [Robust Test Suite Dependencies and Execution]
+*   Updated `test_helpers.py` to auto-install missing packages (`pillow`, `playwright`, `pytest`) at runtime using `subprocess.check_call`, completely preventing agent sandbox initialization errors and pipeline halts.
+*   Fixed mobile `pointer.x` click simulation math in Playwright tests by explicitly applying `lensOffsetX` and `lensOffsetY` mapping, and triggering native `scene.input.emit('pointerdown')` instead of brittle DOM bounding box intercepts.
+*   Ensured fallback simulated collection correctly updates the `foundEggs` registry to include full `symbolData` so the `EggZamRoom` sorting dialog can process testing states accurately.
+*   Consolidated and removed redundant low-value screenshots in `test_ui_interactions.py` (e.g. intermediate pressed states, closing menus) to reduce test noise.

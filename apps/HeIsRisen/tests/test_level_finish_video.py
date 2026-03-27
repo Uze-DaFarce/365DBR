@@ -39,12 +39,11 @@ def run_level_finish_video(is_mobile=False):
                     user_agent=iphone['user_agent'],
                     device_scale_factor=iphone['device_scale_factor'],
                     is_mobile=iphone['is_mobile'],
-                    has_touch=iphone['has_touch'],
-                    record_video_dir="verification/video"
+                    has_touch=iphone['has_touch']
                 )
             else:
                 browser = p.chromium.launch(headless=True)
-                context = browser.new_context(viewport={'width': 1280, 'height': 720}, record_video_dir="verification/video")
+                context = browser.new_context(viewport={'width': 1280, 'height': 720})
 
             page = context.new_page()
 

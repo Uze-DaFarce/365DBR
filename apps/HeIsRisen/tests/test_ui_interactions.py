@@ -54,11 +54,8 @@ def run_ui_interaction_test(is_mobile=False):
             time.sleep(2) # Wait for MapScene
             th.wait_for_active_scene(page, "MapScene")
 
-            # Take a baseline screenshot
+            # Skip redundant baseline screenshot
             time.sleep(1) # Let the map settle
-            screenshot_baseline = os.path.join(verification_dir, f"01_baseline_{context_type}.png")
-            page.screenshot(path=screenshot_baseline)
-            print(f"Captured baseline screenshot: {screenshot_baseline}")
 
             # 2. Open Settings Menu
             print("Opening settings menu...")
@@ -102,9 +99,7 @@ def run_ui_interaction_test(is_mobile=False):
             time.sleep(0.5)
             page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
 
-            screenshot_slider = os.path.join(verification_dir, f"03_settings_slider_drag_{context_type}.png")
-            page.screenshot(path=screenshot_slider)
-            print(f"Captured slider drag screenshot: {screenshot_slider}")
+            # Skip redundant slider screenshot (since it doesn't clearly show new info over open settings)
 
             # 4. Test Settings Close Button (with 150ms delay)
             print("Testing close button with 150ms delay...")
@@ -128,17 +123,17 @@ def run_ui_interaction_test(is_mobile=False):
             time.sleep(1)
             page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
 
-            screenshot_closed = os.path.join(verification_dir, f"04_settings_closed_{context_type}.png")
-            page.screenshot(path=screenshot_closed)
-            print(f"Captured settings closed screenshot: {screenshot_closed}")
+            # Skip redundant settings closed screenshot
 
             # 5. Navigate to Endgame
             print("Forcing endgame state to test 'Play Again' button delay...")
             page.evaluate("""
                 () => {
                     const registry = window.game.scene.scenes[0].registry;
-                    registry.set('foundEggs', 12);
-                    registry.set('correctCategorizations', 12);
+                    const TOTAL_EGGS = 60; // Assuming TOTAL_EGGS is 60
+                    const dummyEggs = Array.from({ length: TOTAL_EGGS }, (_, i) => ({ eggId: i + 1, categorized: true }));
+                    registry.set('foundEggs', dummyEggs);
+                    registry.set('correctCategorizations', 60);
                     window.game.scene.getScenes(true)[0].scene.start('EggZamRoom');
                 }
             """)
@@ -169,14 +164,11 @@ def run_ui_interaction_test(is_mobile=False):
             # Take a picture IMMEDIATELY after clicking to try and catch the pressed state before the delay finishes
             time.sleep(0.05)
             page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
-            screenshot_pressing = os.path.join(verification_dir, f"06_game_restarting_pressed_{context_type}.png")
-            page.screenshot(path=screenshot_pressing)
+            # Skip redundant pressed state screenshot
 
             time.sleep(1) # Wait for transition
             page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
-            screenshot_restarted = os.path.join(verification_dir, f"07_game_restarted_{context_type}.png")
-            page.screenshot(path=screenshot_restarted)
-            print(f"Captured game restarted screenshot: {screenshot_restarted}")
+            # Skip redundant game restarted screenshot
 
             # Verification logic for play again
             print("SUCCESS: UI interactions completed without blocking the game thread.")
