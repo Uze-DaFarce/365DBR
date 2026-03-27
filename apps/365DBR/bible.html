@@ -272,7 +272,8 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
                 }
             } else {
                 const rect = el.getBoundingClientRect();
-                targetY = window.scrollY + rect.top - 125;
+                const absoluteTop = window.scrollY + rect.top;
+                targetY = absoluteTop - 125;
             }
 
             window.dispatchEvent(new CustomEvent('scrolllock'));
@@ -1098,7 +1099,8 @@ function App() {
                           }
                       } else {
                           const rect = el.getBoundingClientRect();
-                          targetY = window.scrollY + rect.top - 125;
+                          const absoluteTop = window.scrollY + rect.top;
+                          targetY = absoluteTop - 125;
                       }
 
                       window.dispatchEvent(new CustomEvent('scrolllock'));
@@ -1318,7 +1320,8 @@ function App() {
               }
           } else {
               const rect = el.getBoundingClientRect();
-              targetY = window.scrollY + rect.top - 125;
+              const absoluteTop = window.scrollY + rect.top;
+              targetY = absoluteTop - 125;
           }
 
           window.dispatchEvent(new CustomEvent('scrolllock'));
@@ -1393,7 +1396,8 @@ function App() {
                   }
               } else {
                   const rect = el.getBoundingClientRect();
-                  targetY = window.scrollY + rect.top - 125;
+                  const absoluteTop = window.scrollY + rect.top;
+                  targetY = absoluteTop - 125;
               }
 
               window.dispatchEvent(new CustomEvent('scrolllock'));
