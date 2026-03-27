@@ -1083,9 +1083,24 @@ function App() {
               const tryScroll = () => {
                   const el = document.getElementById(`verse-${resolvedVid}`);
                   if (el) {
-                      const rect = el.getBoundingClientRect();
-                      const absoluteTop = window.scrollY + rect.top;
-                      const targetY = absoluteTop - 125;
+                      const isIframe = window !== window.parent;
+                      let targetY;
+                      if (isIframe) {
+                          const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
+                          if (focalSlot) {
+                              const rect = focalSlot.getBoundingClientRect();
+                              targetY = window.scrollY + rect.top - 80;
+                          } else {
+                              const rect = el.getBoundingClientRect();
+                              targetY = window.scrollY + rect.top - 80;
+                          }
+                      } else {
+                          const rect = el.getBoundingClientRect();
+                          const absoluteTop = window.scrollY + rect.top;
+                          targetY = absoluteTop - 125;
+                      }
+
+                      window.dispatchEvent(new CustomEvent('scrolllock'));
                       window.scrollTo({ top: targetY, behavior: 'auto' });
                       setActiveVerseId(resolvedVid);
                       foundAndScrolled++;
@@ -1094,6 +1109,7 @@ function App() {
                           setTimeout(tryScroll, 150);
                       } else {
                           // Final scroll using smooth behavior to ensure it lands exactly where intended
+                          window.dispatchEvent(new CustomEvent('scrolllock'));
                           window.scrollTo({ top: targetY, behavior: 'smooth' });
                           setTargetScrollVerse(null);
                       }
@@ -1215,7 +1231,17 @@ function App() {
     if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0 || targetScrollVerse) {
         return () => window.removeEventListener('verseclicked', handleVerseClickedEvent);
     }
+    let isScrollLocked = false;
+    let lockTimeout = null;
+    const handleScrollLock = () => {
+        isScrollLocked = true;
+        if (lockTimeout) clearTimeout(lockTimeout);
+        lockTimeout = setTimeout(() => { isScrollLocked = false; }, 800);
+    };
+    window.addEventListener('scrolllock', handleScrollLock);
+
     const observer = new IntersectionObserver((entries) => {
+      if (isScrollLocked) return;
       // Check if we are at the absolute bottom of the page first to prevent bounce-back
       // Use scrollHeight and Math.ceil/floor tolerance for cross-browser sub-pixel accuracy
       if (Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
@@ -1246,6 +1272,8 @@ function App() {
 
     return () => {
         window.removeEventListener('verseclicked', handleVerseClickedEvent);
+        window.removeEventListener('scrolllock', handleScrollLock);
+        if (lockTimeout) clearTimeout(lockTimeout);
         observer.disconnect();
         window.removeEventListener('scroll', handleScroll);
     };
