@@ -265,10 +265,10 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
                 const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
                 if (focalSlot) {
                     const rect = focalSlot.getBoundingClientRect();
-                    targetY = window.scrollY + rect.top - 80;
+                    targetY = window.scrollY + rect.top - 62;
                 } else {
                     const rect = el.getBoundingClientRect();
-                    targetY = window.scrollY + rect.top - 80;
+                    targetY = window.scrollY + rect.top - 62;
                 }
             } else {
                 const rect = el.getBoundingClientRect();
@@ -1092,10 +1092,10 @@ function App() {
                           if (focalSlot) {
                               const rect = focalSlot.getBoundingClientRect();
                               // Add a small 20px padding so it doesn't hug the absolute top
-                              targetY = window.scrollY + rect.top - 80;
+                              targetY = window.scrollY + rect.top - 62;
                           } else {
                               const rect = el.getBoundingClientRect();
-                              targetY = window.scrollY + rect.top - 80;
+                              targetY = window.scrollY + rect.top - 62;
                           }
                       } else {
                           const rect = el.getBoundingClientRect();
@@ -1313,10 +1313,10 @@ function App() {
               const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
               if (focalSlot) {
                   const rect = focalSlot.getBoundingClientRect();
-                  targetY = window.scrollY + rect.top - 80;
+                  targetY = window.scrollY + rect.top - 62;
               } else {
                   const rect = el.getBoundingClientRect();
-                  targetY = window.scrollY + rect.top - 80;
+                  targetY = window.scrollY + rect.top - 62;
               }
           } else {
               const rect = el.getBoundingClientRect();
@@ -1389,10 +1389,10 @@ function App() {
                   const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
                   if (focalSlot) {
                       const rect = focalSlot.getBoundingClientRect();
-                      targetY = window.scrollY + rect.top - 80;
+                      targetY = window.scrollY + rect.top - 62;
                   } else {
                       const rect = el.getBoundingClientRect();
-                      targetY = window.scrollY + rect.top - 80;
+                      targetY = window.scrollY + rect.top - 62;
                   }
               } else {
                   const rect = el.getBoundingClientRect();
