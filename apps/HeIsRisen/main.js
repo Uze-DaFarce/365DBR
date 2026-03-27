@@ -314,7 +314,7 @@ class CursorScene extends Phaser.Scene {
     // Better to launch CursorScene FROM MainMenu after preload.
     this.fingerCursor = this.add.image(0, 0, 'finger-cursor')
         .setOrigin(0, 0)
-        .setDepth(10000); // Always on top
+        .setDepth(11111); // Always on top
 
     // ⚡ Bolt Optimization: Move static DOM operations and scaling out of update loop
     this.input.setDefaultCursor('none');
@@ -538,7 +538,7 @@ class UIScene extends Phaser.Scene {
 
     gearContainer.setSize(40, 40);
     gearContainer.setInteractive();
-    gearContainer.input.cursor = 'pointer';
+    gearContainer.input.cursor = 'none';
 
     gearContainer.baseScaleX = gearContainer.scaleX;
     gearContainer.baseScaleY = gearContainer.scaleY;
@@ -637,11 +637,11 @@ class UIScene extends Phaser.Scene {
     addButtonInteraction(this, closeBtn, 'menu-click');
 
     closeBtn.on('pointerover', () => {
-        this.input.setDefaultCursor('pointer');
+        this.input.setDefaultCursor('none');
     });
 
     closeBtn.on('pointerout', () => {
-        this.input.setDefaultCursor('default');
+        this.input.setDefaultCursor('none');
     });
 
     closeBtn.on('pointerdown', () => {
@@ -683,11 +683,11 @@ class UIScene extends Phaser.Scene {
     addButtonInteraction(this, resetBtnContainer, 'menu-click');
 
     resetBtnContainer.on('pointerover', () => {
-        this.input.setDefaultCursor('pointer');
+        this.input.setDefaultCursor('none');
     });
 
     resetBtnContainer.on('pointerout', () => {
-        this.input.setDefaultCursor('default');
+        this.input.setDefaultCursor('none');
     });
 
     resetBtnContainer.on('pointerdown', () => {
@@ -731,7 +731,7 @@ class UIScene extends Phaser.Scene {
     this.settingsContainer.add(text);
 
     // Invisible hit area for easier clicking on track (increased height to 60)
-    const trackHitArea = this.add.rectangle(centerX, y + 10, 200, 60, 0x888888, 0).setInteractive({ cursor: 'pointer' });
+    const trackHitArea = this.add.rectangle(centerX, y + 10, 200, 60, 0x888888, 0).setInteractive();
     this.settingsContainer.add(trackHitArea);
     this.settingsContainer.add(this.add.rectangle(centerX, y + 10, 200, 4, 0x888888));
 
@@ -760,11 +760,11 @@ class UIScene extends Phaser.Scene {
     trackHitArea.on('pointerdown', (p) => updateVolume(p.worldX));
 
     handleContainer.on('pointerover', () => {
-        this.input.setDefaultCursor('pointer');
+        this.input.setDefaultCursor('none');
         this.tweens.add({ targets: handleContainer, scaleX: 1.3, scaleY: 1.3, duration: 100, ease: 'Back.out' });
     });
     handleContainer.on('pointerout', () => {
-        this.input.setDefaultCursor('default');
+        this.input.setDefaultCursor('none');
         this.tweens.add({ targets: handleContainer, scaleX: 1, scaleY: 1, duration: 100, ease: 'Back.out' });
     });
   }
@@ -772,7 +772,7 @@ class UIScene extends Phaser.Scene {
   openSettings() {
     this.settingsContainer.setVisible(true);
     this.gearIcon.setVisible(false);
-    this.input.setDefaultCursor('default');
+    this.input.setDefaultCursor('none');
   }
 }
 
@@ -1395,7 +1395,7 @@ class MapScene extends Phaser.Scene {
       // (though for main.js it gets set in updateLayout immediately after)
 
       thumb.on('pointerover', () => {
-          this.input.setDefaultCursor('pointer');
+          this.input.setDefaultCursor('none');
           this.tweens.add({
               targets: thumb,
               scaleX: thumb.baseScale * 1.1,
@@ -1406,7 +1406,7 @@ class MapScene extends Phaser.Scene {
       });
 
       thumb.on('pointerout', () => {
-          this.input.setDefaultCursor('default');
+          this.input.setDefaultCursor('none');
           this.tweens.add({
               targets: thumb,
               scaleX: thumb.baseScale,
@@ -2673,7 +2673,7 @@ class EggZamRoom extends Phaser.Scene {
         scriptures.forEach((scripture, index) => {
             const verseText = this.add.text(currentX, scriptureY, scripture, {
                 fontSize: `${24 * uiScale}px`, fill: '#0000ee', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
-            }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
+            }).setOrigin(0, 0.5).setInteractive();
 
             verseText.on('pointerdown', (p, x, y, event) => {
                 event.stopPropagation();
@@ -2985,16 +2985,16 @@ class EggZamRoom extends Phaser.Scene {
           addButtonInteraction(this, playBtnContainer, 'menu-click');
 
           playBtnContainer.on('pointerover', () => {
-              this.input.setDefaultCursor('pointer');
+              this.input.setDefaultCursor('none');
           });
 
           playBtnContainer.on('pointerout', () => {
-              this.input.setDefaultCursor('default');
+              this.input.setDefaultCursor('none');
           });
 
           const triggerRestart = () => {
               this.time.delayedCall(150, () => {
-                  this.input.setDefaultCursor('default');
+                  this.input.setDefaultCursor('none');
                   localStorage.removeItem('heIsRisenGameState');
                   initializeGameData(this.registry, this.cache, true);
                   this.scene.start('MapScene');

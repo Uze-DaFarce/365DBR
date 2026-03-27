@@ -485,7 +485,7 @@ class UIScene extends Phaser.Scene {
     const y = this.cameras.main.height - 30;
 
     // Create a container to hold the background and the cog
-    const gearContainer = this.add.container(x, y).setDepth(10); // Keep below cursor
+    const gearContainer = this.add.container(x, y).setDepth(1); // Keep below cursor
 
     // Draw white circle with yellow border
     // Tightly wrap the 25x25 mobile cog (radius 15 -> 30px diam)
@@ -569,7 +569,7 @@ class UIScene extends Phaser.Scene {
   }
 
   createSettingsPanel() {
-    this.settingsContainer = this.add.container(0, 0).setVisible(false).setDepth(100);
+    this.settingsContainer = this.add.container(0, 0).setVisible(false).setDepth(10);
     this.createSettingsPanelContent(this.cameras.main.width, this.cameras.main.height);
   }
 
@@ -766,7 +766,7 @@ class UIScene extends Phaser.Scene {
   openSettings() {
     this.settingsContainer.setVisible(true);
     this.gearIcon.setVisible(false);
-    this.input.setDefaultCursor('default');
+    this.input.setDefaultCursor('none');
   }
 }
 
@@ -978,7 +978,7 @@ class MainMenu extends Phaser.Scene {
           .setOrigin(0, 0)
           .setAngle(0)
           .setDisplaySize(50 * scale, 75 * scale)
-          .setDepth(1000); // Ensure cursor is on top of everything
+          .setDepth(111111); // Ensure cursor is on top of everything
       }
 
       // Handle both mouse and touch input, request fullscreen on first click
@@ -1026,7 +1026,7 @@ class MainMenu extends Phaser.Scene {
           fill: '#ffffff',
           stroke: '#000000',
           strokeThickness: 6
-      }).setOrigin(0.5).setDepth(100);
+      }).setOrigin(0.5).setDepth(11);
 
       // "Play Now" / "Continue" Button Container (Initially Hidden)
       const buttonWidth = 400;
@@ -1035,7 +1035,7 @@ class MainMenu extends Phaser.Scene {
       const btnY = 580 * scale;
       const hasSaveState = localStorage.getItem('heIsRisenGameState') !== null;
 
-      const startBtnContainer = this.add.container(btnX, btnY).setVisible(false).setDepth(101);
+      const startBtnContainer = this.add.container(btnX, btnY).setVisible(false).setDepth(11);
       this.startBtnContainer = startBtnContainer;
 
       let btnTextString = hasSaveState ? 'CONTINUE THE HUNT!' : 'PLAY NOW';
@@ -1586,6 +1586,7 @@ class MapScene extends Phaser.Scene {
       this.fingerCursor = this.add.image(0, 0, 'finger-cursor')
         .setOrigin(0, 0)
         .setAngle(0)
+        .setDepth(111111) // Ensure cursor is on top of everything
         .setDisplaySize(50 * scale, 75 * scale);
     }
   }
@@ -2094,7 +2095,7 @@ class SectionHunt extends Phaser.Scene {
     this.fingerCursor = this.add.image(0, 0, 'finger-cursor')
         .setOrigin(0, 0)
         .setAngle(0)
-        .setDepth(8)
+        .setDepth(111111)
         .setScrollFactor(0)
         .setVisible(false);
 
@@ -2716,7 +2717,7 @@ class EggZamRoom extends Phaser.Scene {
 
             this.explanationText = this.add.container(width / 2, height / 2).setDepth(100);
 
-        const bgWidth = Math.min(width * 0.95, 1200 * assetScale);
+        const bgWidth = Math.min(width * 0.95, 1280 * assetScale);
         const bgHeight = Math.min(height * 0.95, 720 * assetScale);
 
         const bg = this.add.graphics();
@@ -2779,7 +2780,7 @@ class EggZamRoom extends Phaser.Scene {
         scriptures.forEach((scripture, index) => {
             const verseText = this.add.text(currentX, scriptureY, scripture, {
                 fontSize: `${24 * assetScale}px`, fill: '#0000ee', fontStyle: 'italic', fontFamily: 'Comic Sans MS'
-            }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
+            }).setOrigin(0, 0.5).setInteractive();
 
             verseText.on('pointerdown', (p, x, y, event) => {
                 event.stopPropagation();
@@ -2984,7 +2985,7 @@ class EggZamRoom extends Phaser.Scene {
         .setOrigin(0, 0)
         .setAngle(0)
         .setDisplaySize(50 * this.gameScale, 75 * this.gameScale)
-        .setDepth(1000); // Ensure it renders above the popup modal (depth 100)
+        .setDepth(111111); // Ensure it renders above the popup modal (depth 100)
     }
   }
 
@@ -3013,7 +3014,7 @@ class EggZamRoom extends Phaser.Scene {
           fontFamily: 'Comic Sans MS',
           stroke: '#fff',
           strokeThickness: 3 * this.gameScale,
-          wordWrap: { width: 480 * this.gameScale, useAdvancedWrap: true }
+          wordWrap: { width: 1200 * this.gameScale, useAdvancedWrap: true }
         }).setOrigin(0, 0).setDepth(10);
 
         if (foundEggs.length === TOTAL_EGGS) {
@@ -3104,7 +3105,7 @@ class EggZamRoom extends Phaser.Scene {
 
           const triggerRestart = () => {
               this.time.delayedCall(150, () => {
-                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('default');
+                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
                   localStorage.removeItem('heIsRisenGameState');
                   initializeGameData(this.registry, this.cache, true);
                   this.scene.start('MapScene');
