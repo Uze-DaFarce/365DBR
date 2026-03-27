@@ -258,9 +258,23 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
             const evt = new CustomEvent('verseclicked', { detail: { vid } });
             window.dispatchEvent(evt);
 
-            const rect = el.getBoundingClientRect();
-            const absoluteTop = window.scrollY + rect.top;
-            const targetY = absoluteTop - 125;
+            const isIframe = window !== window.parent;
+            let targetY;
+
+            if (isIframe) {
+                const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
+                if (focalSlot) {
+                    const rect = focalSlot.getBoundingClientRect();
+                    targetY = window.scrollY + rect.top - 20;
+                } else {
+                    const rect = el.getBoundingClientRect();
+                    targetY = window.scrollY + rect.top - 20;
+                }
+            } else {
+                const rect = el.getBoundingClientRect();
+                targetY = window.scrollY + rect.top - 125;
+            }
+
             window.scrollTo({ top: targetY, behavior: 'smooth' });
         }
     };
@@ -1067,9 +1081,25 @@ function App() {
               const tryScroll = () => {
                   const el = document.getElementById(`verse-${resolvedVid}`);
                   if (el) {
-                      const rect = el.getBoundingClientRect();
-                      const absoluteTop = window.scrollY + rect.top;
-                      const targetY = absoluteTop - 125;
+                      const isIframe = window !== window.parent;
+                      let targetY;
+
+                      if (isIframe) {
+                          // In an iframe, find the 3rd slot (Focal Verse) to scroll directly to it
+                          const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
+                          if (focalSlot) {
+                              const rect = focalSlot.getBoundingClientRect();
+                              // Add a small 20px padding so it doesn't hug the absolute top
+                              targetY = window.scrollY + rect.top - 20;
+                          } else {
+                              const rect = el.getBoundingClientRect();
+                              targetY = window.scrollY + rect.top - 20;
+                          }
+                      } else {
+                          const rect = el.getBoundingClientRect();
+                          targetY = window.scrollY + rect.top - 125;
+                      }
+
                       window.scrollTo({ top: targetY, behavior: 'auto' });
                       setActiveVerseId(resolvedVid);
                       foundAndScrolled++;
@@ -1255,9 +1285,23 @@ function App() {
 
       const el = document.getElementById(`verse-${vid}`);
       if (el) {
-          const rect = el.getBoundingClientRect();
-          const absoluteTop = window.scrollY + rect.top;
-          const targetY = absoluteTop - 125;
+          const isIframe = window !== window.parent;
+          let targetY;
+
+          if (isIframe) {
+              const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
+              if (focalSlot) {
+                  const rect = focalSlot.getBoundingClientRect();
+                  targetY = window.scrollY + rect.top - 20;
+              } else {
+                  const rect = el.getBoundingClientRect();
+                  targetY = window.scrollY + rect.top - 20;
+              }
+          } else {
+              const rect = el.getBoundingClientRect();
+              targetY = window.scrollY + rect.top - 125;
+          }
+
           window.scrollTo({ top: targetY, behavior: 'smooth' });
       }
   };
@@ -1315,9 +1359,23 @@ function App() {
           setActiveVerseId(nextVid);
           const el = document.getElementById(`verse-${nextVid}`);
           if (el) {
-              const rect = el.getBoundingClientRect();
-              const absoluteTop = window.scrollY + rect.top;
-              const targetY = absoluteTop - 125;
+              const isIframe = window !== window.parent;
+              let targetY;
+
+              if (isIframe) {
+                  const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
+                  if (focalSlot) {
+                      const rect = focalSlot.getBoundingClientRect();
+                      targetY = window.scrollY + rect.top - 20;
+                  } else {
+                      const rect = el.getBoundingClientRect();
+                      targetY = window.scrollY + rect.top - 20;
+                  }
+              } else {
+                  const rect = el.getBoundingClientRect();
+                  targetY = window.scrollY + rect.top - 125;
+              }
+
               window.scrollTo({ top: targetY, behavior: 'smooth' });
           }
       }
