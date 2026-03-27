@@ -2828,7 +2828,7 @@ class EggZamRoom extends Phaser.Scene {
                     closeBtn.style.justifyContent = 'center';
 
                     const closeIframe = () => {
-                        document.body.removeChild(iframeOverlay);
+                        iframeOverlay.remove();
                         window.removeEventListener('keydown', iframeKeyHandler);
                     };
 
@@ -2843,7 +2843,8 @@ class EggZamRoom extends Phaser.Scene {
 
                     iframeOverlay.appendChild(closeBtn);
                     iframeOverlay.appendChild(iframe);
-                    document.body.appendChild(iframeOverlay);
+                    const targetContainer = document.fullscreenElement || document.webkitFullscreenElement || document.body;
+                    targetContainer.appendChild(iframeOverlay);
                 }
             });
 
