@@ -14,42 +14,6 @@ function announceToScreenReader(message) {
     }
 }
 
-function addButtonInteraction(scene, button, sfxKey) {
-    button.baseScaleX = button.scaleX;
-    button.baseScaleY = button.scaleY;
-
-    button.on('pointerover', () => scene.tweens.add({
-        targets: button,
-        scaleX: button.baseScaleX * 1.1,
-        scaleY: button.baseScaleY * 1.1,
-        duration: 100,
-        ease: 'Sine.easeInOut'
-    }));
-
-    button.on('pointerout', () => scene.tweens.add({
-        targets: button,
-        scaleX: button.baseScaleX,
-        scaleY: button.baseScaleY,
-        duration: 100,
-        ease: 'Sine.easeInOut'
-    }));
-
-    button.on('pointerdown', () => {
-        const musicScene = scene.scene.get('MusicScene');
-        if (musicScene && musicScene.scene.isActive()) {
-            musicScene.playSFX(sfxKey);
-        }
-        scene.tweens.add({
-            targets: button,
-            scaleX: button.baseScaleX * 0.9,
-            scaleY: button.baseScaleY * 0.9,
-            duration: 50,
-            yoyo: true,
-            ease: 'Power1'
-        });
-    });
-}
-
 class Confirmation extends Phaser.GameObjects.Container {
     constructor(scene, x, y, text, onYes, onNo) {
         super(scene, x, y);
@@ -3081,9 +3045,13 @@ function addButtonInteraction(scene, button, soundKey = 'success') {
   button.on('pointerdown', () => {
     const musicScene = scene.scene.get('MusicScene');
     if (musicScene && musicScene.scene.isActive()) {
-        musicScene.playSFX(soundKey);
+      musicScene.playSFX(soundKey);
     } else if (soundKey && scene.sound.get(soundKey)) {
-        scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
+      scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
+    }
+
+    if (navigator && navigator.vibrate) {
+      navigator.vibrate(20);
     }
 
     if (button.baseScaleX === undefined) {
