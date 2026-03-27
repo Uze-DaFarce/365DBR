@@ -1943,6 +1943,40 @@ class SectionHunt extends Phaser.Scene {
             .setDisplaySize(1280 * scale, 720 * scale)
             .setDepth(0);
 
+        const applySectionVideoScale = () => {
+             if (this.sectionVideo && this.sectionVideo.active && this.sectionVideo.width > 0) {
+                 const w = this.scale.width;
+                 const h = this.scale.height;
+                 const sX = w / 1280;
+                 const sY = h / 720;
+                 const tScale = Math.max(sX, sY);
+
+                 // Use a threshold to prevent jitter/unnecessary redraws
+                 if (Math.abs(this.sectionVideo.displayWidth - (1280 * tScale)) > 5) {
+                     this.sectionVideo.setDisplaySize(1280 * tScale, 720 * tScale);
+                     this.sectionVideo.setPosition(w / 2, h / 2);
+
+                     this.bgScale = tScale;
+                     this.bgOffsetX = (w - 1280 * tScale) / 2;
+                     this.bgOffsetY = (h - 720 * tScale) / 2;
+                 }
+             }
+        };
+
+        this.sectionVideo.once('play', () => {
+            if (this.sectionVideo.width === 0) {
+                 this.time.delayedCall(100, applySectionVideoScale);
+            } else {
+                 applySectionVideoScale();
+            }
+        });
+
+        // Add a scale event listener to replace the update loop checks for resize
+        this.scale.on('resize', applySectionVideoScale, this);
+        this.events.once('shutdown', () => {
+             this.scale.off('resize', applySectionVideoScale, this);
+        });
+
         this.sectionVideo.play(true); // Loop
         this.sectionVideo.setMute(false); // iOS quirk: keep muted attr false to avoid global context suspension
         // Initialize volume from Ambient setting (reduced to 25% due to loud video mixing)
