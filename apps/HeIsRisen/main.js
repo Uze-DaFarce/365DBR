@@ -1173,13 +1173,22 @@ class MainMenu extends Phaser.Scene {
     // Handle Resize
     this.scale.on('resize', this.resize, this);
 
-    // Safety: Check video dimensions after a short delay to ensure metadata loaded
-    this.time.delayedCall(100, () => {
-        if (this.introVideo && this.introVideo.active) {
-            // Force resize logic
-            this.resize(this.scale);
-        }
-    });
+    // Handle delayed video metadata loading
+    if (this.introVideo && this.introVideo.active) {
+        const checkVideoReady = () => {
+            if (this.introVideo && this.introVideo.active) {
+                if (this.introVideo.width > 0) {
+                    this.resize(this.scale);
+                } else {
+                    // Poll occasionally until metadata is fully available (safer than a hardcoded 100ms)
+                    this.time.delayedCall(100, checkVideoReady);
+                }
+            }
+        };
+        this.introVideo.once('play', checkVideoReady);
+        // Fallback for Safari/iOS that might require interaction
+        this.time.delayedCall(100, checkVideoReady);
+    }
 
     const symbolsData = this.cache.json.get('symbols');
     if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
@@ -1963,13 +1972,19 @@ class SectionHunt extends Phaser.Scene {
              }
         };
 
-        this.sectionVideo.once('play', () => {
-            if (this.sectionVideo.width === 0) {
-                 this.time.delayedCall(100, applySectionVideoScale);
-            } else {
-                 applySectionVideoScale();
-            }
-        });
+        const checkSectionVideoReady = () => {
+             if (this.sectionVideo && this.sectionVideo.active) {
+                 if (this.sectionVideo.width > 0) {
+                     applySectionVideoScale();
+                 } else {
+                     this.time.delayedCall(100, checkSectionVideoReady);
+                 }
+             }
+        };
+
+        this.sectionVideo.once('play', checkSectionVideoReady);
+        // Fallback trigger if event misses
+        this.time.delayedCall(100, checkSectionVideoReady);
 
         // Add a scale event listener to replace the update loop checks for resize
         this.scale.on('resize', applySectionVideoScale, this);

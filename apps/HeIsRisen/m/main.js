@@ -971,18 +971,22 @@ class MainMenu extends Phaser.Scene {
       };
 
       if (this.introVideo && this.introVideo.active) {
-          this.introVideo.once('play', () => {
-              // Wait a tick for metadata if 0
-              if (this.introVideo.width === 0) {
-                  this.time.delayedCall(100, applyVideoScale);
-              } else {
-                  applyVideoScale();
+          const checkVideoReady = () => {
+              if (this.introVideo && this.introVideo.active) {
+                  if (this.introVideo.width > 0) {
+                      applyVideoScale();
+                  } else {
+                      this.time.delayedCall(100, checkVideoReady);
+                  }
               }
-          });
+          };
+          this.introVideo.once('play', checkVideoReady);
           this.scale.on('resize', applyVideoScale, this);
           this.events.once('shutdown', () => {
                this.scale.off('resize', applyVideoScale, this);
           });
+          // Fallback trigger if event misses
+          this.time.delayedCall(100, checkVideoReady);
       }
 
       try {
