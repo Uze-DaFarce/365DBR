@@ -1137,13 +1137,22 @@ class MainMenu extends Phaser.Scene {
     // Handle Resize
     this.scale.on('resize', this.resize, this);
 
-    // Safety: Check video dimensions after a short delay to ensure metadata loaded
-    this.time.delayedCall(100, () => {
-        if (this.introVideo && this.introVideo.active) {
-            // Force resize logic
-            this.resize(this.scale);
-        }
-    });
+    // Handle delayed video metadata loading
+    if (this.introVideo && this.introVideo.active) {
+        const checkVideoReady = () => {
+            if (this.introVideo && this.introVideo.active) {
+                if (this.introVideo.width > 0) {
+                    this.resize(this.scale);
+                } else {
+                    // Poll occasionally until metadata is fully available (safer than a hardcoded 100ms)
+                    this.time.delayedCall(100, checkVideoReady);
+                }
+            }
+        };
+        this.introVideo.once('play', checkVideoReady);
+        // Fallback for Safari/iOS that might require interaction
+        this.time.delayedCall(100, checkVideoReady);
+    }
 
     const symbolsData = this.cache.json.get('symbols');
     if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
@@ -1906,6 +1915,46 @@ class SectionHunt extends Phaser.Scene {
         this.sectionVideo = this.add.video(width/2, height/2, videoKey)
             .setDisplaySize(1280 * scale, 720 * scale)
             .setDepth(0);
+
+        const applySectionVideoScale = () => {
+             if (this.sectionVideo && this.sectionVideo.active && this.sectionVideo.width > 0) {
+                 const w = this.scale.width;
+                 const h = this.scale.height;
+                 const sX = w / 1280;
+                 const sY = h / 720;
+                 const tScale = Math.max(sX, sY);
+
+                 // Use a threshold to prevent jitter/unnecessary redraws
+                 if (Math.abs(this.sectionVideo.displayWidth - (1280 * tScale)) > 5) {
+                     this.sectionVideo.setDisplaySize(1280 * tScale, 720 * tScale);
+                     this.sectionVideo.setPosition(w / 2, h / 2);
+
+                     this.bgScale = tScale;
+                     this.bgOffsetX = (w - 1280 * tScale) / 2;
+                     this.bgOffsetY = (h - 720 * tScale) / 2;
+                 }
+             }
+        };
+
+        const checkSectionVideoReady = () => {
+             if (this.sectionVideo && this.sectionVideo.active) {
+                 if (this.sectionVideo.width > 0) {
+                     applySectionVideoScale();
+                 } else {
+                     this.time.delayedCall(100, checkSectionVideoReady);
+                 }
+             }
+        };
+
+        this.sectionVideo.once('play', checkSectionVideoReady);
+        // Fallback trigger if event misses
+        this.time.delayedCall(100, checkSectionVideoReady);
+
+        // Add a scale event listener to replace the update loop checks for resize
+        this.scale.on('resize', applySectionVideoScale, this);
+        this.events.once('shutdown', () => {
+             this.scale.off('resize', applySectionVideoScale, this);
+        });
 
         this.sectionVideo.play(true); // Loop
         this.sectionVideo.setMute(false); // iOS quirk: keep muted attr false to avoid global context suspension

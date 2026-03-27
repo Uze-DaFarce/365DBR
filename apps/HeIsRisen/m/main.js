@@ -923,6 +923,36 @@ class MainMenu extends Phaser.Scene {
       this.introVideo = introVideo; // Store reference for resizing
       introVideo.setMute(true); // Start muted to allow autoplay
       introVideo.disableInteractive(); // Ensure video ignores input
+
+      // Handle delayed video metadata loading and scaling on resize
+      const applyVideoScale = () => {
+          if (this.introVideo && this.introVideo.active && this.introVideo.width > 0) {
+              if (Math.abs(this.introVideo.displayWidth - this.game.config.width) > 10) {
+                  this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height);
+                  this.introVideo.setPosition(this.game.config.width / 2, this.game.config.height / 2);
+              }
+          }
+      };
+
+      if (this.introVideo && this.introVideo.active) {
+          const checkVideoReady = () => {
+              if (this.introVideo && this.introVideo.active) {
+                  if (this.introVideo.width > 0) {
+                      applyVideoScale();
+                  } else {
+                      this.time.delayedCall(100, checkVideoReady);
+                  }
+              }
+          };
+          this.introVideo.once('play', checkVideoReady);
+          this.scale.on('resize', applyVideoScale, this);
+          this.events.once('shutdown', () => {
+               this.scale.off('resize', applyVideoScale, this);
+          });
+          // Fallback trigger if event misses
+          this.time.delayedCall(100, checkVideoReady);
+      }
+
       try {
         introVideo.play(true); // Loop
       } catch (e) {
@@ -1243,13 +1273,6 @@ class MainMenu extends Phaser.Scene {
   update() {
     if (this.fingerCursor) {
       this.fingerCursor.setPosition(this.input.x, this.input.y);
-    }
-
-    // Ensure video size is correct once texture loads
-    if (this.introVideo && this.introVideo.active && this.introVideo.width > 0) {
-        if (Math.abs(this.introVideo.displayWidth - this.game.config.width) > 10) {
-            this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height);
-        }
     }
   }
 }
