@@ -257,15 +257,17 @@ def run_collect_eggs_in_level(is_mobile=False):
                          # Also call the simulated collection fallback logic properly
                          page.evaluate(f"""() => {{
                               const scene = window.game.scene.getScene('SectionHunt');
-                              const eggsGroup = scene.eggs.getChildren();
-                              const eggIdMatch = scene.registry.get('eggData').find(e => e.x === {egg_x} && e.y === {egg_y})?.eggId;
-                              const eggObject = eggsGroup.find(e => e.getData('eggId') === eggIdMatch);
-                              if (eggObject && eggObject.active && !eggObject.getData('collected')) {{
-                                   eggObject.setData('animX', {egg_x});
-                                   eggObject.setData('animY', {egg_y});
-                                   scene.collectEgg(eggObject);
-                                   eggObject.setData('collected', true);
-                                   eggObject.destroy();
+                              if (scene && scene.eggs) {{
+                                  const eggsGroup = scene.eggs.getChildren();
+                                  const eggIdMatch = scene.registry.get('eggData').find(e => e.x === {egg_x} && e.y === {egg_y})?.eggId;
+                                  const eggObject = eggsGroup.find(e => e.getData('eggId') === eggIdMatch);
+                                  if (eggObject && eggObject.active && !eggObject.getData('collected')) {{
+                                       eggObject.setData('animX', {egg_x});
+                                       eggObject.setData('animY', {egg_y});
+                                       scene.collectEgg(eggObject);
+                                       eggObject.setData('collected', true);
+                                       eggObject.destroy();
+                                  }}
                               }}
                          }}""")
                      else:
