@@ -52,7 +52,15 @@ def run_state_corruption_test(is_mobile=False):
                     // No sfxVolume_backup set
 
                     // Tamper with the main game state
-                    localStorage.setItem('heIsRisenGameState', '{ invalid json: ] ] }');
+                    const corruptedState = {
+                        eggData: "not an array",
+                        sections: { wrong: "type" },
+                        foundEggs: "should be array",
+                        stampedSections: 12345,
+                        correctCategorizations: "NaN",
+                        currentScore: "HACKED"
+                    };
+                    localStorage.setItem('heIsRisenGameState', JSON.stringify(corruptedState));
                 }
             """)
 
@@ -95,6 +103,32 @@ def run_state_corruption_test(is_mobile=False):
             # Expect sfx to fallback to 0.5 because backup is missing
             if music_vol != 0.8 or ambient_vol != 0.5 or sfx_vol != 0.5:
                  raise AssertionError(f"Volumes should fallback properly, but got Music:{music_vol}, Ambient:{ambient_vol}, SFX:{sfx_vol}")
+
+            current_score = page.evaluate("() => window.game.scene.scenes[0].registry.get('currentScore')")
+            print(f"Current Score after corrupted load: {current_score}")
+            if current_score != 0 or type(current_score) != int:
+                raise AssertionError(f"Current score failed to fallback to 0 or is invalid. Got {current_score} ({type(current_score)})")
+
+            correct_cat = page.evaluate("() => window.game.scene.scenes[0].registry.get('correctCategorizations')")
+            print(f"Correct Categorizations after corrupted load: {correct_cat}")
+            if correct_cat != 0 or type(correct_cat) != int:
+                raise AssertionError(f"Correct Categorizations failed to fallback to 0 or is invalid. Got {correct_cat} ({type(correct_cat)})")
+
+            found_eggs = page.evaluate("() => window.game.scene.scenes[0].registry.get('foundEggs')")
+            if not isinstance(found_eggs, list):
+                raise AssertionError(f"foundEggs is not a list. Got {type(found_eggs)}")
+
+            stamped_sections = page.evaluate("() => window.game.scene.scenes[0].registry.get('stampedSections')")
+            if not isinstance(stamped_sections, list):
+                raise AssertionError(f"stampedSections is not a list. Got {type(stamped_sections)}")
+
+            egg_data = page.evaluate("() => window.game.scene.scenes[0].registry.get('eggData')")
+            if not isinstance(egg_data, list):
+                raise AssertionError(f"eggData is not a list. Got {type(egg_data)}")
+
+            sections = page.evaluate("() => window.game.scene.scenes[0].registry.get('sections')")
+            if not isinstance(sections, list):
+                raise AssertionError(f"sections is not a list. Got {type(sections)}")
 
             print("SUCCESS: State corruption was safely rejected and game defaulted to stable values (or valid backups).")
 

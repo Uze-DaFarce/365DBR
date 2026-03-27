@@ -168,13 +168,20 @@ function initializeGameData(registry, cache, forceNew = false) {
                 } catch (e) {
                     console.warn('Invalid saved game state in localStorage', e);
                 }
-                if (savedState && typeof savedState === 'object' && savedState.eggData && savedState.sections) {
+                if (savedState && typeof savedState === 'object' && Array.isArray(savedState.eggData) && Array.isArray(savedState.sections)) {
                     registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
-                    registry.set('foundEggs', savedState.foundEggs || []);
-                    registry.set('stampedSections', savedState.stampedSections || []);
-                    registry.set('correctCategorizations', savedState.correctCategorizations || 0);
-                    registry.set('currentScore', savedState.currentScore || 0);
+
+                    registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
+                    registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
+
+                    let loadedCorrect = parseInt(savedState.correctCategorizations);
+                    if (isNaN(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
+                    registry.set('correctCategorizations', loadedCorrect);
+
+                    let loadedScore = parseInt(savedState.currentScore);
+                    if (isNaN(loadedScore) || loadedScore < 0) loadedScore = 0;
+                    registry.set('currentScore', loadedScore);
 
                     // Always ensure highScore is loaded/initialized correctly
                     try {
@@ -2002,7 +2009,9 @@ class SectionHunt extends Phaser.Scene {
       .setInteractive()
       .on('pointerdown', () => {
         // console.log('Click on eggZitButton');
-        this.scene.start('MapScene');
+        this.time.delayedCall(150, () => {
+            this.scene.start('MapScene');
+        });
       })
       .setDepth(4)
       .setScrollFactor(0);
@@ -2318,8 +2327,14 @@ class SectionHunt extends Phaser.Scene {
              if (btn.baseScaleX === undefined) btn.baseScaleX = btn.scaleX;
              if (btn.baseScaleY === undefined) btn.baseScaleY = btn.scaleY;
 
-             const bounds = btn.getBounds();
-             if (bounds.contains(pointer.x, pointer.y)) {
+                 // ⚡ Bolt Optimization: Avoid expensive getBounds() matrix calculations in 60fps update loop
+                 // Since UI buttons are unrotated and have origin (0, 0), we can use simple AABB math
+                 const left = btn.x;
+                 const top = btn.y;
+                 const right = left + btn.displayWidth;
+                 const bottom = top + btn.displayHeight;
+
+                 if (pointer.x >= left && pointer.x <= right && pointer.y >= top && pointer.y <= bottom) {
                  isHoveringButton = true;
                  if (!btn.isHovered) {
                      btn.isHovered = true;
@@ -2591,7 +2606,11 @@ class EggZamRoom extends Phaser.Scene {
       .setOrigin(0, 0)
       .setDisplaySize(150 * this.gameScale, 131 * this.gameScale)
       .setInteractive()
-      .on('pointerdown', () => this.scene.start('MapScene'))
+      .on('pointerdown', () => {
+          this.time.delayedCall(150, () => {
+              this.scene.start('MapScene');
+          });
+      })
       .setDepth(4)
       .setScrollFactor(0);
     addButtonInteraction(this, this.eggZitButton, 'drive1');
@@ -2788,19 +2807,24 @@ class EggZamRoom extends Phaser.Scene {
                     iframe.style.backgroundColor = 'white';
 
                     const closeBtn = document.createElement('button');
-                    closeBtn.innerHTML = '&#10006; Close';
+                    closeBtn.innerHTML = '&#10006;';
                     closeBtn.style.position = 'absolute';
-                    closeBtn.style.top = '0%';
-                    closeBtn.style.right = '0%';
-                    closeBtn.style.padding = '10px 20px';
-                    closeBtn.style.fontSize = '24px';
+                    closeBtn.style.top = '10px';
+                    closeBtn.style.right = '10px';
+                    closeBtn.style.width = '60px';
+                    closeBtn.style.height = '60px';
+                    closeBtn.style.padding = '0';
+                    closeBtn.style.fontSize = '32px';
                     closeBtn.style.fontWeight = 'bold';
                     closeBtn.style.color = 'white';
-                    closeBtn.style.backgroundColor = 'red';
-                    closeBtn.style.border = '2px solid white';
-                    closeBtn.style.borderRadius = '10px';
+                    closeBtn.style.backgroundColor = '#ff0000';
+                    closeBtn.style.border = '4px solid #8b4513';
+                    closeBtn.style.borderRadius = '50%';
                     closeBtn.style.cursor = 'pointer';
                     closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
+                    closeBtn.style.display = 'flex';
+                    closeBtn.style.alignItems = 'center';
+                    closeBtn.style.justifyContent = 'center';
 
                     const closeIframe = () => {
                         document.body.removeChild(iframeOverlay);
@@ -2877,7 +2901,7 @@ class EggZamRoom extends Phaser.Scene {
         closeBtnContainer.add([closeBtnBg, closeBtnText]);
         // Set interactive area for a circle
         closeBtnContainer.setSize(closeBtnSize, closeBtnSize);
-        closeBtnContainer.setInteractive(new Phaser.Geom.Circle(0, 0, closeBtnSize/2), Phaser.Geom.Circle.Contains);
+        closeBtnContainer.setInteractive();
         
         // Add hand cursor manually as setInteractive config above doesn't support it directly in this shorthand
         closeBtnContainer.input.cursor = 'pointer';
