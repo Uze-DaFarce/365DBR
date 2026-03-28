@@ -300,16 +300,13 @@ class MusicScene extends Phaser.Scene {
   }
 
   create() {
-    // console.log('MusicScene: checking background music');
     const music = this.sound.get('background-music');
     if (!music) {
       this.sound.add('background-music', { loop: true, volume: this.musicVolume }).play();
-      // console.log('MusicScene: Background music started');
     } else if (!music.isPlaying) {
       // Ensure volume is updated if restarting
       music.setVolume(this.musicVolume);
       music.play();
-      // console.log('MusicScene: Background music resumed');
     }
 
     // Schedule random ambient sound to play periodically
@@ -840,7 +837,6 @@ class MainMenu extends Phaser.Scene {
     }
 
     this.load.on('filecomplete-json-symbols', (key, type, data) => {
-      // console.log(`MainMenu: filecomplete-json-symbols: Key='${key}', Type='${type}'`);
       if (data && data.symbols) {
         const symbolBasePath = ''; // symbols.json paths are relative to assets/
         data.symbols.forEach(symbol => {
@@ -854,12 +850,10 @@ class MainMenu extends Phaser.Scene {
             console.warn(`Security: Skipped invalid symbol filename: ${symbol.filename}`);
           }
         });
-        // console.log(`MainMenu: Queued ${data.symbols.length} symbol images for loading.`);
       }
     });
 
     this.load.on('filecomplete-json-map_sections', (key, type, data) => {
-      // console.log(`MainMenu: filecomplete-json-map_sections: Key='${key}', Type='${type}'`);
       if (Array.isArray(data)) {
         data.forEach(section => {
              // Enqueue thumbnail explicitly
@@ -899,7 +893,6 @@ class MainMenu extends Phaser.Scene {
       this.gameScale = scale;
 
       // NEW: Initialize all game variables
-      // console.log('MainMenu: Initializing game state');
       this.registry.set('foundEggs', []);
       this.registry.set('stampedSections', []);
       this.registry.set('correctCategorizations', 0);
@@ -916,7 +909,6 @@ class MainMenu extends Phaser.Scene {
           console.warn('LocalStorage access failed:', e);
           this.registry.set('highScore', 0);
       }
-      // console.log('MainMenu: highScore:', this.registry.get('highScore'));
 
       // Load and validate symbols and map sections
       if (!this.registry.has('eggData')) {
@@ -924,7 +916,6 @@ class MainMenu extends Phaser.Scene {
       }
 
       // Debug: Log game dimensions and scale
-      // console.log(`MainMenu: Game dimensions - width: ${this.game.config.width}, height: ${this.game.config.height}, scale: ${scale}`);
 
       // Set camera bounds to match viewport
       this.cameras.main.setBounds(0, 0, this.game.config.width, this.game.config.height);
@@ -936,7 +927,6 @@ class MainMenu extends Phaser.Scene {
       this.cameras.main.setPosition(0, 0);
 
       // Debug: Log camera position
-      // console.log(`MainMenu: Camera position - x: ${this.cameras.main.scrollX}, y: ${this.cameras.main.scrollY}`);
 
       // Intro Video - centered
       const introVideo = this.add.video(this.game.config.width / 2, this.game.config.height / 2, 'intro-video');
@@ -998,9 +988,9 @@ class MainMenu extends Phaser.Scene {
       // Handle both mouse and touch input, request fullscreen on first click
       const safeRequestFullscreen = (element) => {
         if (element.requestFullscreen) {
-          element.requestFullscreen().catch(err => {}); // console.log('Fullscreen failed:', err));
+          element.requestFullscreen().catch(err => {});
         } else if (element.webkitRequestFullscreen) {
-          element.webkitRequestFullscreen().catch(err => {}); // console.log('Fullscreen failed:', err));
+          element.webkitRequestFullscreen().catch(err => {});
         }
       };
 
@@ -1335,7 +1325,6 @@ class MapScene extends Phaser.Scene {
       this.scene.start('MainMenu'); // Fallback to MainMenu
       return;
     }
-    // console.log('MapScene: Using existing eggData:', eggData);
 
     if (!this.scene.get('MusicScene').scene.isActive()) {
       this.scene.launch('MusicScene');
@@ -1352,7 +1341,6 @@ class MapScene extends Phaser.Scene {
     const nativeH = this.mapImage.height || 768;
     const mapScale = Math.max(this.game.config.width / nativeW, this.game.config.height / nativeH);
     this.mapImage.setScale(mapScale);
-    // console.log(`Map display size: ${this.mapImage.displayWidth}x${this.mapImage.displayHeight}, Position: (${this.mapImage.x}, ${this.mapImage.y})`);
 
     // Create map thumbnails (videos/images)
     this.mapZones = [];
@@ -1634,7 +1622,6 @@ class SectionHunt extends Phaser.Scene {
       symbolData: egg.getData('symbolDetails'),
       categorized: false
     };
-    // console.log('SectionHunt: Collecting egg with symbolData:', eggInfo.symbolData);
     if (!foundEggs.some(e => e.eggId === eggInfo.eggId)) {
       const musicScene = this.scene.get('MusicScene');
       if (musicScene) {
@@ -1681,13 +1668,11 @@ class SectionHunt extends Phaser.Scene {
         this.registry.set('highScore', currentScore);
         localStorage.setItem('highScore', currentScore);
       }
-      // console.log(`SectionHunt: Collected egg-${eggInfo.eggId} with symbol:`, eggInfo.symbolData ? eggInfo.symbolData.name : 'none', `Score: ${currentScore}`);
 
       saveGameState(this.registry);
 
       this.checkLevelComplete();
     } else {
-      // console.log(`SectionHunt: Egg-${eggInfo.eggId} already collected, skipping`);
     }
   }
 
@@ -1980,7 +1965,6 @@ class SectionHunt extends Phaser.Scene {
     const eggData = this.registry.get('eggData') || [];
     const sectionEggs = eggData.filter(e => e.section === this.sectionName && !e.collected);
     this.eggs = this.add.group();
-    // console.log(`SectionHunt: Creating ${sectionEggs.length} uncollected eggs for ${this.sectionName}`);
 
     sectionEggs.forEach(eggData => {
       const egg = this.add.image(eggData.x, eggData.y, `egg-${eggData.eggId}`)
@@ -1998,13 +1982,11 @@ class SectionHunt extends Phaser.Scene {
             .setDisplaySize(50 * scale, 75 * scale)
             .setAlpha(0);
           egg.symbolSprite = symbolSprite;
-          // console.log(`SectionHunt: Added symbol '${eggData.symbol.name}' (${textureKey}) to egg-${eggData.eggId}`);
         } else {
           console.warn(`SectionHunt: Texture '${textureKey}' not found for symbol '${eggData.symbol.name}'`);
           egg.symbolSprite = null;
         }
       } else {
-        // console.log(`SectionHunt: No symbol for egg-${eggData.eggId}`);
         egg.symbolSprite = null;
       }
       // Note: We removed the individual click handler on egg to use global lens click logic
@@ -2016,7 +1998,6 @@ class SectionHunt extends Phaser.Scene {
       .setDisplaySize(150 * scale, 150 * scale)
       .setInteractive()
       .on('pointerdown', () => {
-        // console.log('Click on eggZitButton');
         this.time.delayedCall(150, () => {
             this.scene.start('MapScene');
         });
@@ -2035,7 +2016,6 @@ class SectionHunt extends Phaser.Scene {
 
     // Delayed transition
     this.eggsAmminHaul.on('pointerdown', () => {
-        // console.log('Click on eggsAmminHaul');
         this.time.delayedCall(100, () => {
              this.scene.start('EggZamRoom');
         });
@@ -2533,7 +2513,6 @@ class EggZamRoom extends Phaser.Scene {
     });
 
     this.load.on('filecomplete', (key, type, data) => {
-      // console.log(`EggZamRoom: Successfully loaded asset: Key='${key}', Type='${type}'`);
     });
   }
 
