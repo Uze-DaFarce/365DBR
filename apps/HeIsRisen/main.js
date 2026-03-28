@@ -2422,7 +2422,7 @@ class EggZamRoom extends Phaser.Scene {
                         onComplete: () => {
                             halo.destroy();
                             sparkles.destroy();
-                            if (onCompleteCallback) onCompleteCallback();
+                            // callback is handled by playVideo completion
                         }
                     });
                 }
@@ -2688,14 +2688,14 @@ class EggZamRoom extends Phaser.Scene {
                   this.registry.set('highScore', currentScore);
                   localStorage.setItem('highScore', currentScore);
                 }
-
-                this.currentEgg.categorized = true;
-                saveGameState(this.registry);
             } else {
                 if (musicScene) {
                     musicScene.playSFX('error');
                 }
             }
+
+            this.currentEgg.categorized = true;
+            saveGameState(this.registry);
 
             if (this.explanationText) this.explanationText.destroy();
 
@@ -3152,7 +3152,7 @@ class EggZamRoom extends Phaser.Scene {
           this.input.keyboard.once('keydown-SPACE', triggerRestart);
           this.input.keyboard.once('keydown-ENTER', triggerRestart);
 
-          summaryContainer.add([panelBg, titleText, holyText, worldlyText, totalText, playBtnContainer]);
+          summaryContainer.add([panelBg, titleText, scoreTextLabel, holyText, worldlyText, totalText, playBtnContainer]);
         }
 
         return;
