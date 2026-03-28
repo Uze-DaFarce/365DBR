@@ -2697,13 +2697,14 @@ class EggZamRoom extends Phaser.Scene {
                   this.registry.set('highScore', currentScore);
                   localStorage.setItem('highScore', currentScore);
                 }
-                this.currentEgg.categorized = true;
-                saveGameState(this.registry);
             } else {
                 if (musicScene) {
                     musicScene.playSFX('error');
                 }
             }
+
+            this.currentEgg.categorized = true;
+            saveGameState(this.registry);
 
             if (this.explanationText) this.explanationText.destroy();
 
