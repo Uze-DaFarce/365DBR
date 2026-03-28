@@ -800,9 +800,17 @@ class MainMenu extends Phaser.Scene {
     this.load.image('score', 'assets/objects/score.png');
     this.load.image('magnifying-glass', 'assets/cursor/magnifying-glass.png');
     this.load.image('egg-zit-button', 'assets/objects/egg-zit-button.png');
-    this.load.image('egg-zam-room', 'assets/map/egg-zam-room.png');
-    this.load.image('egg-zamminer', 'assets/objects/egg-zamminer.png');
-    this.load.image('symbol-result-summary-diag', 'assets/objects/symbol-result-summary-diag.png');
+
+    this.load.image('eggzam-keyframe', 'assets/eggzam-keyframe.jpg');
+    this.load.video('eggzam-eggcellent', 'assets/eggzam-eggcellent.mp4');
+    this.load.video('eggzam-stinky', 'assets/eggzam-stinky.mp4');
+    this.load.video('eggzam-incorrect-classification', 'assets/eggzam-incorrect-classification.mp4');
+    this.load.video('eggzam-ambient-1', 'assets/eggzam-ambient-1.mp4');
+    this.load.video('eggzam-ambient-2', 'assets/eggzam-ambient-2.mp4');
+    this.load.atlas('egg-cellent', 'assets/objects/egg-cellent.png', 'assets/objects/egg-cellent.json');
+    this.load.atlas('eggs-tra-stinky', 'assets/objects/eggs-tra-stinky.png', 'assets/objects/eggs-tra-stinky.json');
+
+            this.load.image('symbol-result-summary-diag', 'assets/objects/symbol-result-summary-diag.png');
 
     // Audio assets
     this.load.audio('background-music', 'assets/audio/background-music.mp3');
@@ -2377,6 +2385,10 @@ class SectionHunt extends Phaser.Scene {
 class EggZamRoom extends Phaser.Scene {
 
   playGoodEggAnimation(eggImage, symbolImage, onCompleteCallback) {
+    if (this.videoEggcellent) {
+        this.videoEggcellent.setVisible(true);
+        this.videoEggcellent.play();
+    }
     const startX = eggImage.x;
     const startY = eggImage.y;
     const targetY = startY - 80;
@@ -2421,6 +2433,8 @@ class EggZamRoom extends Phaser.Scene {
                     this.time.delayedCall(1000, () => {
                         halo.destroy();
                         sparkles.destroy();
+                        if (eggImage) eggImage.y = startY;
+                        if (symbolImage) symbolImage.y = startY;
                         if (onCompleteCallback) onCompleteCallback();
                     });
                 }
@@ -2430,6 +2444,10 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   playBadEggAnimation(eggImage, symbolImage, onCompleteCallback) {
+    if (this.videoStinky) {
+        this.videoStinky.setVisible(true);
+        this.videoStinky.play();
+    }
     const startX = eggImage.x;
     const startY = eggImage.y;
 
@@ -2504,11 +2522,34 @@ class EggZamRoom extends Phaser.Scene {
     const bgScale = Math.min(scaleX, scaleY);
 
     // Position background centered
-    this.add.image(width/2, height/2, 'egg-zam-room')
-      .setDisplaySize(1280 * bgScale, 720 * bgScale)
-      .setDepth(0);
 
-    const examiner = this.add.image(0, 0, 'egg-zamminer').setOrigin(0, 0).setDepth(2);
+    const bgScale = Math.max(scaleX, scaleY); // Fullscreen cover
+
+    // Keyframe Background
+    this.keyframe = this.add.image(width/2, height/2, 'eggzam-keyframe')
+        .setDisplaySize(1920 * bgScale, 1080 * bgScale)
+        .setDepth(0);
+
+    // Fullscreen Action Videos (Hidden initially)
+    const setupVideo = (key, depth) => {
+        const vid = this.add.video(width/2, height/2, key)
+            .setDisplaySize(1920 * bgScale, 1080 * bgScale)
+            .setDepth(depth)
+            .setVisible(false);
+        vid.on('complete', () => vid.setVisible(false));
+        return vid;
+    };
+
+    this.videoEggcellent = setupVideo('eggzam-eggcellent', 1);
+    this.videoStinky = setupVideo('eggzam-stinky', 1);
+    this.videoIncorrect = setupVideo('eggzam-incorrect-classification', 1);
+
+    // Ambient Videos (Hidden initially)
+    this.ambient1 = setupVideo('eggzam-ambient-1', 1);
+    this.ambient2 = setupVideo('eggzam-ambient-2', 1);
+
+
+
     // Original pos: 390, 250. Size? Default.
     // Let's assume original design was 1280x720 fixed.
     // We scale everything by 'scale' (min) to ensure UI fits on screen.
@@ -2571,40 +2612,55 @@ class EggZamRoom extends Phaser.Scene {
       strokeThickness: 6 * uiScale
     }).setDepth(5).setOrigin(0.5);
 
-    // Create hover graphics for highlighting bottles
-    this.hoverGraphics = this.add.graphics().setDepth(10);
 
-    // Zones need to be positioned relative to the SCALED examiner/room
-    // Original: 450, 300, 100x200
-    const leftBottleZone = this.add.zone(offsetX + 450 * uiScale, offsetY + 300 * uiScale, 100 * uiScale, 200 * uiScale).setOrigin(0, 0).setInteractive();
-    // Original: 750, 300, 100x200
-    const rightBottleZone = this.add.zone(offsetX + 750 * uiScale, offsetY + 300 * uiScale, 100 * uiScale, 200 * uiScale).setOrigin(0, 0).setInteractive();
+    // New Animated Atlas Buttons
+    const btnScale = uiScale * 0.9;
 
-    const addZoneHover = (zone) => {
-        zone.on('pointerover', () => {
-            this.hoverGraphics.clear();
-            this.hoverGraphics.lineStyle(4, 0xffff00, 1);
-            this.hoverGraphics.strokeRect(zone.x, zone.y, zone.width, zone.height);
-            this.hoverGraphics.fillStyle(0xffff00, 0.2);
-            this.hoverGraphics.fillRect(zone.x, zone.y, zone.width, zone.height);
-        });
+    // Left Button: Egg-cellent
+    const btnEggcellent = this.add.sprite(offsetX + 350 * btnScale, offsetY + 600 * btnScale, 'egg-cellent', 'egg-cellent-neutral')
+        .setDepth(10)
+        .setScale(btnScale)
+        .setInteractive({ useHandCursor: true });
 
-        zone.on('pointerout', () => {
-            this.hoverGraphics.clear();
-        });
-    };
+    btnEggcellent.on('pointerover', () => {
+        btnEggcellent.setFrame('egg-cellent-hover');
+        this.sound.play('menu-hover');
+    });
+    btnEggcellent.on('pointerout', () => {
+        btnEggcellent.setFrame('egg-cellent-neutral');
+    });
+    btnEggcellent.on('pointerdown', () => {
+        if (typeof resetAmbientTimer === 'function') resetAmbientTimer();
+        btnEggcellent.setFrame('egg-cellent-press');
+        this.sound.play('menu-click');
+    });
 
-    addZoneHover(leftBottleZone);
-    addZoneHover(rightBottleZone);
+    // Right Button: Eggs-tra Stinky
+    const btnStinky = this.add.sprite(offsetX + 1550 * btnScale, offsetY + 600 * btnScale, 'eggs-tra-stinky', 'eggs-tra-stinky-neutral')
+        .setDepth(10)
+        .setScale(btnScale)
+        .setInteractive({ useHandCursor: true });
 
-    addTooltip(this, leftBottleZone, 'Categorize as Egg-cellent');
-    addTooltip(this, rightBottleZone, 'Categorize as Eggs-tra Stinky');
+    btnStinky.on('pointerover', () => {
+        btnStinky.setFrame('eggs-tra-stinky-hover');
+        this.sound.play('menu-hover');
+    });
+    btnStinky.on('pointerout', () => {
+        btnStinky.setFrame('eggs-tra-stinky-neutral');
+    });
+    btnStinky.on('pointerdown', () => {
+        if (typeof resetAmbientTimer === 'function') resetAmbientTimer();
+        btnStinky.setFrame('eggs-tra-stinky-press');
+        this.sound.play('menu-click');
+    });
+
 
     const showExplanation = (isCorrect, guessText) => {
         if (this.explanationText) this.explanationText.destroy();
         const data = this.currentEgg.symbolData;
         const eggId = this.currentEgg.eggId;
 
+        // Setup execution payload
         const executeExplanationPopup = () => {
             const musicScene = this.scene.get('MusicScene');
             if (isCorrect) {
@@ -2842,7 +2898,6 @@ class EggZamRoom extends Phaser.Scene {
                     if (!isCorrect) {
                         this.currentEgg = null;
                     }
-                    this.displayRandomEggInfo(offsetX, offsetY, uiScale);
                     window.removeEventListener('keydown', this.popupKeyHandler);
                 }
             });
@@ -2868,6 +2923,12 @@ class EggZamRoom extends Phaser.Scene {
         this.explanationText.setScale(0);
         this.tweens.add({ targets: this.explanationText, scaleX: 1, scaleY: 1, duration: 300, ease: 'Back.out' });
 
+        // Swap egg in background while popup is showing
+        if (!isCorrect) {
+            this.currentEgg = null;
+        }
+        this.displayRandomEggInfo(offsetX, offsetY, uiScale);
+
         // Removed bg click dismiss
         };
 
@@ -2880,23 +2941,103 @@ class EggZamRoom extends Phaser.Scene {
                 executeExplanationPopup();
             }
         } else {
-            executeExplanationPopup();
+            // Incorrect guess triggers the video and skip logic
+            const musicScene = this.scene.get('MusicScene');
+            if (musicScene) musicScene.playSFX('failure');
+            if (this.videoIncorrect) {
+                this.videoIncorrect.setVisible(true);
+                this.videoIncorrect.play();
+                this.videoIncorrect.once('complete', () => {
+                    executeExplanationPopup();
+                });
+            } else {
+                executeExplanationPopup();
+            }
         }
     };
 
-    leftBottleZone.on('pointerdown', () => {
+
+
+
+    btnEggcellent.on('pointerup', () => {
+      btnEggcellent.setFrame('egg-cellent-hover');
       if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
         showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
       }
     });
 
-    rightBottleZone.on('pointerdown', () => {
+    btnStinky.on('pointerup', () => {
+      btnStinky.setFrame('eggs-tra-stinky-hover');
       if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
         showExplanation(this.currentEgg.symbolData.category === 'Pagan', 'Eggs-tra Stinky');
       }
     });
 
+
     this.displayRandomEggInfo(offsetX, offsetY, uiScale);
+
+    // --- Ambient Inactivity Timer ---
+    let ambientTimer = null;
+    let currentAmbient = 1;
+
+    const playAmbient = () => {
+        // Prevent playing if a popup is active or an action video is playing
+        if ((this.videoEggcellent && this.videoEggcellent.isPlaying()) ||
+            (this.videoStinky && this.videoStinky.isPlaying()) ||
+            (this.videoIncorrect && this.videoIncorrect.isPlaying())) {
+            resetAmbientTimer();
+            return;
+        }
+
+        if (currentAmbient === 1 && this.ambient1) {
+            this.ambient1.setVisible(true);
+            this.ambient1.play();
+            this.ambient1.once('complete', () => {
+                if (ambientTimer) { // only loop if we weren't interrupted
+                    this.ambient1.setVisible(false);
+                    currentAmbient = 2;
+                    playAmbient();
+                }
+            });
+        } else if (currentAmbient === 2 && this.ambient2) {
+            this.ambient2.setVisible(true);
+            this.ambient2.play();
+            this.ambient2.once('complete', () => {
+                if (ambientTimer) { // only loop if we weren't interrupted
+                    this.ambient2.setVisible(false);
+                    currentAmbient = 1;
+                    playAmbient();
+                }
+            });
+        }
+    };
+
+    const resetAmbientTimer = () => {
+        if (ambientTimer) ambientTimer.remove();
+
+        // Stop currently playing ambient videos
+        if (this.ambient1 && this.ambient1.isPlaying()) {
+            this.ambient1.stop();
+            this.ambient1.setVisible(false);
+        }
+        if (this.ambient2 && this.ambient2.isPlaying()) {
+            this.ambient2.stop();
+            this.ambient2.setVisible(false);
+        }
+
+        ambientTimer = this.time.addEvent({
+            delay: 30000, // 30 seconds
+            callback: playAmbient,
+            callbackScope: this
+        });
+    };
+
+    // Listen for global interaction
+
+
+    // Initial start
+    resetAmbientTimer();
+    // --- End Ambient Timer ---
 
     // Store scale params for update/resize if needed (or just restart scene on resize)
     this.uiParams = { offsetX, offsetY, uiScale };
@@ -3046,21 +3187,23 @@ class EggZamRoom extends Phaser.Scene {
 
     if (this.currentEgg) {
       const { eggId, symbolData } = this.currentEgg;
-      const eggPosX = offsetX + 630 * scale;
-      // User requested egg to move down ~10px on desktop
-      const eggPosY = offsetY + 360 * scale;
+      const eggPosX = this.cameras.main.width / 2;
+      // Position the egg semi-transparently inside the large center glass chamber
+      const eggPosY = this.cameras.main.height / 2 - (100 * scale);
       const symbolPosX = eggPosX;
       const symbolPosY = eggPosY;
 
       if (this.textures.exists(`egg-${eggId}`)) {
         this.displayedEggImage = this.add.image(eggPosX, eggPosY, `egg-${eggId}`)
           .setDisplaySize(100 * scale, 125 * scale)
-          .setDepth(3);
+          .setDepth(3)
+          .setAlpha(0.65);
       }
       if (symbolData && symbolData.filename && this.textures.exists(symbolData.filename)) {
         this.displayedSymbolImage = this.add.image(symbolPosX, symbolPosY, symbolData.filename)
           .setDisplaySize(100 * scale, 125 * scale)
-          .setDepth(3);
+          .setDepth(3)
+          .setAlpha(0.65);
       }
     }
   }
