@@ -23,14 +23,8 @@ try:
         }''')
         page.wait_for_timeout(3000)
 
-        # Click the "Egg-cellent" button to trigger the good egg animation and video
-        # The button is centered on the bottom half. CenterX = 333, CenterY = 275, buttonSpacing = 120 * scale ~ 50. So Right button ~ X: 380, Y: 275
-        page.mouse.click(383, 275)
-
-        # Wait for video to finish and popup to show
-        page.wait_for_timeout(5000)
-
-        page.screenshot(path='apps/HeIsRisen/tests/mobile_eggzam_room_landscape.png')
+        # screenshot right after loading
+        page.screenshot(path='apps/HeIsRisen/tests/mobile_eggzam_room_landscape_start.png')
         page.wait_for_timeout(1000)
         context.close()
         browser.close()

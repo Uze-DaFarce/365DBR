@@ -120,6 +120,4 @@ def wait_for_phaser_init(page):
     page.wait_for_function("() => window.game && window.game.scene && window.game.scene.scenes.length > 0")
 
 def wait_for_active_scene(page, scene_name):
-    # Log errors in the console to help debug
-    page.on("console", lambda msg: print(f"Browser Console: {msg.text}") if msg.type == "error" else None)
-    page.wait_for_function(f"() => window.game.scene.getScene('{scene_name}').scene.isActive()", timeout=15000)
+    page.wait_for_function(f"() => window.game.scene.getScene('{scene_name}').scene.isActive()")
