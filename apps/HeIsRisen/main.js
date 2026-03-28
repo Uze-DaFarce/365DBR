@@ -14,42 +14,6 @@ function announceToScreenReader(message) {
     }
 }
 
-function addButtonInteraction(scene, button, sfxKey) {
-    button.baseScaleX = button.scaleX;
-    button.baseScaleY = button.scaleY;
-
-    button.on('pointerover', () => scene.tweens.add({
-        targets: button,
-        scaleX: button.baseScaleX * 1.1,
-        scaleY: button.baseScaleY * 1.1,
-        duration: 100,
-        ease: 'Sine.easeInOut'
-    }));
-
-    button.on('pointerout', () => scene.tweens.add({
-        targets: button,
-        scaleX: button.baseScaleX,
-        scaleY: button.baseScaleY,
-        duration: 100,
-        ease: 'Sine.easeInOut'
-    }));
-
-    button.on('pointerdown', () => {
-        const musicScene = scene.scene.get('MusicScene');
-        if (musicScene && musicScene.scene.isActive()) {
-            musicScene.playSFX(sfxKey);
-        }
-        scene.tweens.add({
-            targets: button,
-            scaleX: button.baseScaleX * 0.9,
-            scaleY: button.baseScaleY * 0.9,
-            duration: 50,
-            yoyo: true,
-            ease: 'Power1'
-        });
-    });
-}
-
 class Confirmation extends Phaser.GameObjects.Container {
     constructor(scene, x, y, text, onYes, onNo) {
         super(scene, x, y);
@@ -467,24 +431,13 @@ class UIScene extends Phaser.Scene {
     // Add ESC and ENTER key support to toggle settings
     const toggleSettings = () => {
         if (this.settingsContainer.visible) {
-            this.settingsContainer.setVisible(false);
-            this.gearIcon.setVisible(true);
-            this.gearIcon.setScale(1);
-            this.input.setDefaultCursor('none');
+            this.closeSettings();
         } else {
             this.openSettings();
         }
     };
-    const closeSettings = () => {
-        if (this.settingsContainer.visible) {
-            this.settingsContainer.setVisible(false);
-            this.gearIcon.setVisible(true);
-            this.gearIcon.setScale(1);
-            this.input.setDefaultCursor('none');
-        }
-    };
     this.input.keyboard.on('keydown-ESC', toggleSettings);
-    this.input.keyboard.on('keydown-ENTER', closeSettings);
+    this.input.keyboard.on('keydown-ENTER', () => this.closeSettings());
 
     this.scale.on('resize', this.resize, this);
   }
@@ -646,10 +599,7 @@ class UIScene extends Phaser.Scene {
 
     closeBtn.on('pointerdown', () => {
         this.time.delayedCall(150, () => {
-            this.settingsContainer.setVisible(false);
-            this.gearIcon.setVisible(true);
-            this.gearIcon.setScale(1);
-            this.input.setDefaultCursor('none');
+            this.closeSettings();
         });
     });
     this.settingsContainer.add(closeBtn);
@@ -707,10 +657,7 @@ class UIScene extends Phaser.Scene {
 
             // Close settings
             this.time.delayedCall(150, () => {
-                this.settingsContainer.setVisible(false);
-                this.gearIcon.setVisible(true);
-                this.gearIcon.setScale(1);
-                this.input.setDefaultCursor('none');
+                this.closeSettings();
             });
         });
         this.settingsContainer.add(confirmation);
@@ -769,10 +716,40 @@ class UIScene extends Phaser.Scene {
     });
   }
 
+  closeSettings() {
+    if (this.settingsContainer && this.settingsContainer.visible) {
+        this.tweens.killTweensOf(this.settingsContainer);
+        this.tweens.add({
+            targets: this.settingsContainer,
+            alpha: 0,
+            duration: 200,
+            ease: 'Power2',
+            onComplete: () => {
+                this.settingsContainer.setVisible(false);
+                this.settingsContainer.setAlpha(1); // Reset for next time
+                if (this.gearIcon) {
+                    this.gearIcon.setVisible(true);
+                    this.gearIcon.setScale(1);
+                }
+                if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+            }
+        });
+    }
+  }
+
   openSettings() {
+    this.tweens.killTweensOf(this.settingsContainer);
+    this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
-    this.gearIcon.setVisible(false);
-    this.input.setDefaultCursor('none');
+    if (this.gearIcon) this.gearIcon.setVisible(false);
+    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+
+    this.tweens.add({
+        targets: this.settingsContainer,
+        alpha: 1,
+        duration: 200,
+        ease: 'Power2'
+    });
   }
 }
 
@@ -1173,13 +1150,22 @@ class MainMenu extends Phaser.Scene {
     // Handle Resize
     this.scale.on('resize', this.resize, this);
 
-    // Safety: Check video dimensions after a short delay to ensure metadata loaded
-    this.time.delayedCall(100, () => {
-        if (this.introVideo && this.introVideo.active) {
-            // Force resize logic
-            this.resize(this.scale);
-        }
-    });
+    // Handle delayed video metadata loading
+    if (this.introVideo && this.introVideo.active) {
+        const checkVideoReady = () => {
+            if (this.introVideo && this.introVideo.active) {
+                if (this.introVideo.width > 0) {
+                    this.resize(this.scale);
+                } else {
+                    // Poll occasionally until metadata is fully available (safer than a hardcoded 100ms)
+                    this.time.delayedCall(100, checkVideoReady);
+                }
+            }
+        };
+        this.introVideo.once('play', checkVideoReady);
+        // Fallback for Safari/iOS that might require interaction
+        this.time.delayedCall(100, checkVideoReady);
+    }
 
     const symbolsData = this.cache.json.get('symbols');
     if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
@@ -1942,6 +1928,46 @@ class SectionHunt extends Phaser.Scene {
         this.sectionVideo = this.add.video(width/2, height/2, videoKey)
             .setDisplaySize(1280 * scale, 720 * scale)
             .setDepth(0);
+
+        const applySectionVideoScale = () => {
+             if (this.sectionVideo && this.sectionVideo.active && this.sectionVideo.width > 0) {
+                 const w = this.scale.width;
+                 const h = this.scale.height;
+                 const sX = w / 1280;
+                 const sY = h / 720;
+                 const tScale = Math.max(sX, sY);
+
+                 // Use a threshold to prevent jitter/unnecessary redraws
+                 if (Math.abs(this.sectionVideo.displayWidth - (1280 * tScale)) > 5) {
+                     this.sectionVideo.setDisplaySize(1280 * tScale, 720 * tScale);
+                     this.sectionVideo.setPosition(w / 2, h / 2);
+
+                     this.bgScale = tScale;
+                     this.bgOffsetX = (w - 1280 * tScale) / 2;
+                     this.bgOffsetY = (h - 720 * tScale) / 2;
+                 }
+             }
+        };
+
+        const checkSectionVideoReady = () => {
+             if (this.sectionVideo && this.sectionVideo.active) {
+                 if (this.sectionVideo.width > 0) {
+                     applySectionVideoScale();
+                 } else {
+                     this.time.delayedCall(100, checkSectionVideoReady);
+                 }
+             }
+        };
+
+        this.sectionVideo.once('play', checkSectionVideoReady);
+        // Fallback trigger if event misses
+        this.time.delayedCall(100, checkSectionVideoReady);
+
+        // Add a scale event listener to replace the update loop checks for resize
+        this.scale.on('resize', applySectionVideoScale, this);
+        this.events.once('shutdown', () => {
+             this.scale.off('resize', applySectionVideoScale, this);
+        });
 
         this.sectionVideo.play(true); // Loop
         this.sectionVideo.setMute(false); // iOS quirk: keep muted attr false to avoid global context suspension
@@ -3081,9 +3107,13 @@ function addButtonInteraction(scene, button, soundKey = 'success') {
   button.on('pointerdown', () => {
     const musicScene = scene.scene.get('MusicScene');
     if (musicScene && musicScene.scene.isActive()) {
-        musicScene.playSFX(soundKey);
+      musicScene.playSFX(soundKey);
     } else if (soundKey && scene.sound.get(soundKey)) {
-        scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
+      scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
+    }
+
+    if (navigator && navigator.vibrate) {
+      navigator.vibrate(20);
     }
 
     if (button.baseScaleX === undefined) {

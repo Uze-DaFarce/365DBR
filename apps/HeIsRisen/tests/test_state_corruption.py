@@ -132,6 +132,73 @@ def run_state_corruption_test(is_mobile=False):
 
             print("SUCCESS: State corruption was safely rejected and game defaulted to stable values (or valid backups).")
 
+            # Inject a visual dialog to show the user what was tested and how it was resolved
+            page.evaluate(f"""
+                () => {{
+                    const dialog = document.createElement('div');
+                    dialog.style.position = 'absolute';
+                    dialog.style.top = '10%';
+                    dialog.style.left = '10%';
+                    dialog.style.width = '80%';
+                    dialog.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+                    dialog.style.border = '4px solid #ff0000';
+                    dialog.style.borderRadius = '10px';
+                    dialog.style.color = '#ffffff';
+                    dialog.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
+                    dialog.style.padding = '20px';
+                    dialog.style.zIndex = '999999';
+                    dialog.style.boxSizing = 'border-box';
+
+                    dialog.innerHTML = `
+                        <h2 style="color: #ffff00; margin-top: 0; text-align: center;">🛡️ Sentinel: State Corruption Test</h2>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                            <tr style="border-bottom: 2px solid #666;">
+                                <th style="text-align: left; padding: 5px;">Key</th>
+                                <th style="text-align: left; padding: 5px;">Injected Value</th>
+                                <th style="text-align: left; padding: 5px;">Resolved To</th>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #444;">
+                                <td style="padding: 5px; color: #ff9999;">highScore</td>
+                                <td style="padding: 5px; color: #ff9999;">'-Infinity'</td>
+                                <td style="padding: 5px; color: #99ff99;">0 (Fallback)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #444;">
+                                <td style="padding: 5px; color: #ff9999;">currentScore</td>
+                                <td style="padding: 5px; color: #ff9999;">'HACKED'</td>
+                                <td style="padding: 5px; color: #99ff99;">0 (Fallback)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #444;">
+                                <td style="padding: 5px; color: #ff9999;">correctCategorizations</td>
+                                <td style="padding: 5px; color: #ff9999;">'NaN'</td>
+                                <td style="padding: 5px; color: #99ff99;">0 (Fallback)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #444;">
+                                <td style="padding: 5px; color: #ff9999;">musicVolume</td>
+                                <td style="padding: 5px; color: #ff9999;">'NaN'</td>
+                                <td style="padding: 5px; color: #99ff99;">0.8 (Valid Backup)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #444;">
+                                <td style="padding: 5px; color: #ff9999;">ambientVolume</td>
+                                <td style="padding: 5px; color: #ff9999;">'{{}}'</td>
+                                <td style="padding: 5px; color: #99ff99;">0.5 (Invalid Backup -> Default)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px; color: #ff9999;">sfxVolume</td>
+                                <td style="padding: 5px; color: #ff9999;">' '</td>
+                                <td style="padding: 5px; color: #99ff99;">0.5 (No Backup -> Default)</td>
+                            </tr>
+                        </table>
+                        <h3 style="color: #00ff00; text-align: center; margin-bottom: 0;">✅ SUCCESS: Data Integrity Maintained</h3>
+                    `;
+
+                    const targetContainer = document.fullscreenElement || document.webkitFullscreenElement || document.body;
+                    targetContainer.appendChild(dialog);
+                }}
+            """)
+
+            # Wait for injected dialog to render
+            time.sleep(1)
+
             # Capture visual proof
             os.makedirs("verification", exist_ok=True)
             screenshot_path = f"verification/state_corruption_{context_type}.png"

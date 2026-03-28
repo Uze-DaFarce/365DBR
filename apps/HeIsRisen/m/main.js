@@ -15,42 +15,6 @@ function announceToScreenReader(message) {
     }
 }
 
-function addButtonInteraction(scene, button, sfxKey) {
-    button.baseScaleX = button.scaleX;
-    button.baseScaleY = button.scaleY;
-
-    button.on('pointerover', () => scene.tweens.add({
-        targets: button,
-        scaleX: button.baseScaleX * 1.1,
-        scaleY: button.baseScaleY * 1.1,
-        duration: 100,
-        ease: 'Sine.easeInOut'
-    }));
-
-    button.on('pointerout', () => scene.tweens.add({
-        targets: button,
-        scaleX: button.baseScaleX,
-        scaleY: button.baseScaleY,
-        duration: 100,
-        ease: 'Sine.easeInOut'
-    }));
-
-    button.on('pointerdown', () => {
-        const musicScene = scene.scene.get('MusicScene');
-        if (musicScene && musicScene.scene.isActive()) {
-            musicScene.playSFX(sfxKey);
-        }
-        scene.tweens.add({
-            targets: button,
-            scaleX: button.baseScaleX * 0.9,
-            scaleY: button.baseScaleY * 0.9,
-            duration: 50,
-            yoyo: true,
-            ease: 'Power1'
-        });
-    });
-}
-
 class Confirmation extends Phaser.GameObjects.Container {
     constructor(scene, x, y, text, onYes, onNo) {
         super(scene, x, y);
@@ -436,23 +400,14 @@ class UIScene extends Phaser.Scene {
     // Add ESC and ENTER key support to toggle settings
     const toggleSettings = () => {
         if (this.settingsContainer && this.settingsContainer.visible) {
-            this.settingsContainer.setVisible(false);
-            if (this.gearIcon) this.gearIcon.setVisible(true);
-            this.input.setDefaultCursor('none');
+            this.closeSettings();
         } else {
             this.openSettings();
         }
     };
-    const closeSettings = () => {
-        if (this.settingsContainer && this.settingsContainer.visible) {
-            this.settingsContainer.setVisible(false);
-            if (this.gearIcon) this.gearIcon.setVisible(true);
-            this.input.setDefaultCursor('none');
-        }
-    };
     if (this.input.keyboard) {
         this.input.keyboard.on('keydown-ESC', toggleSettings);
-        this.input.keyboard.on('keydown-ENTER', closeSettings);
+        this.input.keyboard.on('keydown-ENTER', () => this.closeSettings());
     }
 
     // Listen for resize events to update UI positions
@@ -641,9 +596,7 @@ class UIScene extends Phaser.Scene {
         this.tweens.add({
             targets: closeBtn, scaleX: 0.9, scaleY: 0.9, duration: 50, ease: 'Power1', yoyo: true,
             onComplete: () => {
-                this.settingsContainer.setVisible(false);
-                this.gearIcon.setVisible(true);
-                this.input.setDefaultCursor('none');
+                this.closeSettings();
                 closeBtn.setScale(1); // Reset
             }
         });
@@ -701,9 +654,7 @@ class UIScene extends Phaser.Scene {
 
             // Close settings
             this.time.delayedCall(150, () => {
-                this.settingsContainer.setVisible(false);
-                if (this.gearIcon) this.gearIcon.setVisible(true);
-                if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+                this.closeSettings();
             });
         });
         this.settingsContainer.add(confirmation);
@@ -763,10 +714,40 @@ class UIScene extends Phaser.Scene {
     handle.on('pointerout', () => this.tweens.add({ targets: handle, scale: 1, duration: 100, ease: 'Back.out' }));
   }
 
+  closeSettings() {
+      if (this.settingsContainer && this.settingsContainer.visible) {
+          this.tweens.killTweensOf(this.settingsContainer);
+          this.tweens.add({
+              targets: this.settingsContainer,
+              alpha: 0,
+              duration: 200,
+              ease: 'Power2',
+              onComplete: () => {
+                  this.settingsContainer.setVisible(false);
+                  this.settingsContainer.setAlpha(1); // Reset for next time
+                  if (this.gearIcon) {
+                      this.gearIcon.setVisible(true);
+                      this.gearIcon.setScale(1);
+                  }
+                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+              }
+          });
+      }
+  }
+
   openSettings() {
+    this.tweens.killTweensOf(this.settingsContainer);
+    this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
-    this.gearIcon.setVisible(false);
-    this.input.setDefaultCursor('none');
+    if (this.gearIcon) this.gearIcon.setVisible(false);
+    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+
+    this.tweens.add({
+        targets: this.settingsContainer,
+        alpha: 1,
+        duration: 200,
+        ease: 'Power2'
+    });
   }
 }
 
@@ -959,6 +940,36 @@ class MainMenu extends Phaser.Scene {
       this.introVideo = introVideo; // Store reference for resizing
       introVideo.setMute(true); // Start muted to allow autoplay
       introVideo.disableInteractive(); // Ensure video ignores input
+
+      // Handle delayed video metadata loading and scaling on resize
+      const applyVideoScale = () => {
+          if (this.introVideo && this.introVideo.active && this.introVideo.width > 0) {
+              if (Math.abs(this.introVideo.displayWidth - this.game.config.width) > 10) {
+                  this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height);
+                  this.introVideo.setPosition(this.game.config.width / 2, this.game.config.height / 2);
+              }
+          }
+      };
+
+      if (this.introVideo && this.introVideo.active) {
+          const checkVideoReady = () => {
+              if (this.introVideo && this.introVideo.active) {
+                  if (this.introVideo.width > 0) {
+                      applyVideoScale();
+                  } else {
+                      this.time.delayedCall(100, checkVideoReady);
+                  }
+              }
+          };
+          this.introVideo.once('play', checkVideoReady);
+          this.scale.on('resize', applyVideoScale, this);
+          this.events.once('shutdown', () => {
+               this.scale.off('resize', applyVideoScale, this);
+          });
+          // Fallback trigger if event misses
+          this.time.delayedCall(100, checkVideoReady);
+      }
+
       try {
         introVideo.play(true); // Loop
       } catch (e) {
@@ -1279,13 +1290,6 @@ class MainMenu extends Phaser.Scene {
   update() {
     if (this.fingerCursor) {
       this.fingerCursor.setPosition(this.input.x, this.input.y);
-    }
-
-    // Ensure video size is correct once texture loads
-    if (this.introVideo && this.introVideo.active && this.introVideo.width > 0) {
-        if (Math.abs(this.introVideo.displayWidth - this.game.config.width) > 10) {
-            this.introVideo.setDisplaySize(this.game.config.width, this.game.config.height);
-        }
     }
   }
 }
@@ -3277,9 +3281,13 @@ function addButtonInteraction(scene, button, soundKey = 'success') {
     // Try to play sound via MusicScene if available to ensure persistence
     const musicScene = scene.scene.get('MusicScene');
     if (musicScene && musicScene.scene.isActive()) {
-        musicScene.playSFX(soundKey);
+      musicScene.playSFX(soundKey);
     } else if (soundKey && scene.sound.get(soundKey)) {
-        scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
+      scene.sound.play(soundKey, { volume: scene.registry.get('sfxVolume') ?? 0.5 });
+    }
+
+    if (navigator && navigator.vibrate) {
+      navigator.vibrate(20);
     }
 
     if (button.baseScaleX === undefined || !scene.tweens.isTweening(button)) {
