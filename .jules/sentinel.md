@@ -116,3 +116,7 @@ Dynamically loaded external JSON files accessed via `cache.json.get('key')` (lik
 *   Fixed mobile `pointer.x` click simulation math in Playwright tests by explicitly applying `lensOffsetX` and `lensOffsetY` mapping, and triggering native `scene.input.emit('pointerdown')` instead of brittle DOM bounding box intercepts.
 *   Ensured fallback simulated collection correctly updates the `foundEggs` registry to include full `symbolData` so the `EggZamRoom` sorting dialog can process testing states accurately.
 *   Consolidated and removed redundant low-value screenshots in `test_ui_interactions.py` (e.g. intermediate pressed states, closing menus) to reduce test noise.
+
+## 2026-03-28 - Strict Validation for External Game State (localStorage)
+**Learning:** `parseInt()` can lead to silent failures by partially parsing invalid strings (e.g., `parseInt('5a')` returns `5`). This violates the "fail fast on corruption" principle and could allow corrupted game state from `localStorage` to bypass initialization checks.
+**Action:** Replaced all instances of `parseInt()` with `Number()` when reading `localStorage` data (`currentScore`, `correctCategorizations`, `highScore`) in `apps/HeIsRisen/main.js` and `apps/HeIsRisen/m/main.js`. Added strict `!isFinite()` and `isNaN()` validation to ensure corrupted or malformed inputs correctly reset the game state safely.
