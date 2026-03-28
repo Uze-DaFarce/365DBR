@@ -1233,12 +1233,21 @@ function App() {
     }
     let isScrollLocked = false;
     let lockTimeout = null;
+    const isIframe = window !== window.parent;
+
     const handleScrollLock = () => {
         isScrollLocked = true;
         if (lockTimeout) clearTimeout(lockTimeout);
-        lockTimeout = setTimeout(() => { isScrollLocked = false; }, 800);
+        // Extend the lock slightly in iframe to ensure the programmatic scroll completely settles
+        // before the intersection observer starts firing again and potentially jumping verses.
+        const lockDuration = isIframe ? 1200 : 800;
+        lockTimeout = setTimeout(() => { isScrollLocked = false; }, lockDuration);
     };
     window.addEventListener('scrolllock', handleScrollLock);
+
+    // For small iframes, use a tighter margin so we don't prematurely detect the next verse
+    // when scrolled down to the focal translation (slot 3).
+    const observerMargin = isIframe ? '-10% 0px -40% 0px' : '-15% 0px -70% 0px';
 
     const observer = new IntersectionObserver((entries) => {
       if (isScrollLocked) return;
@@ -1250,11 +1259,12 @@ function App() {
 
       const intersecting = entries.filter(e => e.isIntersecting);
       if (intersecting.length > 0) {
-        // Sort by distance to "reading line" (approx 120px from top)
-        const bestEntry = intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top - 120) - Math.abs(b.boundingClientRect.top - 120))[0];
+        // In iframe, focal text is at the bottom. Tweak the "reading line" reference to prioritize the visible text
+        const referenceLine = isIframe ? window.innerHeight / 2 : 120;
+        const bestEntry = intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top - referenceLine) - Math.abs(b.boundingClientRect.top - referenceLine))[0];
         setActiveVerseId(bestEntry.target.id.replace('verse-', ''));
       }
-    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+    }, { rootMargin: observerMargin, threshold: 0 });
 
     groupedVids.forEach((group) => {
       const vid = group[0];
