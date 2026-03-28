@@ -786,7 +786,6 @@ class UIScene extends Phaser.Scene {
         duration: 200,
         ease: 'Power2'
     });
-    announceToScreenReader('Settings menu opened. Press Escape to close.');
   }
 }
 
