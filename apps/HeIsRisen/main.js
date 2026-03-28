@@ -2560,15 +2560,14 @@ class EggZamRoom extends Phaser.Scene {
           if (this.actionButtons && !videoKey.includes('ambient')) {
               this.actionButtons.forEach(btn => btn.setVisible(false));
           }
-          const fallbackTimer = this.time.delayedCall(4000, () => {
-          if (this.currentVideo && this.currentVideo.active) {
+          this.currentVideo.on('complete', () => {
               this.stopCurrentVideo();
               if (onComplete) onComplete();
-    }
           });
-          this.currentVideo.on('complete', () => {
-            this.stopCurrentVideo();
-            if (onComplete) onComplete();
+          this.currentVideo.on('error', () => {
+              console.error(`Error playing video ${videoKey}`);
+              this.stopCurrentVideo();
+              if (onComplete) onComplete();
           });
       } catch (error) {
           console.error(`Error playing video ${videoKey}:`, error);
