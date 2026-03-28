@@ -266,43 +266,6 @@ function initializeGameData(registry, cache, forceNew = false) {
     saveGameState(registry);
 }
 
-class CursorScene extends Phaser.Scene {
-  constructor() {
-    super({ key: 'CursorScene', active: false });
-  }
-
-  create() {
-    // If not loaded yet (e.g. boot), wait?
-    // Assets are loaded in MainMenu. CursorScene starts active but MainMenu preloads.
-    // If MainMenu hasn't loaded 'finger-cursor', this will fail.
-    // Better to launch CursorScene FROM MainMenu after preload.
-    this.fingerCursor = this.add.image(0, 0, 'finger-cursor')
-        .setOrigin(0, 0)
-        .setDepth(11111); // Always on top
-
-    // ⚡ Bolt Optimization: Move static DOM operations and scaling out of update loop
-    this.input.setDefaultCursor('none');
-
-    // Set initial size
-    const initialScale = Math.min(this.scale.width / 1280, this.scale.height / 720);
-    this.fingerCursor.setDisplaySize(50 * initialScale, 75 * initialScale);
-
-    // Update size only on resize events
-    this.scale.on('resize', (gameSize) => {
-      const scale = Math.min(gameSize.width / 1280, gameSize.height / 720);
-      if (this.fingerCursor && this.fingerCursor.active) {
-        this.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
-      }
-    });
-  }
-
-  update() {
-    const pointer = this.input.activePointer;
-    if (this.fingerCursor) {
-        this.fingerCursor.setPosition(pointer.x, pointer.y);
-    }
-  }
-}
 
 class MusicScene extends Phaser.Scene {
   constructor() {
@@ -663,7 +626,7 @@ class UIScene extends Phaser.Scene {
 
     // Invisible hit area for easier clicking on track (increased height to 60)
     const trackHitArea = this.add.rectangle(centerX, y + 10, 200, 60, 0x888888, 0).setInteractive();
-    trackHitArea.input.cursor = 'pointer';
+    trackHitArea.input.cursor = 'url(assets/cursor/pointer-finger-pointer.png), pointer';
     this.settingsContainer.add(trackHitArea);
     this.settingsContainer.add(this.add.rectangle(centerX, y + 10, 200, 4, 0x888888));
 
@@ -675,7 +638,7 @@ class UIScene extends Phaser.Scene {
     const handleContainer = this.add.container(startX + (currentVol * 200), y + 10);
     handleContainer.setSize(60, 60);
     handleContainer.setInteractive(new Phaser.Geom.Circle(0, 0, 30), Phaser.Geom.Circle.Contains);
-    handleContainer.input.cursor = 'pointer';
+    handleContainer.input.cursor = 'url(assets/cursor/pointer-finger-pointer.png), pointer';
     this.input.setDraggable(handleContainer);
 
     const visualHandle = this.add.circle(0, 0, 12, 0xffffff);
@@ -715,7 +678,7 @@ class UIScene extends Phaser.Scene {
                     this.gearIcon.setVisible(true);
                     this.gearIcon.setScale(1);
                 }
-                if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+                if (this.input.setDefaultCursor) this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
             }
         });
     }
@@ -726,7 +689,7 @@ class UIScene extends Phaser.Scene {
     this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
     if (this.gearIcon) this.gearIcon.setVisible(false);
-    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+    if (this.input.setDefaultCursor) this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
 
     this.tweens.add({
         targets: this.settingsContainer,
@@ -868,7 +831,7 @@ class MainMenu extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
+    this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
 
     const width = this.scale.width;
     const height = this.scale.height;
@@ -993,9 +956,6 @@ class MainMenu extends Phaser.Scene {
     }
 
     // Launch Cursor Scene if not active (and assets loaded)
-    if (!this.scene.get('CursorScene').scene.isActive()) {
-        this.scene.launch('CursorScene');
-        this.scene.bringToTop('CursorScene');
     }
 
     // Intro Logic State
@@ -1242,7 +1202,7 @@ class MapScene extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
+    this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
 
     // Generate missing particle textures dynamically
     if (!this.textures.exists('halo')) {
@@ -1877,7 +1837,7 @@ class SectionHunt extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
+    this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
 
     // Background lazy-load core EggZam videos
     if (!this.registry.get('eggzamVideosLoaded')) {
@@ -2551,8 +2511,7 @@ class EggZamRoom extends Phaser.Scene {
       }
   }
   create() {
-    this.input.setDefaultCursor('none');
-    this.scene.bringToTop('CursorScene');
+    this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
     // Background lazy-load core EggZam videos
     if (!this.registry.get('eggzamVideosLoaded')) {
         this.registry.set('eggzamVideosLoaded', true);
@@ -2779,7 +2738,7 @@ class EggZamRoom extends Phaser.Scene {
                     closeBtn.style.backgroundColor = '#ff0000';
                     closeBtn.style.border = '4px solid #8b4513';
                     closeBtn.style.borderRadius = '50%';
-                    closeBtn.style.cursor = 'pointer';
+                    closeBtn.style.cursor = 'url(assets/cursor/pointer-finger-pointer.png), pointer';
                     closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
                     closeBtn.style.display = 'flex';
                     closeBtn.style.alignItems = 'center';
@@ -2864,7 +2823,7 @@ class EggZamRoom extends Phaser.Scene {
         closeBtnContainer.setInteractive();
         
         // Add hand cursor manually as setInteractive config above doesn't support it directly in this shorthand
-        closeBtnContainer.input.cursor = 'pointer';
+        closeBtnContainer.input.cursor = 'url(assets/cursor/pointer-finger-pointer.png), pointer';
 
         closeBtnContainer.baseScaleX = 1;
         closeBtnContainer.baseScaleY = 1;
@@ -3368,7 +3327,7 @@ const config = {
       width: '100%',
       height: '100%'
   },
-  scene: [MainMenu, MapScene, SectionHunt, EggZamRoom, MusicScene, UIScene, CursorScene],
+  scene: [MainMenu, MapScene, SectionHunt, EggZamRoom, MusicScene, UIScene],
   parent: 'game',
   backgroundColor: '#000000',
 };

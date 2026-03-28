@@ -675,7 +675,7 @@ class UIScene extends Phaser.Scene {
 
     // Increase track hit area for easier tapping (60px height)
     const track = this.add.rectangle(centerX, y + 10, trackWidth, 60, 0x888888).setAlpha(0.01).setInteractive();
-    track.input.cursor = 'pointer';
+    track.input.cursor = 'url(assets/cursor/pointer-finger-pointer.png), pointer';
     // Visual track
     const visualTrack = this.add.rectangle(centerX, y + 10, trackWidth, 4, 0x888888);
     this.settingsContainer.add(track);
@@ -691,7 +691,7 @@ class UIScene extends Phaser.Scene {
     const handle = this.add.container(handleX, y + 10);
     handle.setSize(60, 60); // 30px radius * 2
     handle.setInteractive(new Phaser.Geom.Circle(0, 0, 30), Phaser.Geom.Circle.Contains);
-    handle.input.cursor = 'pointer';
+    handle.input.cursor = 'url(assets/cursor/pointer-finger-pointer.png), pointer';
     this.input.setDraggable(handle);
 
     // Visuals
@@ -731,7 +731,7 @@ class UIScene extends Phaser.Scene {
                       this.gearIcon.setVisible(true);
                       this.gearIcon.setScale(1);
                   }
-                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
               }
           });
       }
@@ -742,7 +742,7 @@ class UIScene extends Phaser.Scene {
     this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
     if (this.gearIcon) this.gearIcon.setVisible(false);
-    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+    if (this.input.setDefaultCursor) this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
 
     this.tweens.add({
         targets: this.settingsContainer,
@@ -890,7 +890,7 @@ class MainMenu extends Phaser.Scene {
 
   create() {
     try {
-      this.input.setDefaultCursor('none');
+      this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
 
       // Get scale factors based on game dimensions
       const scaleX = this.game.config.width / 1280;
@@ -985,9 +985,7 @@ class MainMenu extends Phaser.Scene {
 
       // Only show cursor on desktop
       if (!this.sys.game.device.os.desktop) {
-        this.fingerCursor = null;
       } else {
-        this.fingerCursor = this.add.image(0, 0, 'finger-cursor')
           .setOrigin(0, 0)
           .setAngle(0)
           .setDisplaySize(50 * scale, 75 * scale)
@@ -1290,9 +1288,6 @@ class MainMenu extends Phaser.Scene {
   }
 
   update() {
-    if (this.fingerCursor) {
-      this.fingerCursor.setPosition(this.input.x, this.input.y);
-    }
   }
 }
 
@@ -1307,7 +1302,7 @@ class MapScene extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
+    this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
 
     // Get scale factors relative to the viewport
     const scaleX = this.game.config.width / 1280;
@@ -1587,9 +1582,7 @@ class MapScene extends Phaser.Scene {
 
     // Cursor for desktop only
     if (!this.sys.game.device.os.desktop) {
-      this.fingerCursor = null;
     } else {
-      this.fingerCursor = this.add.image(0, 0, 'finger-cursor')
         .setOrigin(0, 0)
         .setAngle(0)
         .setDepth(111111) // Ensure cursor is on top of everything
@@ -1598,9 +1591,6 @@ class MapScene extends Phaser.Scene {
   }
 
   update() {
-    if (this.fingerCursor) {
-      this.fingerCursor.setPosition(this.input.x, this.input.y);
-    }
   }
 }
 
@@ -1866,7 +1856,7 @@ class SectionHunt extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
+    this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
 
     const scaleX = this.game.config.width / 1280;
     const scaleY = this.game.config.height / 720;
@@ -2098,7 +2088,6 @@ class SectionHunt extends Phaser.Scene {
         loop: true
     });
 
-    this.fingerCursor = this.add.image(0, 0, 'finger-cursor')
         .setOrigin(0, 0)
         .setAngle(0)
         .setDepth(111111)
@@ -2375,11 +2364,6 @@ class SectionHunt extends Phaser.Scene {
         if (this.zoomedView) this.zoomedView.setVisible(false);
         if (this.maskGraphics) this.maskGraphics.setVisible(false);
 
-        if (this.fingerCursor) {
-            this.fingerCursor.setVisible(true);
-            this.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
-            this.fingerCursor.setPosition(pointer.x, pointer.y);
-        }
     } else {
         if (this.magnifyingGlass) {
              this.magnifyingGlass.setVisible(true);
@@ -2388,7 +2372,6 @@ class SectionHunt extends Phaser.Scene {
         }
         if (this.zoomedView) this.zoomedView.setVisible(true);
         if (this.maskGraphics) this.maskGraphics.setVisible(true);
-        if (this.fingerCursor) this.fingerCursor.setVisible(false);
     }
   }
 }
@@ -2522,7 +2505,6 @@ class EggZamRoom extends Phaser.Scene {
     this.correctText = null;
     this.leftBottleZone = null;
     this.rightBottleZone = null;
-    this.fingerCursor = null;
   }
 
   preload() {
@@ -2537,7 +2519,7 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
+    this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
 
     // Generate missing particle textures dynamically
     if (!this.textures.exists('halo')) {
@@ -2827,7 +2809,7 @@ class EggZamRoom extends Phaser.Scene {
                     closeBtn.style.backgroundColor = '#ff0000';
                     closeBtn.style.border = '4px solid #8b4513';
                     closeBtn.style.borderRadius = '50%';
-                    closeBtn.style.cursor = 'pointer';
+                    closeBtn.style.cursor = 'url(assets/cursor/pointer-finger-pointer.png), pointer';
                     closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
                     closeBtn.style.display = 'flex';
                     closeBtn.style.alignItems = 'center';
@@ -2912,7 +2894,7 @@ class EggZamRoom extends Phaser.Scene {
         closeBtnContainer.setInteractive();
         
         // Add hand cursor manually as setInteractive config above doesn't support it directly in this shorthand
-        closeBtnContainer.input.cursor = 'pointer';
+        closeBtnContainer.input.cursor = 'url(assets/cursor/pointer-finger-pointer.png), pointer';
 
         closeBtnContainer.baseScaleX = 1;
         closeBtnContainer.baseScaleY = 1;
@@ -2986,9 +2968,7 @@ class EggZamRoom extends Phaser.Scene {
     this.displayRandomEggInfo();
 
     if (!this.sys.game.device.os.desktop) {
-      this.fingerCursor = null;
     } else {
-      this.fingerCursor = this.add.image(0, 0, 'finger-cursor')
         .setOrigin(0, 0)
         .setAngle(0)
         .setDisplaySize(50 * this.gameScale, 75 * this.gameScale)
@@ -3112,7 +3092,7 @@ class EggZamRoom extends Phaser.Scene {
 
           const triggerRestart = () => {
               this.time.delayedCall(150, () => {
-                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('url(assets/cursor/pointer-finger-pointer.png), pointer');
                   localStorage.removeItem('heIsRisenGameState');
                   initializeGameData(this.registry, this.cache, true);
                   this.scene.start('MapScene');
@@ -3168,9 +3148,6 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   update() {
-    if (this.fingerCursor) {
-      this.fingerCursor.setPosition(this.input.x, this.input.y);
-    }
   }
 }
 
@@ -3455,8 +3432,6 @@ function resizeGame() {
         const foundEggsCount = scene.registry.get('foundEggs').length;
         scene.scoreText.setText(`${foundEggsCount}/${TOTAL_EGGS}`);
       }
-      if (scene.fingerCursor) {
-        scene.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
       }
     }
     if (scene.scene.key === 'SectionHunt') {
@@ -3588,7 +3563,6 @@ function resizeGame() {
         scene.noEggsText.setPosition(0.36 * width, textY);
         scene.noEggsText.setStyle({ fontSize: `${(isDesktop ? 28 : 40) * scale}px`, strokeThickness: 3 * scale, wordWrap: { width: 480 * scale, useAdvancedWrap: true } });
       }
-      if (scene.fingerCursor) scene.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
     }
   }
 }
