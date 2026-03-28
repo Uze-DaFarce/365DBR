@@ -343,15 +343,16 @@ class MusicScene extends Phaser.Scene {
     this.scheduleAmbientSound();
 
     // Global UI update listeners for static elements that shouldn't be polled in update loops
+    const scenesWithScore = ['MapScene', 'SectionHunt', 'EggZamRoom'];
     this.registry.events.on('changedata', (parent, key, data) => {
         if (key === 'foundEggs') {
-            const scenesWithScore = ['MapScene', 'SectionHunt', 'EggZamRoom'];
-            scenesWithScore.forEach(sceneKey => {
-                const scene = this.scene.get(sceneKey);
+            // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations
+            for (let i = 0, len = scenesWithScore.length; i < len; i++) {
+                const scene = this.scene.get(scenesWithScore[i]);
                 if (scene && scene.sys.isActive() && scene.scoreText) {
                     scene.scoreText.setText(`${data.length}/${TOTAL_EGGS}`);
                 }
-            });
+            }
         }
     });
 
