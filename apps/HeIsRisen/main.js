@@ -138,18 +138,19 @@ function initializeGameData(registry, cache, forceNew = false) {
                     registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
                     registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
 
-                    let loadedCorrect = parseInt(savedState.correctCategorizations);
-                    if (isNaN(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
+                    let loadedCorrect = savedState.correctCategorizations !== null && savedState.correctCategorizations !== '' ? Number(savedState.correctCategorizations) : NaN;
+                    if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
                     registry.set('correctCategorizations', loadedCorrect);
 
-                    let loadedScore = parseInt(savedState.currentScore);
-                    if (isNaN(loadedScore) || loadedScore < 0) loadedScore = 0;
+                    let loadedScore = savedState.currentScore !== null && savedState.currentScore !== '' ? Number(savedState.currentScore) : NaN;
+                    if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) loadedScore = 0;
                     registry.set('currentScore', loadedScore);
 
                     // Always ensure highScore is loaded/initialized correctly
                     try {
-                        let loadedScore = parseInt(localStorage.getItem('highScore'));
-                        if (isNaN(loadedScore) || loadedScore < 0) {
+                        let highScoreVal = localStorage.getItem('highScore');
+                        let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
+                        if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
                             loadedScore = 0;
                         }
                         registry.set('highScore', loadedScore);
@@ -253,8 +254,9 @@ function initializeGameData(registry, cache, forceNew = false) {
     registry.set('currentScore', 0);
 
     try {
-        let loadedScore = parseInt(localStorage.getItem('highScore'));
-        if (isNaN(loadedScore) || loadedScore < 0) {
+        let highScoreVal = localStorage.getItem('highScore');
+        let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
+        if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
             loadedScore = 0;
         }
         registry.set('highScore', loadedScore);
