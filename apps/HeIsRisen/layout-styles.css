@@ -1,4 +1,7 @@
 html,body {
+  cursor: url(assets/cursor/pointer-finger-pointer.png), auto !important;
+}
+html,body {
   height: 100%;
 }
 
@@ -87,7 +90,7 @@ input, button, select, textarea {
     line-height: inherit;
 }
 button, html input[type="button"], input[type="reset"], input[type="submit"] {
-    cursor: pointer;
+    cursor: url(assets/cursor/pointer-finger-pointer.png), pointer !important;
 }
 button, select {
     text-transform: none;
@@ -111,7 +114,7 @@ button, input, select, textarea {
     border-radius: 0 0 0 0;
     border-style: solid;
     border-width: 0 0 3px;
-    cursor: pointer;
+    cursor: url(assets/cursor/pointer-finger-pointer.png), pointer !important;
     display: inline-block;
     font-size: 14px;
     font-weight: 300;
