@@ -2926,35 +2926,10 @@ class EggZamRoom extends Phaser.Scene {
     const centerBottomX = offsetX + (1280 * uiScale) / 2;
     const centerBottomY = offsetY + (720 * uiScale) - (100 * uiScale);
 
-    const eggCellentBtn = this.add.sprite(centerBottomX - 200 * uiScale, centerBottomY, 'egg-cellent-button')
-        .setScale(btnScale)
-        .setDepth(102)
-        .setInteractive();
+    const buttonSpacing = 120 * uiScale;
 
-    eggCellentBtn.on('pointerover', () => {
-        this.input.setDefaultCursor('pointer');
-        eggCellentBtn.setFrame('Eggcellent0004');
-    });
-
-    eggCellentBtn.on('pointerout', () => {
-        this.input.setDefaultCursor('none');
-        eggCellentBtn.setFrame('Eggcellent0000');
-    });
-
-    eggCellentBtn.on('pointerdown', () => {
-        if (this.currentVideo && this.currentVideo.active && this.currentVideo.video.src.includes('ambient')) {
-            this.stopCurrentVideo();
-        }
-        this.resetAmbientTimer();
-        this.sound.play('menu-click', { volume: this.registry.get('sfxVolume') ?? 0.5 });
-        if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active && !this.currentVideo) {
-            showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
-        }
-    });
-
-    addTooltip(this, eggCellentBtn, 'Categorize as Egg-cellent');
-
-    const stinkyBtn = this.add.sprite(centerBottomX + 200 * uiScale, centerBottomY, 'eggs-tra-stinky-button')
+    // Swap positions: Eggs-tra Stinky on the left, Egg-cellent on the right, and closer together
+    const stinkyBtn = this.add.sprite(centerBottomX - buttonSpacing, centerBottomY, 'eggs-tra-stinky-button')
         .setScale(btnScale)
         .setDepth(102)
         .setInteractive();
@@ -2982,7 +2957,36 @@ class EggZamRoom extends Phaser.Scene {
 
     addTooltip(this, stinkyBtn, 'Categorize as Eggs-tra Stinky');
 
-    this.actionButtons = [eggCellentBtn, stinkyBtn];
+    const eggCellentBtn = this.add.sprite(centerBottomX + buttonSpacing, centerBottomY, 'egg-cellent-button')
+        .setScale(btnScale)
+        .setDepth(102)
+        .setInteractive();
+
+    eggCellentBtn.on('pointerover', () => {
+        this.input.setDefaultCursor('pointer');
+        eggCellentBtn.setFrame('Eggcellent0004');
+    });
+
+    eggCellentBtn.on('pointerout', () => {
+        this.input.setDefaultCursor('none');
+        eggCellentBtn.setFrame('Eggcellent0000');
+    });
+
+    eggCellentBtn.on('pointerdown', () => {
+        if (this.currentVideo && this.currentVideo.active && this.currentVideo.video.src.includes('ambient')) {
+            this.stopCurrentVideo();
+        }
+        this.resetAmbientTimer();
+        this.sound.play('menu-click', { volume: this.registry.get('sfxVolume') ?? 0.5 });
+        if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active && !this.currentVideo) {
+            showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
+        }
+    });
+
+    addTooltip(this, eggCellentBtn, 'Categorize as Egg-cellent');
+
+    // Make sure we store them in visual order left-to-right for consistency later if needed
+    this.actionButtons = [stinkyBtn, eggCellentBtn];
 
     this.displayRandomEggInfo(offsetX, offsetY, uiScale);
 
@@ -3138,24 +3142,25 @@ class EggZamRoom extends Phaser.Scene {
       // Target coordinates inside the central egg chamber of the keyframe.
       // Based on visual inspection: Center-left.
       // Assuming original keyframe coords (1168x784), scaled down/up via coverScale.
-      const eggPosX = offsetX + (1280 * scale) * 0.44;
-      const eggPosY = offsetY + (720 * scale) * 0.42;
+      const eggPosX = offsetX + (1280 * scale) * 0.44 + (6 * scale);
+      const eggPosY = offsetY + (720 * scale) * 0.42 + (12 * scale);
       const symbolPosX = eggPosX;
       const symbolPosY = eggPosY;
 
       // Make egg as large as possible to fit chamber
-      const eggScaleTarget = 240 * scale;
-      const eggHeightTarget = 300 * scale;
+      const eggScaleTarget = (240 * scale) * 0.9;
+      const eggHeightTarget = (300 * scale) * 0.9;
 
       if (this.textures.exists(`egg-${eggId}`)) {
         this.displayedEggImage = this.add.image(eggPosX, eggPosY, `egg-${eggId}`)
           .setDisplaySize(eggScaleTarget, eggHeightTarget)
+          .setAlpha(0.4) // Reduced opacity to 40%
           .setDepth(3);
       }
       if (symbolData && symbolData.filename && this.textures.exists(symbolData.filename)) {
         this.displayedSymbolImage = this.add.image(symbolPosX, symbolPosY, symbolData.filename)
           .setDisplaySize(eggScaleTarget, eggHeightTarget)
-          .setDepth(3);
+          .setDepth(4); // Symbol sits above the egg
       }
     }
   }
