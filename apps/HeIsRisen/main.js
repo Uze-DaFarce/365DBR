@@ -455,11 +455,68 @@ class UIScene extends Phaser.Scene {
       }
 
       if (this.settingsContainer) {
-          // Re-center settings panel
+          const panelWidth = 500;
+          const panelHeight = 500;
+          const targetX = (width - panelWidth) / 2;
+          const targetY = (height - panelHeight) / 2;
+
+          let sliderYOffsets = [150, 250, 350]; // Music, Ambient, SFX
+          let sliderLabelIndex = 0;
+          let sliderTrackAreaIndex = 0;
+          let sliderTrackLineIndex = 0;
+          let sliderHandleIndex = 0;
+
+          const panelCenterX = targetX + panelWidth / 2;
+
           this.settingsContainer.getAll().forEach(child => {
-              // Update overlay
-              if (child.width === this.cameras.main.width && child.height === this.cameras.main.height) {
+              // Re-size overlay
+              if (child.type === 'Rectangle' && child.fillAlpha === 0.7) {
                   child.setSize(width, height);
+              }
+              // Re-center main panel
+              else if (child.type === 'Rectangle' && child.fillColor === 0x333333) {
+                  child.setPosition(width / 2, height / 2);
+              }
+              // Re-center title
+              else if (child.type === 'Text' && child.text === 'Audio Settings') {
+                  child.setPosition(width / 2, targetY + 50);
+              }
+              // Re-center close button (it's a container with closeX, closeY)
+              else if (child.type === 'Container' && child.list.length > 0 && child.list[0].type === 'Graphics' && child.width === 40) {
+                  const closeX = targetX + panelWidth - 30;
+                  const closeY = targetY + 30;
+                  child.setPosition(closeX, closeY);
+              }
+              // Re-center "START NEW GAME" button container (it's a container)
+              else if (child.type === 'Container' && child.list.length > 1 && child.list[1].type === 'Text' && child.list[1].text === 'START NEW GAME') {
+                  child.setPosition(panelCenterX, targetY + 440);
+              }
+              // Sliders logic: Text label, Rectangle (hit area), Rectangle (track line), Container (handle)
+              // Label
+              else if (child.type === 'Text' && ['Music', 'Ambient', 'SFX'].includes(child.text)) {
+                  child.setPosition(panelCenterX, targetY + sliderYOffsets[sliderLabelIndex] - 30);
+                  sliderLabelIndex++;
+              }
+              // Hit Area & Track Line
+              else if (child.type === 'Rectangle' && child.width === 200) {
+                  if (child.height === 60) { // Hit Area
+                      child.setPosition(panelCenterX, targetY + sliderYOffsets[sliderTrackAreaIndex] + 10);
+                      sliderTrackAreaIndex++;
+                  } else if (child.height === 4) { // Track Line
+                      child.setPosition(panelCenterX, targetY + sliderYOffsets[sliderTrackLineIndex] + 10);
+                      sliderTrackLineIndex++;
+                  }
+              }
+              // Handle Container (the 60x60 container around the handle)
+              else if (child.type === 'Container' && child.width === 60 && child.height === 60 && child.list.length > 0 && child.list[0].type === 'Arc') {
+                  const types = ['music', 'ambient', 'sfx'];
+                  const type = types[sliderHandleIndex];
+                  let vol = 0.5;
+                  if (this.registry.has(`${type}Volume`)) vol = this.registry.get(`${type}Volume`);
+
+                  const startX = panelCenterX - 100;
+                  child.setPosition(startX + (vol * 200), targetY + sliderYOffsets[sliderHandleIndex] + 10);
+                  sliderHandleIndex++;
               }
           });
       }

@@ -756,6 +756,10 @@ function App() {
   // Persistence: Scroll Target
   const [targetScrollVerse, setTargetScrollVerse] = useState(null);
 
+  // Track scroll lock across hook remounts
+  const isScrollLockedRef = useRef(false);
+  const scrollLockTimeoutRef = useRef(null);
+
   // Bookmarks State
   const [bookmarks, setBookmarks] = useState({});
   const [bookmarkDialogTarget, setBookmarkDialogTarget] = useState(null);
@@ -893,7 +897,11 @@ function App() {
                 if (urlBook && urlChapter && newIndex[urlBook] && newIndex[urlBook][urlChapter]) {
                     setSelectedBook(urlBook);
                     setSelectedChapter(urlChapter);
-                    if (urlVerse) setTargetScrollVerse(`${urlBook}.${urlChapter}.${urlVerse}`);
+                    if (urlVerse) {
+                        const fullVid = `${urlBook}.${urlChapter}.${urlVerse}`;
+                        setTargetScrollVerse(fullVid);
+                        setActiveVerseId(fullVid);
+                    }
                 } else {
                     try {
                         const saved = localStorage.getItem('bible_browser_state');
@@ -902,7 +910,10 @@ function App() {
                             if (state.book && state.chapter && newIndex[state.book] && newIndex[state.book][state.chapter]) {
                                 setSelectedBook(state.book);
                                 setSelectedChapter(state.chapter);
-                                if (state.verseId) setTargetScrollVerse(state.verseId);
+                                if (state.verseId) {
+                                    setTargetScrollVerse(state.verseId);
+                                    setActiveVerseId(state.verseId);
+                                }
                             } else {
                                 setIsBrowseOpen(true);
                             }
@@ -1231,17 +1242,26 @@ function App() {
     if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0 || targetScrollVerse) {
         return () => window.removeEventListener('verseclicked', handleVerseClickedEvent);
     }
-    let isScrollLocked = false;
-    let lockTimeout = null;
+    const isIframe = window !== window.parent;
+
     const handleScrollLock = () => {
-        isScrollLocked = true;
-        if (lockTimeout) clearTimeout(lockTimeout);
-        lockTimeout = setTimeout(() => { isScrollLocked = false; }, 800);
+        isScrollLockedRef.current = true;
+        if (scrollLockTimeoutRef.current) clearTimeout(scrollLockTimeoutRef.current);
+        // Extend the lock slightly in iframe to ensure the programmatic scroll completely settles
+        // before the intersection observer starts firing again and potentially jumping verses.
+        const lockDuration = isIframe ? 1200 : 800;
+        scrollLockTimeoutRef.current = setTimeout(() => { isScrollLockedRef.current = false; }, lockDuration);
     };
     window.addEventListener('scrolllock', handleScrollLock);
 
+    // For small iframes, use a tighter margin so we don't prematurely detect the next verse
+    // when scrolled down to the focal translation (slot 3).
+    // Using a very aggressive top margin to guarantee the target verse (which lands 80px from top)
+    // is fully encompassed. We also add a threshold of [0, 0.1] to trigger more reliably when scrolling settles.
+    const observerMargin = isIframe ? '200px 0px -40% 0px' : '-15% 0px -70% 0px';
+
     const observer = new IntersectionObserver((entries) => {
-      if (isScrollLocked) return;
+      if (isScrollLockedRef.current) return;
       // Check if we are at the absolute bottom of the page first to prevent bounce-back
       // Use scrollHeight and Math.ceil/floor tolerance for cross-browser sub-pixel accuracy
       if (Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
@@ -1250,11 +1270,14 @@ function App() {
 
       const intersecting = entries.filter(e => e.isIntersecting);
       if (intersecting.length > 0) {
-        // Sort by distance to "reading line" (approx 120px from top)
-        const bestEntry = intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top - 120) - Math.abs(b.boundingClientRect.top - 120))[0];
+        // We set targetY to window.scrollY + rect.top - 80 when programmatic scrolling.
+        // This places the top of the element exactly 80px from the top of the viewport.
+        // The referenceLine must match this behavior to prevent immediate reverting.
+        const referenceLine = isIframe ? 80 : 120;
+        const bestEntry = intersecting.sort((a, b) => Math.abs(a.boundingClientRect.top - referenceLine) - Math.abs(b.boundingClientRect.top - referenceLine))[0];
         setActiveVerseId(bestEntry.target.id.replace('verse-', ''));
       }
-    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+    }, { rootMargin: observerMargin, threshold: [0, 0.1] });
 
     groupedVids.forEach((group) => {
       const vid = group[0];
@@ -1273,7 +1296,7 @@ function App() {
     return () => {
         window.removeEventListener('verseclicked', handleVerseClickedEvent);
         window.removeEventListener('scrolllock', handleScrollLock);
-        if (lockTimeout) clearTimeout(lockTimeout);
+        if (scrollLockTimeoutRef.current) clearTimeout(scrollLockTimeoutRef.current);
         observer.disconnect();
         window.removeEventListener('scroll', handleScroll);
     };
