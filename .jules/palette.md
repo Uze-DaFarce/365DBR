@@ -330,6 +330,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-20 - Empty State Calls to Action
 **Learning:** Presenting a static "All items categorized" empty state when the user is only partially through the game creates a "dead end" in the flow. Users may mistakenly believe they have finished the entire game rather than just their current batch.
 **Action:** Always provide explicit, contextual Calls to Action (CTAs) in empty states (e.g., "Return to the map to find more") so the user clearly understands what to do next to continue the core game loop.
+
 ## 2026-03-21 - Farticle Gas Effect Tuning
 **Learning:** Using simple `SCREEN` blend mode and low scaling on solid circles for a gas/smoke effect creates obvious, distinct dots. To simulate realistic gas dynamically, layer multiple low-opacity radial circles in the generated texture, set the blend mode to `NORMAL` (to hide particles behind one another, adding density), and massively increase the particle scale while letting them slowly float upwards via gravity.
 **Action:** When asked to generate gas or smoke effects, use large, low-opacity layered radial textures with `NORMAL` blend mode and upward gravity.
@@ -337,11 +338,19 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-23 - Audio Pitch Variation for Repetitive Actions
 **Learning:** Playing the exact same audio file repeatedly during core loops (like collecting 60 eggs) quickly causes audio fatigue and annoyance.
 **Action:** Always add a slight pitch variation (e.g., `detune: Phaser.Math.Between(-200, 200)`) when triggering highly repetitive interaction sounds (like 'collect') to make the audio experience feel dynamic and reduce listener fatigue.
-## 2024-03-20 - [Add Screen Reader Announcements to Canvas Games]
+
+## 2026-03-20 - [Add Screen Reader Announcements to Canvas Games]
 **Learning:** HTML5 Canvas games (like Phaser 3) natively trap screen readers because the internal game state is completely hidden from the DOM. Without explicit DOM elements, critical gameplay interactions (like collecting an item or completing a level) are completely invisible to assistive technologies.
 **Action:** Always inject an invisible `aria-live="polite"` DOM element (e.g., `<div id="sr-announcer" class="sr-only" aria-live="polite"></div>`) alongside the canvas element. Update its `textContent` dynamically via JavaScript when critical game events occur to make the canvas experience accessible without disrupting the visual UI.
 
-## 2024-03-20 - [Engage the Sense of Touch via Haptic Feedback]
+## 2026-03-20 - [Engage the Sense of Touch via Haptic Feedback]
 **Learning:** For mobile and tablet users playing highly repetitive or visually focused games, adding short bursts of haptic feedback (vibration) for key successful interactions (like collecting an item) significantly increases the feeling of reward and tactility for the vast majority of players.
 **Action:** Use `if (navigator && navigator.vibrate) { navigator.vibrate(50); }` to provide a subtle 50ms pulse of tactile feedback upon a successful user interaction, creating a more multi-sensory and engaging micro-UX.
-\n## 2026-03-27 - Smooth UI Toggle Transitions\n**Learning:** Instantly toggling visibility (`setVisible(true/false)`) on major UI modals (like a settings menu) creates a jarring, unpolished experience. Even simple UI elements benefit from basic animation (like a quick 200ms alpha fade).\n**Action:** When building UI modals or menus in Phaser, always apply a short fade-in/fade-out tween (`alpha: 0` to `1`) instead of instantly changing visibility. Remember to call `killTweensOf(target)` before adding the new tween to handle rapid user toggling.
+
+## 2026-03-27 - Smooth UI Toggle Transitions
+**Learning:** Instantly toggling visibility (`setVisible(true/false)`) on major UI modals (like a settings menu) creates a jarring, unpolished experience. Even simple UI elements benefit from basic animation (like a quick 200ms alpha fade).
+**Action:** When building UI modals or menus in Phaser, always apply a short fade-in/fade-out tween (`alpha: 0` to `1`) instead of instantly changing visibility. Remember to call `killTweensOf(target)` before adding the new tween to handle rapid user toggling.
+
+## 2026-03-27 - [Expand Haptic Feedback to Buttons]
+**Learning:** Adding haptic feedback (`navigator.vibrate`) specifically to interactive buttons, not just core game events, significantly increases the tactile feel of UI components on mobile devices.
+**Action:** Consistently add a subtle haptic burst (e.g., 20ms) inside global interaction handlers like `addButtonInteraction` for pointer events.
