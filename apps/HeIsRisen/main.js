@@ -2881,6 +2881,11 @@ class EggZamRoom extends Phaser.Scene {
                         this.actionButtons.forEach(btn => btn.setVisible(true));
                     }
                     
+                    if (!isCorrect) {
+                        this.currentEgg = null;
+                    }
+                    this.displayRandomEggInfo(offsetX, offsetY, uiScale);
+
                     window.removeEventListener('keydown', this.popupKeyHandler);
                 }
             });
@@ -2913,10 +2918,6 @@ class EggZamRoom extends Phaser.Scene {
 
         this.explanationText.setScale(0);
         this.tweens.add({ targets: this.explanationText, scaleX: 1, scaleY: 1, duration: 300, ease: 'Back.out' });
-
-        // Load next egg immediately behind popup so it's ready when dismissed
-        this.currentEgg = null;
-        this.displayRandomEggInfo(offsetX, offsetY, uiScale);
         };
 
         if (isCorrect) {
