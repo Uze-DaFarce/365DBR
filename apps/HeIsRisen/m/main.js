@@ -3249,8 +3249,8 @@ class EggZamRoom extends Phaser.Scene {
       const symbolPosY = eggPosY;
 
       // Make egg as large as possible to fit chamber
-      const eggScaleTarget = (240 * uiParams.uiScale) * 0.85;
-      const eggHeightTarget = (300 * uiParams.uiScale) * 0.85;
+      const eggScaleTarget = (240 * uiParams.uiScale) * 0.95;
+      const eggHeightTarget = (300 * uiParams.uiScale) * 0.95;
 
       if (this.textures.exists(`egg-${eggId}`)) {
         this.displayedEggImage = this.add.image(eggPosX, eggPosY, `egg-${eggId}`)
