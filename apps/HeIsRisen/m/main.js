@@ -139,18 +139,19 @@ function initializeGameData(registry, cache, forceNew = false) {
                     registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
                     registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
 
-                    let loadedCorrect = parseInt(savedState.correctCategorizations);
-                    if (isNaN(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
+                    let loadedCorrect = savedState.correctCategorizations !== null && savedState.correctCategorizations !== '' ? Number(savedState.correctCategorizations) : NaN;
+                    if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
                     registry.set('correctCategorizations', loadedCorrect);
 
-                    let loadedScore = parseInt(savedState.currentScore);
-                    if (isNaN(loadedScore) || loadedScore < 0) loadedScore = 0;
+                    let loadedScore = savedState.currentScore !== null && savedState.currentScore !== '' ? Number(savedState.currentScore) : NaN;
+                    if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) loadedScore = 0;
                     registry.set('currentScore', loadedScore);
 
                     // Always ensure highScore is loaded/initialized correctly
                     try {
-                        let loadedScore = parseInt(localStorage.getItem('highScore'));
-                        if (isNaN(loadedScore) || loadedScore < 0) {
+                        let highScoreVal = localStorage.getItem('highScore');
+                        let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
+                        if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
                             loadedScore = 0;
                         }
                         registry.set('highScore', loadedScore);
@@ -315,15 +316,16 @@ class MusicScene extends Phaser.Scene {
     this.scheduleAmbientSound();
 
     // Global UI update listeners for static elements that shouldn't be polled in update loops
+    const scenesWithScore = ['MapScene', 'SectionHunt', 'EggZamRoom'];
     this.registry.events.on('changedata', (parent, key, data) => {
         if (key === 'foundEggs') {
-            const scenesWithScore = ['MapScene', 'SectionHunt', 'EggZamRoom'];
-            scenesWithScore.forEach(sceneKey => {
-                const scene = this.scene.get(sceneKey);
+            // ⚡ Bolt Optimization: Replace forEach with fast for loop to prevent closure allocations
+            for (let i = 0, len = scenesWithScore.length; i < len; i++) {
+                const scene = this.scene.get(scenesWithScore[i]);
                 if (scene && scene.sys.isActive() && scene.scoreText) {
                     scene.scoreText.setText(`${data.length}/${TOTAL_EGGS}`);
                 }
-            });
+            }
         }
     });
 
@@ -904,8 +906,9 @@ class MainMenu extends Phaser.Scene {
       this.registry.set('currentScore', 0);
 
       try {
-          let loadedScore = parseInt(localStorage.getItem('highScore'));
-          if (isNaN(loadedScore) || loadedScore < 0) {
+          let highScoreVal = localStorage.getItem('highScore');
+          let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
+          if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
               loadedScore = 0;
           }
           this.registry.set('highScore', loadedScore);
@@ -2438,10 +2441,16 @@ class EggZamRoom extends Phaser.Scene {
                 ease: 'Sine.easeInOut',
                 onComplete: () => {
                     sparkles.stop();
-                    this.time.delayedCall(1000, () => {
-                        halo.destroy();
-                        sparkles.destroy();
-                        if (onCompleteCallback) onCompleteCallback();
+                    this.tweens.add({
+                        targets: [eggImage, symbolImage].filter(img => img),
+                        y: startY,
+                        duration: 800,
+                        ease: 'Cubic.easeIn',
+                        onComplete: () => {
+                            halo.destroy();
+                            sparkles.destroy();
+                            if (onCompleteCallback) onCompleteCallback();
+                        }
                     });
                 }
             });
