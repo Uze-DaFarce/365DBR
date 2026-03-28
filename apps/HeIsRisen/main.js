@@ -2411,9 +2411,16 @@ class EggZamRoom extends Phaser.Scene {
                 ease: 'Sine.easeInOut',
                 onComplete: () => {
                     sparkles.stop();
-                    this.time.delayedCall(1000, () => {
-                        halo.destroy();
-                        sparkles.destroy();
+                    this.tweens.add({
+                        targets: [eggImage, symbolImage].filter(img => img),
+                        y: startY,
+                        duration: 800,
+                        ease: 'Cubic.easeIn',
+                        onComplete: () => {
+                            halo.destroy();
+                            sparkles.destroy();
+                            if (onCompleteCallback) onCompleteCallback();
+                        }
                     });
                 }
             });
