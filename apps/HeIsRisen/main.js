@@ -431,24 +431,13 @@ class UIScene extends Phaser.Scene {
     // Add ESC and ENTER key support to toggle settings
     const toggleSettings = () => {
         if (this.settingsContainer.visible) {
-            this.settingsContainer.setVisible(false);
-            this.gearIcon.setVisible(true);
-            this.gearIcon.setScale(1);
-            this.input.setDefaultCursor('none');
+            this.closeSettings();
         } else {
             this.openSettings();
         }
     };
-    const closeSettings = () => {
-        if (this.settingsContainer.visible) {
-            this.settingsContainer.setVisible(false);
-            this.gearIcon.setVisible(true);
-            this.gearIcon.setScale(1);
-            this.input.setDefaultCursor('none');
-        }
-    };
     this.input.keyboard.on('keydown-ESC', toggleSettings);
-    this.input.keyboard.on('keydown-ENTER', closeSettings);
+    this.input.keyboard.on('keydown-ENTER', () => this.closeSettings());
 
     this.scale.on('resize', this.resize, this);
   }
@@ -610,10 +599,7 @@ class UIScene extends Phaser.Scene {
 
     closeBtn.on('pointerdown', () => {
         this.time.delayedCall(150, () => {
-            this.settingsContainer.setVisible(false);
-            this.gearIcon.setVisible(true);
-            this.gearIcon.setScale(1);
-            this.input.setDefaultCursor('none');
+            this.closeSettings();
         });
     });
     this.settingsContainer.add(closeBtn);
@@ -671,10 +657,7 @@ class UIScene extends Phaser.Scene {
 
             // Close settings
             this.time.delayedCall(150, () => {
-                this.settingsContainer.setVisible(false);
-                this.gearIcon.setVisible(true);
-                this.gearIcon.setScale(1);
-                this.input.setDefaultCursor('none');
+                this.closeSettings();
             });
         });
         this.settingsContainer.add(confirmation);
@@ -733,10 +716,40 @@ class UIScene extends Phaser.Scene {
     });
   }
 
+  closeSettings() {
+    if (this.settingsContainer && this.settingsContainer.visible) {
+        this.tweens.killTweensOf(this.settingsContainer);
+        this.tweens.add({
+            targets: this.settingsContainer,
+            alpha: 0,
+            duration: 200,
+            ease: 'Power2',
+            onComplete: () => {
+                this.settingsContainer.setVisible(false);
+                this.settingsContainer.setAlpha(1); // Reset for next time
+                if (this.gearIcon) {
+                    this.gearIcon.setVisible(true);
+                    this.gearIcon.setScale(1);
+                }
+                if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+            }
+        });
+    }
+  }
+
   openSettings() {
+    this.tweens.killTweensOf(this.settingsContainer);
+    this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
-    this.gearIcon.setVisible(false);
-    this.input.setDefaultCursor('none');
+    if (this.gearIcon) this.gearIcon.setVisible(false);
+    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
+
+    this.tweens.add({
+        targets: this.settingsContainer,
+        alpha: 1,
+        duration: 200,
+        ease: 'Power2'
+    });
   }
 }
 
