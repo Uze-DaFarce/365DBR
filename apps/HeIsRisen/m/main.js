@@ -3253,8 +3253,8 @@ class EggZamRoom extends Phaser.Scene {
       const offsetY = (height - (784 * coverScale)) / 2;
 
       // Calculate relative to the keyframe bounds so it aligns with the chamber
-      const eggPosX = offsetX + (1168 * coverScale) * 0.493;
-      const eggPosY = offsetY + (784 * coverScale) * 0.50;
+      const eggPosX = offsetX + (1168 * coverScale) * 0.493 - (16 * coverScale);
+      const eggPosY = offsetY + (784 * coverScale) * 0.50 + (10 * coverScale);
       const symbolPosX = eggPosX;
       const symbolPosY = eggPosY;
 
@@ -3266,14 +3266,22 @@ class EggZamRoom extends Phaser.Scene {
         this.displayedEggImage = this.add.image(eggPosX, eggPosY, `egg-${eggId}`)
           .setOrigin(0.5, 0.5)
           .setDisplaySize(eggScaleTarget, eggHeightTarget)
+          .setAlpha(0)
           .setDepth(3);
       }
       if (symbolData && symbolData.filename && this.textures.exists(symbolData.filename)) {
         this.displayedSymbolImage = this.add.image(symbolPosX, symbolPosY, symbolData.filename)
           .setOrigin(0.5, 0.5)
           .setDisplaySize(eggScaleTarget, eggHeightTarget)
+          .setAlpha(0)
           .setDepth(3);
       }
+
+      this.tweens.add({
+        targets: [this.displayedEggImage, this.displayedSymbolImage].filter(Boolean),
+        alpha: 1,
+        duration: 500
+      });
     }
   }
 
