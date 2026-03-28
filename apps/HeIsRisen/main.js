@@ -2369,17 +2369,20 @@ class EggZamRoom extends Phaser.Scene {
   playGoodEggAnimation(eggImage, symbolImage, onCompleteCallback) {
     this.playVideo('eggzam-eggcellent', onCompleteCallback);
 
+    const scale = Math.min(this.sys.game.canvas.width / 1280, this.sys.game.canvas.height / 720);
+
     const startX = eggImage.x;
     const startY = eggImage.y;
+    const targetY = startY - (100 * scale);
     
-    const halo = this.add.image(startX, startY, 'halo').setDepth(2).setAlpha(0).setScale(0.5);
+    const halo = this.add.image(startX, targetY, 'halo').setDepth(2).setAlpha(0).setScale(0.5 * scale);
 
     const sparkles = this.add.particles(0, 0, 'sparkle', {
         x: startX,
-        y: startY,
-        speed: { min: -100, max: 100 },
+        y: targetY,
+        speed: { min: -150 * scale, max: 150 * scale },
         angle: { min: 0, max: 360 },
-        scale: { start: 1, end: 0 },
+        scale: { start: 1 * scale, end: 0 },
         alpha: { start: 1, end: 0 },
         lifespan: 1000,
         frequency: 100,
@@ -2387,26 +2390,41 @@ class EggZamRoom extends Phaser.Scene {
     }).setDepth(4);
 
     this.tweens.add({
-        targets: halo,
-        alpha: 1,
-        scaleX: 1.5,
-        scaleY: 1.5,
-        duration: 500,
-        yoyo: true,
-        repeat: 1
-    });
-
-    this.time.delayedCall(4000, () => {
-        sparkles.stop();
-        this.time.delayedCall(1000, () => {
-            halo.destroy();
-            sparkles.destroy();
-        });
+        targets: [eggImage, symbolImage].filter(img => img),
+        y: targetY,
+        duration: 800,
+        ease: 'Cubic.easeOut',
+        onComplete: () => {
+            this.tweens.add({
+                targets: halo,
+                alpha: 1,
+                scaleX: 2.0 * scale,
+                scaleY: 2.0 * scale,
+                duration: 500,
+                yoyo: true,
+                repeat: 1
+            });
+            this.tweens.add({
+                targets: [eggImage, symbolImage].filter(img => img),
+                angle: 360,
+                duration: 1000,
+                ease: 'Sine.easeInOut',
+                onComplete: () => {
+                    sparkles.stop();
+                    this.time.delayedCall(1000, () => {
+                        halo.destroy();
+                        sparkles.destroy();
+                    });
+                }
+            });
+        }
     });
   }
 
   playBadEggAnimation(eggImage, symbolImage, onCompleteCallback) {
     this.playVideo('eggzam-stinky', onCompleteCallback);
+
+    const scale = Math.min(this.sys.game.canvas.width / 1280, this.sys.game.canvas.height / 720);
 
     const startX = eggImage.x;
     const startY = eggImage.y;
@@ -2420,15 +2438,15 @@ class EggZamRoom extends Phaser.Scene {
     const gasParticles = this.add.particles(0, 0, 'green-gas', {
         x: startX,
         y: startY,
-        speed: { min: 20, max: 100 },
+        speed: { min: 20 * scale, max: 100 * scale },
         angle: { min: 0, max: 360 },
-        scale: { start: 1, end: 8 }, 
+        scale: { start: 1 * scale, end: 8 * scale },
         alpha: { start: 0.9, end: 0 },
         lifespan: 3000,
         frequency: 30, 
         blendMode: 'NORMAL', 
         rotate: { min: -10, max: 10 },
-        gravityY: -20, 
+        gravityY: -20 * scale,
     }).setDepth(4);
     
     this.tweens.add({
@@ -2440,8 +2458,8 @@ class EggZamRoom extends Phaser.Scene {
         onComplete: () => {
             this.tweens.add({
                 targets: [eggImage, symbolImage].filter(img => img),
-                x: this.cameras.main.width + 200,
-                y: -100,
+                x: this.cameras.main.width + (200 * scale),
+                y: -100 * scale,
                 angle: 720,
                 duration: 800,
                 ease: 'Back.in',
