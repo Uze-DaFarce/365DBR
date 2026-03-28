@@ -827,8 +827,9 @@ class MainMenu extends Phaser.Scene {
     this.load.image('egg-zit-button', 'assets/objects/egg-zit-button.png');
     this.load.image('eggs-ammin-haul', 'assets/objects/eggs-ammin-haul.png');
     this.load.image('score', 'assets/objects/score.png');
-    this.load.image('egg-zam-room', 'assets/map/egg-zam-room.png');
-    this.load.image('egg-zamminer', 'assets/objects/egg-zamminer.png');
+    this.load.image('eggzam-keyframe', 'assets/video/eggzam-keyframe.jpg');
+    this.load.atlas('egg-cellent-button', 'assets/objects/egg-cellent.png', 'assets/objects/egg-cellent.json');
+    this.load.atlas('eggs-tra-stinky-button', 'assets/objects/eggs-tra-stinky.png', 'assets/objects/eggs-tra-stinky.json');
     this.load.image('symbol-result-summary-diag', 'assets/objects/symbol-result-summary-diag.png');
 
     // Preload all 60 eggs
@@ -2377,6 +2378,8 @@ class SectionHunt extends Phaser.Scene {
 class EggZamRoom extends Phaser.Scene {
 
   playGoodEggAnimation(eggImage, symbolImage, onCompleteCallback) {
+    this.playVideo('eggzam-eggcellent', onCompleteCallback);
+
     const scale = this.gameScale;
     const isDesktop = this.sys.game.device.os.desktop;
     const assetScale = isDesktop ? scale : scale * 2;
@@ -2429,7 +2432,7 @@ class EggZamRoom extends Phaser.Scene {
                         onComplete: () => {
                             halo.destroy();
                             sparkles.destroy();
-                            if (onCompleteCallback) onCompleteCallback();
+                            // callback is handled by playVideo completion
                         }
                     });
                 }
@@ -2439,6 +2442,8 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   playBadEggAnimation(eggImage, symbolImage, onCompleteCallback) {
+    this.playVideo('eggzam-stinky', onCompleteCallback);
+
     const scale = this.gameScale;
     const isDesktop = this.sys.game.device.os.desktop;
     const assetScale = isDesktop ? scale : scale * 2;
@@ -2484,12 +2489,16 @@ class EggZamRoom extends Phaser.Scene {
                     gasParticles.stop();
                     this.time.delayedCall(1000, () => {
                         gasParticles.destroy();
-                        if (onCompleteCallback) onCompleteCallback();
+                        // callback is handled by playVideo completion
                     });
                 }
             });
         }
     });
+  }
+
+  playIncorrectAnimation(onCompleteCallback) {
+      this.playVideo('eggzam-incorrect', onCompleteCallback);
   }
 
   constructor() {
@@ -2510,6 +2519,88 @@ class EggZamRoom extends Phaser.Scene {
     this.leftBottleZone = null;
     this.rightBottleZone = null;
     this.fingerCursor = null;
+    this.ambientTimer = null;
+    this.currentVideo = null;
+  }
+
+  resetAmbientTimer() {
+      if (this.ambientTimer) {
+          this.ambientTimer.remove(false);
+      }
+
+      const playAmbient = () => {
+          if (this.currentVideo && this.currentVideo.active) {
+             this.resetAmbientTimer();
+             return;
+          }
+
+          this.playVideo(this.registry.get('lastAmbient') === 1 ? 'eggzam-ambient-2' : 'eggzam-ambient-1', () => {
+              this.registry.set('lastAmbient', this.registry.get('lastAmbient') === 1 ? 2 : 1);
+              this.resetAmbientTimer();
+          });
+      };
+
+      this.ambientTimer = this.time.delayedCall(10000, playAmbient, [], this);
+  }
+
+  stopCurrentVideo() {
+      if (this.currentVideo) {
+          this.currentVideo.destroy();
+          this.currentVideo = null;
+
+          if (this.actionButtons && !this.explanationText?.active) {
+              this.actionButtons.forEach(btn => btn.setVisible(true));
+          }
+      }
+  }
+
+  playVideo(videoKey, onComplete) {
+      this.stopCurrentVideo();
+      if (!this.cache.video.exists(videoKey)) {
+          console.warn(`Video ${videoKey} not found in cache. Skipping video and firing complete.`);
+          if (onComplete) onComplete();
+
+          return;
+      }
+
+      try {
+          const width = this.game.config.width;
+          const height = this.game.config.height;
+          const scaleX = width / 1280;
+          const scaleY = height / 720;
+          const coverScale = Math.max(scaleX, scaleY);
+
+          this.currentVideo = this.add.video(width/2, height/2, videoKey)
+              .setDepth(1)
+              .setOrigin(0.5, 0.5);
+
+          // Phaser videos sometimes don't scale correctly until they are actively playing and populated
+          this.currentVideo.once('play', () => {
+              if (this.currentVideo && this.currentVideo.active) {
+                  this.currentVideo.setDisplaySize(1168 * coverScale, 784 * coverScale);
+              }
+          });
+
+          this.currentVideo.play();
+
+          if (this.actionButtons && !videoKey.includes('ambient')) {
+              this.actionButtons.forEach(btn => btn.setVisible(false));
+          }
+
+          this.currentVideo.on('complete', () => {
+            this.stopCurrentVideo();
+            if (onComplete) onComplete();
+          });
+
+          this.currentVideo.on('error', () => {
+            this.stopCurrentVideo();
+            if (onComplete) onComplete();
+          });
+      } catch (error) {
+          console.error(`Error playing video ${videoKey}:`, error);
+          this.stopCurrentVideo();
+          if (onComplete) onComplete();
+      }
   }
 
   preload() {
@@ -2567,25 +2658,35 @@ class EggZamRoom extends Phaser.Scene {
     this.cameras.main.setViewport(0, 0, width, height);
     this.cameras.main.setPosition(0, 0);
 
-    this.background = this.add.image(0, 0, 'egg-zam-room')
-      .setOrigin(0, 0)
+    // Background lazy-load core EggZam videos
+    if (!this.registry.get('eggzamVideosLoaded')) {
+        this.registry.set('eggzamVideosLoaded', true);
+        this.load.video('eggzam-eggcellent', 'assets/video/eggzam-eggcellent.mp4');
+        this.load.video('eggzam-stinky', 'assets/video/eggzam-stinky.mp4');
+        this.load.video('eggzam-incorrect', 'assets/video/eggzam-incorrect-classification.mp4');
+        this.load.start();
+    }
+    // Background lazy-load ambient EggZam videos
+    if (!this.registry.get('eggzamAmbientVideosLoaded')) {
+        this.registry.set('eggzamAmbientVideosLoaded', true);
+        this.load.video('eggzam-ambient-1', 'assets/video/eggzam-ambient-1.mp4');
+        this.load.video('eggzam-ambient-2', 'assets/video/eggzam-ambient-2.mp4');
+        this.load.start();
+    }
+
+    if (!this.registry.has('lastAmbient')) {
+        this.registry.set('lastAmbient', 1);
+    }
+
+    const coverScale = Math.max(scaleX, scaleY);
+
+    this.background = this.add.image(width/2, height/2, 'eggzam-keyframe')
+      .setOrigin(0.5, 0.5)
       .setDepth(0)
-      .setDisplaySize(width, height);
+      .setDisplaySize(1168 * coverScale, 784 * coverScale);
 
     const isDesktop = this.sys.game.device.os.desktop;
     const assetScale = isDesktop ? this.gameScale : this.gameScale * 1.75;
-
-    const tanBoxCenterX = (640 / 1280) * width;
-    const examinerWidth = 400 * assetScale;
-    const examinerHeight = 500 * assetScale;
-    const examinerX = tanBoxCenterX - (examinerWidth / 2);
-    const floorY = isDesktop ? ((740 / 720) * height) : height + (100 * assetScale); // push further down on mobile
-    const examinerY = floorY - examinerHeight;
-
-    this.examiner = this.add.image(examinerX, examinerY, 'egg-zamminer')
-      .setOrigin(0, 0)
-      .setDepth(2)
-      .setDisplaySize(examinerWidth, examinerHeight);
 
     const diagX = 0.55 * width;
     const diagY = 0.05 * height;
@@ -2640,38 +2741,6 @@ class EggZamRoom extends Phaser.Scene {
       stroke: '#fff',
       strokeThickness: (isDesktop ? 6 : 8) * this.gameScale
     }).setOrigin(0.5).setDepth(5);
-
-    const zoneWidth = 200 * assetScale;
-    const zoneHeight = 400 * assetScale;
-    const zoneY = examinerY + 100 * assetScale;
-
-    this.leftBottleZone = this.add.zone(examinerX, zoneY, zoneWidth, zoneHeight)
-      .setOrigin(0, 0)
-      .setInteractive();
-
-    this.rightBottleZone = this.add.zone(examinerX + zoneWidth, zoneY, zoneWidth, zoneHeight)
-      .setOrigin(0, 0)
-      .setInteractive();
-
-    // Create hover graphics for highlighting bottles
-    this.hoverGraphics = this.add.graphics().setDepth(10);
-
-    const addZoneHover = (zone) => {
-        zone.on('pointerover', () => {
-            this.hoverGraphics.clear();
-            this.hoverGraphics.lineStyle(4, 0xffff00, 1);
-            this.hoverGraphics.strokeRect(zone.x, zone.y, zone.width, zone.height);
-            this.hoverGraphics.fillStyle(0xffff00, 0.2);
-            this.hoverGraphics.fillRect(zone.x, zone.y, zone.width, zone.height);
-        });
-
-        zone.on('pointerout', () => {
-            this.hoverGraphics.clear();
-        });
-    };
-
-    addZoneHover(this.leftBottleZone);
-    addZoneHover(this.rightBottleZone);
 
     const showExplanation = (isCorrect, guessText) => {
         const data = this.currentEgg.symbolData;
@@ -2954,21 +3023,70 @@ class EggZamRoom extends Phaser.Scene {
                 executeExplanationPopup();
             }
         } else {
-            executeExplanationPopup();
+            this.playIncorrectAnimation(executeExplanationPopup);
         }
     };
 
-    this.leftBottleZone.on('pointerdown', () => {
-      if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
-        showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
-      }
+    const btnScale = this.gameScale * 0.4;
+    const centerBottomX = width / 2;
+    const centerBottomY = height - (100 * this.gameScale);
+
+    const buttonSpacing = 120 * this.gameScale;
+
+    // Eggs-tra Stinky on the left, Egg-cellent on the right
+    const stinkyBtn = this.add.sprite(centerBottomX - buttonSpacing, centerBottomY, 'eggs-tra-stinky-button', 'Symbol 10000')
+        .setScale(btnScale)
+        .setDepth(90)
+        .setInteractive();
+
+    stinkyBtn.on('pointerover', () => {
+        stinkyBtn.setFrame('Symbol 10003');
     });
 
-    this.rightBottleZone.on('pointerdown', () => {
+    stinkyBtn.on('pointerout', () => {
+        stinkyBtn.setFrame('Symbol 10000');
+    });
+
+    stinkyBtn.on('pointerdown', () => {
+      if (this.currentVideo && this.currentVideo.active && this.currentVideo.video.src.includes('ambient')) {
+          this.stopCurrentVideo();
+      }
+      this.resetAmbientTimer();
+      this.sound.play('menu-click', { volume: this.registry.get('sfxVolume') ?? 0.5 });
       if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
         showExplanation(this.currentEgg.symbolData.category === 'Pagan', 'Eggs-tra Stinky');
       }
     });
+
+    if (typeof addTooltip === 'function') addTooltip(this, stinkyBtn, 'Categorize as Eggs-tra Stinky');
+
+    const eggCellentBtn = this.add.sprite(centerBottomX + buttonSpacing, centerBottomY, 'egg-cellent-button')
+        .setScale(btnScale)
+        .setDepth(90)
+        .setInteractive();
+
+    eggCellentBtn.on('pointerover', () => {
+        eggCellentBtn.setFrame('Eggcellent0004');
+    });
+
+    eggCellentBtn.on('pointerout', () => {
+        eggCellentBtn.setFrame('Eggcellent0000');
+    });
+
+    eggCellentBtn.on('pointerdown', () => {
+        if (this.currentVideo && this.currentVideo.active && this.currentVideo.video.src.includes('ambient')) {
+            this.stopCurrentVideo();
+        }
+        this.resetAmbientTimer();
+        this.sound.play('menu-click', { volume: this.registry.get('sfxVolume') ?? 0.5 });
+        if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
+            showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
+        }
+    });
+
+    if (typeof addTooltip === 'function') addTooltip(this, eggCellentBtn, 'Categorize as Egg-cellent');
+
+    this.actionButtons = [stinkyBtn, eggCellentBtn];
 
     this.displayRandomEggInfo();
 
@@ -3125,30 +3243,35 @@ class EggZamRoom extends Phaser.Scene {
 
     if (this.currentEgg) {
       const { eggId, symbolData } = this.currentEgg;
-      const isDesktop = this.sys.game.device.os.desktop;
-      const assetScale = isDesktop ? this.gameScale : this.gameScale * 2;
+      const width = this.game.config.width;
+      const height = this.game.config.height;
+      const scaleX = width / 1280;
+      const scaleY = height / 720;
+      const coverScale = Math.max(scaleX, scaleY);
 
-      const windowCenterX = 196 * assetScale;
-      const windowBottomY = 190 * assetScale;
-      const eggHeight = 125 * assetScale;
-      const symbolHeight = 125 * assetScale;
+      const offsetX = (width - (1168 * coverScale)) / 2;
+      const offsetY = (height - (784 * coverScale)) / 2;
 
-      const eggPosX = this.examiner.x + windowCenterX;
-      // User requested egg to move down ~6-10px to not overlap top border
-      const eggPosY = this.examiner.y + windowBottomY - (eggHeight / 2) + (10 * assetScale);
-      const symbolPosX = this.examiner.x + windowCenterX;
-      const symbolPosY = this.examiner.y + windowBottomY - (symbolHeight / 2) + (10 * assetScale);
+      // Calculate relative to the keyframe bounds so it aligns with the chamber
+      const eggPosX = offsetX + (1168 * coverScale) * 0.493;
+      const eggPosY = offsetY + (784 * coverScale) * 0.50;
+      const symbolPosX = eggPosX;
+      const symbolPosY = eggPosY;
+
+      // Scale them to match the new background design
+      const eggScaleTarget = (240 * coverScale) * 0.85;
+      const eggHeightTarget = (300 * coverScale) * 0.85;
 
       if (this.textures.exists(`egg-${eggId}`)) {
         this.displayedEggImage = this.add.image(eggPosX, eggPosY, `egg-${eggId}`)
           .setOrigin(0.5, 0.5)
-          .setDisplaySize(100 * assetScale, 125 * assetScale)
+          .setDisplaySize(eggScaleTarget, eggHeightTarget)
           .setDepth(3);
       }
       if (symbolData && symbolData.filename && this.textures.exists(symbolData.filename)) {
         this.displayedSymbolImage = this.add.image(symbolPosX, symbolPosY, symbolData.filename)
           .setOrigin(0.5, 0.5)
-          .setDisplaySize(100 * assetScale, 125 * assetScale)
+          .setDisplaySize(eggScaleTarget, eggHeightTarget)
           .setDepth(3);
       }
     }

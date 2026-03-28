@@ -2560,13 +2560,13 @@ class EggZamRoom extends Phaser.Scene {
           if (this.actionButtons && !videoKey.includes('ambient')) {
               this.actionButtons.forEach(btn => btn.setVisible(false));
           }
-          const fallbackTimer = this.time.delayedCall(4000, () => {
-          if (this.currentVideo && this.currentVideo.active) {
-              this.stopCurrentVideo();
-              if (onComplete) onComplete();
-    }
-          });
+
           this.currentVideo.on('complete', () => {
+            this.stopCurrentVideo();
+            if (onComplete) onComplete();
+          });
+
+          this.currentVideo.on('error', () => {
             this.stopCurrentVideo();
             if (onComplete) onComplete();
           });
@@ -2989,7 +2989,7 @@ class EggZamRoom extends Phaser.Scene {
       }
       this.resetAmbientTimer();
       this.sound.play('menu-click', { volume: this.registry.get('sfxVolume') ?? 0.5 });
-      if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active && !this.currentVideo) {
+      if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
         showExplanation(this.currentEgg.symbolData.category === 'Pagan', 'Eggs-tra Stinky');
       }
     });
@@ -3015,7 +3015,7 @@ class EggZamRoom extends Phaser.Scene {
         }
         this.resetAmbientTimer();
         this.sound.play('menu-click', { volume: this.registry.get('sfxVolume') ?? 0.5 });
-        if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active && !this.currentVideo) {
+        if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active) {
             showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
         }
     });
