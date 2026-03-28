@@ -2792,7 +2792,7 @@ class EggZamRoom extends Phaser.Scene {
                     iframe.style.backgroundColor = 'white';
 
                     const closeBtn = document.createElement('button');
-                    closeBtn.innerHTML = '&#10006;';
+                    closeBtn.textContent = '✖';
                     closeBtn.style.position = 'absolute';
                     closeBtn.style.top = '10px';
                     closeBtn.style.right = '10px';
