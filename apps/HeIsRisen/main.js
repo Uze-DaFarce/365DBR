@@ -3142,14 +3142,14 @@ class EggZamRoom extends Phaser.Scene {
       // Target coordinates inside the central egg chamber of the keyframe.
       // Based on visual inspection: Center-left.
       // Assuming original keyframe coords (1168x784), scaled down/up via coverScale.
-      const eggPosX = offsetX + (1280 * scale) * 0.44 + (6 * scale);
-      const eggPosY = offsetY + (720 * scale) * 0.42 + (12 * scale);
+      const eggPosX = offsetX + (1280 * scale) * 0.44 + (16 * scale);
+      const eggPosY = offsetY + (720 * scale) * 0.42 + (27 * scale);
       const symbolPosX = eggPosX;
       const symbolPosY = eggPosY;
 
       // Make egg as large as possible to fit chamber
-      const eggScaleTarget = (240 * scale) * 0.9;
-      const eggHeightTarget = (300 * scale) * 0.9;
+      const eggScaleTarget = (240 * scale) * 0.85;
+      const eggHeightTarget = (300 * scale) * 0.85;
 
       if (this.textures.exists(`egg-${eggId}`)) {
         this.displayedEggImage = this.add.image(eggPosX, eggPosY, `egg-${eggId}`)
