@@ -2969,7 +2969,7 @@ class EggZamRoom extends Phaser.Scene {
 
     const eggCellentBtn = this.add.sprite(centerBottomX + buttonSpacing, centerBottomY, 'egg-cellent-button')
         .setScale(btnScale)
-        .setDepth(102)
+        .setDepth(90)
         .setInteractive();
         
     eggCellentBtn.on('pointerover', () => {
