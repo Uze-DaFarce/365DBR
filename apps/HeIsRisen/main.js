@@ -3057,11 +3057,11 @@ class EggZamRoom extends Phaser.Scene {
           strokeThickness: 3 * scale,
           align: 'center',
           wordWrap: { width: 480 * scale, useAdvancedWrap: true }
-        }).setOrigin(0, 0);
+        }).setDepth(90).setOrigin(0, 0);
 
         if (foundEggs.length === TOTAL_EGGS) {
           // Summary Panel
-          const summaryContainer = this.add.container(offsetX + 420 * scale, offsetY + 300 * scale).setDepth(100);
+          const summaryContainer = this.add.container(offsetX + 420 * scale, offsetY + 300 * scale).setDepth(90);
 
           const holyEggs = foundEggs.filter(e => e.symbolData && e.symbolData.category === 'Christian').length;
           const worldlyEggs = foundEggs.filter(e => e.symbolData && e.symbolData.category === 'Pagan').length;
