@@ -461,7 +461,12 @@ class UIScene extends Phaser.Scene {
           const targetY = (height - panelHeight) / 2;
 
           let sliderYOffsets = [150, 250, 350]; // Music, Ambient, SFX
-          let sliderIndex = 0;
+          let sliderLabelIndex = 0;
+          let sliderTrackAreaIndex = 0;
+          let sliderTrackLineIndex = 0;
+          let sliderHandleIndex = 0;
+
+          const panelCenterX = targetX + panelWidth / 2;
 
           this.settingsContainer.getAll().forEach(child => {
               // Re-size overlay
@@ -484,14 +489,34 @@ class UIScene extends Phaser.Scene {
               }
               // Re-center "START NEW GAME" button container (it's a container)
               else if (child.type === 'Container' && child.list.length > 1 && child.list[1].type === 'Text' && child.list[1].text === 'START NEW GAME') {
-                  child.setPosition(targetX + panelWidth / 2, targetY + 440);
+                  child.setPosition(panelCenterX, targetY + 440);
               }
-              // Re-center sliders (Containers containing graphics/text)
-              else if (child.type === 'Container' && child.width !== 40 && child.list.length > 0 && !(child.list.length > 1 && child.list[1].text === 'START NEW GAME')) {
-                  if (sliderIndex < sliderYOffsets.length) {
-                      child.setPosition(targetX + panelWidth / 2, targetY + sliderYOffsets[sliderIndex]);
-                      sliderIndex++;
+              // Sliders logic: Text label, Rectangle (hit area), Rectangle (track line), Container (handle)
+              // Label
+              else if (child.type === 'Text' && ['Music', 'Ambient', 'SFX'].includes(child.text)) {
+                  child.setPosition(panelCenterX, targetY + sliderYOffsets[sliderLabelIndex] - 30);
+                  sliderLabelIndex++;
+              }
+              // Hit Area & Track Line
+              else if (child.type === 'Rectangle' && child.width === 200) {
+                  if (child.height === 60) { // Hit Area
+                      child.setPosition(panelCenterX, targetY + sliderYOffsets[sliderTrackAreaIndex] + 10);
+                      sliderTrackAreaIndex++;
+                  } else if (child.height === 4) { // Track Line
+                      child.setPosition(panelCenterX, targetY + sliderYOffsets[sliderTrackLineIndex] + 10);
+                      sliderTrackLineIndex++;
                   }
+              }
+              // Handle Container (the 60x60 container around the handle)
+              else if (child.type === 'Container' && child.width === 60 && child.height === 60 && child.list.length > 0 && child.list[0].type === 'Arc') {
+                  const types = ['music', 'ambient', 'sfx'];
+                  const type = types[sliderHandleIndex];
+                  let vol = 0.5;
+                  if (this.registry.has(`${type}Volume`)) vol = this.registry.get(`${type}Volume`);
+
+                  const startX = panelCenterX - 100;
+                  child.setPosition(startX + (vol * 200), targetY + sliderYOffsets[sliderHandleIndex] + 10);
+                  sliderHandleIndex++;
               }
           });
       }
