@@ -663,6 +663,7 @@ class UIScene extends Phaser.Scene {
 
     // Invisible hit area for easier clicking on track (increased height to 60)
     const trackHitArea = this.add.rectangle(centerX, y + 10, 200, 60, 0x888888, 0).setInteractive();
+    trackHitArea.input.cursor = 'pointer';
     this.settingsContainer.add(trackHitArea);
     this.settingsContainer.add(this.add.rectangle(centerX, y + 10, 200, 4, 0x888888));
 
@@ -674,6 +675,7 @@ class UIScene extends Phaser.Scene {
     const handleContainer = this.add.container(startX + (currentVol * 200), y + 10);
     handleContainer.setSize(60, 60);
     handleContainer.setInteractive(new Phaser.Geom.Circle(0, 0, 30), Phaser.Geom.Circle.Contains);
+    handleContainer.input.cursor = 'pointer';
     this.input.setDraggable(handleContainer);
 
     const visualHandle = this.add.circle(0, 0, 12, 0xffffff);

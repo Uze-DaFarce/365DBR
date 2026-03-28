@@ -354,3 +354,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-27 - [Expand Haptic Feedback to Buttons]
 **Learning:** Adding haptic feedback (`navigator.vibrate`) specifically to interactive buttons, not just core game events, significantly increases the tactile feel of UI components on mobile devices.
 **Action:** Consistently add a subtle haptic burst (e.g., 20ms) inside global interaction handlers like `addButtonInteraction` for pointer events.
+
+## 2026-03-28 - Desktop Pointer Affordance for Custom Sliders
+**Learning:** Custom Canvas/WebGL interactive UI components (like Phaser 3 volume sliders) lack native browser CSS properties by default. Mouse users rely heavily on the cursor changing to a pointer `cursor: 'pointer'` to understand that an element is draggable or clickable. Leaving it as the default arrow cursor makes the UI feel unresponsive and frustrating, especially on desktop.
+**Action:** Always explicitly set the input cursor to 'pointer' (`object.input.cursor = 'pointer'`) on custom interactive elements like sliders, handles, and hit areas in Phaser to ensure desktop users receive the expected visual affordance.

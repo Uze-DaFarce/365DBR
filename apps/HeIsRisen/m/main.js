@@ -675,6 +675,7 @@ class UIScene extends Phaser.Scene {
 
     // Increase track hit area for easier tapping (60px height)
     const track = this.add.rectangle(centerX, y + 10, trackWidth, 60, 0x888888).setAlpha(0.01).setInteractive();
+    track.input.cursor = 'pointer';
     // Visual track
     const visualTrack = this.add.rectangle(centerX, y + 10, trackWidth, 4, 0x888888);
     this.settingsContainer.add(track);
@@ -690,6 +691,7 @@ class UIScene extends Phaser.Scene {
     const handle = this.add.container(handleX, y + 10);
     handle.setSize(60, 60); // 30px radius * 2
     handle.setInteractive(new Phaser.Geom.Circle(0, 0, 30), Phaser.Geom.Circle.Contains);
+    handle.input.cursor = 'pointer';
     this.input.setDraggable(handle);
 
     // Visuals
