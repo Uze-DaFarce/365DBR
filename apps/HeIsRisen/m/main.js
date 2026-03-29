@@ -2867,7 +2867,7 @@ class EggZamRoom extends Phaser.Scene {
                     iframe.style.backgroundColor = 'white';
 
                     const closeBtn = document.createElement('button');
-                    closeBtn.textContent = '✖';
+                    closeBtn.textContent = '\u2716';
                     closeBtn.style.position = 'absolute';
                     closeBtn.style.top = '10px';
                     closeBtn.style.right = '10px';
@@ -2952,7 +2952,7 @@ class EggZamRoom extends Phaser.Scene {
         closeBtnBg.fillCircle(0, 0, closeBtnSize/2);
         closeBtnBg.strokeCircle(0, 0, closeBtnSize/2);
 
-        const closeBtnText = this.add.text(0, 0, '✖', {
+        const closeBtnText = this.add.text(0, 0, '\u2716', {
             fontSize: `${48 * assetScale}px`,
             fill: '#ffffff',
             fontStyle: 'bold',
