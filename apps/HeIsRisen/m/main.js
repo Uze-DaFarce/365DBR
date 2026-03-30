@@ -1033,6 +1033,16 @@ class MainMenu extends Phaser.Scene {
           strokeThickness: 6
       }).setOrigin(0.5).setDepth(11);
 
+      // Pulse animation to make it obvious the game is waiting for user input
+      this.tweens.add({
+          targets: tapToStartText,
+          alpha: 0.5,
+          duration: 800,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut'
+      });
+
       // "Play Now" / "Continue" Button Container (Initially Hidden)
       const buttonWidth = 400;
       const buttonHeight = 80;
