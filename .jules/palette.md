@@ -358,3 +358,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-30 - Unique Screen Reader Announcer IDs
 **Learning:** Having multiple elements with the exact same ID (like `id="sr-announcer"`) in the DOM creates invalid HTML, and often breaks `document.getElementById` and causes screen readers to misbehave or ignore subsequent updates to the ARIA live region.
 **Action:** Ensure that the `#sr-announcer` live region is instantiated exactly once per page. Use `aria-live="polite"` and `aria-atomic="true"` on a single unified element instead of splitting or duplicating.
+
+## 2026-03-30 - Core Action Tactility
+**Learning:** Even when primary interactions (like categorization buttons) have hover states or visual feedback on desktop, omitting standardized haptic feedback and 'juicy' scale animations on mobile makes the core gameplay loop (repeated 60+ times) feel hollow and unrewarding.
+**Action:** Always ensure that *all* primary user actions, especially those repeated frequently, utilize standardized 'juicy' feedback handlers (like `addButtonInteraction`) to provide consistent haptics, scale squish, and audio feedback, rather than relying on disparate manual bindings.

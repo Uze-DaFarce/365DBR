@@ -3044,12 +3044,12 @@ class EggZamRoom extends Phaser.Scene {
         stinkyBtn.setFrame('Symbol 10000');
     });
 
+    addButtonInteraction(this, stinkyBtn, 'menu-click');
     stinkyBtn.on('pointerdown', () => {
       if (this.currentVideo && this.currentVideo.active && this.currentVideo.video.src.includes('ambient')) {
           this.stopCurrentVideo();
       }
       this.resetAmbientTimer();
-      this.sound.play('menu-click', { volume: this.registry.get('sfxVolume') ?? 0.5 });
       if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active && !this.currentVideo) {
         showExplanation(this.currentEgg.symbolData.category === 'Pagan', 'Eggs-tra Stinky');
       }
@@ -3068,13 +3068,13 @@ class EggZamRoom extends Phaser.Scene {
         eggCellentBtn.setFrame('Eggcellent0000');
     });
 
+    addButtonInteraction(this, eggCellentBtn, 'menu-click');
     eggCellentBtn.on('pointerdown', () => {
         if (this.currentVideo && this.currentVideo.active && this.currentVideo.video.src.includes('ambient')) {
             this.stopCurrentVideo();
         }
         this.resetAmbientTimer();
-        this.sound.play('menu-click', { volume: this.registry.get('sfxVolume') ?? 0.5 });
-        if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active && !this.currentVideo) {
+      if (this.currentEgg && !this.currentEgg.categorized && !this.explanationText?.active && !this.currentVideo) {
             showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
         }
     });
