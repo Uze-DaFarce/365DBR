@@ -1284,6 +1284,22 @@ class MainMenu extends Phaser.Scene {
           }
       });
 
+      // Check if device is desktop
+      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (!isMobileDevice && !this.registry.get('desktopPromptShown')) {
+          this.registry.set('desktopPromptShown', true);
+          const promptContainer = new Confirmation(
+              this,
+              0,
+              0,
+              "It looks like you're on a desktop.\nWould you like to switch to the Desktop Version?",
+              () => { window.location.href = '/HeIsRisen/'; }, // On Yes
+              () => {} // On No
+          );
+          this.add.existing(promptContainer);
+          promptContainer.setDepth(9999);
+      }
+
       // Ensure loading text is destroyed if it persists (safety check)
       // Note: loadingText is local to preload, so we can't access it here directly easily unless stored on this.
       // But preload logic destroys it on complete.

@@ -29,6 +29,7 @@ def wait_for_scene(page, scene_key):
 def test_desktop_a11y_sr_only(browser_context):
     context = browser_context.new_context(viewport={'width': 1280, 'height': 720})
     page = context.new_page()
+    th.init_global_bypasses(page)
     page.goto("http://127.0.0.1:8080/")
 
     # Wait for the MainMenu scene to be active to ensure game is loaded
@@ -65,6 +66,7 @@ def test_mobile_a11y_sr_only(browser_context):
     # Landscape orientation for mobile game
     context = browser_context.new_context(viewport={'width': 844, 'height': 390})
     page = context.new_page()
+    th.init_global_bypasses(page)
     page.goto("http://127.0.0.1:8080/m/")
 
     # Wait for the MainMenu scene to be active
