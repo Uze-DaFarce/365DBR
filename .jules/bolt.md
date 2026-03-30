@@ -111,3 +111,13 @@
 ## 2026-03-27 - [Optimizing Phaser Update Loops Scaling Checks]
 **Learning:** Continuously polling for video metadata availability (like `introVideo.width > 0`) and recalculating `scale` properties (e.g. `setDisplaySize`) inside a Phaser 60fps `update()` loop creates a heavy, redundant performance bottleneck. In both desktop and mobile versions, these static calculations were running continuously despite the video size only needing to be calculated once it begins playing or when the window resizes.
 **Action:** Removed continuous scale checks from the `update()` loops in `MainMenu` and `SectionHunt` across both desktop and mobile. Instead, bound the scaling logic to one-time `introVideo.once('play')` and continuous `this.scale.on('resize')` event listeners.
+
+## 2026-03-30 - Global Cursor Override & Video Output Restrictions
+**Learning:**
+1. The user explicitly prefers the `fingerCursor` to remain visible alongside the magnifying glass during `SectionHunt`. Attempting to "fix" this by hiding the finger cursor when the magnifying glass is active is viewed as a regression of a happy accident that improved UX.
+2. Furthermore, the user strictly forbids using default Windows cursors (like arrow, pointer, etc) in addition to the custom cursors, which previously resulted in double-cursor rendering over interactive DOM elements or unhandled states.
+3. The Playwright UI does NOT support `.webm` video playback without merging to main. Including `.webm` files in PRs clutters the history and frustrates the user, who cannot view them.
+**Action:**
+1. Reverted the logic that manually toggles `fingerCursor` visibility based on the magnifying glass state in `SectionHunt`. Let both show simultaneously.
+2. Verified all `setDefaultCursor('none')` logic is centralized in the global `CursorScene` for both desktop and mobile to permanently prevent default OS cursors from appearing over the game canvas.
+3. Configured Playwright verification scripts to NOT record or save `.webm` videos. Only generate `.png` screenshots for frontend verification steps.

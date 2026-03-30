@@ -2356,12 +2356,6 @@ class SectionHunt extends Phaser.Scene {
         if (this.magnifyingGlass) this.magnifyingGlass.setVisible(false);
         if (this.zoomedView) this.zoomedView.setVisible(false);
         if (this.maskGraphics) this.maskGraphics.setVisible(false);
-
-        if (this.fingerCursor) {
-            this.fingerCursor.setVisible(true);
-            this.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
-            this.fingerCursor.setPosition(pointer.x, pointer.y);
-        }
     } else {
         if (this.magnifyingGlass) {
              this.magnifyingGlass.setVisible(true);
@@ -2370,7 +2364,6 @@ class SectionHunt extends Phaser.Scene {
         }
         if (this.zoomedView) this.zoomedView.setVisible(true);
         if (this.maskGraphics) this.maskGraphics.setVisible(true);
-        if (this.fingerCursor) this.fingerCursor.setVisible(false);
     }
   }
 }
