@@ -455,18 +455,21 @@ class UIScene extends Phaser.Scene {
       }
 
       if (this.settingsContainer) {
-          const panelWidth = 500;
-          const panelHeight = 500;
+          // Determine layout mode based on available height.
+          // Need roughly 500px for a clean single column. Less than that -> 2 columns.
+          const isTwoColumn = height < 500;
+          const panelWidth = isTwoColumn ? Math.min(800, width - 40) : 500;
+          const panelHeight = isTwoColumn ? Math.min(300, height - 40) : 500;
           const targetX = (width - panelWidth) / 2;
           const targetY = (height - panelHeight) / 2;
-
-          let sliderYOffsets = [150, 250, 350]; // Music, Ambient, SFX
-          let sliderLabelIndex = 0;
-          let sliderTrackAreaIndex = 0;
-          let sliderTrackLineIndex = 0;
-          let sliderHandleIndex = 0;
-
           const panelCenterX = targetX + panelWidth / 2;
+
+          let controlYOffsets = isTwoColumn ? [120, 200, 120] : [150, 250, 350];
+          let controlXOffsets = isTwoColumn ? [panelCenterX - 150, panelCenterX - 150, panelCenterX + 150] : [panelCenterX, panelCenterX, panelCenterX];
+          let controlLabelIndex = 0;
+          let controlArrowLeftIndex = 0;
+          let controlArrowRightIndex = 0;
+          let controlValueIndex = 0;
 
           this.settingsContainer.getAll().forEach(child => {
               // Re-size overlay
@@ -476,47 +479,46 @@ class UIScene extends Phaser.Scene {
               // Re-center main panel
               else if (child.type === 'Rectangle' && child.fillColor === 0x333333) {
                   child.setPosition(width / 2, height / 2);
+                  child.setSize(panelWidth, panelHeight);
+                  // Update geometry for rounded rect if we resized it
+                  child.geom.width = panelWidth;
+                  child.geom.height = panelHeight;
+                  child.updateDisplayOrigin();
               }
               // Re-center title
               else if (child.type === 'Text' && child.text === 'Audio Settings') {
-                  child.setPosition(width / 2, targetY + 50);
+                  child.setPosition(width / 2, targetY + 40);
               }
-              // Re-center close button (it's a container with closeX, closeY)
+              // Re-center close button
               else if (child.type === 'Container' && child.list.length > 0 && child.list[0].type === 'Graphics' && child.width === 40) {
                   const closeX = targetX + panelWidth - 30;
                   const closeY = targetY + 30;
                   child.setPosition(closeX, closeY);
               }
-              // Re-center "START NEW GAME" button container (it's a container)
+              // Re-center "START NEW GAME" button container
               else if (child.type === 'Container' && child.list.length > 1 && child.list[1].type === 'Text' && child.list[1].text === 'START NEW GAME') {
-                  child.setPosition(panelCenterX, targetY + 440);
+                  const btnY = isTwoColumn ? targetY + panelHeight - 40 : targetY + 440;
+                  child.setPosition(panelCenterX, btnY);
               }
-              // Sliders logic: Text label, Rectangle (hit area), Rectangle (track line), Container (handle)
-              // Label
+              // Controls logic: Label, Left Arrow, Right Arrow, Value Text
               else if (child.type === 'Text' && ['Music', 'Ambient', 'SFX'].includes(child.text)) {
-                  child.setPosition(panelCenterX, targetY + sliderYOffsets[sliderLabelIndex] - 30);
-                  sliderLabelIndex++;
+                  child.setPosition(controlXOffsets[controlLabelIndex], targetY + controlYOffsets[controlLabelIndex] - 30);
+                  controlLabelIndex++;
               }
-              // Hit Area & Track Line
-              else if (child.type === 'Rectangle' && child.width === 200) {
-                  if (child.height === 60) { // Hit Area
-                      child.setPosition(panelCenterX, targetY + sliderYOffsets[sliderTrackAreaIndex] + 10);
-                      sliderTrackAreaIndex++;
-                  } else if (child.height === 4) { // Track Line
-                      child.setPosition(panelCenterX, targetY + sliderYOffsets[sliderTrackLineIndex] + 10);
-                      sliderTrackLineIndex++;
-                  }
+              // Number Value Text (matches 0-10 format, typically length 1 or 2 digits)
+              else if (child.type === 'Text' && /^\d+$/.test(child.text)) {
+                  child.setPosition(controlXOffsets[controlValueIndex], targetY + controlYOffsets[controlValueIndex]);
+                  controlValueIndex++;
               }
-              // Handle Container (the 60x60 container around the handle)
-              else if (child.type === 'Container' && child.width === 60 && child.height === 60 && child.list.length > 0 && child.list[0].type === 'Arc') {
-                  const types = ['music', 'ambient', 'sfx'];
-                  const type = types[sliderHandleIndex];
-                  let vol = 0.5;
-                  if (this.registry.has(`${type}Volume`)) vol = this.registry.get(`${type}Volume`);
-
-                  const startX = panelCenterX - 100;
-                  child.setPosition(startX + (vol * 200), targetY + sliderYOffsets[sliderHandleIndex] + 10);
-                  sliderHandleIndex++;
+              // Left Arrow Container
+              else if (child.type === 'Container' && child.list.length > 0 && child.list[1] && child.list[1].type === 'Text' && child.list[1].text === '<') {
+                  child.setPosition(controlXOffsets[controlArrowLeftIndex] - 50, targetY + controlYOffsets[controlArrowLeftIndex]);
+                  controlArrowLeftIndex++;
+              }
+              // Right Arrow Container
+              else if (child.type === 'Container' && child.list.length > 0 && child.list[1] && child.list[1].type === 'Text' && child.list[1].text === '>') {
+                  child.setPosition(controlXOffsets[controlArrowRightIndex] + 50, targetY + controlYOffsets[controlArrowRightIndex]);
+                  controlArrowRightIndex++;
               }
           });
       }
@@ -591,27 +593,30 @@ class UIScene extends Phaser.Scene {
   }
 
   createSettingsPanel() {
-    const width = 500;
-    const height = 500;
-    const x = (this.cameras.main.width - width) / 2;
-    const y = (this.cameras.main.height - height) / 2;
+    const sw = this.cameras.main.width;
+    const sh = this.cameras.main.height;
+    const isTwoColumn = sh < 500;
+    const width = isTwoColumn ? Math.min(800, sw - 40) : 500;
+    const height = isTwoColumn ? Math.min(300, sh - 40) : 500;
+    const x = (sw - width) / 2;
+    const y = (sh - height) / 2;
 
     this.settingsContainer = this.add.container(0, 0).setVisible(false).setDepth(100);
 
     // Overlay
-    const overlay = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.7)
+    const overlay = this.add.rectangle(0, 0, sw, sh, 0x000000, 0.7)
         .setOrigin(0)
         .setInteractive(); // Block clicks
 
     this.settingsContainer.add(overlay);
 
     // Panel
-    const panel = this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, width, height, 0x333333)
+    const panel = this.add.rectangle(sw / 2, sh / 2, width, height, 0x333333)
         .setStrokeStyle(4, 0xffffff);
     this.settingsContainer.add(panel);
 
     // Title
-    const title = this.add.text(this.cameras.main.width / 2, y + 50, 'Audio Settings', {
+    const title = this.add.text(sw / 2, y + 40, 'Audio Settings', {
         fontSize: '32px',
         fontFamily: 'Comic Sans MS',
         fill: '#ffffff'
@@ -656,13 +661,18 @@ class UIScene extends Phaser.Scene {
     });
     this.settingsContainer.add(closeBtn);
 
-    // Sliders
-    this.createSlider('Music', y + 150, 'music');
-    this.createSlider('Ambient', y + 250, 'ambient');
-    this.createSlider('SFX', y + 350, 'sfx');
+    // Controls
+    let controlYOffsets = isTwoColumn ? [120, 200, 120] : [150, 250, 350];
+    const panelCenterX = x + width / 2;
+    let controlXOffsets = isTwoColumn ? [panelCenterX - 150, panelCenterX - 150, panelCenterX + 150] : [panelCenterX, panelCenterX, panelCenterX];
+
+    this.createNumberControl('Music', controlXOffsets[0], y + controlYOffsets[0], 'music');
+    this.createNumberControl('Ambient', controlXOffsets[1], y + controlYOffsets[1], 'ambient');
+    this.createNumberControl('SFX', controlXOffsets[2], y + controlYOffsets[2], 'sfx');
 
     // Start New Game Button
-    const resetBtnContainer = this.add.container(x + width / 2, y + 440);
+    const btnY = isTwoColumn ? y + height - 40 : y + 440;
+    const resetBtnContainer = this.add.container(panelCenterX, btnY);
     const resetBg = this.add.graphics();
     resetBg.fillStyle(0xff4444, 1);
     resetBg.fillRoundedRect(-125, -25, 250, 50, 10);
@@ -709,11 +719,7 @@ class UIScene extends Phaser.Scene {
     this.settingsContainer.add(resetBtnContainer);
   }
 
-  createSlider(label, y, type) {
-    const centerX = this.cameras.main.width / 2;
-    const startX = centerX - 100;
-    const endX = centerX + 100;
-
+  createNumberControl(label, centerX, y, type) {
     const text = this.add.text(centerX, y - 30, label, {
         fontSize: '24px',
         fontFamily: 'Comic Sans MS',
@@ -721,41 +727,58 @@ class UIScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.settingsContainer.add(text);
 
-    // Invisible hit area for easier clicking on track (increased height to 60)
-    const trackHitArea = this.add.rectangle(centerX, y + 10, 200, 60, 0x888888, 0).setInteractive();
-    this.settingsContainer.add(trackHitArea);
-    this.settingsContainer.add(this.add.rectangle(centerX, y + 10, 200, 4, 0x888888));
-
-    // Handle
     let currentVol = 0.5;
     if (this.registry.has(`${type}Volume`)) currentVol = this.registry.get(`${type}Volume`);
 
-    // Wrap handle in a container to enlarge hit area (30 radius) like mobile
-    const handleContainer = this.add.container(startX + (currentVol * 200), y + 10);
-    handleContainer.setSize(60, 60);
-    handleContainer.setInteractive(new Phaser.Geom.Circle(0, 0, 30), Phaser.Geom.Circle.Contains);
-    this.input.setDraggable(handleContainer);
+    // Convert 0.0-1.0 to 0-10
+    let displayValue = Math.round(currentVol * 10);
 
-    const visualHandle = this.add.circle(0, 0, 12, 0xffffff);
-    handleContainer.add(visualHandle);
+    const valueText = this.add.text(centerX, y, displayValue.toString(), {
+        fontSize: '32px',
+        fontFamily: 'Comic Sans MS',
+        fill: '#ffff00',
+        fontStyle: 'bold'
+    }).setOrigin(0.5);
+    this.settingsContainer.add(valueText);
 
-    this.settingsContainer.add(handleContainer);
-
-    const updateVolume = (x) => {
-        const clampedX = Phaser.Math.Clamp(x, startX, endX);
-        handleContainer.x = clampedX;
-        this.registry.set(`${type}Volume`, (clampedX - startX) / 200);
+    const updateVolume = (delta) => {
+        displayValue = Phaser.Math.Clamp(displayValue + delta, 0, 10);
+        valueText.setText(displayValue.toString());
+        this.registry.set(`${type}Volume`, displayValue / 10);
     };
 
-    handleContainer.on('drag', (p, x) => updateVolume(x));
-    trackHitArea.on('pointerdown', (p) => updateVolume(p.worldX));
+    // Left Arrow Container
+    const leftArrowContainer = this.add.container(centerX - 50, y);
+    const leftArrowText = this.add.text(0, 0, '<', {
+        fontSize: '32px',
+        fontFamily: 'Comic Sans MS',
+        fill: '#ffffff',
+        fontStyle: 'bold'
+    }).setOrigin(0.5);
+    // Hit area background
+    const leftHitArea = this.add.rectangle(0, 0, 40, 40, 0xffffff, 0.01);
+    leftArrowContainer.add([leftHitArea, leftArrowText]);
+    leftArrowContainer.setSize(40, 40);
+    leftArrowContainer.setInteractive();
+    addButtonInteraction(this, leftArrowContainer, 'menu-click');
+    leftArrowContainer.on('pointerdown', () => updateVolume(-1));
+    this.settingsContainer.add(leftArrowContainer);
 
-    handleContainer.on('pointerover', () => {
-        this.tweens.add({ targets: handleContainer, scaleX: 1.3, scaleY: 1.3, duration: 100, ease: 'Back.out' });
-    });
-    handleContainer.on('pointerout', () => {
-        this.tweens.add({ targets: handleContainer, scaleX: 1, scaleY: 1, duration: 100, ease: 'Back.out' });
-    });
+    // Right Arrow Container
+    const rightArrowContainer = this.add.container(centerX + 50, y);
+    const rightArrowText = this.add.text(0, 0, '>', {
+        fontSize: '32px',
+        fontFamily: 'Comic Sans MS',
+        fill: '#ffffff',
+        fontStyle: 'bold'
+    }).setOrigin(0.5);
+    const rightHitArea = this.add.rectangle(0, 0, 40, 40, 0xffffff, 0.01);
+    rightArrowContainer.add([rightHitArea, rightArrowText]);
+    rightArrowContainer.setSize(40, 40);
+    rightArrowContainer.setInteractive();
+    addButtonInteraction(this, rightArrowContainer, 'menu-click');
+    rightArrowContainer.on('pointerdown', () => updateVolume(1));
+    this.settingsContainer.add(rightArrowContainer);
   }
 
   closeSettings() {
