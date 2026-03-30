@@ -366,3 +366,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-30 - Video Volume Integration
 **Learning:** When using Phaser `Video` objects or HTML5 `<video>` tags alongside standard Canvas audio context, the video track volume is often entirely independent of the game's audio manager settings (like `scene.sound`). Muting the game via settings sliders will not mute the videos unless explicitly bound.
 **Action:** Always manually bind the volume of instantiated video objects to the global `sfxVolume` or `musicVolume` registry settings immediately upon calling `.play()`, e.g., `video.setVolume(registry.get('sfxVolume') ?? 0.5)`, to ensure user audio preferences are respected universally.
+
+## 2026-03-30 - Audio Clutter in Complex Interactions
+**Learning:** When a button triggers a complex chain of feedback (like playing a full-screen video, particle effects, and subsequent audio cues), appending a default, long 'click' audio sample to the initial interaction creates audio clutter, overlaps, and a muddy user experience.
+**Action:** Always evaluate the entire chain of feedback when applying interaction handlers like `addButtonInteraction`. If the resulting action spawns its own prominent audio (like a video), explicitly pass `null` as the soundKey (e.g., `addButtonInteraction(this, btn, null)`) to disable the redundant click noise and let the primary feedback shine.

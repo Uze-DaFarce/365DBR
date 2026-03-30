@@ -3041,7 +3041,7 @@ class EggZamRoom extends Phaser.Scene {
         stinkyBtn.setFrame('Symbol 10000');
     });
 
-    addButtonInteraction(this, stinkyBtn, 'menu-click');
+    addButtonInteraction(this, stinkyBtn, null);
     stinkyBtn.on('pointerdown', () => {
       if (this.currentVideo && this.currentVideo.active && this.currentVideo.video.src.includes('ambient')) {
           this.stopCurrentVideo();
@@ -3067,7 +3067,7 @@ class EggZamRoom extends Phaser.Scene {
         eggCellentBtn.setFrame('Eggcellent0000');
     });
     
-    addButtonInteraction(this, eggCellentBtn, 'menu-click');
+    addButtonInteraction(this, eggCellentBtn, null);
     eggCellentBtn.on('pointerdown', () => {
         if (this.currentVideo && this.currentVideo.active && this.currentVideo.video.src.includes('ambient')) {
             this.stopCurrentVideo();
