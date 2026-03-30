@@ -111,7 +111,7 @@ def init_global_bypasses(page):
     """
     page.add_init_script("""
         window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.code === 'Enter') {
+            if (e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape') {
                 // Let Phaser handle it via its own listener
             }
         });
