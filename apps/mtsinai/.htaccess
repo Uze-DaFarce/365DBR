@@ -49,6 +49,32 @@ ServerSignature Off
   Header set Content-Security-Policy "default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; frame-src 'none'; object-src 'none'; worker-src 'none'; base-uri 'self'; form-action 'self' https://docs.google.com; frame-ancestors 'none'; upgrade-insecure-requests; require-trusted-types-for 'script';"
 </IfModule>
 
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 🚦 Router: Case-insensitive and trailing slash redirects
+
+  # Redirect variants of HeIsRisen
+  RewriteCond %{REQUEST_URI} ^/(heisrisen|HEISRISEN|HeisRisen)/?$ [NC]
+  RewriteCond %{REQUEST_URI} !^/HeIsRisen/$
+  RewriteRule ^(.*)$ /HeIsRisen/ [R=301,L]
+
+  # Redirect variants of m
+  RewriteCond %{REQUEST_URI} ^/(M|m)/?$ [NC]
+  RewriteCond %{REQUEST_URI} !^/m/$
+  RewriteRule ^(.*)$ /m/ [R=301,L]
+
+  # Redirect variants of 365DBR
+  RewriteCond %{REQUEST_URI} ^/(365dbr|365DBR|365Dbr)/?$ [NC]
+  RewriteCond %{REQUEST_URI} !^/365DBR/$
+  RewriteRule ^(.*)$ /365DBR/ [R=301,L]
+
+  # Redirect variants of CMC
+  RewriteCond %{REQUEST_URI} ^/(cmc|CMC|Cmc)/?$ [NC]
+  RewriteCond %{REQUEST_URI} !^/CMC/$
+  RewriteRule ^(.*)$ /CMC/ [R=301,L]
+</IfModule>
+
 <IfModule mod_alias.c>
   # 🛡️ Sentinel: Block access to hidden files/directories (dotfiles)
   # Prevents leakage of sensitive config like .git, .env, or .Jules

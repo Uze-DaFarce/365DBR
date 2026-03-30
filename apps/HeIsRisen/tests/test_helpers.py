@@ -107,6 +107,7 @@ def get_random_map_section(page):
 def init_global_bypasses(page):
     """
     Injects global scripts to bypass autoplay policies or user interaction requirements.
+    It also dismisses device mismatch popups automatically.
     """
     page.add_init_script("""
         window.addEventListener('keydown', (e) => {
@@ -114,6 +115,18 @@ def init_global_bypasses(page):
                 // Let Phaser handle it via its own listener
             }
         });
+
+        // Auto-dismiss the device mismatch prompts to prevent blocking tests
+        const checkPrompt = setInterval(() => {
+            if (window.game && window.game.scene && window.game.scene.scenes.length > 0) {
+                const mainScene = window.game.scene.getScene('MainMenu');
+                if (mainScene && mainScene.registry) {
+                    mainScene.registry.set('mobilePromptShown', true);
+                    mainScene.registry.set('desktopPromptShown', true);
+                    clearInterval(checkPrompt);
+                }
+            }
+        }, 100);
     """)
 
 def wait_for_phaser_init(page):

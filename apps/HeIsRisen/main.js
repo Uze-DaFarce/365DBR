@@ -1232,6 +1232,28 @@ class MainMenu extends Phaser.Scene {
     if (!this.registry.has('eggData')) {
         initializeGameData(this.registry, this.cache);
     }
+
+    // Check if device is mobile and screen is constrained (e.g. height < 600 or portrait)
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const isConstrained = Math.min(w, h) < 600 || h > w; // less than 600px shortest side, or portrait
+
+    // Use a flag to ensure we only show the prompt once per session
+    if (isMobile && isConstrained && !this.registry.get('mobilePromptShown')) {
+        this.registry.set('mobilePromptShown', true);
+        const promptContainer = new Confirmation(
+            this,
+            0,
+            0,
+            "It looks like you're on a mobile device.\nWould you like to switch to the Mobile Version?",
+            () => { window.location.href = '/m/'; }, // On Yes
+            () => {} // On No
+        );
+        this.add.existing(promptContainer);
+        // Ensure prompt stays on top of everything
+        promptContainer.setDepth(9999);
+    }
   }
 
   resize(gameSize) {

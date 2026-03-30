@@ -34,6 +34,11 @@ def test_desktop_a11y_sr_only(browser_context):
     # Wait for the MainMenu scene to be active to ensure game is loaded
     wait_for_scene(page, 'MainMenu')
 
+    # Click No on desktop-mobile prompt if it appears
+    page.locator('canvas').first.click(force=True)
+    page.wait_for_timeout(500)
+    page.keyboard.press("Escape")
+
     # Bypass audio context splash screen
     page.locator('canvas').first.click(force=True)
     page.wait_for_timeout(1500)
@@ -69,6 +74,11 @@ def test_mobile_a11y_sr_only(browser_context):
 
     # Wait for the MainMenu scene to be active
     wait_for_scene(page, 'MainMenu')
+
+    # Click No on desktop-mobile prompt if it appears
+    page.locator('canvas').first.click(force=True)
+    page.wait_for_timeout(500)
+    page.keyboard.press("Escape")
 
     # Bypass audio context splash screen
     page.locator('canvas').first.click(force=True)
