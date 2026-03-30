@@ -362,3 +362,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-30 - Core Action Tactility
 **Learning:** Even when primary interactions (like categorization buttons) have hover states or visual feedback on desktop, omitting standardized haptic feedback and 'juicy' scale animations on mobile makes the core gameplay loop (repeated 60+ times) feel hollow and unrewarding.
 **Action:** Always ensure that *all* primary user actions, especially those repeated frequently, utilize standardized 'juicy' feedback handlers (like `addButtonInteraction`) to provide consistent haptics, scale squish, and audio feedback, rather than relying on disparate manual bindings.
+
+## 2026-03-30 - Video Volume Integration
+**Learning:** When using Phaser `Video` objects or HTML5 `<video>` tags alongside standard Canvas audio context, the video track volume is often entirely independent of the game's audio manager settings (like `scene.sound`). Muting the game via settings sliders will not mute the videos unless explicitly bound.
+**Action:** Always manually bind the volume of instantiated video objects to the global `sfxVolume` or `musicVolume` registry settings immediately upon calling `.play()`, e.g., `video.setVolume(registry.get('sfxVolume') ?? 0.5)`, to ensure user audio preferences are respected universally.

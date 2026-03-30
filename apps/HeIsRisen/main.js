@@ -2613,6 +2613,7 @@ class EggZamRoom extends Phaser.Scene {
           });
               
           this.currentVideo.play();
+          this.currentVideo.setVolume(this.registry.get('sfxVolume') ?? 0.5);
           
           if (this.actionButtons && !videoKey.includes('ambient')) {
               this.actionButtons.forEach(btn => btn.setVisible(false));
