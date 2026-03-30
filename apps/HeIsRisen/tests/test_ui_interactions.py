@@ -76,30 +76,23 @@ def run_ui_interaction_test(is_mobile=False):
             page.screenshot(path=screenshot_open)
             print(f"Captured settings open screenshot: {screenshot_open}")
 
-            # 3. Test Slider Interaction (Drag to change volume)
-            print("Testing visual slider interactions for Ambient and SFX Volume...")
+            # 3. Test Number Control Interaction (Arrows to change volume)
+            print("Testing visual interactions for Ambient and SFX Volume controls...")
 
-            # Hover and simulate drag on handles
+            # Hover and simulate click on left arrow
             page.evaluate("""
                 () => {
                     const uiScene = window.game.scene.getScene('UIScene');
-                    const handles = uiScene.settingsContainer ? uiScene.settingsContainer.list.filter(c => c.type === 'Container') : [];
+                    const arrows = uiScene.settingsContainer ? uiScene.settingsContainer.list.filter(c => c.type === 'Container' && c.list.length > 1 && (c.list[1].text === '<' || c.list[1].text === '>')) : [];
 
-                    if (handles.length >= 2) {
-                        // Ambient Handle - simulate hover
-                        const ambHandle = handles[0].list.find(c => c.type === 'Image' || c.type === 'Sprite');
-                        if(ambHandle) {
-                           ambHandle.emit('pointerover');
-                           // Fake the internal dragging update visually for the screenshot
-                           handles[0].x = handles[0].x - 50;
-                        }
+                    if (arrows.length >= 2) {
+                        // First left arrow - simulate pointerdown (decreases volume)
+                        arrows[0].emit('pointerdown');
                     }
                 }
             """)
             time.sleep(0.5)
             page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
-
-            # Skip redundant slider screenshot (since it doesn't clearly show new info over open settings)
 
             # 4. Test Settings Close Button (with 150ms delay)
             print("Testing close button with 150ms delay...")
