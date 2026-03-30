@@ -115,7 +115,7 @@ function saveGameState(registry) {
         currentScore: registry.get('currentScore')
     };
     try {
-        localStorage.setItem('heIsRisenGameState', JSON.stringify(state));
+        try { localStorage.setItem('heIsRisenGameState', JSON.stringify(state)); } catch (e) { console.warn('localStorage error', e); }
     } catch (e) {
         console.warn('Failed to save game state to localStorage', e);
     }
@@ -124,7 +124,8 @@ function saveGameState(registry) {
 function initializeGameData(registry, cache, forceNew = false) {
     if (!forceNew) {
         try {
-            const savedStateStr = localStorage.getItem('heIsRisenGameState');
+            let savedStateStr = null;
+            try { savedStateStr = localStorage.getItem('heIsRisenGameState'); } catch (e) { console.warn('localStorage error', e); }
             if (savedStateStr) {
                 let savedState = null;
                 try {
@@ -149,7 +150,8 @@ function initializeGameData(registry, cache, forceNew = false) {
 
                     // Always ensure highScore is loaded/initialized correctly
                     try {
-                        let highScoreVal = localStorage.getItem('highScore');
+                        let highScoreVal = null;
+                        try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
                         let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
                         if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
                             loadedScore = 0;
@@ -282,10 +284,12 @@ class MusicScene extends Phaser.Scene {
     super({ key: 'MusicScene' });
 
     const getSafeVol = (key) => {
-      let val = localStorage.getItem(key);
+      let val = null;
+      try { val = localStorage.getItem(key); } catch (e) { console.warn('localStorage error', e); }
       let parsed = parseFloat(val);
       if (isNaN(parsed) || parsed < 0 || parsed > 1) {
-          const backupVal = localStorage.getItem(key + '_backup');
+          let backupVal = null;
+          try { backupVal = localStorage.getItem(key + '_backup'); } catch (e) { console.warn('localStorage error', e); }
           parsed = parseFloat(backupVal);
           if (isNaN(parsed) || parsed < 0 || parsed > 1) {
               return 0.5;
@@ -347,8 +351,12 @@ class MusicScene extends Phaser.Scene {
     // Save settings on change
     this.registry.events.on('changedata', (parent, key, data) => {
         if (['musicVolume', 'ambientVolume', 'sfxVolume'].includes(key)) {
-            localStorage.setItem(key, data);
-            localStorage.setItem(key + '_backup', data);
+            try {
+                localStorage.setItem(key, data);
+                localStorage.setItem(key + '_backup', data);
+            } catch (e) {
+                console.warn('localStorage error', e);
+            }
         }
     });
   }
@@ -638,7 +646,7 @@ class UIScene extends Phaser.Scene {
 
     resetBtnContainer.on('pointerdown', () => {
         const confirmation = new Confirmation(this, 0, 0, 'Your current game will be reset,\nare you sure?', () => {
-            localStorage.removeItem('heIsRisenGameState');
+            try { localStorage.removeItem('heIsRisenGameState'); } catch (e) { console.warn('localStorage error', e); }
             const mainScene = this.scene.get('MainMenu');
             if (mainScene) {
                 initializeGameData(mainScene.registry, mainScene.cache, true);
@@ -900,7 +908,8 @@ class MainMenu extends Phaser.Scene {
       this.registry.set('currentScore', 0);
 
       try {
-          let highScoreVal = localStorage.getItem('highScore');
+          let highScoreVal = null;
+          try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
           let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
           if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
               loadedScore = 0;
@@ -1003,10 +1012,12 @@ class MainMenu extends Phaser.Scene {
 
     // Initialize volume registry early (Load from localStorage if available)
     const getSafeVol = (key) => {
-      let val = localStorage.getItem(key);
+      let val = null;
+      try { val = localStorage.getItem(key); } catch (e) { console.warn('localStorage error', e); }
       let parsed = parseFloat(val);
       if (isNaN(parsed) || parsed < 0 || parsed > 1) {
-          const backupVal = localStorage.getItem(key + '_backup');
+          let backupVal = null;
+          try { backupVal = localStorage.getItem(key + '_backup'); } catch (e) { console.warn('localStorage error', e); }
           parsed = parseFloat(backupVal);
           if (isNaN(parsed) || parsed < 0 || parsed > 1) {
               return 0.5;
@@ -1048,7 +1059,8 @@ class MainMenu extends Phaser.Scene {
       const buttonHeight = 80;
       const btnX = this.game.config.width / 2;
       const btnY = 580 * scale;
-      const hasSaveState = localStorage.getItem('heIsRisenGameState') !== null;
+      let hasSaveState = false;
+      try { hasSaveState = localStorage.getItem('heIsRisenGameState') !== null; } catch (e) { console.warn('localStorage error', e); }
 
       const startBtnContainer = this.add.container(btnX, btnY).setVisible(false).setDepth(11);
       this.startBtnContainer = startBtnContainer;
@@ -1677,7 +1689,7 @@ class SectionHunt extends Phaser.Scene {
       const highScore = this.registry.get('highScore');
       if (currentScore > highScore) {
         this.registry.set('highScore', currentScore);
-        localStorage.setItem('highScore', currentScore);
+        try { localStorage.setItem('highScore', currentScore); } catch (e) { console.warn('localStorage error', e); }
       }
 
       saveGameState(this.registry);
@@ -2771,7 +2783,7 @@ class EggZamRoom extends Phaser.Scene {
                 const highScore = this.registry.get('highScore');
                 if (currentScore > highScore) {
                   this.registry.set('highScore', currentScore);
-                  localStorage.setItem('highScore', currentScore);
+                  try { localStorage.setItem('highScore', currentScore); } catch (e) { console.warn('localStorage error', e); }
                 }
             } else {
                 if (musicScene) {
@@ -3221,7 +3233,7 @@ class EggZamRoom extends Phaser.Scene {
           const triggerRestart = () => {
               this.time.delayedCall(150, () => {
                   if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
-                  localStorage.removeItem('heIsRisenGameState');
+                  try { localStorage.removeItem('heIsRisenGameState'); } catch (e) { console.warn('localStorage error', e); }
                   initializeGameData(this.registry, this.cache, true);
                   this.scene.start('MapScene');
               });
