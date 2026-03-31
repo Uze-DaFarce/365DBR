@@ -47,10 +47,51 @@ def run_ui_interaction_test(is_mobile=False):
 
             th.wait_for_phaser_init(page)
 
-            # 1. Start Game
-            print("Starting game via Spacebar...")
-            time.sleep(1)
-            page.keyboard.press("Space")
+            # 1. Main Menu Interaction Testing
+            print("Testing Main Menu buttons...")
+            page.evaluate("""
+                () => {
+                    // Force a save state to show the START NEW GAME button
+                    window.localStorage.setItem('heIsRisenGameState', JSON.stringify({
+                        eggData: [],
+                        sections: [],
+                        foundEggs: [1],
+                        stampedSections: [],
+                        correctCategorizations: 0,
+                        currentScore: 10
+                    }));
+                }
+            """)
+            page.reload()
+            th.wait_for_phaser_init(page)
+            time.sleep(2) # wait for animations and buttons to appear
+
+            # Click to start intro (dismissing "Click anywhere to start")
+            page.mouse.click(640, 360) if not is_mobile else page.mouse.click(400, 200)
+            time.sleep(2)
+
+            screenshot_menu_default = os.path.join(verification_dir, f"00_main_menu_default_{context_type}.png")
+            page.screenshot(path=screenshot_menu_default)
+            print(f"Captured main menu default screenshot: {screenshot_menu_default}")
+
+            # Hover over PLAY NOW
+            if not is_mobile:
+                page.mouse.move(640, 520) # Approx position of PLAY NOW mainBtnContainer
+            else:
+                page.mouse.move(422, 312)
+            time.sleep(0.5)
+            screenshot_menu_hover = os.path.join(verification_dir, f"00_main_menu_hover_{context_type}.png")
+            page.screenshot(path=screenshot_menu_hover)
+
+            # Press PLAY NOW
+            page.mouse.down()
+            time.sleep(0.1)
+            screenshot_menu_press = os.path.join(verification_dir, f"00_main_menu_press_{context_type}.png")
+            page.screenshot(path=screenshot_menu_press)
+            page.mouse.up()
+
+            # 2. Start Game
+            print("Starting game...")
             time.sleep(3) # Wait for start screen tween
             page.keyboard.press("Space")
             time.sleep(2) # Wait for MapScene
