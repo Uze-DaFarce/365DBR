@@ -1,10 +1,11 @@
 from playwright.sync_api import sync_playwright
 import time
 import os
+from test_helpers import start_server
 
 def run_cuj(page):
     print("Navigating to local server...")
-    page.goto("http://localhost:8080/apps/HeIsRisen/index.html")
+    page.goto('http://127.0.0.1:8080/index.html')
     page.wait_for_timeout(2000)
 
     print("Starting game...")
@@ -55,16 +56,16 @@ def run_cuj(page):
     page.wait_for_timeout(4000)
 
     print("Taking screenshot of the explanation popup...")
-    os.makedirs("/home/jules/verification/screenshots", exist_ok=True)
-    page.screenshot(path="/home/jules/verification/screenshots/verification_eggzam_desktop.png")
+    os.makedirs('apps/HeIsRisen/test-results', exist_ok=True)
+    page.screenshot(path="apps/HeIsRisen/test-results/verification_eggzam_desktop.png")
     page.wait_for_timeout(1000)
 
 if __name__ == "__main__":
+    server = start_server(os.path.join(os.path.dirname(__file__), '..'))
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context(
-            record_video_dir="/home/jules/verification/videos",
-            viewport={'width': 1280, 'height': 720}
+                        viewport={'width': 1280, 'height': 720}
         )
         page = context.new_page()
         try:
@@ -72,4 +73,6 @@ if __name__ == "__main__":
         finally:
             context.close()
             browser.close()
-            print("Verification complete.")
+            print('Verification complete.')
+            server.terminate()
+            server.wait()

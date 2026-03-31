@@ -354,3 +354,19 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-27 - [Expand Haptic Feedback to Buttons]
 **Learning:** Adding haptic feedback (`navigator.vibrate`) specifically to interactive buttons, not just core game events, significantly increases the tactile feel of UI components on mobile devices.
 **Action:** Consistently add a subtle haptic burst (e.g., 20ms) inside global interaction handlers like `addButtonInteraction` for pointer events.
+
+## 2026-03-30 - Unique Screen Reader Announcer IDs
+**Learning:** Having multiple elements with the exact same ID (like `id="sr-announcer"`) in the DOM creates invalid HTML, and often breaks `document.getElementById` and causes screen readers to misbehave or ignore subsequent updates to the ARIA live region.
+**Action:** Ensure that the `#sr-announcer` live region is instantiated exactly once per page. Use `aria-live="polite"` and `aria-atomic="true"` on a single unified element instead of splitting or duplicating.
+
+## 2026-03-30 - Core Action Tactility
+**Learning:** Even when primary interactions (like categorization buttons) have hover states or visual feedback on desktop, omitting standardized haptic feedback and 'juicy' scale animations on mobile makes the core gameplay loop (repeated 60+ times) feel hollow and unrewarding.
+**Action:** Always ensure that *all* primary user actions, especially those repeated frequently, utilize standardized 'juicy' feedback handlers (like `addButtonInteraction`) to provide consistent haptics, scale squish, and audio feedback, rather than relying on disparate manual bindings.
+
+## 2026-03-30 - Video Volume Integration
+**Learning:** When using Phaser `Video` objects or HTML5 `<video>` tags alongside standard Canvas audio context, the video track volume is often entirely independent of the game's audio manager settings (like `scene.sound`). Muting the game via settings sliders will not mute the videos unless explicitly bound.
+**Action:** Always manually bind the volume of instantiated video objects to the global `sfxVolume` or `musicVolume` registry settings immediately upon calling `.play()`, e.g., `video.setVolume(registry.get('sfxVolume') ?? 0.5)`, to ensure user audio preferences are respected universally.
+
+## 2026-03-30 - Audio Clutter in Complex Interactions
+**Learning:** When a button triggers a complex chain of feedback (like playing a full-screen video, particle effects, and subsequent audio cues), appending a default, long 'click' audio sample to the initial interaction creates audio clutter, overlaps, and a muddy user experience.
+**Action:** Always evaluate the entire chain of feedback when applying interaction handlers like `addButtonInteraction`. If the resulting action spawns its own prominent audio (like a video), explicitly pass `null` as the soundKey (e.g., `addButtonInteraction(this, btn, null)`) to disable the redundant click noise and let the primary feedback shine.
