@@ -54,6 +54,7 @@ def run_full_game_loop(is_mobile=False):
 
             print("2. Waiting for Map Scene")
             th.wait_for_active_scene(page, "MapScene")
+            page.screenshot(path="/tmp/full_loop_{}_3_map_after_hunt.png".format("mobile" if is_mobile else "desktop"))
             th.assert_not_blank_screen(page, "Map Scene failed to render")
 
             # Step 3: We need to collect an egg so we have something to sort in the EggZam room
@@ -62,6 +63,7 @@ def run_full_game_loop(is_mobile=False):
             page.evaluate(f"() => window.game.scene.getScenes(true)[0].scene.start('SectionHunt', {{ sectionName: '{random_section}' }})")
 
             th.wait_for_active_scene(page, "SectionHunt")
+            page.screenshot(path="/tmp/full_loop_{}_2_hunt.png".format("mobile" if is_mobile else "desktop"))
             eggs = tce.get_eggs_for_section(page, random_section)
 
             if len(eggs) == 0:
@@ -114,12 +116,14 @@ def run_full_game_loop(is_mobile=False):
             print("4. Returning to MapScene")
             page.evaluate("() => window.game.scene.getScenes(true)[0].scene.start('MapScene')")
             th.wait_for_active_scene(page, "MapScene")
+            page.screenshot(path="/tmp/full_loop_{}_3_map_after_hunt.png".format("mobile" if is_mobile else "desktop"))
 
             # Step 5: Go to EggZamRoom
             print("5. Navigating to EggZamRoom")
             page.evaluate("() => window.game.scene.getScenes(true)[0].scene.start('EggZamRoom')")
             th.wait_for_active_scene(page, "EggZamRoom")
             th.assert_not_blank_screen(page, "EggZam Room failed to render")
+            page.screenshot(path="/tmp/full_loop_{}_4_eggzam.png".format("mobile" if is_mobile else "desktop"))
 
             time.sleep(1)
 
@@ -218,6 +222,7 @@ def run_full_game_loop(is_mobile=False):
             if score == 0 or score is None:
                  raise AssertionError("Sorting the egg did not increment the correctCategorizations registry score!")
 
+            page.screenshot(path="/tmp/full_loop_{}_5_eggzam_sorted.png".format("mobile" if is_mobile else "desktop"))
             print("SUCCESS: Full loop completed from Map -> Hunt -> Map -> Sort.")
             browser.close()
     finally:
