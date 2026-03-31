@@ -293,11 +293,15 @@ class CursorScene extends Phaser.Scene {
     this.fingerCursor.setDisplaySize(50 * initialScale, 75 * initialScale);
 
     // Update size only on resize events
-    this.scale.on('resize', (gameSize) => {
+    const updateCursorSize = (gameSize) => {
       const scale = Math.min(gameSize.width / 1280, gameSize.height / 720);
       if (this.fingerCursor && this.fingerCursor.active) {
         this.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
       }
+    };
+    this.scale.on('resize', updateCursorSize);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', updateCursorSize);
     });
   }
 
@@ -449,6 +453,9 @@ class UIScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-ENTER', () => this.closeSettings());
 
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
   }
 
   resize(gameSize) {
@@ -1231,6 +1238,9 @@ class MainMenu extends Phaser.Scene {
 
     // Handle Resize
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
 
     // Handle delayed video metadata loading
     if (this.introVideo && this.introVideo.active) {
@@ -1625,6 +1635,9 @@ class MapScene extends Phaser.Scene {
     this.updateLayout(width, height);
 
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
   }
 
   resize(gameSize) {
@@ -2234,6 +2247,9 @@ class SectionHunt extends Phaser.Scene {
     });
 
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
 
     // Check level complete immediately if returning to a completed map
     this.checkLevelComplete(true);
@@ -3126,8 +3142,12 @@ class EggZamRoom extends Phaser.Scene {
     // Store scale params for update/resize if needed (or just restart scene on resize)
     this.uiParams = { offsetX, offsetY, uiScale };
 
-    this.scale.on('resize', () => {
+    const restartSceneOnResize = () => {
         this.scene.restart(); // Simplest way to handle resizing complex UI layouts
+    };
+    this.scale.on('resize', restartSceneOnResize);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', restartSceneOnResize);
     });
   }
 
