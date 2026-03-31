@@ -2971,6 +2971,8 @@ class EggZamRoom extends Phaser.Scene {
                     iframeOverlay.style.flexDirection = 'column';
                     iframeOverlay.style.alignItems = 'center';
                     iframeOverlay.style.justifyContent = 'center';
+                    // Override the global cursor: none !important to show custom finger cursor
+                    iframeOverlay.style.setProperty('cursor', "url('assets/cursor/pointer-finger-pointer.png'), auto", 'important');
 
                     const iframe = document.createElement('iframe');
                     iframe.src = link;
@@ -2994,6 +2996,7 @@ class EggZamRoom extends Phaser.Scene {
                     closeBtn.style.backgroundColor = '#ff0000';
                     closeBtn.style.border = '4px solid #8b4513';
                     closeBtn.style.borderRadius = '50%';
+                    closeBtn.style.setProperty('cursor', "url('assets/cursor/pointer-finger-pointer.png'), auto", 'important');
                     closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
                     closeBtn.style.display = 'flex';
                     closeBtn.style.alignItems = 'center';
