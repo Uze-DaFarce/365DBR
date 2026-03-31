@@ -419,6 +419,9 @@ class UIScene extends Phaser.Scene {
 
     // Listen for resize events to update UI positions
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
   }
 
   resize(gameSize) {
