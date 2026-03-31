@@ -64,37 +64,45 @@ def run_ui_interaction_test(is_mobile=False):
             """)
             page.reload()
             th.wait_for_phaser_init(page)
-            time.sleep(2) # wait for animations and buttons to appear
 
-            # Click to start intro (dismissing "Click anywhere to start")
-            page.mouse.click(640, 360) if not is_mobile else page.mouse.click(400, 200)
-            time.sleep(2)
+            # Ensure "Tap anywhere to start" screen is dismissed first!
+            time.sleep(1)
+            page.keyboard.press("Space")
+            time.sleep(3) # Wait for title sequence tween/animation
+
+            # Verify the scene is fully loaded before continuing
+            th.assert_not_blank_screen(page, "Main Menu failed to render")
 
             screenshot_menu_default = os.path.join(verification_dir, f"00_main_menu_default_{context_type}.png")
             page.screenshot(path=screenshot_menu_default)
             print(f"Captured main menu default screenshot: {screenshot_menu_default}")
 
-            # Hover over PLAY NOW
+            # Hover over START NEW GAME (which is below PLAY NOW)
             if not is_mobile:
-                page.mouse.move(640, 520) # Approx position of PLAY NOW mainBtnContainer
+                page.mouse.move(640, 570)
             else:
-                page.mouse.move(422, 312)
+                page.mouse.move(422, 335)
             time.sleep(0.5)
-            screenshot_menu_hover = os.path.join(verification_dir, f"00_main_menu_hover_{context_type}.png")
+            screenshot_menu_hover = os.path.join(verification_dir, f"00_main_menu_hover_new_{context_type}.png")
             page.screenshot(path=screenshot_menu_hover)
 
-            # Press PLAY NOW
+            # Press START NEW GAME
             page.mouse.down()
             time.sleep(0.1)
-            screenshot_menu_press = os.path.join(verification_dir, f"00_main_menu_press_{context_type}.png")
+            screenshot_menu_press = os.path.join(verification_dir, f"00_main_menu_press_new_{context_type}.png")
             page.screenshot(path=screenshot_menu_press)
             page.mouse.up()
 
-            # 2. Start Game
-            print("Starting game...")
-            time.sleep(3) # Wait for start screen tween
+            # The click event will now trigger the button, wait for it to process
+            time.sleep(1)
+
+            # In order to trigger the intro video or whatever comes next if the click didn't fully register
+            # We'll just press space to ensure we move forward just like the original test did
+            print("Pressing Space to ensure progression past MainMenu...")
             page.keyboard.press("Space")
-            time.sleep(2) # Wait for MapScene
+
+            # Wait for transition to MapScene
+            time.sleep(2)
             th.wait_for_active_scene(page, "MapScene")
 
             # Skip redundant baseline screenshot
