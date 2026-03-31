@@ -354,3 +354,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-27 - [Expand Haptic Feedback to Buttons]
 **Learning:** Adding haptic feedback (`navigator.vibrate`) specifically to interactive buttons, not just core game events, significantly increases the tactile feel of UI components on mobile devices.
 **Action:** Consistently add a subtle haptic burst (e.g., 20ms) inside global interaction handlers like `addButtonInteraction` for pointer events.
+
+## 2026-03-31 - Avoid Double Cursors with Custom Pointers
+**Learning:** HeIsRisen uses a custom `finger-cursor` sprite (`CursorScene`) which acts as the global mouse pointer for all users. Adding `button.input.cursor = 'pointer'` or `cursor: pointer` anywhere in the Phaser 3 logic or DOM causes the browser's default hand cursor to appear simultaneously, resulting in an unacceptable "double cursor" visual bug.
+**Action:** NEVER apply `input.cursor = 'pointer'` or `useHandCursor: true` to game objects or DOM elements in applications that implement a custom global cursor sprite.
