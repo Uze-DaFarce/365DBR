@@ -355,6 +355,6 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 **Learning:** Adding haptic feedback (`navigator.vibrate`) specifically to interactive buttons, not just core game events, significantly increases the tactile feel of UI components on mobile devices.
 **Action:** Consistently add a subtle haptic burst (e.g., 20ms) inside global interaction handlers like `addButtonInteraction` for pointer events.
 
-## 2026-03-31 - Pointer Cursor Affordance on Interactive Elements
-**Learning:** In Phaser 3, game objects do not inherently change the mouse cursor to a pointer when hovered, even if they are interactive. This lack of visual affordance can make it difficult for desktop/mouse users to distinguish clickable elements from static graphics.
-**Action:** When creating reusable interaction helpers (like `addButtonInteraction`), always set `button.input.cursor = 'pointer'` to automatically provide this essential affordance to any object using the helper. Always check `if (button.input)` first to ensure the object has been made interactive before applying the cursor style.
+## 2026-03-31 - Avoid Double Cursors with Custom Pointers
+**Learning:** HeIsRisen uses a custom `finger-cursor` sprite (`CursorScene`) which acts as the global mouse pointer for all users. Adding `button.input.cursor = 'pointer'` or `cursor: pointer` anywhere in the Phaser 3 logic or DOM causes the browser's default hand cursor to appear simultaneously, resulting in an unacceptable "double cursor" visual bug.
+**Action:** NEVER apply `input.cursor = 'pointer'` or `useHandCursor: true` to game objects or DOM elements in applications that implement a custom global cursor sprite.

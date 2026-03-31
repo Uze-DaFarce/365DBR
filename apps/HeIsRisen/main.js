@@ -2984,9 +2984,6 @@ class EggZamRoom extends Phaser.Scene {
         // Set interactive area for a circle
         closeBtnContainer.setSize(closeBtnSize, closeBtnSize);
         closeBtnContainer.setInteractive();
-        
-        // Add hand cursor manually as setInteractive config above doesn't support it directly in this shorthand
-        closeBtnContainer.input.cursor = 'pointer';
 
         closeBtnContainer.baseScaleX = 1;
         closeBtnContainer.baseScaleY = 1;
@@ -3298,10 +3295,6 @@ class EggZamRoom extends Phaser.Scene {
  * Adds a "pop" animation to a game object on hover.
  */
 function addButtonInteraction(scene, button, soundKey = 'success') {
-  if (button.input) {
-      button.input.cursor = 'pointer';
-  }
-
   button.on('pointerover', () => {
     if (!button.isHovered) {
         button.baseScaleX = button.scaleX;

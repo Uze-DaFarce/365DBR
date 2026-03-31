@@ -3069,9 +3069,6 @@ class EggZamRoom extends Phaser.Scene {
         // Set interactive area for a circle
         closeBtnContainer.setSize(closeBtnSize, closeBtnSize);
         closeBtnContainer.setInteractive();
-        
-        // Add hand cursor manually as setInteractive config above doesn't support it directly in this shorthand
-        closeBtnContainer.input.cursor = 'pointer';
 
         closeBtnContainer.baseScaleX = 1;
         closeBtnContainer.baseScaleY = 1;
@@ -3485,10 +3482,6 @@ function parseScriptureLink(scriptureText) {
  * @param {string} [soundKey='success'] - The key of the sound to play on click.
  */
 function addButtonInteraction(scene, button, soundKey = 'success') {
-  if (button.input) {
-      button.input.cursor = 'pointer';
-  }
-
   button.on('pointerdown', () => {
     // Try to play sound via MusicScene if available to ensure persistence
     const musicScene = scene.scene.get('MusicScene');
