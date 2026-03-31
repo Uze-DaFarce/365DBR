@@ -38,6 +38,7 @@ def run_game_state_validation_test(is_mobile=False):
             url = "http://127.0.0.1:8080/m/" if is_mobile else "http://127.0.0.1:8080/"
 
             # Go to a blank page on the same origin first to set local storage
+            page.on('console', lambda msg: print(f'BROWSER CONSOLE: {msg.text}'))
             page.goto("http://127.0.0.1:8080/index.html")
 
             page.evaluate("""
@@ -49,6 +50,7 @@ def run_game_state_validation_test(is_mobile=False):
                 }
             """)
 
+            page.on('console', lambda msg: print(f'BROWSER CONSOLE: {msg.text}'))
             page.goto(url)
             page.wait_for_load_state('networkidle')
 

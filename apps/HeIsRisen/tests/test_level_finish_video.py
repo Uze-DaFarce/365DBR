@@ -50,8 +50,10 @@ def run_level_finish_video(is_mobile=False):
             th.init_global_bypasses(page)
 
             if is_mobile:
+                page.on('console', lambda msg: print(f'BROWSER CONSOLE: {msg.text}'))
                 page.goto("http://127.0.0.1:8080/m/")
             else:
+                page.on('console', lambda msg: print(f'BROWSER CONSOLE: {msg.text}'))
                 page.goto("http://127.0.0.1:8080/")
             page.wait_for_load_state('networkidle')
 
