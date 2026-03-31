@@ -286,7 +286,6 @@ class CursorScene extends Phaser.Scene {
         .setDepth(11111); // Always on top
 
     // ⚡ Bolt Optimization: Move static DOM operations and scaling out of update loop
-    this.input.setDefaultCursor('none');
 
     // Set initial size
     const initialScale = Math.min(this.scale.width / 1280, this.scale.height / 720);
@@ -566,7 +565,6 @@ class UIScene extends Phaser.Scene {
 
     gearContainer.setSize(40, 40);
     gearContainer.setInteractive();
-    gearContainer.input.cursor = 'none';
 
     gearContainer.baseScaleX = gearContainer.scaleX;
     gearContainer.baseScaleY = gearContainer.scaleY;
@@ -809,7 +807,6 @@ class UIScene extends Phaser.Scene {
                     this.gearIcon.setVisible(true);
                     this.gearIcon.setScale(1);
                 }
-                if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
             }
         });
     }
@@ -820,7 +817,6 @@ class UIScene extends Phaser.Scene {
     this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
     if (this.gearIcon) this.gearIcon.setVisible(false);
-    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
 
     this.tweens.add({
         targets: this.settingsContainer,
@@ -959,7 +955,6 @@ class MainMenu extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     const width = this.scale.width;
     const height = this.scale.height;
@@ -1350,7 +1345,6 @@ class MapScene extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     // Generate missing particle textures dynamically
     if (!this.textures.exists('halo')) {
@@ -1999,7 +1993,6 @@ class SectionHunt extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     // Background lazy-load core EggZam videos
     if (!this.registry.get('eggzamVideosLoaded')) {
@@ -2702,7 +2695,6 @@ class EggZamRoom extends Phaser.Scene {
       }
   }
   create() {
-    this.input.setDefaultCursor('none');
     this.scene.bringToTop('CursorScene');
     // Background lazy-load core EggZam videos
     if (!this.registry.get('eggzamVideosLoaded')) {
@@ -2930,7 +2922,6 @@ class EggZamRoom extends Phaser.Scene {
                     closeBtn.style.backgroundColor = '#ff0000';
                     closeBtn.style.border = '4px solid #8b4513';
                     closeBtn.style.borderRadius = '50%';
-                    closeBtn.style.cursor = 'pointer';
                     closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
                     closeBtn.style.display = 'flex';
                     closeBtn.style.alignItems = 'center';

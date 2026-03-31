@@ -821,7 +821,6 @@ class UIScene extends Phaser.Scene {
                       this.gearIcon.setVisible(true);
                       this.gearIcon.setScale(1);
                   }
-                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
               }
           });
       }
@@ -832,7 +831,6 @@ class UIScene extends Phaser.Scene {
     this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
     if (this.gearIcon) this.gearIcon.setVisible(false);
-    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
 
     this.tweens.add({
         targets: this.settingsContainer,
@@ -978,7 +976,6 @@ class MainMenu extends Phaser.Scene {
 
   create() {
     try {
-      this.input.setDefaultCursor('none');
 
       // Get scale factors based on game dimensions
       const scaleX = this.game.config.width / 1280;
@@ -1408,7 +1405,6 @@ class MapScene extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     // Get scale factors relative to the viewport
     const scaleX = this.game.config.width / 1280;
@@ -1971,7 +1967,6 @@ class SectionHunt extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     const scaleX = this.game.config.width / 1280;
     const scaleY = this.game.config.height / 720;
@@ -2730,7 +2725,6 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     // Background lazy-load core EggZam videos
     if (!this.registry.get('eggzamVideosLoaded')) {
@@ -3000,7 +2994,6 @@ class EggZamRoom extends Phaser.Scene {
                     closeBtn.style.backgroundColor = '#ff0000';
                     closeBtn.style.border = '4px solid #8b4513';
                     closeBtn.style.borderRadius = '50%';
-                    closeBtn.style.cursor = 'pointer';
                     closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
                     closeBtn.style.display = 'flex';
                     closeBtn.style.alignItems = 'center';
@@ -3327,7 +3320,6 @@ class EggZamRoom extends Phaser.Scene {
 
           const triggerRestart = () => {
               this.time.delayedCall(150, () => {
-                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
                   try { localStorage.removeItem('heIsRisenGameState'); } catch (e) { console.warn('localStorage error', e); }
                   initializeGameData(this.registry, this.cache, true);
                   this.scene.start('MapScene');
