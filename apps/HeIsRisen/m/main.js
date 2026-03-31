@@ -419,6 +419,9 @@ class UIScene extends Phaser.Scene {
 
     // Listen for resize events to update UI positions
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
   }
 
   resize(gameSize) {
@@ -818,7 +821,6 @@ class UIScene extends Phaser.Scene {
                       this.gearIcon.setVisible(true);
                       this.gearIcon.setScale(1);
                   }
-                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
               }
           });
       }
@@ -829,7 +831,6 @@ class UIScene extends Phaser.Scene {
     this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
     if (this.gearIcon) this.gearIcon.setVisible(false);
-    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
 
     this.tweens.add({
         targets: this.settingsContainer,
@@ -975,7 +976,6 @@ class MainMenu extends Phaser.Scene {
 
   create() {
     try {
-      this.input.setDefaultCursor('none');
 
       // Get scale factors based on game dimensions
       const scaleX = this.game.config.width / 1280;
@@ -1170,6 +1170,7 @@ class MainMenu extends Phaser.Scene {
       mainBtnContainer.setSize(buttonWidth, buttonHeight);
       // Massive hit area for easier tapping
       mainBtnContainer.setInteractive();
+      addButtonInteraction(this, mainBtnContainer, 'menu-click');
       startBtnContainer.add(mainBtnContainer);
 
       let newGameBtnContainer = null;
@@ -1194,6 +1195,7 @@ class MainMenu extends Phaser.Scene {
 
           newGameBtnContainer.setSize(buttonWidth, buttonHeight);
           newGameBtnContainer.setInteractive();
+          addButtonInteraction(this, newGameBtnContainer, 'menu-click');
           startBtnContainer.add(newGameBtnContainer);
       }
 
@@ -1403,7 +1405,6 @@ class MapScene extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     // Get scale factors relative to the viewport
     const scaleX = this.game.config.width / 1280;
@@ -1855,9 +1856,20 @@ class SectionHunt extends Phaser.Scene {
         starObject.destroy();
     }
 
+    // Flash white circle effect behind the egg
+    const flash = this.add.circle(x, y, 10 * scale, 0xffffff, 0.8).setDepth(18);
+    this.tweens.add({
+        targets: flash,
+        scale: 15,
+        alpha: 0,
+        duration: 600,
+        ease: 'Cubic.easeOut',
+        onComplete: () => flash.destroy()
+    });
+
     const emitter = this.add.particles(x, y, 'sparkle', {
-        speed: { min: 100 * scale, max: 300 * scale }, scale: { start: 1.5 * scale, end: 0 }, alpha: { start: 1, end: 0 },
-        lifespan: 1000, gravityY: 300 * scale, quantity: 30, duration: 150
+        speed: { min: 200 * scale, max: 500 * scale }, scale: { start: 2 * scale, end: 0 }, alpha: { start: 1, end: 0 },
+        lifespan: 1200, gravityY: 400 * scale, quantity: 45, duration: 250, blendMode: 'ADD'
     }).setDepth(19);
     emitter.once('complete', () => emitter.destroy());
 
@@ -1865,13 +1877,11 @@ class SectionHunt extends Phaser.Scene {
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50 * scale, 75 * scale);
     this.tweens.add({
         targets: eggSprite,
-        y: y - (150 * scale),
-        scaleX: eggSprite.scaleX * 2.0,
-        scaleY: eggSprite.scaleY * 2.0,
-        angle: 720,
-        alpha: 0,
-        duration: 1200,
-        ease: 'Back.easeOut',
+        y: y - (180 * scale),
+        scaleX: { value: eggSprite.scaleX * 2.5, duration: 400, ease: 'Back.easeOut' },
+        scaleY: { value: eggSprite.scaleY * 2.5, duration: 400, ease: 'Back.easeOut' },
+        angle: { value: 360, duration: 600, ease: 'Quad.easeOut' },
+        alpha: { value: 0, delay: 600, duration: 400 },
         onComplete: () => eggSprite.destroy()
     });
 
@@ -1880,33 +1890,33 @@ class SectionHunt extends Phaser.Scene {
         const symSprite = this.add.image(x, y, symbolTexture).setDepth(21).setDisplaySize(50 * scale, 75 * scale);
         this.tweens.add({
             targets: symSprite,
-            y: y - (150 * scale),
-            scaleX: symSprite.scaleX * 2.0,
-            scaleY: symSprite.scaleY * 2.0,
-            angle: 720,
-            alpha: 0,
-            duration: 1200,
-            ease: 'Back.easeOut',
+            y: y - (180 * scale),
+            scaleX: { value: symSprite.scaleX * 2.5, duration: 400, ease: 'Back.easeOut' },
+            scaleY: { value: symSprite.scaleY * 2.5, duration: 400, ease: 'Back.easeOut' },
+            angle: { value: 360, duration: 600, ease: 'Quad.easeOut' },
+            alpha: { value: 0, delay: 600, duration: 400 },
             onComplete: () => symSprite.destroy()
         });
     }
 
     const feedback = this.add.text(x, y - (40 * scale), 'Found!', {
-        fontSize: `${32 * scale}px`,
+        fontSize: `${40 * scale}px`,
         fontFamily: 'Comic Sans MS',
-        fill: '#ffff00',
-        stroke: '#000000',
-        strokeThickness: 4 * scale
+        fill: '#ffffff',
+        stroke: '#ff9900',
+        strokeThickness: 6 * scale,
+        shadow: { offsetX: 2 * scale, offsetY: 2 * scale, color: '#000000', blur: 4 * scale, stroke: true, fill: true }
     }).setOrigin(0.5).setDepth(22);
 
     this.tweens.add({
         targets: feedback,
-        y: y - (150 * scale),
-        scaleX: 1.5,
-        scaleY: 1.5,
-        alpha: 0,
+        y: y - (200 * scale),
+        scaleX: { start: 0.5, to: 1.5 },
+        scaleY: { start: 0.5, to: 1.5 },
+        alpha: { value: 0, delay: 800, duration: 400 },
         duration: 1200,
-        ease: 'Back.easeOut',
+        ease: 'Elastic.easeOut',
+        easeParams: [1.5, 0.5],
         onComplete: () => feedback.destroy()
     });
   }
@@ -1957,7 +1967,6 @@ class SectionHunt extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     const scaleX = this.game.config.width / 1280;
     const scaleY = this.game.config.height / 720;
@@ -2716,7 +2725,6 @@ class EggZamRoom extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     // Background lazy-load core EggZam videos
     if (!this.registry.get('eggzamVideosLoaded')) {
@@ -2986,7 +2994,6 @@ class EggZamRoom extends Phaser.Scene {
                     closeBtn.style.backgroundColor = '#ff0000';
                     closeBtn.style.border = '4px solid #8b4513';
                     closeBtn.style.borderRadius = '50%';
-                    closeBtn.style.cursor = 'pointer';
                     closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
                     closeBtn.style.display = 'flex';
                     closeBtn.style.alignItems = 'center';
@@ -3069,9 +3076,6 @@ class EggZamRoom extends Phaser.Scene {
         // Set interactive area for a circle
         closeBtnContainer.setSize(closeBtnSize, closeBtnSize);
         closeBtnContainer.setInteractive();
-        
-        // Add hand cursor manually as setInteractive config above doesn't support it directly in this shorthand
-        closeBtnContainer.input.cursor = 'pointer';
 
         closeBtnContainer.baseScaleX = 1;
         closeBtnContainer.baseScaleY = 1;
@@ -3316,7 +3320,6 @@ class EggZamRoom extends Phaser.Scene {
 
           const triggerRestart = () => {
               this.time.delayedCall(150, () => {
-                  if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
                   try { localStorage.removeItem('heIsRisenGameState'); } catch (e) { console.warn('localStorage error', e); }
                   initializeGameData(this.registry, this.cache, true);
                   this.scene.start('MapScene');

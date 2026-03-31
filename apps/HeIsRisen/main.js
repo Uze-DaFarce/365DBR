@@ -286,18 +286,21 @@ class CursorScene extends Phaser.Scene {
         .setDepth(11111); // Always on top
 
     // ⚡ Bolt Optimization: Move static DOM operations and scaling out of update loop
-    this.input.setDefaultCursor('none');
 
     // Set initial size
     const initialScale = Math.min(this.scale.width / 1280, this.scale.height / 720);
     this.fingerCursor.setDisplaySize(50 * initialScale, 75 * initialScale);
 
     // Update size only on resize events
-    this.scale.on('resize', (gameSize) => {
+    const onResize = (gameSize) => {
       const scale = Math.min(gameSize.width / 1280, gameSize.height / 720);
       if (this.fingerCursor && this.fingerCursor.active) {
         this.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
       }
+    };
+    this.scale.on('resize', onResize);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', onResize);
     });
   }
 
@@ -449,6 +452,9 @@ class UIScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-ENTER', () => this.closeSettings());
 
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
   }
 
   resize(gameSize) {
@@ -559,7 +565,6 @@ class UIScene extends Phaser.Scene {
 
     gearContainer.setSize(40, 40);
     gearContainer.setInteractive();
-    gearContainer.input.cursor = 'none';
 
     gearContainer.baseScaleX = gearContainer.scaleX;
     gearContainer.baseScaleY = gearContainer.scaleY;
@@ -802,7 +807,6 @@ class UIScene extends Phaser.Scene {
                     this.gearIcon.setVisible(true);
                     this.gearIcon.setScale(1);
                 }
-                if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
             }
         });
     }
@@ -813,7 +817,6 @@ class UIScene extends Phaser.Scene {
     this.settingsContainer.setAlpha(0);
     this.settingsContainer.setVisible(true);
     if (this.gearIcon) this.gearIcon.setVisible(false);
-    if (this.input.setDefaultCursor) this.input.setDefaultCursor('none');
 
     this.tweens.add({
         targets: this.settingsContainer,
@@ -952,7 +955,6 @@ class MainMenu extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     const width = this.scale.width;
     const height = this.scale.height;
@@ -1035,6 +1037,7 @@ class MainMenu extends Phaser.Scene {
 
     mainBtnContainer.setSize(buttonWidth, buttonHeight);
     mainBtnContainer.setInteractive();
+    addButtonInteraction(this, mainBtnContainer, 'menu-click');
     startBtnContainer.add(mainBtnContainer);
 
     let newGameBtnContainer = null;
@@ -1059,6 +1062,7 @@ class MainMenu extends Phaser.Scene {
 
         newGameBtnContainer.setSize(buttonWidth, buttonHeight);
         newGameBtnContainer.setInteractive();
+        addButtonInteraction(this, newGameBtnContainer, 'menu-click');
         startBtnContainer.add(newGameBtnContainer);
     }
 
@@ -1231,6 +1235,9 @@ class MainMenu extends Phaser.Scene {
 
     // Handle Resize
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
 
     // Handle delayed video metadata loading
     if (this.introVideo && this.introVideo.active) {
@@ -1338,7 +1345,6 @@ class MapScene extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     // Generate missing particle textures dynamically
     if (!this.textures.exists('halo')) {
@@ -1625,6 +1631,9 @@ class MapScene extends Phaser.Scene {
     this.updateLayout(width, height);
 
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
   }
 
   resize(gameSize) {
@@ -1874,23 +1883,34 @@ class SectionHunt extends Phaser.Scene {
         starObject.destroy();
     }
 
+    // Flash white circle effect behind the egg
+    const flash = this.add.circle(x, y, 10, 0xffffff, 0.8).setDepth(18);
+    this.tweens.add({
+        targets: flash,
+        scale: 15,
+        alpha: 0,
+        duration: 600,
+        ease: 'Cubic.easeOut',
+        onComplete: () => flash.destroy()
+    });
+
     const emitter = this.add.particles(x, y, 'sparkle', {
-        speed: { min: 100, max: 300 }, scale: { start: 1.5, end: 0 }, alpha: { start: 1, end: 0 },
-        lifespan: 1000, gravityY: 300, quantity: 30, duration: 150
+        speed: { min: 200, max: 500 }, scale: { start: 2, end: 0 }, alpha: { start: 1, end: 0 },
+        lifespan: 1200, gravityY: 400, quantity: 45, duration: 250, blendMode: 'ADD'
     }).setDepth(19);
     emitter.once('complete', () => emitter.destroy());
 
     // Show Egg Sprite
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50, 75);
+
+    // Animate the egg collection ("Juicy" squish and pop)
     this.tweens.add({
         targets: eggSprite,
-        y: y - 150,
-        scaleX: eggSprite.scaleX * 2.0,
-        scaleY: eggSprite.scaleY * 2.0,
-        angle: 720,
-        alpha: 0,
-        duration: 1200,
-        ease: 'Back.easeOut',
+        y: y - 180,
+        scaleX: { value: eggSprite.scaleX * 2.5, duration: 400, ease: 'Back.easeOut' },
+        scaleY: { value: eggSprite.scaleY * 2.5, duration: 400, ease: 'Back.easeOut' },
+        angle: { value: 360, duration: 600, ease: 'Quad.easeOut' },
+        alpha: { value: 0, delay: 600, duration: 400 },
         onComplete: () => eggSprite.destroy()
     });
 
@@ -1899,33 +1919,33 @@ class SectionHunt extends Phaser.Scene {
         const symSprite = this.add.image(x, y, symbolTexture).setDepth(21).setDisplaySize(50, 75);
         this.tweens.add({
             targets: symSprite,
-            y: y - 150,
-            scaleX: symSprite.scaleX * 2.0,
-            scaleY: symSprite.scaleY * 2.0,
-            angle: 720,
-            alpha: 0,
-            duration: 1200,
-            ease: 'Back.easeOut',
+            y: y - 180,
+            scaleX: { value: symSprite.scaleX * 2.5, duration: 400, ease: 'Back.easeOut' },
+            scaleY: { value: symSprite.scaleY * 2.5, duration: 400, ease: 'Back.easeOut' },
+            angle: { value: 360, duration: 600, ease: 'Quad.easeOut' },
+            alpha: { value: 0, delay: 600, duration: 400 },
             onComplete: () => symSprite.destroy()
         });
     }
 
     const feedback = this.add.text(x, y - 40, 'Found!', {
-        fontSize: '32px',
+        fontSize: '40px',
         fontFamily: 'Comic Sans MS',
-        fill: '#ffff00',
-        stroke: '#000000',
-        strokeThickness: 4
+        fill: '#ffffff',
+        stroke: '#ff9900',
+        strokeThickness: 6,
+        shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 4, stroke: true, fill: true }
     }).setOrigin(0.5).setDepth(22);
 
     this.tweens.add({
         targets: feedback,
-        y: y - 150,
-        scaleX: 1.5,
-        scaleY: 1.5,
-        alpha: 0,
+        y: y - 200,
+        scaleX: { start: 0.5, to: 1.5 },
+        scaleY: { start: 0.5, to: 1.5 },
+        alpha: { value: 0, delay: 800, duration: 400 },
         duration: 1200,
-        ease: 'Back.easeOut',
+        ease: 'Elastic.easeOut',
+        easeParams: [1.5, 0.5],
         onComplete: () => feedback.destroy()
     });
   }
@@ -1973,7 +1993,6 @@ class SectionHunt extends Phaser.Scene {
   }
 
   create() {
-    this.input.setDefaultCursor('none');
 
     // Background lazy-load core EggZam videos
     if (!this.registry.get('eggzamVideosLoaded')) {
@@ -2234,6 +2253,9 @@ class SectionHunt extends Phaser.Scene {
     });
 
     this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', this.resize, this);
+    });
 
     // Check level complete immediately if returning to a completed map
     this.checkLevelComplete(true);
@@ -2673,7 +2695,6 @@ class EggZamRoom extends Phaser.Scene {
       }
   }
   create() {
-    this.input.setDefaultCursor('none');
     this.scene.bringToTop('CursorScene');
     // Background lazy-load core EggZam videos
     if (!this.registry.get('eggzamVideosLoaded')) {
@@ -2901,7 +2922,6 @@ class EggZamRoom extends Phaser.Scene {
                     closeBtn.style.backgroundColor = '#ff0000';
                     closeBtn.style.border = '4px solid #8b4513';
                     closeBtn.style.borderRadius = '50%';
-                    closeBtn.style.cursor = 'pointer';
                     closeBtn.style.fontFamily = '"Comic Sans MS", cursive, sans-serif';
                     closeBtn.style.display = 'flex';
                     closeBtn.style.alignItems = 'center';
@@ -2984,9 +3004,6 @@ class EggZamRoom extends Phaser.Scene {
         // Set interactive area for a circle
         closeBtnContainer.setSize(closeBtnSize, closeBtnSize);
         closeBtnContainer.setInteractive();
-        
-        // Add hand cursor manually as setInteractive config above doesn't support it directly in this shorthand
-        closeBtnContainer.input.cursor = 'pointer';
 
         closeBtnContainer.baseScaleX = 1;
         closeBtnContainer.baseScaleY = 1;
@@ -3126,8 +3143,12 @@ class EggZamRoom extends Phaser.Scene {
     // Store scale params for update/resize if needed (or just restart scene on resize)
     this.uiParams = { offsetX, offsetY, uiScale };
 
-    this.scale.on('resize', () => {
+    const onResize = () => {
         this.scene.restart(); // Simplest way to handle resizing complex UI layouts
+    };
+    this.scale.on('resize', onResize);
+    this.events.once('shutdown', () => {
+        this.scale.off('resize', onResize);
     });
   }
 
