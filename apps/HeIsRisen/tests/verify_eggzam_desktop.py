@@ -4,6 +4,7 @@ import os
 
 def run_cuj(page):
     print("Navigating to local server...")
+    page.on('console', lambda msg: print(f'BROWSER CONSOLE: {msg.text}'))
     page.goto("http://localhost:8080/apps/HeIsRisen/index.html")
     page.wait_for_timeout(2000)
 

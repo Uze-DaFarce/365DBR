@@ -334,16 +334,13 @@ class MusicScene extends Phaser.Scene {
   }
 
   create() {
-    // console.log('MusicScene: checking background music');
     const music = this.sound.get('background-music');
     if (!music) {
       this.sound.add('background-music', { loop: true, volume: this.musicVolume }).play();
-      // console.log('MusicScene: Background music started');
     } else if (!music.isPlaying) {
       // Ensure volume is updated if restarting
       music.setVolume(this.musicVolume);
       music.play();
-      // console.log('MusicScene: Background music resumed');
     }
 
     // Schedule random ambient sound to play periodically
@@ -901,7 +898,6 @@ class MainMenu extends Phaser.Scene {
     this.load.audio('level-complete-audio', 'assets/audio/level-complete.mp3');
 
     this.load.on('filecomplete-json-map_sections', (key, type, data) => {
-      // console.log(`MainMenu: filecomplete-json-map_sections: Key='${key}', Type='${type}'`);
       if (Array.isArray(data)) {
         data.forEach(section => {
              // Enqueue thumbnail (.jpg) explicitly as thumb to avoid fallback errors
@@ -912,12 +908,10 @@ class MainMenu extends Phaser.Scene {
              // Preload video backgrounds
              this.load.video(`${section.name}-video`, `assets/video/${section.name}.mp4`);
         });
-        // console.log(`MainMenu: Queued ${data.length} section backgrounds and Videos for loading.`);
       }
     });
 
     this.load.on('filecomplete-json-symbols', (key, type, data) => {
-      // console.log(`MainMenu: filecomplete-json-symbols: Key='${key}', Type='${type}'`);
       // Preload all 60 eggs
       for (let i = 1; i <= TOTAL_EGGS; i++) {
         this.load.image(`egg-${i}`, `assets/eggs/egg-${i}.png`);
@@ -1331,7 +1325,6 @@ class MainMenu extends Phaser.Scene {
            // If current scale is default (1) but desired is different, apply it
            // Use a small epsilon to avoid float jitter
            if (Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
-               console.log(`MainMenu: Applying delayed scale. Video: ${this.introVideo.width}x${this.introVideo.height}, Screen: ${width}x${height}, Scale: ${desiredScale}`);
                this.introVideo.setScale(desiredScale);
            }
        }
@@ -2455,7 +2448,6 @@ class SectionHunt extends Phaser.Scene {
              const targetDisplayW = 1280 * targetScale;
 
              if (Math.abs(this.sectionVideo.displayWidth - targetDisplayW) > 5) {
-                 // console.log(`SectionHunt: Fixing video scale. Screen: ${width}x${height}, TargetW: ${targetDisplayW}`);
                  this.sectionVideo.setDisplaySize(1280 * targetScale, 720 * targetScale);
                  this.sectionVideo.setPosition(width/2, height/2);
 

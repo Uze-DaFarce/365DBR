@@ -20,6 +20,7 @@ def run_test():
 
         try:
             # Navigate to the local server
+            page.on('console', lambda msg: print(f'BROWSER CONSOLE: {msg.text}'))
             page.goto("http://localhost:8080/apps/HeIsRisen/index.html")
             page.wait_for_load_state("networkidle")
 
