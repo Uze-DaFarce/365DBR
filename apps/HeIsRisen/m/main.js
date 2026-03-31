@@ -2675,6 +2675,8 @@ class EggZamRoom extends Phaser.Scene {
               .setDepth(1)
               .setOrigin(0.5, 0.5);
 
+          this.currentVideo.setVolume(this.registry.get('sfxVolume') ?? 0.5);
+
           this.currentVideo.once('play', () => {
               if (this.currentVideo && this.currentVideo.active) {
                   this.currentVideo.setDisplaySize(1168 * coverScale, 784 * coverScale);

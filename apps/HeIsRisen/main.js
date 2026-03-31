@@ -2642,6 +2642,8 @@ class EggZamRoom extends Phaser.Scene {
               .setDepth(1)
               .setOrigin(0.5, 0.5);
               
+          this.currentVideo.setVolume(this.registry.get('sfxVolume') ?? 0.5);
+
           // Phaser videos sometimes don't scale correctly until they are actively playing and populated
           this.currentVideo.once('play', () => {
               if (this.currentVideo && this.currentVideo.active) {
