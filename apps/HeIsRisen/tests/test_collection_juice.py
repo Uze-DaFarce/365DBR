@@ -41,6 +41,11 @@ def run_test():
             const scene = window.game.scene.getScene('SectionHunt');
             if (!scene || !scene.eggs) return;
 
+            // Hide the magnifying glass so it doesn't cover the animation
+            if (scene.magnifyingGlass) scene.magnifyingGlass.setVisible(false);
+            if (scene.zoomedView) scene.zoomedView.setVisible(false);
+            if (scene.maskGraphics) scene.maskGraphics.setVisible(false);
+
             if (scene.eggs && scene.eggs.children.entries.length > 0) {
                 const egg = scene.eggs.children.entries[0];
                 scene.collectEgg(egg);
