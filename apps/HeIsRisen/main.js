@@ -1874,23 +1874,34 @@ class SectionHunt extends Phaser.Scene {
         starObject.destroy();
     }
 
+    // Flash white circle effect behind the egg
+    const flash = this.add.circle(x, y, 10, 0xffffff, 0.8).setDepth(18);
+    this.tweens.add({
+        targets: flash,
+        scale: 15,
+        alpha: 0,
+        duration: 600,
+        ease: 'Cubic.easeOut',
+        onComplete: () => flash.destroy()
+    });
+
     const emitter = this.add.particles(x, y, 'sparkle', {
-        speed: { min: 100, max: 300 }, scale: { start: 1.5, end: 0 }, alpha: { start: 1, end: 0 },
-        lifespan: 1000, gravityY: 300, quantity: 30, duration: 150
+        speed: { min: 200, max: 500 }, scale: { start: 2, end: 0 }, alpha: { start: 1, end: 0 },
+        lifespan: 1200, gravityY: 400, quantity: 45, duration: 250, blendMode: 'ADD'
     }).setDepth(19);
     emitter.once('complete', () => emitter.destroy());
 
     // Show Egg Sprite
     const eggSprite = this.add.image(x, y, eggTexture).setDepth(20).setDisplaySize(50, 75);
+
+    // Animate the egg collection ("Juicy" squish and pop)
     this.tweens.add({
         targets: eggSprite,
-        y: y - 150,
-        scaleX: eggSprite.scaleX * 2.0,
-        scaleY: eggSprite.scaleY * 2.0,
-        angle: 720,
-        alpha: 0,
-        duration: 1200,
-        ease: 'Back.easeOut',
+        y: y - 180,
+        scaleX: { value: eggSprite.scaleX * 2.5, duration: 400, ease: 'Back.easeOut' },
+        scaleY: { value: eggSprite.scaleY * 2.5, duration: 400, ease: 'Back.easeOut' },
+        angle: { value: 360, duration: 600, ease: 'Quad.easeOut' },
+        alpha: { value: 0, delay: 600, duration: 400 },
         onComplete: () => eggSprite.destroy()
     });
 
@@ -1899,33 +1910,33 @@ class SectionHunt extends Phaser.Scene {
         const symSprite = this.add.image(x, y, symbolTexture).setDepth(21).setDisplaySize(50, 75);
         this.tweens.add({
             targets: symSprite,
-            y: y - 150,
-            scaleX: symSprite.scaleX * 2.0,
-            scaleY: symSprite.scaleY * 2.0,
-            angle: 720,
-            alpha: 0,
-            duration: 1200,
-            ease: 'Back.easeOut',
+            y: y - 180,
+            scaleX: { value: symSprite.scaleX * 2.5, duration: 400, ease: 'Back.easeOut' },
+            scaleY: { value: symSprite.scaleY * 2.5, duration: 400, ease: 'Back.easeOut' },
+            angle: { value: 360, duration: 600, ease: 'Quad.easeOut' },
+            alpha: { value: 0, delay: 600, duration: 400 },
             onComplete: () => symSprite.destroy()
         });
     }
 
     const feedback = this.add.text(x, y - 40, 'Found!', {
-        fontSize: '32px',
+        fontSize: '40px',
         fontFamily: 'Comic Sans MS',
-        fill: '#ffff00',
-        stroke: '#000000',
-        strokeThickness: 4
+        fill: '#ffffff',
+        stroke: '#ff9900',
+        strokeThickness: 6,
+        shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 4, stroke: true, fill: true }
     }).setOrigin(0.5).setDepth(22);
 
     this.tweens.add({
         targets: feedback,
-        y: y - 150,
-        scaleX: 1.5,
-        scaleY: 1.5,
-        alpha: 0,
+        y: y - 200,
+        scaleX: { start: 0.5, to: 1.5 },
+        scaleY: { start: 0.5, to: 1.5 },
+        alpha: { value: 0, delay: 800, duration: 400 },
         duration: 1200,
-        ease: 'Back.easeOut',
+        ease: 'Elastic.easeOut',
+        easeParams: [1.5, 0.5],
         onComplete: () => feedback.destroy()
     });
   }
