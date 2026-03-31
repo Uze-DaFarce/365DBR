@@ -2,6 +2,32 @@
 # Prevent server version information leakage
 ServerSignature Off
 
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 🚦 Router: Case-insensitive and trailing slash redirects
+
+  # Redirect variants of HeIsRisen
+  RewriteCond %{REQUEST_URI} ^/heisrisen(?:/|$) [NC]
+  RewriteCond %{REQUEST_URI} !^/HeIsRisen/
+  RewriteRule ^heisrisen/?(.*)$ /HeIsRisen/$1 [R=301,NC,L]
+
+  # Redirect variants of m
+  RewriteCond %{REQUEST_URI} ^/m(?:/|$) [NC]
+  RewriteCond %{REQUEST_URI} !^/m/
+  RewriteRule ^m/?(.*)$ /m/$1 [R=301,NC,L]
+
+  # Redirect variants of 365DBR
+  RewriteCond %{REQUEST_URI} ^/365dbr(?:/|$) [NC]
+  RewriteCond %{REQUEST_URI} !^/365DBR/
+  RewriteRule ^365dbr/?(.*)$ /365DBR/$1 [R=301,NC,L]
+
+  # Redirect variants of CMC
+  RewriteCond %{REQUEST_URI} ^/cmc(?:/|$) [NC]
+  RewriteCond %{REQUEST_URI} !^/CMC/
+  RewriteRule ^cmc/?(.*)$ /CMC/$1 [R=301,NC,L]
+</IfModule>
+
 <IfModule mod_autoindex.c>
   # 🛡️ Sentinel: Disable directory listing
   # Prevents attackers from enumerating files in directories like /pics or /css
