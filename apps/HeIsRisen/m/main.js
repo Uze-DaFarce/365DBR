@@ -1784,7 +1784,16 @@ class SectionHunt extends Phaser.Scene {
   checkLevelComplete(immediate = false) {
       const foundEggs = this.registry.get('foundEggs');
       const sections = this.registry.get('sections');
-      const currentSection = sections.find(s => s.name === this.sectionName);
+
+      // ⚡ Bolt Optimization: Use standard for loop instead of .find()
+      let currentSection = null;
+      for (let i = 0, len = sections.length; i < len; i++) {
+          if (sections[i].name === this.sectionName) {
+              currentSection = sections[i];
+              break;
+          }
+      }
+
       const scale = this.gameScale;
 
       if (foundEggs.length === TOTAL_EGGS) {
@@ -1812,8 +1821,22 @@ class SectionHunt extends Phaser.Scene {
       }
 
       if (currentSection) {
-          const foundIds = foundEggs.map(e => e.eggId);
-          const remainingCount = currentSection.eggs.filter(id => !foundIds.includes(id)).length;
+          // ⚡ Bolt Optimization: Replace .map, .filter, .includes with standard for loops
+          let remainingCount = 0;
+          const sectionEggs = currentSection.eggs;
+          for (let i = 0, len = sectionEggs.length; i < len; i++) {
+              let isFound = false;
+              for (let j = 0, fLen = foundEggs.length; j < fLen; j++) {
+                  if (foundEggs[j].eggId === sectionEggs[i]) {
+                      isFound = true;
+                      break;
+                  }
+              }
+              if (!isFound) {
+                  remainingCount++;
+              }
+          }
+
           if (remainingCount === 0) {
               announceToScreenReader('Great Job Detective!! You found all the hidden eggs on this map, the others are hidden in other maps.');
               const clearText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, "Great Job Detective!! You found all the hidden eggs on this map, the others are hidden in other maps.", {
