@@ -1035,6 +1035,7 @@ class MainMenu extends Phaser.Scene {
 
     mainBtnContainer.setSize(buttonWidth, buttonHeight);
     mainBtnContainer.setInteractive();
+    addButtonInteraction(this, mainBtnContainer, 'menu-click');
     startBtnContainer.add(mainBtnContainer);
 
     let newGameBtnContainer = null;
@@ -1059,6 +1060,7 @@ class MainMenu extends Phaser.Scene {
 
         newGameBtnContainer.setSize(buttonWidth, buttonHeight);
         newGameBtnContainer.setInteractive();
+        addButtonInteraction(this, newGameBtnContainer, 'menu-click');
         startBtnContainer.add(newGameBtnContainer);
     }
 
