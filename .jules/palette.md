@@ -354,3 +354,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-27 - [Expand Haptic Feedback to Buttons]
 **Learning:** Adding haptic feedback (`navigator.vibrate`) specifically to interactive buttons, not just core game events, significantly increases the tactile feel of UI components on mobile devices.
 **Action:** Consistently add a subtle haptic burst (e.g., 20ms) inside global interaction handlers like `addButtonInteraction` for pointer events.
+
+## 2026-03-31 - Pointer Cursor Affordance on Interactive Elements
+**Learning:** In Phaser 3, game objects do not inherently change the mouse cursor to a pointer when hovered, even if they are interactive. This lack of visual affordance can make it difficult for desktop/mouse users to distinguish clickable elements from static graphics.
+**Action:** When creating reusable interaction helpers (like `addButtonInteraction`), always set `button.input.cursor = 'pointer'` to automatically provide this essential affordance to any object using the helper. Always check `if (button.input)` first to ensure the object has been made interactive before applying the cursor style.

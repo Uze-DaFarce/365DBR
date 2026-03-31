@@ -3485,6 +3485,10 @@ function parseScriptureLink(scriptureText) {
  * @param {string} [soundKey='success'] - The key of the sound to play on click.
  */
 function addButtonInteraction(scene, button, soundKey = 'success') {
+  if (button.input) {
+      button.input.cursor = 'pointer';
+  }
+
   button.on('pointerdown', () => {
     // Try to play sound via MusicScene if available to ensure persistence
     const musicScene = scene.scene.get('MusicScene');

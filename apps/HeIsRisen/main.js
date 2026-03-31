@@ -3298,6 +3298,10 @@ class EggZamRoom extends Phaser.Scene {
  * Adds a "pop" animation to a game object on hover.
  */
 function addButtonInteraction(scene, button, soundKey = 'success') {
+  if (button.input) {
+      button.input.cursor = 'pointer';
+  }
+
   button.on('pointerover', () => {
     if (!button.isHovered) {
         button.baseScaleX = button.scaleX;
