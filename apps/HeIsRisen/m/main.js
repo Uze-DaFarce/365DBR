@@ -114,11 +114,7 @@ function saveGameState(registry) {
         correctCategorizations: registry.get('correctCategorizations'),
         currentScore: registry.get('currentScore')
     };
-    try {
-        try { localStorage.setItem('heIsRisenGameState', JSON.stringify(state)); } catch (e) { console.warn('localStorage error', e); }
-    } catch (e) {
-        console.warn('Failed to save game state to localStorage', e);
-    }
+    try { localStorage.setItem('heIsRisenGameState', JSON.stringify(state)); } catch (e) { console.warn('localStorage error', e); }
 }
 
 function initializeGameData(registry, cache, forceNew = false) {
@@ -140,11 +136,13 @@ function initializeGameData(registry, cache, forceNew = false) {
                     registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
                     registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
 
-                    let loadedCorrect = savedState.correctCategorizations !== null && savedState.correctCategorizations !== '' ? Number(savedState.correctCategorizations) : NaN;
+                    let rawCorrect = savedState.correctCategorizations;
+                    let loadedCorrect = (rawCorrect !== null && String(rawCorrect).trim() !== '' && typeof rawCorrect !== 'object') ? Number(rawCorrect) : NaN;
                     if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
                     registry.set('correctCategorizations', loadedCorrect);
 
-                    let loadedScore = savedState.currentScore !== null && savedState.currentScore !== '' ? Number(savedState.currentScore) : NaN;
+                    let rawScore = savedState.currentScore;
+                    let loadedScore = (rawScore !== null && String(rawScore).trim() !== '' && typeof rawScore !== 'object') ? Number(rawScore) : NaN;
                     if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) loadedScore = 0;
                     registry.set('currentScore', loadedScore);
 
@@ -152,11 +150,11 @@ function initializeGameData(registry, cache, forceNew = false) {
                     try {
                         let highScoreVal = null;
                         try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
-                        let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
-                        if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
-                            loadedScore = 0;
+                        let loadedHigh = (highScoreVal !== null && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object') ? Number(highScoreVal) : NaN;
+                        if (isNaN(loadedHigh) || !isFinite(loadedHigh) || loadedHigh < 0) {
+                            loadedHigh = 0;
                         }
-                        registry.set('highScore', loadedScore);
+                        registry.set('highScore', loadedHigh);
                     } catch (e) {
                         registry.set('highScore', 0);
                     }
@@ -351,12 +349,8 @@ class MusicScene extends Phaser.Scene {
     // Save settings on change
     this.registry.events.on('changedata', (parent, key, data) => {
         if (['musicVolume', 'ambientVolume', 'sfxVolume'].includes(key)) {
-            try {
-                localStorage.setItem(key, data);
-                localStorage.setItem(key + '_backup', data);
-            } catch (e) {
-                console.warn('localStorage error', e);
-            }
+            try { localStorage.setItem(key, data); } catch (e) { console.warn('localStorage error', e); }
+            try { localStorage.setItem(key + '_backup', data); } catch (e) { console.warn('localStorage error', e); }
         }
     });
   }
@@ -992,11 +986,11 @@ class MainMenu extends Phaser.Scene {
       try {
           let highScoreVal = null;
           try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
-          let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
-          if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
-              loadedScore = 0;
+          let loadedHigh = (highScoreVal !== null && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object') ? Number(highScoreVal) : NaN;
+          if (isNaN(loadedHigh) || !isFinite(loadedHigh) || loadedHigh < 0) {
+              loadedHigh = 0;
           }
-          this.registry.set('highScore', loadedScore);
+          this.registry.set('highScore', loadedHigh);
       } catch (e) {
           console.warn('LocalStorage access failed:', e);
           this.registry.set('highScore', 0);
@@ -1096,12 +1090,12 @@ class MainMenu extends Phaser.Scene {
     const getSafeVol = (key) => {
       let val = null;
       try { val = localStorage.getItem(key); } catch (e) { console.warn('localStorage error', e); }
-      let parsed = parseFloat(val);
-      if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+      let parsed = (val !== null && String(val).trim() !== '' && typeof val !== 'object') ? Number(val) : NaN;
+      if (isNaN(parsed) || !isFinite(parsed) || parsed < 0 || parsed > 1) {
           let backupVal = null;
           try { backupVal = localStorage.getItem(key + '_backup'); } catch (e) { console.warn('localStorage error', e); }
-          parsed = parseFloat(backupVal);
-          if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+          parsed = (backupVal !== null && String(backupVal).trim() !== '' && typeof backupVal !== 'object') ? Number(backupVal) : NaN;
+          if (isNaN(parsed) || !isFinite(parsed) || parsed < 0 || parsed > 1) {
               return 0.5;
           }
       }
