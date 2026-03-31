@@ -64,7 +64,7 @@ def run_audio_system_test(is_mobile=False):
                 raise AssertionError(f"Audio Context is not running! State: {audio_state}")
 
             # 2. Test ambient volume setting actually affects sound objects
-            print("Testing ambient audio volume slider integration...")
+            print("Testing ambient audio volume setting integration...")
 
             # Read current ambient volume from registry
             initial_ambient_vol = page.evaluate("() => window.game.scene.scenes[0].registry.get('ambientVolume')")
@@ -177,31 +177,31 @@ def run_audio_system_test(is_mobile=False):
                     // isn't attached or errors if the asset didn't load completely.
                     // We directly test the handler logic here.
                     // To do so reliably, we mock setMute so we can track what the code attempts to do.
-                    let wasMuted = false;
-                    // Preserve the original setMute to prevent breaking other listeners,
+                    let currentVolume = 1.0;
+                    // Preserve the original setVolume to prevent breaking other listeners,
                     // but also intercept the value
-                    const originalSetMute = videoObj.setMute.bind(videoObj);
-                    videoObj.setMute = (val) => { wasMuted = val; originalSetMute(val); };
+                    const originalSetVolume = videoObj.setVolume.bind(videoObj);
+                    videoObj.setVolume = (val) => { currentVolume = val; originalSetVolume(val); };
 
                     // Force initial state for test predictability
                     videoObj.loopCount = 0;
-                    videoObj.setMute(false);
+                    videoObj.setVolume(0.5);
 
-                    results.push(wasMuted === false);
+                    results.push(currentVolume > 0);
 
                     // Loop 1 (should mute)
                     videoObj.emit('loop');
-                    results.push(wasMuted === true);
+                    results.push(currentVolume === 0);
 
                     // Loop 2, 3, 4 (should stay muted)
                     videoObj.emit('loop');
                     videoObj.emit('loop');
                     videoObj.emit('loop');
-                    results.push(wasMuted === true);
+                    results.push(currentVolume === 0);
 
                     // Loop 5 (5th time emitting loop, so 6th play overall - should unmute)
                     videoObj.emit('loop');
-                    results.push(wasMuted === false);
+                    results.push(currentVolume > 0);
 
                     return { success: results.every(r => r === true), details: results };
                 }
