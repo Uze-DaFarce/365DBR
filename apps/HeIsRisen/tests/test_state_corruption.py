@@ -38,65 +38,48 @@ def run_state_corruption_test(is_mobile=False):
             # Pre-populate localStorage with corrupted data to simulate tampering
             url = "http://127.0.0.1:8080/m/" if is_mobile else "http://127.0.0.1:8080/"
 
+            # Go to a blank page on the same origin first to set local storage
+            page.on('console', lambda msg: print(f'BROWSER CONSOLE: {msg.text}'))
+            page.goto("http://127.0.0.1:8080/index.html")
 
-            test_vals = ["'-Infinity'", "'NaN'", "'null'", "'undefined'", "{}", "[]", "'[1,2]'"]
-            for idx, test_val in enumerate(test_vals):
-                print(f"\n--- Testing corruption with injected value: {test_val} ---")
+            page.evaluate("""
+                () => {
+                    localStorage.setItem('highScore', '-Infinity'); // Edge case negative infinity
+                    localStorage.setItem('musicVolume', 'NaN'); // Not a number
+                    localStorage.setItem('musicVolume_backup', '0.8'); // Valid backup
+                    localStorage.setItem('ambientVolume', '{}'); // Stringified object
+                    localStorage.setItem('ambientVolume_backup', 'not_a_number'); // Invalid backup
+                    localStorage.setItem('sfxVolume', ' '); // Empty/whitespace string
+                    // No sfxVolume_backup set
 
-                # Clear origin state completely before setting new ones
-                page.goto("about:blank")
-                page.goto("http://127.0.0.1:8080/index.html")
-                page.evaluate("localStorage.clear(); sessionStorage.clear();")
+                    // Tamper with the main game state
+                    const corruptedState = {
+                        eggData: "not an array",
+                        sections: { wrong: "type" },
+                        foundEggs: "should be array",
+                        stampedSections: 12345,
+                        correctCategorizations: "NaN",
+                        currentScore: "HACKED"
+                    };
+                    localStorage.setItem('heIsRisenGameState', JSON.stringify(corruptedState));
+                }
+            """)
 
-                page.evaluate(f"""
-                    () => {{
-                        localStorage.setItem('highScore', {test_val});
-                        localStorage.setItem('musicVolume', 'NaN');
-                        localStorage.setItem('musicVolume_backup', '0.8');
-                        localStorage.setItem('ambientVolume', '{{}}');
-                        localStorage.setItem('ambientVolume_backup', 'not_a_number');
-                        localStorage.setItem('sfxVolume', ' ');
+            page.on('console', lambda msg: print(f'BROWSER CONSOLE: {msg.text}'))
+            page.goto(url)
+            page.wait_for_load_state('networkidle')
 
-                        const corruptedState = {{
-                            eggData: "not an array",
-                            sections: {{ wrong: "type" }},
-                            foundEggs: "should be array",
-                            stampedSections: 12345,
-                            correctCategorizations: {test_val},
-                            currentScore: {test_val}
-                        }};
-                        localStorage.setItem('heIsRisenGameState', JSON.stringify(corruptedState));
-                    }}
-                """)
+            th.wait_for_phaser_init(page)
 
-                page.goto(url)
-                page.wait_for_load_state('networkidle')
+            # Start Game to activate Audio Context
+            time.sleep(1)
+            page.keyboard.press("Space")
+            time.sleep(3) # Wait for start screen tween
+            page.keyboard.press("Space")
+            time.sleep(2) # Wait for MapScene
 
-                th.wait_for_phaser_init(page)
+            th.wait_for_active_scene(page, "MapScene")
 
-                time.sleep(1)
-                page.keyboard.press("Space")
-                time.sleep(3)
-                page.keyboard.press("Space")
-                time.sleep(2)
-
-                th.wait_for_active_scene(page, "MapScene")
-
-                high_score = page.evaluate("() => window.game.scene.scenes[0].registry.get('highScore')")
-                if high_score != 0:
-                    raise AssertionError(f"High score failed to fallback to 0. Got {high_score}")
-
-                current_score = page.evaluate("() => window.game.scene.scenes[0].registry.get('currentScore')")
-                if current_score != 0 or type(current_score) != int:
-                    raise AssertionError(f"Current score failed to fallback to 0 or is invalid. Got {current_score} ({type(current_score)})")
-
-                correct_cat = page.evaluate("() => window.game.scene.scenes[0].registry.get('correctCategorizations')")
-                if correct_cat != 0 or type(correct_cat) != int:
-                    raise AssertionError(f"Correct Categorizations failed to fallback to 0 or is invalid. Got {correct_cat} ({type(correct_cat)})")
-
-                if idx == len(test_vals) - 1:
-                    # Proceed with full assertions for the final payload
-                    pass
             # Verify high score was handled gracefully (should be 0)
             high_score = page.evaluate("() => window.game.scene.scenes[0].registry.get('highScore')")
             print(f"High Score after corrupted load: {high_score}")

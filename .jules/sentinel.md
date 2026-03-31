@@ -123,16 +123,3 @@ Dynamically loaded external JSON files accessed via `cache.json.get('key')` (lik
 ## 2026-03-30 - Prevent DOM Exceptions from blocked localStorage
 **Learning:** Browser privacy settings or restrictive iframe contexts can forcefully deny access to the `localStorage` API. Directly accessing it (e.g., `localStorage.getItem('key')`) without wrapping it in a `try-catch` block will immediately throw an uncaught `DOMException: Access denied for this document`, fatally crashing the entire application script.
 **Action:** Always wrap `localStorage.getItem`, `localStorage.setItem`, and `localStorage.removeItem` operations in robust `try-catch` blocks and implement safe fallback defaults (e.g., in-memory state or safe numbers) to ensure the game functions seamlessly even when storage persistence is disabled.
-## 2026-03-31 - [Sentinel] Securing localStorage Extraction (NaN & Type Validation)
-
-**Threat Vector:**
-Client-side state data extracted from `localStorage.getItem()` and parsed via `JSON.parse` is vulnerable to tampering. Modifying numeric values to strings like `"NaN"`, `"null"`, `"-Infinity"`, or explicitly injecting objects/arrays (`{}`, `[]`) causes JS functions to evaluate invalid mathematical boundaries, potentially causing runtime `NaN` pollution across the Phaser registry or triggering fatal mathematical errors.
-
-**Sentinel Action:**
-- Explicitly validated `localStorage` access points for `highScore`, `correctCategorizations`, and `currentScore` in both `HeIsRisen/main.js` and `m/main.js`.
-- Implemented robust `Number()` extraction logic coupled with type checking (`typeof val !== 'object'`) and `.trim()` checks for empty strings/whitespace.
-- Enhanced bounds enforcement globally using `Number.isFinite()` instead of relying on generic `!isNaN()` defaults.
-- Expanded `tests/test_state_corruption.py` to iteratively hammer the local state parser with a litany of malicious boundary values (`'-Infinity'`, `'NaN'`, `'null'`, `'undefined'`, `{}`, `[]`, `'[1,2]'`).
-
-**Resolution:**
-The production clients now gracefully reject non-finite inputs, invalid structural objects, and empty arrays, defaulting safely to `0` or appropriate backup metrics without leaking `NaN` exceptions or disrupting gameplay.
