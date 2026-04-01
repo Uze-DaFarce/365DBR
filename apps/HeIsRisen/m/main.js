@@ -1308,6 +1308,7 @@ class MainMenu extends Phaser.Scene {
                   if (this.introVideo) {
                       this.introVideo.stop();
                       this.introVideo.destroy();
+                      this.introVideo = null;
                   }
 
                   // Start Background Music
@@ -1362,10 +1363,12 @@ class MainMenu extends Phaser.Scene {
       
       // Clean up on shutdown
       this.events.once('shutdown', () => {
+          this.registry.events.off('changedata', updateIntroVolume);
           if (introVideo) {
               introVideo.stop();
               introVideo.destroy();
           }
+          this.introVideo = null;
       });
 
       // Ensure loading text is destroyed if it persists (safety check)
