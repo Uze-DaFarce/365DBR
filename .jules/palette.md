@@ -358,3 +358,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-31 - Avoid Double Cursors with Custom Pointers
 **Learning:** HeIsRisen uses a custom `finger-cursor` sprite (`CursorScene`) which acts as the global mouse pointer for all users. Adding `button.input.cursor = 'pointer'` or `cursor: pointer` anywhere in the Phaser 3 logic or DOM causes the browser's default hand cursor to appear simultaneously, resulting in an unacceptable "double cursor" visual bug.
 **Action:** NEVER apply `input.cursor = 'pointer'` or `useHandCursor: true` to game objects or DOM elements in applications that implement a custom global cursor sprite.
+
+## 2026-04-01 - Duplicate Screen Reader Announcer Elements
+**Learning:** Having multiple elements with `id="sr-announcer"` in the HTML causes `document.getElementById('sr-announcer')` to potentially target the wrong element or conflict across accessibility features. Multiple instances of screen reader elements might announce the same message redundantly or fail to announce it entirely if the attributes (like `aria-live="polite"` and `aria-atomic="true"`) are split across them.
+**Action:** Always ensure there is exactly one unified `#sr-announcer` div per HTML file combining all necessary attributes (e.g., `aria-live="polite"` and `aria-atomic="true"`).
