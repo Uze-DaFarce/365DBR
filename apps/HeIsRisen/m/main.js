@@ -1987,6 +1987,14 @@ class SectionHunt extends Phaser.Scene {
         useVideo = true;
     }
 
+    const thumbKey = `${this.sectionName}-thumb`;
+    if (this.textures.exists(thumbKey)) {
+        this.sectionThumbImage = this.add.image(0, 0, thumbKey)
+            .setOrigin(0, 0)
+            .setDisplaySize(this.game.config.width, this.game.config.height)
+            .setDepth(-1); // Underneath the video
+    }
+
     if (useVideo) {
         this.sectionImage = this.add.video(0, 0, videoKey)
             .setOrigin(0, 0)
