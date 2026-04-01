@@ -2005,6 +2005,34 @@ class SectionHunt extends Phaser.Scene {
         this.sectionImage.setMute(false); // iOS quirk: keep muted attr false to avoid global context suspension
         const ambientVol = this.registry.has('ambientVolume') ? this.registry.get('ambientVolume') : 0.5;
         this.sectionImage.setVolume(ambientVol * 0.25);
+
+        const applySectionVideoScale = () => {
+             if (this.sectionImage && this.sectionImage.active && this.sectionImage.width > 0) {
+                 if (Math.abs(this.sectionImage.displayWidth - this.game.config.width) > 10) {
+                      this.sectionImage.setDisplaySize(this.game.config.width, this.game.config.height);
+                 }
+             }
+        };
+
+        const checkSectionVideoReady = () => {
+             if (this.sectionImage && this.sectionImage.active) {
+                 if (this.sectionImage.width > 0) {
+                     applySectionVideoScale();
+                 } else {
+                     this.time.delayedCall(100, checkSectionVideoReady);
+                 }
+             }
+        };
+
+        this.sectionImage.once('play', checkSectionVideoReady);
+        this.time.delayedCall(100, checkSectionVideoReady);
+
+        // Add a scale event listener to replace the update loop checks for resize
+        this.scale.on('resize', applySectionVideoScale, this);
+        this.events.once('shutdown', () => {
+             this.scale.off('resize', applySectionVideoScale, this);
+        });
+
         this.sectionImage.play(true);
         this.isUsingVideo = true;
 
@@ -2280,13 +2308,6 @@ class SectionHunt extends Phaser.Scene {
     const lensX = Phaser.Math.Clamp(rawLensX, lensRadius, this.game.config.width - lensRadius);
     const lensY = Phaser.Math.Clamp(rawLensY, lensRadius, this.game.config.height - lensRadius);
 
-    // Ensure video size is correct once texture loads
-    if (this.sectionImage && this.sectionImage.active && this.sectionImage.width > 0) {
-        if (Math.abs(this.sectionImage.displayWidth - this.game.config.width) > 10) {
-             this.sectionImage.setDisplaySize(this.game.config.width, this.game.config.height);
-        }
-    }
-
     // Update Zoomed View Position (centered on lens)
     this.zoomedView.setPosition(lensX, lensY);
     this.maskGraphics.setPosition(lensX, lensY);
@@ -2477,24 +2498,28 @@ class SectionHunt extends Phaser.Scene {
     }
 
     if (isHoveringButton) {
-        if (this.magnifyingGlass) this.magnifyingGlass.setVisible(false);
-        if (this.zoomedView) this.zoomedView.setVisible(false);
-        if (this.maskGraphics) this.maskGraphics.setVisible(false);
+        if (this.magnifyingGlass && this.magnifyingGlass.visible) {
+            this.magnifyingGlass.setVisible(false);
+            if (this.zoomedView) this.zoomedView.setVisible(false);
+            if (this.maskGraphics) this.maskGraphics.setVisible(false);
 
+            if (this.fingerCursor) {
+                this.fingerCursor.setVisible(true);
+                this.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
+            }
+        }
         if (this.fingerCursor) {
-            this.fingerCursor.setVisible(true);
-            this.fingerCursor.setDisplaySize(50 * scale, 75 * scale);
             this.fingerCursor.setPosition(pointer.x, pointer.y);
         }
     } else {
-        if (this.magnifyingGlass) {
-             this.magnifyingGlass.setVisible(true);
-             this.magnifyingGlass.setDisplaySize(150 * scale, 187.5 * scale);
-             // position is now handled smoothly at the top of update()
+        if (this.magnifyingGlass && !this.magnifyingGlass.visible) {
+            this.magnifyingGlass.setVisible(true);
+            this.magnifyingGlass.setDisplaySize(150 * scale, 187.5 * scale);
+            if (this.zoomedView) this.zoomedView.setVisible(true);
+            if (this.maskGraphics) this.maskGraphics.setVisible(true);
+            if (this.fingerCursor) this.fingerCursor.setVisible(false);
         }
-        if (this.zoomedView) this.zoomedView.setVisible(true);
-        if (this.maskGraphics) this.maskGraphics.setVisible(true);
-        if (this.fingerCursor) this.fingerCursor.setVisible(false);
+        // position is now handled smoothly at the top of update() for the magnifier
     }
   }
 }
