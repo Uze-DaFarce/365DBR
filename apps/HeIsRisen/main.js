@@ -2016,17 +2016,21 @@ class SectionHunt extends Phaser.Scene {
 
     this.cameras.main.setViewport(0, 0, width, height);
 
+    // Load Thumbnail Background Immediately (acts as fallback and loading screen)
+    // MapScene preloads these as '-thumb' keys
+    const thumbKey = `${this.sectionName}-thumb`;
+    if (this.textures.exists(thumbKey)) {
+        this.sectionImage = this.add.image(width/2, height/2, thumbKey)
+            .setDisplaySize(1280 * scale, 720 * scale)
+            .setDepth(-1); // Underneath the video
+    }
+
     // Check if video exists in cache
     const videoKey = `${this.sectionName}-video`;
 
-    // Validate video existence AND content
+    // Validate video existence
     let useVideo = false;
     if (this.cache.video.exists(videoKey)) {
-        const videoData = this.cache.video.get(videoKey);
-        // If blob URL or standard, we hope it loaded. MainMenu preloads it.
-        // If load failed, it might still be in cache but broken?
-        // We'll try to add it. If it has 0 duration/width after play attempt, we fallback?
-        // Actually, checking if the texture exists might be safer if Phaser generated one.
         useVideo = true;
     }
 
@@ -2112,16 +2116,13 @@ class SectionHunt extends Phaser.Scene {
         this.isUsingVideo = true;
 
         this.sectionVideo.on('error', () => {
-             console.warn(`SectionHunt: Video ${videoKey} playback error. Falling back.`);
+             console.warn(`SectionHunt: Video ${videoKey} playback error. Falling back to thumbnail.`);
              this.sectionVideo.destroy();
              this.isUsingVideo = false;
-             this.createFallbackImage();
         });
     }
 
-    if (!useVideo) {
-        this.createFallbackImage();
-    }
+    // If no video, we simply rely on the this.sectionImage thumbnail already added at depth -1
 
     const eggDataArray = this.registry.get('eggData') || [];
     const sectionEggsData = eggDataArray.filter(e => e.section === this.sectionName && !e.collected);
@@ -2306,46 +2307,6 @@ class SectionHunt extends Phaser.Scene {
       this.scoreText.setPosition(50 * uiScale, 98 * uiScale).setFontSize(`${42 * uiScale}px`);
   }
 
-  createFallbackImage() {
-    let textureKey = `${this.sectionName}-fallback`;
-
-    if (!this.textures.exists(textureKey)) {
-        textureKey = 'placeholder-bg';
-        if (!this.textures.exists('placeholder-bg')) {
-             console.warn(`SectionHunt: Texture '${textureKey}' missing! Trying fallback...`);
-             const graphics = this.make.graphics({x: 0, y: 0, add: false});
-             graphics.fillStyle(0x444444);
-             graphics.fillRect(0, 0, 1280, 720);
-             graphics.lineStyle(4, 0xff0000);
-             graphics.strokeRect(0, 0, 1280, 720);
-
-             // Add text to the texture
-             const text = this.make.text({
-                 x: 640,
-                 y: 360,
-                 text: `Missing Asset:\n${this.sectionName}`,
-                 origin: { x: 0.5, y: 0.5 },
-                 style: {
-                     font: 'bold 40px Arial',
-                     fill: '#ffffff',
-                     align: 'center'
-                 }
-             });
-
-             graphics.generateTexture('placeholder-bg', 1280, 720);
-             text.destroy();
-             graphics.destroy();
-        }
-    }
-
-    // Ensure scene is still active before adding
-    if (this.sys.settings.active) {
-        this.sectionImage = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, textureKey)
-            .setDisplaySize(1280 * this.bgScale, 720 * this.bgScale)
-            .setDepth(0);
-    }
-    this.isUsingVideo = false;
-  }
 
   update() {
     const pointer = this.input.activePointer;
