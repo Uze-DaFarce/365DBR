@@ -1314,28 +1314,6 @@ class MainMenu extends Phaser.Scene {
   }
 
   update() {
-    // Fallback scaling check: if video loaded late and width was 0
-    if (this.introVideo && this.introVideo.active) {
-       // Ensure centered
-       if (this.introVideo.x !== this.scale.width / 2 || this.introVideo.y !== this.scale.height / 2) {
-           this.introVideo.setPosition(this.scale.width / 2, this.scale.height / 2);
-       }
-
-       // Ensure scaled if dimensions valid
-       if (this.introVideo.width > 0 && this.introVideo.height > 0) {
-           const width = this.scale.width;
-           const height = this.scale.height;
-           const scaleX = width / this.introVideo.width;
-           const scaleY = height / this.introVideo.height;
-           const desiredScale = Math.max(scaleX, scaleY);
-
-           // If current scale is default (1) but desired is different, apply it
-           // Use a small epsilon to avoid float jitter
-           if (Math.abs(this.introVideo.scaleX - desiredScale) > 0.01) {
-               this.introVideo.setScale(desiredScale);
-           }
-       }
-    }
   }
 }
 
