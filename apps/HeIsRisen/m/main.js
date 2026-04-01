@@ -1980,6 +1980,12 @@ class SectionHunt extends Phaser.Scene {
     this.cameras.main.setViewport(0, 0, this.game.config.width, this.game.config.height);
     this.cameras.main.setPosition(0, 0);
 
+    // Unconditionally add the thumbnail as a fallback background behind everything
+    this.fallbackImage = this.add.image(0, 0, `${this.sectionName}-thumb`)
+        .setOrigin(0, 0)
+        .setDisplaySize(this.game.config.width, this.game.config.height)
+        .setDepth(-1);
+
     let useVideo = false;
     const videoKey = `${this.sectionName}-video`;
 
@@ -2027,54 +2033,13 @@ class SectionHunt extends Phaser.Scene {
              console.warn(`SectionHunt: Video ${videoKey} playback error. Falling back.`);
              this.sectionImage.destroy();
              this.isUsingVideo = false;
-             this.createFallbackImage();
         });
     }
 
     if (!useVideo) {
-        this.createFallbackImage();
+        this.isUsingVideo = false;
     }
     this.setupEggsAndUI();
-  }
-
-  createFallbackImage() {
-    let textureKey = `${this.sectionName}-fallback`;
-
-    if (!this.textures.exists(textureKey)) {
-        textureKey = 'placeholder-bg';
-        if (!this.textures.exists('placeholder-bg')) {
-            console.warn(`SectionHunt: Texture '${textureKey}' missing! Trying fallback...`);
-            const graphics = this.make.graphics({x: 0, y: 0, add: false});
-            graphics.fillStyle(0x444444);
-            graphics.fillRect(0, 0, 1280, 720);
-            graphics.lineStyle(4, 0xff0000);
-            graphics.strokeRect(0, 0, 1280, 720);
-
-            const text = this.make.text({
-                x: 640,
-                y: 360,
-                text: `Missing Asset:\n${this.sectionName}`,
-                origin: { x: 0.5, y: 0.5 },
-                style: {
-                    font: 'bold 40px Arial',
-                    fill: '#ffffff',
-                    align: 'center'
-                }
-            });
-
-            graphics.generateTexture('placeholder-bg', 1280, 720);
-            text.destroy();
-            graphics.destroy();
-        }
-    }
-
-    if (this.sys.settings.active) {
-        this.sectionImage = this.add.image(0, 0, textureKey)
-            .setOrigin(0, 0)
-            .setDisplaySize(this.game.config.width, this.game.config.height)
-            .setDepth(0);
-    }
-    this.isUsingVideo = false;
   }
 
   setupEggsAndUI() {

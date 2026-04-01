@@ -2016,6 +2016,11 @@ class SectionHunt extends Phaser.Scene {
 
     this.cameras.main.setViewport(0, 0, width, height);
 
+    // Unconditionally add the thumbnail as a fallback background behind everything
+    this.sectionImage = this.add.image(width/2, height/2, `${this.sectionName}-thumb`)
+        .setDisplaySize(1280 * scale, 720 * scale)
+        .setDepth(-1);
+
     // Check if video exists in cache
     const videoKey = `${this.sectionName}-video`;
 
@@ -2115,12 +2120,11 @@ class SectionHunt extends Phaser.Scene {
              console.warn(`SectionHunt: Video ${videoKey} playback error. Falling back.`);
              this.sectionVideo.destroy();
              this.isUsingVideo = false;
-             this.createFallbackImage();
         });
     }
 
     if (!useVideo) {
-        this.createFallbackImage();
+        this.isUsingVideo = false;
     }
 
     const eggDataArray = this.registry.get('eggData') || [];
@@ -2289,7 +2293,9 @@ class SectionHunt extends Phaser.Scene {
       if (this.isUsingVideo && this.sectionVideo) {
           this.sectionVideo.setPosition(width/2, height/2);
           this.sectionVideo.setDisplaySize(1280 * scale, 720 * scale);
-      } else if (this.sectionImage) {
+      }
+
+      if (this.sectionImage) {
           this.sectionImage.setPosition(width/2, height/2);
           this.sectionImage.setDisplaySize(1280 * scale, 720 * scale);
       }
@@ -2304,47 +2310,6 @@ class SectionHunt extends Phaser.Scene {
       this.eggsAmminHaul.baseScaleY = this.eggsAmminHaul.scaleY;
       this.scoreImage.setDisplaySize(200 * uiScale, 200 * uiScale);
       this.scoreText.setPosition(50 * uiScale, 98 * uiScale).setFontSize(`${42 * uiScale}px`);
-  }
-
-  createFallbackImage() {
-    let textureKey = `${this.sectionName}-fallback`;
-
-    if (!this.textures.exists(textureKey)) {
-        textureKey = 'placeholder-bg';
-        if (!this.textures.exists('placeholder-bg')) {
-             console.warn(`SectionHunt: Texture '${textureKey}' missing! Trying fallback...`);
-             const graphics = this.make.graphics({x: 0, y: 0, add: false});
-             graphics.fillStyle(0x444444);
-             graphics.fillRect(0, 0, 1280, 720);
-             graphics.lineStyle(4, 0xff0000);
-             graphics.strokeRect(0, 0, 1280, 720);
-
-             // Add text to the texture
-             const text = this.make.text({
-                 x: 640,
-                 y: 360,
-                 text: `Missing Asset:\n${this.sectionName}`,
-                 origin: { x: 0.5, y: 0.5 },
-                 style: {
-                     font: 'bold 40px Arial',
-                     fill: '#ffffff',
-                     align: 'center'
-                 }
-             });
-
-             graphics.generateTexture('placeholder-bg', 1280, 720);
-             text.destroy();
-             graphics.destroy();
-        }
-    }
-
-    // Ensure scene is still active before adding
-    if (this.sys.settings.active) {
-        this.sectionImage = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, textureKey)
-            .setDisplaySize(1280 * this.bgScale, 720 * this.bgScale)
-            .setDepth(0);
-    }
-    this.isUsingVideo = false;
   }
 
   update() {
