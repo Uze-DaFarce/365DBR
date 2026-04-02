@@ -358,3 +358,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-31 - Avoid Double Cursors with Custom Pointers
 **Learning:** HeIsRisen uses a custom `finger-cursor` sprite (`CursorScene`) which acts as the global mouse pointer for all users. Adding `button.input.cursor = 'pointer'` or `cursor: pointer` anywhere in the Phaser 3 logic or DOM causes the browser's default hand cursor to appear simultaneously, resulting in an unacceptable "double cursor" visual bug.
 **Action:** NEVER apply `input.cursor = 'pointer'` or `useHandCursor: true` to game objects or DOM elements in applications that implement a custom global cursor sprite.
+
+## 2026-04-04 - Tooltips and Contextual Affordance on Map Thumbnails
+**Learning:** Map thumbnails without text labels or interaction feedback (like scale/audio) force users to guess their destinations. Furthermore, immediate scene transitions cut off the satisfying tactile feedback of standard button interactions.
+**Action:** When adding standard interaction patterns (e.g., `addButtonInteraction`) to visual navigation elements, always include contextual tooltips for wayfinding, and wrap the resulting scene transition in a `delayedCall` (e.g., 150ms) so the visual and auditory feedback has time to play before the screen unloads.
