@@ -576,19 +576,13 @@ class UIScene extends Phaser.Scene {
             if (eggCollected) return;
         }
 
-        this.tweens.add({
-            targets: gearContainer,
-            scaleX: gearContainer.baseScaleX * 0.9,
-            scaleY: gearContainer.baseScaleY * 0.9,
-            duration: 50,
-            ease: 'Power1',
-            yoyo: true,
-            onComplete: () => {
-                gearContainer.setScale(gearContainer.baseScaleX, gearContainer.baseScaleY);
-                this.openSettings();
-            }
+        this.time.delayedCall(150, () => {
+            this.openSettings();
+            gearContainer.setScale(gearContainer.baseScaleX, gearContainer.baseScaleY); // Reset scale for next time
         });
     });
+
+    addButtonInteraction(this, gearContainer, 'menu-click');
 
     this.gearIcon = gearContainer;
   }
