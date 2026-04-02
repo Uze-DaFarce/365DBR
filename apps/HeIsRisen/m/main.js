@@ -140,11 +140,11 @@ function initializeGameData(registry, cache, forceNew = false) {
                     registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
                     registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
 
-                    let loadedCorrect = savedState.correctCategorizations !== null && savedState.correctCategorizations !== '' ? Number(savedState.correctCategorizations) : NaN;
+                    let loadedCorrect = (savedState.correctCategorizations !== null && String(savedState.correctCategorizations).trim() !== '' && typeof savedState.correctCategorizations !== 'object') ? Number(savedState.correctCategorizations) : NaN;
                     if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
                     registry.set('correctCategorizations', loadedCorrect);
 
-                    let loadedScore = savedState.currentScore !== null && savedState.currentScore !== '' ? Number(savedState.currentScore) : NaN;
+                    let loadedScore = (savedState.currentScore !== null && String(savedState.currentScore).trim() !== '' && typeof savedState.currentScore !== 'object') ? Number(savedState.currentScore) : NaN;
                     if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) loadedScore = 0;
                     registry.set('currentScore', loadedScore);
 
@@ -152,7 +152,7 @@ function initializeGameData(registry, cache, forceNew = false) {
                     try {
                         let highScoreVal = null;
                         try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
-                        let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
+                        let loadedScore = (highScoreVal !== null && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object') ? Number(highScoreVal) : NaN;
                         if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
                             loadedScore = 0;
                         }
@@ -286,12 +286,12 @@ class MusicScene extends Phaser.Scene {
     const getSafeVol = (key) => {
       let val = null;
       try { val = localStorage.getItem(key); } catch (e) { console.warn('localStorage error', e); }
-      let parsed = parseFloat(val);
-      if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+      let parsed = (val !== null && String(val).trim() !== '' && typeof val !== 'object') ? Number(val) : NaN;
+      if (isNaN(parsed) || !isFinite(parsed) || parsed < 0 || parsed > 1) {
           let backupVal = null;
           try { backupVal = localStorage.getItem(key + '_backup'); } catch (e) { console.warn('localStorage error', e); }
-          parsed = parseFloat(backupVal);
-          if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+          parsed = (backupVal !== null && String(backupVal).trim() !== '' && typeof backupVal !== 'object') ? Number(backupVal) : NaN;
+          if (isNaN(parsed) || !isFinite(parsed) || parsed < 0 || parsed > 1) {
               return 0.5;
           }
       }
@@ -992,7 +992,7 @@ class MainMenu extends Phaser.Scene {
       try {
           let highScoreVal = null;
           try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
-          let loadedScore = highScoreVal !== null && highScoreVal !== '' ? Number(highScoreVal) : NaN;
+          let loadedScore = (highScoreVal !== null && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object') ? Number(highScoreVal) : NaN;
           if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
               loadedScore = 0;
           }
@@ -1096,12 +1096,12 @@ class MainMenu extends Phaser.Scene {
     const getSafeVol = (key) => {
       let val = null;
       try { val = localStorage.getItem(key); } catch (e) { console.warn('localStorage error', e); }
-      let parsed = parseFloat(val);
-      if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+      let parsed = (val !== null && String(val).trim() !== '' && typeof val !== 'object') ? Number(val) : NaN;
+      if (isNaN(parsed) || !isFinite(parsed) || parsed < 0 || parsed > 1) {
           let backupVal = null;
           try { backupVal = localStorage.getItem(key + '_backup'); } catch (e) { console.warn('localStorage error', e); }
-          parsed = parseFloat(backupVal);
-          if (isNaN(parsed) || parsed < 0 || parsed > 1) {
+          parsed = (backupVal !== null && String(backupVal).trim() !== '' && typeof backupVal !== 'object') ? Number(backupVal) : NaN;
+          if (isNaN(parsed) || !isFinite(parsed) || parsed < 0 || parsed > 1) {
               return 0.5;
           }
       }
