@@ -123,3 +123,6 @@ Dynamically loaded external JSON files accessed via `cache.json.get('key')` (lik
 ## 2026-03-30 - Prevent DOM Exceptions from blocked localStorage
 **Learning:** Browser privacy settings or restrictive iframe contexts can forcefully deny access to the `localStorage` API. Directly accessing it (e.g., `localStorage.getItem('key')`) without wrapping it in a `try-catch` block will immediately throw an uncaught `DOMException: Access denied for this document`, fatally crashing the entire application script.
 **Action:** Always wrap `localStorage.getItem`, `localStorage.setItem`, and `localStorage.removeItem` operations in robust `try-catch` blocks and implement safe fallback defaults (e.g., in-memory state or safe numbers) to ensure the game functions seamlessly even when storage persistence is disabled.
+## 2024-04-02 - Strict localStorage Parsing
+
+Replaced `Number()` and `parseFloat()` in `apps/HeIsRisen/main.js` and `apps/HeIsRisen/m/main.js` with a strict type-checking parsing pattern: `(val !== null && String(val).trim() !== '' && typeof val !== 'object') ? Number(val) : NaN`. This ensures arrays and whitespaces do not bypass the `isNaN` checks and cause data corruption.
