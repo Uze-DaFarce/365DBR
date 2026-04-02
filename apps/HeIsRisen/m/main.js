@@ -3809,7 +3809,15 @@ window.addEventListener('load', () => {
       e.preventDefault();
       e.stopPropagation();
 
-      const touches = Array.from(e.changedTouches).map(touch => {
+      // ⚡ Bolt Optimization: Pre-allocate array and use for loop to prevent closure allocations
+      // Hoist window.innerWidth outside the loop to prevent repeated layout reads
+      const changedTouchesLen = e.changedTouches.length;
+      const touches = new Array(changedTouchesLen);
+      const physicalWidth = window.innerWidth;
+
+      for (let i = 0; i < changedTouchesLen; i++) {
+        const touch = e.changedTouches[i];
+
         // Map portrait screen coordinates to rotated landscape canvas coordinates
         // Visual Rotation is: transform: rotate(90deg) translateY(-100%);
         // This means physical Top-Left (0,0) becomes Canvas Top-Right.
@@ -3818,12 +3826,11 @@ window.addEventListener('load', () => {
 
         const physicalX = touch.clientX;
         const physicalY = touch.clientY;
-        const physicalWidth = window.innerWidth;
 
         const mappedX = physicalY;
         const mappedY = physicalWidth - physicalX;
 
-        return new Touch({
+        touches[i] = new Touch({
           identifier: touch.identifier,
           target: canvas,
           clientX: mappedX,
@@ -3833,7 +3840,7 @@ window.addEventListener('load', () => {
           pageX: mappedX,
           pageY: mappedY
         });
-      });
+      }
 
       const syntheticEvent = new TouchEvent(e.type, {
         cancelable: true,
