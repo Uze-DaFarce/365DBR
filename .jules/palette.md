@@ -358,3 +358,6 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-31 - Avoid Double Cursors with Custom Pointers
 **Learning:** HeIsRisen uses a custom `finger-cursor` sprite (`CursorScene`) which acts as the global mouse pointer for all users. Adding `button.input.cursor = 'pointer'` or `cursor: pointer` anywhere in the Phaser 3 logic or DOM causes the browser's default hand cursor to appear simultaneously, resulting in an unacceptable "double cursor" visual bug.
 **Action:** NEVER apply `input.cursor = 'pointer'` or `useHandCursor: true` to game objects or DOM elements in applications that implement a custom global cursor sprite.
+## 2024-04-18 - Juice Delay Pattern
+**Learning:** When using `addButtonInteraction` on buttons that trigger immediate overlays or scene changes (like Settings modals), the instant state change cuts off the haptic/audio juice and the visual scale squish.
+**Action:** When adding `addButtonInteraction` to transition triggers, wrap the callback action in a `scene.time.delayedCall(150, () => { ... })` to allow the interactive juice animation to fully play out before blocking the UI thread or changing scenes.
