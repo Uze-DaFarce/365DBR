@@ -21,31 +21,24 @@ class Confirmation extends Phaser.GameObjects.Container {
         this.scene = scene;
         this.onYes = onYes;
         this.onNo = onNo;
-        this.isDismissing = false;
-
-        announceToScreenReader('Confirmation: ' + text + ' Press Enter for Yes, Escape for No.');
 
         const overlay = this.scene.add.rectangle(0, 0, this.scene.cameras.main.width, this.scene.cameras.main.height, 0x000000, 0.7)
             .setOrigin(0)
             .setInteractive();
         this.add(overlay);
 
-        this.dialogBox = this.scene.add.container(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2);
-        this.add(this.dialogBox);
-
-        const panel = this.scene.add.rectangle(0, 0, 400, 200, 0x333333)
+        const panel = this.scene.add.rectangle(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2, 400, 200, 0x333333)
             .setStrokeStyle(4, 0xffffff);
-        this.dialogBox.add(panel);
+        this.add(panel);
 
-        const title = this.scene.add.text(0, -50, text, {
+        const title = this.scene.add.text(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2 - 50, text, {
             fontSize: '24px',
             fontFamily: 'Comic Sans MS',
-            fill: '#ffffff',
-            align: 'center'
+            fill: '#ffffff'
         }).setOrigin(0.5);
-        this.dialogBox.add(title);
+        this.add(title);
 
-        const yesBtnContainer = this.scene.add.container(-100, 50);
+        const yesBtnContainer = this.scene.add.container(this.scene.cameras.main.width / 2 - 100, this.scene.cameras.main.height / 2 + 50);
         const yesBg = this.scene.add.graphics();
         yesBg.fillStyle(0x00ff00, 1);
         yesBg.fillRoundedRect(-50, -25, 100, 50, 10);
@@ -62,13 +55,12 @@ class Confirmation extends Phaser.GameObjects.Container {
         yesBtnContainer.setInteractive();
         addButtonInteraction(this.scene, yesBtnContainer, 'menu-click');
         yesBtnContainer.on('pointerdown', () => {
-            if (this.isDismissing) return;
             if (this.onYes) this.onYes();
-            this.dismiss();
+            this.destroy();
         });
-        this.dialogBox.add(yesBtnContainer);
+        this.add(yesBtnContainer);
 
-        const noBtnContainer = this.scene.add.container(100, 50);
+        const noBtnContainer = this.scene.add.container(this.scene.cameras.main.width / 2 + 100, this.scene.cameras.main.height / 2 + 50);
         const noBg = this.scene.add.graphics();
         noBg.fillStyle(0xff0000, 1);
         noBg.fillRoundedRect(-50, -25, 100, 50, 10);
@@ -85,24 +77,21 @@ class Confirmation extends Phaser.GameObjects.Container {
         noBtnContainer.setInteractive();
         addButtonInteraction(this.scene, noBtnContainer, 'menu-click');
         noBtnContainer.on('pointerdown', () => {
-            if (this.isDismissing) return;
             if (this.onNo) this.onNo();
-            this.dismiss();
+            this.destroy();
         });
-        this.dialogBox.add(noBtnContainer);
+        this.add(noBtnContainer);
 
         this.escListener = (e) => {
             if (e.code === 'Escape') {
-                if (this.isDismissing) return;
                 if (this.onNo) this.onNo();
-                this.dismiss();
+                this.destroy();
             }
         };
         this.enterListener = (e) => {
             if (e.code === 'Enter') {
-                if (this.isDismissing) return;
                 if (this.onYes) this.onYes();
-                this.dismiss();
+                this.destroy();
             }
         };
         window.addEventListener('keydown', this.escListener);
@@ -112,31 +101,7 @@ class Confirmation extends Phaser.GameObjects.Container {
             window.removeEventListener('keydown', this.enterListener);
         });
 
-        this.dialogBox.setScale(0);
-        this.scene.tweens.add({
-            targets: this.dialogBox,
-            scaleX: 1,
-            scaleY: 1,
-            duration: 300,
-            ease: 'Back.out'
-        });
-
         this.scene.add.existing(this);
-    }
-
-    dismiss() {
-        if (this.isDismissing) return;
-        this.isDismissing = true;
-        this.scene.tweens.add({
-            targets: this.dialogBox,
-            scaleX: 0,
-            scaleY: 0,
-            duration: 200,
-            ease: 'Back.in',
-            onComplete: () => {
-                this.destroy();
-            }
-        });
     }
 }
 
