@@ -561,7 +561,9 @@ class UIScene extends Phaser.Scene {
             for (let i = children.length - 1; i >= 0; i--) {
                 const egg = children[i];
                 if (egg && egg.active && !egg.getData('collected')) {
-              const distSq = Phaser.Math.Distance.Squared(lensX, lensY, egg.x, egg.y);
+                    const dx = lensX - egg.x;
+                    const dy = lensY - egg.y;
+                    const distSq = dx * dx + dy * dy;
                     if (distSq < captureRadiusSq) {
                   egg.setData('animX', lensX);
                   egg.setData('animY', lensY);
@@ -2215,6 +2217,7 @@ class SectionHunt extends Phaser.Scene {
 
     // Bolt Optimization: Render Stamp for single-pass drawing
     this.renderStamp = this.make.image({ x: 0, y: 0, key: this.sectionName, add: false });
+    this.eggStamp = this.make.image({ x: 0, y: 0, key: 'egg-1', add: false });
 
     // Idle Hint Timer (90 seconds, with 60 second AFK check)
     this.lastInteractionTime = this.time.now;
@@ -2273,7 +2276,10 @@ class SectionHunt extends Phaser.Scene {
         if (egg && egg.active && !egg.getData('collected')) { // collected check might be redundant if we destroy, but safe
            // Bolt Optimization: Squared distance check using POINTER position (where the finger is)
            // Tapping the screen harvests the egg under the finger.
-           const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
+           // ⚡ Bolt Optimization: Inline math to avoid function call overhead
+           const dx = pointer.x - egg.x;
+           const dy = pointer.y - egg.y;
+           const distSq = dx * dx + dy * dy;
 
            // Increased capture radius logic for easier finding
            if (distSq < captureRadiusSq) {
@@ -2419,32 +2425,32 @@ class SectionHunt extends Phaser.Scene {
           }
 
           if (egg.visible && egg.alpha > 0) {
-             // Draw Egg using renderStamp
-             this.renderStamp.setTexture(egg.texture.key, egg.frame.name);
-             this.renderStamp.setAngle(egg.angle);
-             this.renderStamp.setFlipX(egg.flipX);
-             this.renderStamp.setFlipY(egg.flipY);
-             this.renderStamp.setOrigin(0.5, 0.5);
-             this.renderStamp.setScale(egg.scaleX * zoom, egg.scaleY * zoom);
+             // Draw Egg using eggStamp to avoid thrashing background texture
+             this.eggStamp.setTexture(egg.texture.key, egg.frame.name);
+             this.eggStamp.setAngle(egg.angle);
+             this.eggStamp.setFlipX(egg.flipX);
+             this.eggStamp.setFlipY(egg.flipY);
+             this.eggStamp.setOrigin(0.5, 0.5);
+             this.eggStamp.setScale(egg.scaleX * zoom, egg.scaleY * zoom);
 
              // Offset logic: since the background is drawn at (drawX, drawY),
              // the egg (which is at egg.x on the unscaled screen) must be drawn at drawX + (egg.x * zoom).
              const eggDrawX = drawX + (egg.x * zoom);
              const eggDrawY = drawY + (egg.y * zoom);
 
-             this.zoomedView.draw(this.renderStamp, eggDrawX, eggDrawY);
+             this.zoomedView.draw(this.eggStamp, eggDrawX, eggDrawY);
 
-             // Draw Symbol using renderStamp
+             // Draw Symbol using eggStamp
              if (egg.symbolSprite && egg.symbolSprite.active && egg.symbolSprite.visible) {
-                 this.renderStamp.setTexture(egg.symbolSprite.texture.key, egg.symbolSprite.frame.name);
-                 this.renderStamp.setAngle(egg.symbolSprite.angle);
-                 this.renderStamp.setFlipX(egg.symbolSprite.flipX);
-                 this.renderStamp.setFlipY(egg.symbolSprite.flipY);
-                 this.renderStamp.setScale(egg.symbolSprite.scaleX * zoom, egg.symbolSprite.scaleY * zoom);
+                 this.eggStamp.setTexture(egg.symbolSprite.texture.key, egg.symbolSprite.frame.name);
+                 this.eggStamp.setAngle(egg.symbolSprite.angle);
+                 this.eggStamp.setFlipX(egg.symbolSprite.flipX);
+                 this.eggStamp.setFlipY(egg.symbolSprite.flipY);
+                 this.eggStamp.setScale(egg.symbolSprite.scaleX * zoom, egg.symbolSprite.scaleY * zoom);
 
                  const symDrawX = drawX + (egg.symbolSprite.x * zoom);
                  const symDrawY = drawY + (egg.symbolSprite.y * zoom);
-                 this.zoomedView.draw(this.renderStamp, symDrawX, symDrawY);
+                 this.zoomedView.draw(this.eggStamp, symDrawX, symDrawY);
              }
           }
       }
