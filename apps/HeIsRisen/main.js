@@ -101,6 +101,16 @@ class Confirmation extends Phaser.GameObjects.Container {
         });
 
         this.scene.add.existing(this);
+
+        // 🎨 Palette: Add a juicy pop-in animation to the confirmation dialog
+        this.setScale(0);
+        this.scene.tweens.add({
+            targets: this,
+            scaleX: 1,
+            scaleY: 1,
+            duration: 300,
+            ease: 'Back.out'
+        });
     }
 }
 

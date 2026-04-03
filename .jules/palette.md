@@ -358,3 +358,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-03-31 - Avoid Double Cursors with Custom Pointers
 **Learning:** HeIsRisen uses a custom `finger-cursor` sprite (`CursorScene`) which acts as the global mouse pointer for all users. Adding `button.input.cursor = 'pointer'` or `cursor: pointer` anywhere in the Phaser 3 logic or DOM causes the browser's default hand cursor to appear simultaneously, resulting in an unacceptable "double cursor" visual bug.
 **Action:** NEVER apply `input.cursor = 'pointer'` or `useHandCursor: true` to game objects or DOM elements in applications that implement a custom global cursor sprite.
+
+## 2026-04-03 - Juicy Pop-In Animations for Modals
+**Learning:** Instantly rendering major pop-up menus, such as confirmation dialogs, interrupts the gameplay flow and feels less immersive and playful for kids. A quick scale tween creates a far more engaging and modern interaction.
+**Action:** Whenever rendering sudden UI components like `Confirmation` pop-ups, begin by setting scale to `0`, then trigger a 200-300ms tween utilizing `Back.out` or similar easing to naturally pop the element into view.
