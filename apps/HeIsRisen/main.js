@@ -569,32 +569,12 @@ class UIScene extends Phaser.Scene {
     gearContainer.baseScaleX = gearContainer.scaleX;
     gearContainer.baseScaleY = gearContainer.scaleY;
 
-    gearContainer.on('pointerover', () => this.tweens.add({
-        targets: gearContainer, scaleX: gearContainer.baseScaleX * 1.2, scaleY: gearContainer.baseScaleY * 1.2, duration: 100, ease: 'Sine.easeInOut'
-    }));
-
-    gearContainer.on('pointerout', () => this.tweens.add({
-        targets: gearContainer, scaleX: gearContainer.baseScaleX, scaleY: gearContainer.baseScaleY, duration: 100, ease: 'Sine.easeInOut'
-    }));
+    addButtonInteraction(this, gearContainer, 'menu-click');
 
     gearContainer.on('pointerdown', () => {
-        const musicScene = this.scene.get('MusicScene');
-        if (musicScene && musicScene.scene.isActive()) {
-            musicScene.playSFX('menu-click');
-        }
-
-        this.tweens.add({
-            targets: gearContainer,
-            scaleX: gearContainer.baseScaleX * 0.9,
-            scaleY: gearContainer.baseScaleY * 0.9,
-            duration: 50,
-            ease: 'Power1',
-            onComplete: () => {
-                this.time.delayedCall(50, () => {
-                    this.openSettings();
-                    gearContainer.setScale(gearContainer.baseScaleX, gearContainer.baseScaleY); // Reset scale for next time
-                });
-            }
+        this.time.delayedCall(150, () => {
+            this.openSettings();
+            gearContainer.setScale(gearContainer.baseScaleX, gearContainer.baseScaleY); // Reset scale for next time
         });
     });
 
