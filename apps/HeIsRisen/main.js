@@ -2200,7 +2200,10 @@ class SectionHunt extends Phaser.Scene {
             const egg = children[i];
             if (egg && egg.active) {
                 // Check if egg is under the mouse (center of lens)
-                const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
+                // ⚡ Bolt Optimization: Inline math to avoid function call overhead
+                const dx = pointer.x - egg.x;
+                const dy = pointer.y - egg.y;
+                const distSq = dx * dx + dy * dy;
                 if (distSq < captureRadiusSq) {
                      this.collectEgg(egg);
                      egg.destroy();
@@ -2301,11 +2304,15 @@ class SectionHunt extends Phaser.Scene {
 
     if (this.isUsingVideo && this.sectionVideo && this.sectionVideo.active) {
         // Swap texture to video frame
-        this.renderStamp.setTexture(this.sectionVideo.texture.key, this.sectionVideo.frame.name);
+        if (this.renderStamp.texture.key !== this.sectionVideo.texture.key || this.renderStamp.frame.name !== this.sectionVideo.frame.name) {
+            this.renderStamp.setTexture(this.sectionVideo.texture.key, this.sectionVideo.frame.name);
+        }
     } else {
         // Use static image texture
         const key = this.sectionImage ? this.sectionImage.texture.key : this.sectionName;
-        this.renderStamp.setTexture(key);
+        if (this.renderStamp.texture.key !== key) {
+            this.renderStamp.setTexture(key);
+        }
     }
 
     // Ensure stamp is scaled and positioned correctly relative to the "world"
