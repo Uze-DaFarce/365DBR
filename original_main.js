@@ -929,6 +929,7 @@ class MainMenu extends Phaser.Scene {
     });
 
     this.load.on('loaderror', (file) => {
+      // console.error(`MainMenu: Load error: Key='${file.key}', URL='${file.url}'`);
       if (file.key && file.key.endsWith('-fallback')) {
           const sectionName = file.key.replace('-fallback', '');
           // If the failing URL was a .jpg, queue a .png
@@ -2421,7 +2422,7 @@ class EggZamRoom extends Phaser.Scene {
     const startX = eggImage.x;
     const startY = eggImage.y;
     const targetY = startY - (100 * scale);
-    
+
     const halo = this.add.image(startX, targetY, 'halo').setDepth(2).setAlpha(0).setScale(0.5 * scale);
 
     const sparkles = this.add.particles(0, 0, 'sparkle', {
@@ -2497,12 +2498,12 @@ class EggZamRoom extends Phaser.Scene {
         scale: { start: 1 * scale, end: 8 * scale },
         alpha: { start: 0.9, end: 0 },
         lifespan: 3000,
-        frequency: 30, 
-        blendMode: 'NORMAL', 
+        frequency: 30,
+        blendMode: 'NORMAL',
         rotate: { min: -10, max: 10 },
         gravityY: -20 * scale,
     }).setDepth(4);
-    
+
     this.tweens.add({
         targets: [eggImage, symbolImage].filter(img => img),
         angle: { from: -15, to: 15 },
@@ -2527,7 +2528,7 @@ class EggZamRoom extends Phaser.Scene {
         }
     });
   }
-  
+
   playIncorrectAnimation(onCompleteCallback) {
       this.playVideo('eggzam-incorrect', onCompleteCallback);
   }
@@ -2547,13 +2548,13 @@ class EggZamRoom extends Phaser.Scene {
       if (this.ambientTimer) {
           this.ambientTimer.remove(false);
       }
-      
+
       const playAmbient = () => {
           if (this.currentVideo && this.currentVideo.active) {
              this.resetAmbientTimer();
              return;
           }
-          
+
           this.playVideo(this.registry.get('lastAmbient') === 1 ? 'eggzam-ambient-2' : 'eggzam-ambient-1', () => {
               this.registry.set('lastAmbient', this.registry.get('lastAmbient') === 1 ? 2 : 1);
               this.resetAmbientTimer();
@@ -2567,7 +2568,7 @@ class EggZamRoom extends Phaser.Scene {
       if (this.currentVideo) {
           this.currentVideo.destroy();
           this.currentVideo = null;
-          
+
           if (this.actionButtons && !this.explanationText?.active) {
               this.actionButtons.forEach(btn => btn.setVisible(true));
           }
@@ -2582,16 +2583,16 @@ class EggZamRoom extends Phaser.Scene {
 
           return;
       }
-      
+
       try {
           const width = this.scale.width;
           const height = this.scale.height;
           const coverScale = Math.max(width / 1280, height / 720);
-          
+
           this.currentVideo = this.add.video(width/2, height/2, videoKey)
               .setDepth(1)
               .setOrigin(0.5, 0.5);
-              
+
           this.currentVideo.setVolume(this.registry.get('sfxVolume') ?? 0.5);
 
           // Phaser videos sometimes don't scale correctly until they are actively playing and populated
@@ -2600,9 +2601,9 @@ class EggZamRoom extends Phaser.Scene {
                   this.currentVideo.setDisplaySize(1168 * coverScale, 784 * coverScale);
               }
           });
-              
+
           this.currentVideo.play();
-          
+
           if (this.actionButtons && !videoKey.includes('ambient')) {
               this.actionButtons.forEach(btn => btn.setVisible(false));
           }
@@ -2639,7 +2640,7 @@ class EggZamRoom extends Phaser.Scene {
         this.load.video('eggzam-ambient-2', 'assets/video/eggzam-ambient-2.mp4');
         this.load.start();
     }
-    
+
     if (!this.registry.has('lastAmbient')) {
         this.registry.set('lastAmbient', 1);
     }
@@ -2897,7 +2898,7 @@ class EggZamRoom extends Phaser.Scene {
         // We add an equal inset (e.g. 25px * uiScale) for top, left, and right
         const cornerInset = -10 * uiScale;
         const cornerY = -bgHeight/2 + cornerInset;
-        
+
         // Egg aligned to Top-Left corner
         // Origin of image is 0.5, so we shift it down and right by half its size
         const eggSizeW = 80 * uiScale;
@@ -2948,16 +2949,16 @@ class EggZamRoom extends Phaser.Scene {
                 onComplete: () => {
                     this.explanationText.destroy();
                     this.explanationText = null;
-                    
+
                     if (this.actionButtons) {
                         this.actionButtons.forEach(btn => btn.setVisible(true));
                     }
-                    
+
                     if (!isCorrect) {
                         this.currentEgg = null;
                     }
                     this.displayRandomEggInfo(offsetX, offsetY, uiScale);
-                    
+
                     window.removeEventListener('keydown', this.popupKeyHandler);
                 }
             });
@@ -3008,7 +3009,7 @@ class EggZamRoom extends Phaser.Scene {
     const btnScale = uiScale * 0.4;
     const centerBottomX = offsetX + (1280 * uiScale) / 2;
     const centerBottomY = offsetY + (720 * uiScale) - (100 * uiScale);
-    
+
     const buttonSpacing = 120 * uiScale;
 
     // Swap positions: Eggs-tra Stinky on the left, Egg-cellent on the right, and closer together
@@ -3016,13 +3017,13 @@ class EggZamRoom extends Phaser.Scene {
         .setScale(btnScale)
         .setDepth(90)
         .setInteractive();
-        
+
     stinkyBtn.on('pointerover', () => {
         // Check if animations exist, if not, fallback to frame setting manually.
         // It appears 'Symbol 10003' exists in JSON but the initial sprite creation might not have bound the default frame properly causing it to lock.
         stinkyBtn.setFrame('Symbol 10003');
     });
-    
+
     stinkyBtn.on('pointerout', () => {
         stinkyBtn.setFrame('Symbol 10000');
     });
@@ -3044,15 +3045,15 @@ class EggZamRoom extends Phaser.Scene {
         .setScale(btnScale)
         .setDepth(90)
         .setInteractive();
-        
+
     eggCellentBtn.on('pointerover', () => {
         eggCellentBtn.setFrame('Eggcellent0004');
     });
-    
+
     eggCellentBtn.on('pointerout', () => {
         eggCellentBtn.setFrame('Eggcellent0000');
     });
-    
+
     eggCellentBtn.on('pointerdown', () => {
         if (this.currentVideo && this.currentVideo.active && this.currentVideo.video.src.includes('ambient')) {
             this.stopCurrentVideo();
@@ -3063,7 +3064,7 @@ class EggZamRoom extends Phaser.Scene {
             showExplanation(this.currentEgg.symbolData.category === 'Christian', 'Egg-cellent');
         }
     });
-    
+
     addTooltip(this, eggCellentBtn, 'Categorize as Egg-cellent');
 
     // Make sure we store them in visual order left-to-right for consistency later if needed
@@ -3214,15 +3215,15 @@ class EggZamRoom extends Phaser.Scene {
 
     if (this.currentEgg) {
       const { eggId, symbolData } = this.currentEgg;
-      
+
       // Target coordinates inside the central egg chamber of the keyframe.
       // Based on visual inspection: Center-left.
       // Assuming original keyframe coords (1168x784), scaled down/up via coverScale.
-      const eggPosX = offsetX + (1280 * scale) * 0.44 + (34 * scale); 
+      const eggPosX = offsetX + (1280 * scale) * 0.44 + (34 * scale);
       const eggPosY = offsetY + (720 * scale) * 0.42 + (80 * scale);
       const symbolPosX = eggPosX;
       const symbolPosY = eggPosY;
-      
+
       // Make egg as large as possible to fit chamber
       const eggScaleTarget = (240 * scale) * 0.85;
       const eggHeightTarget = (300 * scale) * 0.85;

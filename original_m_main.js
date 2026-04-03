@@ -963,6 +963,7 @@ class MainMenu extends Phaser.Scene {
       }
     });
     this.load.on('loaderror', (file) => {
+      // console.error(`MainMenu: Load error: Key='${file.key}', URL='${file.url}'`);
       if (file.key && file.key.endsWith('-fallback')) {
           const sectionName = file.key.replace('-fallback', '');
           // If the failing URL was a .jpg, queue a .png
@@ -1258,7 +1259,7 @@ class MainMenu extends Phaser.Scene {
 
               // Kill any existing tweens to prevent conflicts
               this.tweens.killTweensOf(startBtnContainer);
-              
+
               // Unmute Video (Bolt Fix: 50% relative volume)
               if (this.introVideo) {
                   this.introVideo.setMute(false);
@@ -1352,7 +1353,7 @@ class MainMenu extends Phaser.Scene {
       this.events.once('shutdown', () => {
           window.removeEventListener('keydown', globalKeyHandler);
       });
-      
+
       // ROBUST AUTOPLAY STRATEGY for Video (Bolt Fix: Volume scaling)
       const musicVol = this.registry.get('musicVolume');
       introVideo.setVolume(musicVol * 0.5);
@@ -1363,7 +1364,7 @@ class MainMenu extends Phaser.Scene {
           }
       };
       this.registry.events.on('changedata', updateIntroVolume);
-      
+
       // Clean up on shutdown
       this.events.once('shutdown', () => {
           this.registry.events.off('changedata', updateIntroVolume);
@@ -3080,7 +3081,7 @@ class EggZamRoom extends Phaser.Scene {
         // We add an equal inset (e.g. 25px * assetScale) for top, left, and right
         const cornerInset = -10 * assetScale;
         const cornerY = -bgHeight/2 + cornerInset;
-        
+
         // Egg aligned to Top-Left corner
         // Origin of image is 0.5, so we shift it down and right by half its size
         const eggSizeW = 80 * assetScale;
