@@ -2209,7 +2209,10 @@ class SectionHunt extends Phaser.Scene {
             const egg = children[i];
             if (egg && egg.active) {
                 // Check if egg is under the mouse (center of lens)
-                const distSq = Phaser.Math.Distance.Squared(pointer.x, pointer.y, egg.x, egg.y);
+                // ⚡ Bolt Optimization: Inline math instead of Phaser.Math.Distance.Squared to avoid function call overhead
+                const dx = pointer.x - egg.x;
+                const dy = pointer.y - egg.y;
+                const distSq = dx * dx + dy * dy;
                 if (distSq < captureRadiusSq) {
                      this.collectEgg(egg);
                      egg.destroy();
