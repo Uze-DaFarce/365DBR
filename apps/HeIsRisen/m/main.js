@@ -150,11 +150,11 @@ function initializeGameData(registry, cache, forceNew = false) {
                     registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
                     registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
 
-                    let loadedCorrect = (savedState.correctCategorizations !== null && savedState.correctCategorizations !== undefined && String(savedState.correctCategorizations).trim() !== '' && typeof savedState.correctCategorizations !== 'object') ? Number(savedState.correctCategorizations) : NaN;
+                    let loadedCorrect = (savedState.correctCategorizations !== null && savedState.correctCategorizations !== undefined && String(savedState.correctCategorizations).trim() !== '' && typeof savedState.correctCategorizations !== 'object' && !Array.isArray(savedState.correctCategorizations)) ? Number(savedState.correctCategorizations) : NaN;
                     if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
                     registry.set('correctCategorizations', loadedCorrect);
 
-                    let loadedScore = (savedState.currentScore !== null && savedState.currentScore !== undefined && String(savedState.currentScore).trim() !== '' && typeof savedState.currentScore !== 'object') ? Number(savedState.currentScore) : NaN;
+                    let loadedScore = (savedState.currentScore !== null && savedState.currentScore !== undefined && String(savedState.currentScore).trim() !== '' && typeof savedState.currentScore !== 'object' && !Array.isArray(savedState.currentScore)) ? Number(savedState.currentScore) : NaN;
                     if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) loadedScore = 0;
                     registry.set('currentScore', loadedScore);
 
@@ -162,7 +162,7 @@ function initializeGameData(registry, cache, forceNew = false) {
                     try {
                         let highScoreVal = null;
                         try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
-                        let loadedScore = (highScoreVal !== null && highScoreVal !== undefined && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object') ? Number(highScoreVal) : NaN;
+                        let loadedScore = (highScoreVal !== null && highScoreVal !== undefined && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object' && !Array.isArray(highScoreVal)) ? Number(highScoreVal) : NaN;
                         if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
                             loadedScore = 0;
                         }
@@ -296,11 +296,11 @@ class MusicScene extends Phaser.Scene {
     const getSafeVol = (key) => {
       let val = null;
       try { val = localStorage.getItem(key); } catch (e) { console.warn('localStorage error', e); }
-      let parsed = (val !== null && val !== undefined && String(val).trim() !== '' && typeof val !== 'object') ? Number(val) : NaN;
+      let parsed = (val !== null && val !== undefined && String(val).trim() !== '' && typeof val !== 'object' && !Array.isArray(val)) ? Number(val) : NaN;
       if (isNaN(parsed) || parsed < 0 || parsed > 1) {
           let backupVal = null;
           try { backupVal = localStorage.getItem(key + '_backup'); } catch (e) { console.warn('localStorage error', e); }
-          parsed = (backupVal !== null && backupVal !== undefined && String(backupVal).trim() !== '' && typeof backupVal !== 'object') ? Number(backupVal) : NaN;
+          parsed = (backupVal !== null && backupVal !== undefined && String(backupVal).trim() !== '' && typeof backupVal !== 'object' && !Array.isArray(backupVal)) ? Number(backupVal) : NaN;
           if (isNaN(parsed) || parsed < 0 || parsed > 1) {
               return 0.5;
           }
@@ -995,7 +995,7 @@ class MainMenu extends Phaser.Scene {
       try {
           let highScoreVal = null;
           try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
-          let loadedScore = (highScoreVal !== null && highScoreVal !== undefined && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object') ? Number(highScoreVal) : NaN;
+          let loadedScore = (highScoreVal !== null && highScoreVal !== undefined && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object' && !Array.isArray(highScoreVal)) ? Number(highScoreVal) : NaN;
           if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
               loadedScore = 0;
           }
@@ -1099,11 +1099,11 @@ class MainMenu extends Phaser.Scene {
     const getSafeVol = (key) => {
       let val = null;
       try { val = localStorage.getItem(key); } catch (e) { console.warn('localStorage error', e); }
-      let parsed = (val !== null && val !== undefined && String(val).trim() !== '' && typeof val !== 'object') ? Number(val) : NaN;
+      let parsed = (val !== null && val !== undefined && String(val).trim() !== '' && typeof val !== 'object' && !Array.isArray(val)) ? Number(val) : NaN;
       if (isNaN(parsed) || parsed < 0 || parsed > 1) {
           let backupVal = null;
           try { backupVal = localStorage.getItem(key + '_backup'); } catch (e) { console.warn('localStorage error', e); }
-          parsed = (backupVal !== null && backupVal !== undefined && String(backupVal).trim() !== '' && typeof backupVal !== 'object') ? Number(backupVal) : NaN;
+          parsed = (backupVal !== null && backupVal !== undefined && String(backupVal).trim() !== '' && typeof backupVal !== 'object' && !Array.isArray(backupVal)) ? Number(backupVal) : NaN;
           if (isNaN(parsed) || parsed < 0 || parsed > 1) {
               return 0.5;
           }
