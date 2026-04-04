@@ -111,3 +111,7 @@
 ## 2026-03-27 - [Optimizing Phaser Update Loops Scaling Checks]
 **Learning:** Continuously polling for video metadata availability (like `introVideo.width > 0`) and recalculating `scale` properties (e.g. `setDisplaySize`) inside a Phaser 60fps `update()` loop creates a heavy, redundant performance bottleneck. In both desktop and mobile versions, these static calculations were running continuously despite the video size only needing to be calculated once it begins playing or when the window resizes.
 **Action:** Removed continuous scale checks from the `update()` loops in `MainMenu` and `SectionHunt` across both desktop and mobile. Instead, bound the scaling logic to one-time `introVideo.once('play')` and continuous `this.scale.on('resize')` event listeners.
+
+## 2026-04-04 - Inlining Math Functions in Hot Paths
+**Learning:** The method `Phaser.Math.Distance.Squared` introduces function call overhead. When used inside a hot path loop (like checking distances to multiple objects during a `pointerdown` event), this library call is less performant than inlined math.
+**Action:** Replace library distance calculations with inlined math (`const dx = x2 - x1; const dy = y2 - y1; const distSq = dx * dx + dy * dy;`) in hot loops to avoid function call overhead.
