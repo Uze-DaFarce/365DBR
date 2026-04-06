@@ -2347,7 +2347,10 @@ class SectionHunt extends Phaser.Scene {
          if (this.renderStamp.texture.key !== this.sectionImage.texture.key) {
              this.renderStamp.setTexture(this.sectionImage.texture.key);
          }
-         this.renderStamp.setFrame(this.sectionImage.frame.name);
+         // ⚡ Bolt Optimization: Wrap setFrame in a cache guard to prevent GPU stalls and texture thrashing
+         if (this.renderStamp.frame.name !== this.sectionImage.frame.name) {
+             this.renderStamp.setFrame(this.sectionImage.frame.name);
+         }
 
          const actualBgWidth = this.renderStamp.width;
          const actualBgHeight = this.renderStamp.height;
