@@ -70,7 +70,7 @@ def is_screen_blank(screenshot_bytes, tolerance_threshold=0.98):
         print(f"Error analyzing image: {e}")
         return True # Default to failing if we can't read the image
 
-def assert_not_blank_screen(page, error_msg="Screen is blank or solid colored"):
+def assert_not_blank_screen(page, error_msg="Screen is blank or solid colored", save_path=None):
     """
     Takes a screenshot and raises an AssertionError if the screen is mostly a single solid color.
     """
@@ -78,7 +78,10 @@ def assert_not_blank_screen(page, error_msg="Screen is blank or solid colored"):
     page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
 
     # Take screenshot in memory
-    screenshot_bytes = page.screenshot(type="jpeg")
+    if save_path:
+        screenshot_bytes = page.screenshot(path=save_path)
+    else:
+        screenshot_bytes = page.screenshot(type="jpeg")
 
     if is_screen_blank(screenshot_bytes):
         raise AssertionError(f"Visual Test Failed: {error_msg}")
