@@ -3095,6 +3095,9 @@ class EggZamRoom extends Phaser.Scene {
         const ctaText = foundEggs.length < TOTAL_EGGS
             ? "All collected eggs categorized!\nReturn to the map to find more."
             : "All eggs categorized!\nHappy Easter!";
+
+        announceToScreenReader(ctaText.replace('\n', ' '));
+
         this.noEggsText = this.add.text(offsetX + 420 * scale, offsetY + 220 * scale, ctaText, {
           fontSize: `${28 * scale}px`,
           fill: '#000',
@@ -3200,6 +3203,30 @@ class EggZamRoom extends Phaser.Scene {
           this.input.keyboard.once('keydown-ENTER', triggerRestart);
 
           summaryContainer.add([panelBg, titleText, scoreTextLabel, holyText, worldlyText, totalText, playBtnContainer]);
+
+          // 🎨 Palette: Add a juicy pop-in animation to the Final EggZam summary panel
+          // Since container origin is implicitly 0,0 and we want to pop from center, we adjust scale
+          const currentX = summaryContainer.x;
+          const currentY = summaryContainer.y;
+
+          summaryContainer.setScale(0);
+
+          // To scale from center visually, we offset position during tween and animate back to original
+          // (Because container scales from its top-left coordinates)
+          const centerXOffset = (480 * scale) / 2;
+          const centerYOffset = (240 * scale) / 2;
+
+          summaryContainer.setPosition(currentX + centerXOffset, currentY + centerYOffset);
+
+          this.tweens.add({
+              targets: summaryContainer,
+              scaleX: 1,
+              scaleY: 1,
+              x: currentX,
+              y: currentY,
+              duration: 500,
+              ease: 'Back.out'
+          });
         }
 
         return;

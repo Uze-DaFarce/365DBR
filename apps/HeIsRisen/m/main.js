@@ -3282,6 +3282,9 @@ class EggZamRoom extends Phaser.Scene {
         const ctaText = foundEggs.length < TOTAL_EGGS
             ? "All collected eggs categorized!\nReturn to the map to find more."
             : "All eggs categorized!\nHappy Easter!";
+
+        announceToScreenReader(ctaText.replace('\n', ' '));
+
         // Position it higher so it isn't blocked by the larger mobile machine
         const isDesktop = this.sys.game.device.os.desktop;
         const textY = isDesktop ? 0.25 * height : 0.15 * height;
@@ -3396,6 +3399,27 @@ class EggZamRoom extends Phaser.Scene {
           }
 
           summaryContainer.add([panelBg, titleText, scoreTextLabel, holyText, worldlyText, totalText, playBtnContainer]);
+
+          // 🎨 Palette: Add a juicy pop-in animation to the Final EggZam summary panel
+          const currentX = summaryContainer.x;
+          const currentY = summaryContainer.y;
+
+          summaryContainer.setScale(0);
+
+          const centerXOffset = panelWidth / 2;
+          const centerYOffset = panelHeight / 2;
+
+          summaryContainer.setPosition(currentX + centerXOffset, currentY + centerYOffset);
+
+          this.tweens.add({
+              targets: summaryContainer,
+              scaleX: 1,
+              scaleY: 1,
+              x: currentX,
+              y: currentY,
+              duration: 500,
+              ease: 'Back.out'
+          });
         }
         return;
       }
