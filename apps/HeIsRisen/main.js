@@ -2156,8 +2156,9 @@ class SectionHunt extends Phaser.Scene {
 
     // Render Stamp (reused for drawing video/bg/eggs into lens)
     // Key: if using video, we swap texture dynamically. If image, we set it here.
-    const key = this.isUsingVideo ? 'placeholder-bg' : (this.sectionImage ? this.sectionImage.texture.key : this.sectionName);
-    this.renderStamp = this.make.image({ x: 0, y: 0, key: key, add: false });
+    const thumbKey = `${this.sectionName}-thumb`;
+    const stampKey = (this.isUsingVideo && this.textures.exists(thumbKey)) ? thumbKey : (this.sectionImage ? this.sectionImage.texture.key : this.sectionName);
+    this.renderStamp = this.make.image({ x: 0, y: 0, key: stampKey, add: false });
 
     // Stamp for eggs
     this.eggStamp = this.make.image({ x: 0, y: 0, key: 'egg-1', add: false });
@@ -2291,15 +2292,16 @@ class SectionHunt extends Phaser.Scene {
     // Draw Background/Video into ZoomedView
     // We use the renderStamp to draw the scaled background/video frame
 
-    if (this.isUsingVideo && this.sectionVideo && this.sectionVideo.active) {
-        // Swap texture to video frame
+    if (this.isUsingVideo && this.sectionVideo && this.sectionVideo.active && this.sectionVideo.width > 0) {
+        // Swap texture to video frame once video is rendering
         // ⚡ Bolt Optimization: Wrap setTexture in a cache guard to prevent GPU stalls and texture thrashing
         if (this.renderStamp.texture.key !== this.sectionVideo.texture.key || this.renderStamp.frame.name !== this.sectionVideo.frame.name) {
             this.renderStamp.setTexture(this.sectionVideo.texture.key, this.sectionVideo.frame.name);
         }
     } else {
-        // Use static image texture
-        const key = this.sectionImage ? this.sectionImage.texture.key : this.sectionName;
+        // Use static image texture (or fallback thumb if video isn't ready)
+        const thumbKey = `${this.sectionName}-thumb`;
+        const key = (this.isUsingVideo && this.textures.exists(thumbKey)) ? thumbKey : (this.sectionImage ? this.sectionImage.texture.key : this.sectionName);
         // ⚡ Bolt Optimization: Wrap setTexture in a cache guard to prevent GPU stalls and texture thrashing
         if (this.renderStamp.texture.key !== key) {
             this.renderStamp.setTexture(key);
