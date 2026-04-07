@@ -115,7 +115,3 @@
 ## 2026-04-04 - Inlining Math Functions in Hot Paths
 **Learning:** The method `Phaser.Math.Distance.Squared` introduces function call overhead. When used inside a hot path loop (like checking distances to multiple objects during a `pointerdown` event), this library call is less performant than inlined math.
 **Action:** Replace library distance calculations with inlined math (`const dx = x2 - x1; const dy = y2 - y1; const distSq = dx * dx + dy * dy;`) in hot loops to avoid function call overhead.
-
-## 2026-04-06 - Preventing Texture Frame Thrashing
-**Learning:** While guarding `setTexture()` calls in Phaser's `update()` loops is common practice, calling `setFrame()` unconditionally on a stamp image every frame (e.g. to keep it in sync with a video background) still forces Phaser to recalculate internal texture coordinates and dirties the transform, causing GPU stalls. The `update()` loop runs at 60fps, but videos typically update at 30fps or less, meaning at least 50% of the frame updates are completely redundant and thrash the pipeline.
-**Action:** Always wrap `.setFrame()` (and `.setTexture(key, frame)`) calls inside a cache guard (`if (stamp.frame.name !== source.frame.name)`) to completely eliminate redundant texture coordinate recalculations.

@@ -366,7 +366,3 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-04-06 - Map Thumb Interaction Consistency
 **Learning:** Map thumbnail interactions were previously missing the standardized visual pop, haptic feedback, and audio present on other buttons. Furthermore, adding the standard `addButtonInteraction` correctly manages dynamic container `scaleX` / `scaleY` properties independently, but scene transitions triggered by the thumb click must be delayed by 150ms to ensure the pop animation and audio are not abruptly cut off by scene unloading.
 **Action:** Always prefer established global interaction handlers (like `addButtonInteraction`) over custom `pointerover/pointerout` logic. Ensure all buttons that trigger immediate scene transitions use `this.time.delayedCall(150, ...)` to allow the tactile interaction lifecycle to complete.
-
-## 2026-04-06 - Apply Juicy Tweens to Ad-Hoc Game Sprites
-**Learning:** Sometimes interactive sprites (like Categorization Buttons in HeIsRisen) only handle hover frames manually but miss out on the global `addButtonInteraction` haptic squeeze effect. Setting `baseScaleX` and `baseScaleY` prior to calling the helper seamlessly adds juice to previously rigid elements without overlapping audio if we pass `null`.
-**Action:** Always check newly discovered interactive sprites for the standard juice helpers, ensuring scale bases are set so standard tweens function properly.
