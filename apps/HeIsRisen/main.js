@@ -1434,32 +1434,12 @@ class MapScene extends Phaser.Scene {
       // Update mask initially if position is already set
       // (though for main.js it gets set in updateLayout immediately after)
 
-      thumb.on('pointerover', () => {
-          this.tweens.add({
-              targets: thumb,
-              scaleX: thumb.baseScale * 1.1,
-              scaleY: thumb.baseScale * 1.1,
-              duration: 100,
-              ease: 'Sine.easeInOut'
-          });
-      });
-
-      thumb.on('pointerout', () => {
-          this.tweens.add({
-              targets: thumb,
-              scaleX: thumb.baseScale,
-              scaleY: thumb.baseScale,
-              duration: 100,
-              ease: 'Sine.easeInOut'
-          });
-      });
+      addButtonInteraction(this, thumb, 'drive1');
 
       thumb.on('pointerdown', () => {
-        const musicScene = this.scene.get('MusicScene');
-        if (musicScene) {
-            musicScene.playSFX('drive1');
-        }
-        this.scene.start('SectionHunt', { sectionName: section.name });
+        this.time.delayedCall(150, () => {
+            this.scene.start('SectionHunt', { sectionName: section.name });
+        });
       });
 
       this.mapZones.push(thumb);
@@ -3028,6 +3008,10 @@ class EggZamRoom extends Phaser.Scene {
         .setDepth(90)
         .setInteractive();
         
+    stinkyBtn.baseScaleX = btnScale;
+    stinkyBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, stinkyBtn, null);
+
     stinkyBtn.on('pointerover', () => {
         // Check if animations exist, if not, fallback to frame setting manually.
         // It appears 'Symbol 10003' exists in JSON but the initial sprite creation might not have bound the default frame properly causing it to lock.
@@ -3056,6 +3040,10 @@ class EggZamRoom extends Phaser.Scene {
         .setDepth(90)
         .setInteractive();
         
+    eggCellentBtn.baseScaleX = btnScale;
+    eggCellentBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, eggCellentBtn, null);
+
     eggCellentBtn.on('pointerover', () => {
         eggCellentBtn.setFrame('Eggcellent0004');
     });

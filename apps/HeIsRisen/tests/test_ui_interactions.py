@@ -59,7 +59,39 @@ def run_ui_interaction_test(is_mobile=False):
             # Skip redundant baseline screenshot
             time.sleep(1) # Let the map settle
 
-            # 2. Open Settings Menu
+            # 2. Verify Map Thumb Juice (Hover/Down)
+            print("Verifying map thumb interaction juice...")
+            page.evaluate("""() => {
+                const scene = window.game.scene.getScene('MapScene');
+                if (scene && scene.mapZones && scene.mapZones.length > 0) {
+                    const thumb = scene.mapZones[0];
+                    thumb.emit('pointerover');
+                }
+            }""")
+            time.sleep(0.5)
+            screenshot_hover = os.path.join(verification_dir, f"01a_map_thumb_hover_{context_type}.png")
+            page.screenshot(path=screenshot_hover)
+            print(f"Captured map thumb hover screenshot: {screenshot_hover}")
+
+            page.evaluate("""() => {
+                const scene = window.game.scene.getScene('MapScene');
+                if (scene && scene.mapZones && scene.mapZones.length > 0) {
+                    const thumb = scene.mapZones[0];
+                    thumb.emit('pointerdown');
+                }
+            }""")
+            time.sleep(0.1) # Wait to capture 0.9x scale before 150ms scene transition delay
+            screenshot_press = os.path.join(verification_dir, f"01b_map_thumb_press_{context_type}.png")
+            page.screenshot(path=screenshot_press)
+            print(f"Captured map thumb press screenshot: {screenshot_press}")
+
+            # Return to MapScene after forced transition
+            time.sleep(1)
+            page.evaluate("() => window.game.scene.getScenes(true)[0].scene.start('MapScene')")
+            th.wait_for_active_scene(page, "MapScene")
+            time.sleep(1)
+
+            # 3. Open Settings Menu
             print("Opening settings menu...")
             page.evaluate("""
                 () => {
