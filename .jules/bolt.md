@@ -119,3 +119,7 @@
 ## 2026-04-06 - Preventing Texture Frame Thrashing
 **Learning:** While guarding `setTexture()` calls in Phaser's `update()` loops is common practice, calling `setFrame()` unconditionally on a stamp image every frame (e.g. to keep it in sync with a video background) still forces Phaser to recalculate internal texture coordinates and dirties the transform, causing GPU stalls. The `update()` loop runs at 60fps, but videos typically update at 30fps or less, meaning at least 50% of the frame updates are completely redundant and thrash the pipeline.
 **Action:** Always wrap `.setFrame()` (and `.setTexture(key, frame)`) calls inside a cache guard (`if (stamp.frame.name !== source.frame.name)`) to completely eliminate redundant texture coordinate recalculations.
+
+## 2026-04-07 - Retaining Video Scaling in Update Loop
+**Learning:** While static resize event listeners are generally preferred over continuous checks, removing the "robust video scaling check" from the `SectionHunt.update()` loop in HeIsRisen causes an immediate visual regression. Phaser video objects sometimes require these continuous dimension guards to maintain exact fit constraints during playback.
+**Action:** Do not remove the `this.isUsingVideo` scaling block from the `update()` loop in HeIsRisen's `SectionHunt` scene, as it is critical for rendering stability.
