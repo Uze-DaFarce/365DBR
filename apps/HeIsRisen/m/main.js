@@ -3197,6 +3197,10 @@ class EggZamRoom extends Phaser.Scene {
         .setDepth(90)
         .setInteractive();
 
+    stinkyBtn.baseScaleX = btnScale;
+    stinkyBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, stinkyBtn, null);
+
     stinkyBtn.on('pointerover', () => {
         stinkyBtn.setFrame('Symbol 10003');
     });
@@ -3220,6 +3224,10 @@ class EggZamRoom extends Phaser.Scene {
         .setScale(btnScale)
         .setDepth(90)
         .setInteractive();
+
+    eggCellentBtn.baseScaleX = btnScale;
+    eggCellentBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, eggCellentBtn, null);
 
     eggCellentBtn.on('pointerover', () => {
         eggCellentBtn.setFrame('Eggcellent0004');

@@ -3026,6 +3026,10 @@ class EggZamRoom extends Phaser.Scene {
         .setDepth(90)
         .setInteractive();
         
+    stinkyBtn.baseScaleX = btnScale;
+    stinkyBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, stinkyBtn, null);
+
     stinkyBtn.on('pointerover', () => {
         // Check if animations exist, if not, fallback to frame setting manually.
         // It appears 'Symbol 10003' exists in JSON but the initial sprite creation might not have bound the default frame properly causing it to lock.
@@ -3054,6 +3058,10 @@ class EggZamRoom extends Phaser.Scene {
         .setDepth(90)
         .setInteractive();
         
+    eggCellentBtn.baseScaleX = btnScale;
+    eggCellentBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, eggCellentBtn, null);
+
     eggCellentBtn.on('pointerover', () => {
         eggCellentBtn.setFrame('Eggcellent0004');
     });
