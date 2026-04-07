@@ -2220,7 +2220,9 @@ class SectionHunt extends Phaser.Scene {
       .setScrollFactor(0);
 
     // Bolt Optimization: Render Stamp for single-pass drawing
-    this.renderStamp = this.make.image({ x: 0, y: 0, key: this.sectionName, add: false });
+    const thumbKey = `${this.sectionName}-thumb`;
+    const stampKey = (this.isUsingVideo && this.textures.exists(thumbKey)) ? thumbKey : this.sectionName;
+    this.renderStamp = this.make.image({ x: 0, y: 0, key: stampKey, add: false });
 
     // Idle Hint Timer (90 seconds, with 60 second AFK check)
     this.lastInteractionTime = this.time.now;
@@ -2343,7 +2345,7 @@ class SectionHunt extends Phaser.Scene {
     let baseScaleX = 1;
     let baseScaleY = 1;
 
-    if (this.sectionImage && this.sectionImage.active) {
+    if (this.sectionImage && this.sectionImage.active && (!this.isUsingVideo || this.sectionImage.width > 0)) {
          if (this.renderStamp.texture.key !== this.sectionImage.texture.key) {
              this.renderStamp.setTexture(this.sectionImage.texture.key);
          }
@@ -2355,8 +2357,10 @@ class SectionHunt extends Phaser.Scene {
          baseScaleX = this.sectionImage.displayWidth / actualBgWidth;
          baseScaleY = this.sectionImage.displayHeight / actualBgHeight;
     } else {
-         if (this.renderStamp.texture.key !== this.sectionName) {
-             this.renderStamp.setTexture(this.sectionName);
+         const thumbKey = `${this.sectionName}-thumb`;
+         const fallbackKey = (this.isUsingVideo && this.textures.exists(thumbKey)) ? thumbKey : this.sectionName;
+         if (this.renderStamp.texture.key !== fallbackKey) {
+             this.renderStamp.setTexture(fallbackKey);
          }
          baseScaleX = this.bgScale || (this.game.config.width / this.renderStamp.width);
          baseScaleY = this.bgScale || (this.game.config.height / this.renderStamp.height);
