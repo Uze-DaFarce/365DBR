@@ -2223,6 +2223,8 @@ class SectionHunt extends Phaser.Scene {
     const thumbKey = `${this.sectionName}-thumb`;
     const stampKey = (this.isUsingVideo && this.textures.exists(thumbKey)) ? thumbKey : this.sectionName;
     this.renderStamp = this.make.image({ x: 0, y: 0, key: stampKey, add: false });
+    this.eggStamp = this.make.image({ x: 0, y: 0, key: 'egg-1', add: false });
+    this.symbolStamp = this.make.image({ x: 0, y: 0, key: 'egg-1', add: false });
 
     // Idle Hint Timer (90 seconds, with 60 second AFK check)
     this.lastInteractionTime = this.time.now;
@@ -2436,31 +2438,38 @@ class SectionHunt extends Phaser.Scene {
 
           if (egg.visible && egg.alpha > 0) {
              // Draw Egg using renderStamp
-             this.renderStamp.setTexture(egg.texture.key, egg.frame.name);
-             this.renderStamp.setAngle(egg.angle);
-             this.renderStamp.setFlipX(egg.flipX);
-             this.renderStamp.setFlipY(egg.flipY);
-             this.renderStamp.setOrigin(0.5, 0.5);
-             this.renderStamp.setScale(egg.scaleX * zoom, egg.scaleY * zoom);
+             // ⚡ Bolt Optimization: Wrap setTexture in cache guard
+             if (this.eggStamp.texture.key !== egg.texture.key || this.eggStamp.frame.name !== egg.frame.name) {
+                 this.eggStamp.setTexture(egg.texture.key, egg.frame.name);
+             }
+             this.eggStamp.setAngle(egg.angle);
+             this.eggStamp.setFlipX(egg.flipX);
+             this.eggStamp.setFlipY(egg.flipY);
+             this.eggStamp.setOrigin(0.5, 0.5);
+             this.eggStamp.setScale(egg.scaleX * zoom, egg.scaleY * zoom);
 
              // Offset logic: since the background is drawn at (drawX, drawY),
              // the egg (which is at egg.x on the unscaled screen) must be drawn at drawX + (egg.x * zoom).
              const eggDrawX = drawX + (egg.x * zoom);
              const eggDrawY = drawY + (egg.y * zoom);
 
-             this.zoomedView.draw(this.renderStamp, eggDrawX, eggDrawY);
+             this.zoomedView.draw(this.eggStamp, eggDrawX, eggDrawY);
 
              // Draw Symbol using renderStamp
              if (egg.symbolSprite && egg.symbolSprite.active && egg.symbolSprite.visible) {
-                 this.renderStamp.setTexture(egg.symbolSprite.texture.key, egg.symbolSprite.frame.name);
-                 this.renderStamp.setAngle(egg.symbolSprite.angle);
-                 this.renderStamp.setFlipX(egg.symbolSprite.flipX);
-                 this.renderStamp.setFlipY(egg.symbolSprite.flipY);
-                 this.renderStamp.setScale(egg.symbolSprite.scaleX * zoom, egg.symbolSprite.scaleY * zoom);
+                 // ⚡ Bolt Optimization: Wrap setTexture in cache guard
+                 if (this.symbolStamp.texture.key !== egg.symbolSprite.texture.key || this.symbolStamp.frame.name !== egg.symbolSprite.frame.name) {
+                     this.symbolStamp.setTexture(egg.symbolSprite.texture.key, egg.symbolSprite.frame.name);
+                 }
+                 this.symbolStamp.setAngle(egg.symbolSprite.angle);
+                 this.symbolStamp.setFlipX(egg.symbolSprite.flipX);
+                 this.symbolStamp.setFlipY(egg.symbolSprite.flipY);
+                 this.symbolStamp.setOrigin(0.5, 0.5);
+                 this.symbolStamp.setScale(egg.symbolSprite.scaleX * zoom, egg.symbolSprite.scaleY * zoom);
 
                  const symDrawX = drawX + (egg.symbolSprite.x * zoom);
                  const symDrawY = drawY + (egg.symbolSprite.y * zoom);
-                 this.zoomedView.draw(this.renderStamp, symDrawX, symDrawY);
+                 this.zoomedView.draw(this.symbolStamp, symDrawX, symDrawY);
              }
           }
       }

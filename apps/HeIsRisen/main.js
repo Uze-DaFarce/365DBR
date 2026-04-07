@@ -2162,6 +2162,7 @@ class SectionHunt extends Phaser.Scene {
 
     // Stamp for eggs
     this.eggStamp = this.make.image({ x: 0, y: 0, key: 'egg-1', add: false });
+    this.symbolStamp = this.make.image({ x: 0, y: 0, key: 'egg-1', add: false });
 
     // Idle Hint Timer
     this.lastInteractionTime = this.time.now;
@@ -2351,7 +2352,10 @@ class SectionHunt extends Phaser.Scene {
 
         if (alpha > 0) {
             // Draw egg into render texture
-            this.eggStamp.setTexture(egg.texture.key, egg.frame.name);
+            // ⚡ Bolt Optimization: Wrap setTexture in cache guard
+            if (this.eggStamp.texture.key !== egg.texture.key || this.eggStamp.frame.name !== egg.frame.name) {
+                this.eggStamp.setTexture(egg.texture.key, egg.frame.name);
+            }
             this.eggStamp.setAngle(egg.angle);
             this.eggStamp.setFlipX(egg.flipX);
             this.eggStamp.setFlipY(egg.flipY);
@@ -2367,11 +2371,19 @@ class SectionHunt extends Phaser.Scene {
             this.zoomedView.draw(this.eggStamp, eggDrawX, eggDrawY);
 
             if (egg.symbolSprite && egg.symbolSprite.active) {
-                this.eggStamp.setTexture(egg.symbolSprite.texture.key, egg.symbolSprite.frame.name);
-                this.eggStamp.setScale(egg.symbolSprite.scaleX * zoom, egg.symbolSprite.scaleY * zoom);
+                // ⚡ Bolt Optimization: Wrap setTexture in cache guard
+                if (this.symbolStamp.texture.key !== egg.symbolSprite.texture.key || this.symbolStamp.frame.name !== egg.symbolSprite.frame.name) {
+                    this.symbolStamp.setTexture(egg.symbolSprite.texture.key, egg.symbolSprite.frame.name);
+                }
+                this.symbolStamp.setAngle(egg.symbolSprite.angle);
+                this.symbolStamp.setFlipX(egg.symbolSprite.flipX);
+                this.symbolStamp.setFlipY(egg.symbolSprite.flipY);
+                this.symbolStamp.setOrigin(0.5, 0.5);
+                this.symbolStamp.setScale(egg.symbolSprite.scaleX * zoom, egg.symbolSprite.scaleY * zoom);
+
                 const symDrawX = (egg.symbolSprite.x - scrollX) * zoom;
                 const symDrawY = (egg.symbolSprite.y - scrollY) * zoom;
-                this.zoomedView.draw(this.eggStamp, symDrawX, symDrawY);
+                this.zoomedView.draw(this.symbolStamp, symDrawX, symDrawY);
             }
         }
       }
