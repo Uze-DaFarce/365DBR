@@ -1537,7 +1537,7 @@ class MapScene extends Phaser.Scene {
       addButtonInteraction(this, thumb, 'drive1');
 
       thumb.on('pointerdown', () => {
-        this.time.delayedCall(100, () => {
+        this.time.delayedCall(150, () => {
             this.scene.start('SectionHunt', { sectionName: section.name });
         });
       });
