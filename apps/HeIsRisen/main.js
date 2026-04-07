@@ -2314,12 +2314,18 @@ class SectionHunt extends Phaser.Scene {
 
     if (this.isUsingVideo && this.sectionVideo && this.sectionVideo.active && this.sectionVideo.width > 0) {
         // Swap texture to video frame once video is rendering
-        this.renderStamp.setTexture(this.sectionVideo.texture.key, this.sectionVideo.frame.name);
+        // ⚡ Bolt Optimization: Wrap setTexture in a cache guard to prevent GPU stalls and texture thrashing
+        if (this.renderStamp.texture.key !== this.sectionVideo.texture.key || this.renderStamp.frame.name !== this.sectionVideo.frame.name) {
+            this.renderStamp.setTexture(this.sectionVideo.texture.key, this.sectionVideo.frame.name);
+        }
     } else {
         // Use static image texture (or fallback thumb if video isn't ready)
         const thumbKey = `${this.sectionName}-thumb`;
         const key = (this.isUsingVideo && this.textures.exists(thumbKey)) ? thumbKey : (this.sectionImage ? this.sectionImage.texture.key : this.sectionName);
-        this.renderStamp.setTexture(key);
+        // ⚡ Bolt Optimization: Wrap setTexture in a cache guard to prevent GPU stalls and texture thrashing
+        if (this.renderStamp.texture.key !== key) {
+            this.renderStamp.setTexture(key);
+        }
     }
 
     // Ensure stamp is scaled and positioned correctly relative to the "world"
