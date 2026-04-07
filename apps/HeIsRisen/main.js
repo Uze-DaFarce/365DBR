@@ -2293,11 +2293,17 @@ class SectionHunt extends Phaser.Scene {
 
     if (this.isUsingVideo && this.sectionVideo && this.sectionVideo.active) {
         // Swap texture to video frame
-        this.renderStamp.setTexture(this.sectionVideo.texture.key, this.sectionVideo.frame.name);
+        // ⚡ Bolt Optimization: Wrap setTexture in a cache guard to prevent GPU stalls and texture thrashing
+        if (this.renderStamp.texture.key !== this.sectionVideo.texture.key || this.renderStamp.frame.name !== this.sectionVideo.frame.name) {
+            this.renderStamp.setTexture(this.sectionVideo.texture.key, this.sectionVideo.frame.name);
+        }
     } else {
         // Use static image texture
         const key = this.sectionImage ? this.sectionImage.texture.key : this.sectionName;
-        this.renderStamp.setTexture(key);
+        // ⚡ Bolt Optimization: Wrap setTexture in a cache guard to prevent GPU stalls and texture thrashing
+        if (this.renderStamp.texture.key !== key) {
+            this.renderStamp.setTexture(key);
+        }
     }
 
     // Ensure stamp is scaled and positioned correctly relative to the "world"
@@ -3000,6 +3006,10 @@ class EggZamRoom extends Phaser.Scene {
         .setDepth(90)
         .setInteractive();
         
+    stinkyBtn.baseScaleX = btnScale;
+    stinkyBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, stinkyBtn, null);
+
     stinkyBtn.on('pointerover', () => {
         // Check if animations exist, if not, fallback to frame setting manually.
         // It appears 'Symbol 10003' exists in JSON but the initial sprite creation might not have bound the default frame properly causing it to lock.
@@ -3028,6 +3038,10 @@ class EggZamRoom extends Phaser.Scene {
         .setDepth(90)
         .setInteractive();
         
+    eggCellentBtn.baseScaleX = btnScale;
+    eggCellentBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, eggCellentBtn, null);
+
     eggCellentBtn.on('pointerover', () => {
         eggCellentBtn.setFrame('Eggcellent0004');
     });

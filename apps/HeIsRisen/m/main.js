@@ -2347,7 +2347,10 @@ class SectionHunt extends Phaser.Scene {
          if (this.renderStamp.texture.key !== this.sectionImage.texture.key) {
              this.renderStamp.setTexture(this.sectionImage.texture.key);
          }
-         this.renderStamp.setFrame(this.sectionImage.frame.name);
+         // ⚡ Bolt Optimization: Wrap setFrame in a cache guard to prevent GPU stalls and texture thrashing
+         if (this.renderStamp.frame.name !== this.sectionImage.frame.name) {
+             this.renderStamp.setFrame(this.sectionImage.frame.name);
+         }
 
          const actualBgWidth = this.renderStamp.width;
          const actualBgHeight = this.renderStamp.height;
@@ -3194,6 +3197,10 @@ class EggZamRoom extends Phaser.Scene {
         .setDepth(90)
         .setInteractive();
 
+    stinkyBtn.baseScaleX = btnScale;
+    stinkyBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, stinkyBtn, null);
+
     stinkyBtn.on('pointerover', () => {
         stinkyBtn.setFrame('Symbol 10003');
     });
@@ -3217,6 +3224,10 @@ class EggZamRoom extends Phaser.Scene {
         .setScale(btnScale)
         .setDepth(90)
         .setInteractive();
+
+    eggCellentBtn.baseScaleX = btnScale;
+    eggCellentBtn.baseScaleY = btnScale;
+    addButtonInteraction(this, eggCellentBtn, null);
 
     eggCellentBtn.on('pointerover', () => {
         eggCellentBtn.setFrame('Eggcellent0004');
