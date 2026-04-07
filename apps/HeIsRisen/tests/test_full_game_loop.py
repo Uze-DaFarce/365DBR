@@ -126,10 +126,6 @@ def run_full_game_loop(is_mobile=False):
             # Step 6: Verify sorting mechanics
             print("6. Sorting collected egg...")
 
-            # Take a screenshot to prove the UI loaded correctly
-            os.makedirs(os.path.join(script_dir, "screenshots"), exist_ok=True)
-            page.screenshot(path=os.path.join(script_dir, f"screenshots/eggzam_room_{'mobile' if is_mobile else 'desktop'}.png"))
-
             # Read state of the room
             state = page.evaluate("""
                 () => {
@@ -221,8 +217,6 @@ def run_full_game_loop(is_mobile=False):
             print(f"Score after sorting: {score}")
             if score == 0 or score is None:
                  raise AssertionError("Sorting the egg did not increment the correctCategorizations registry score!")
-
-            page.screenshot(path=os.path.join(script_dir, f"screenshots/eggzam_room_sorted_{'mobile' if is_mobile else 'desktop'}.png"))
 
             print("SUCCESS: Full loop completed from Map -> Hunt -> Map -> Sort.")
             browser.close()
