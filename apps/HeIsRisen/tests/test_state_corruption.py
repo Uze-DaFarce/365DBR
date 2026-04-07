@@ -45,11 +45,13 @@ def run_state_corruption_test(is_mobile=False):
             page.evaluate("""
                 () => {
                     localStorage.setItem('highScore', '-Infinity'); // Edge case negative infinity
-                    localStorage.setItem('musicVolume', 'NaN'); // Not a number
+                    localStorage.setItem('musicVolume', '[]'); // Not a number
                     localStorage.setItem('musicVolume_backup', '0.8'); // Valid backup
                     localStorage.setItem('ambientVolume', '{}'); // Stringified object
                     localStorage.setItem('ambientVolume_backup', 'not_a_number'); // Invalid backup
-                    localStorage.setItem('sfxVolume', ' '); // Empty/whitespace string
+                    localStorage.setItem('sfxVolume', ' ');
+                    localStorage.setItem('eggData', '[]');
+                    localStorage.setItem('sections', '[]');
                     // No sfxVolume_backup set
 
                     // Tamper with the main game state
@@ -58,8 +60,8 @@ def run_state_corruption_test(is_mobile=False):
                         sections: { wrong: "type" },
                         foundEggs: "should be array",
                         stampedSections: 12345,
-                        correctCategorizations: "NaN",
-                        currentScore: "HACKED"
+                        correctCategorizations: [],
+                        currentScore: []
                     };
                     localStorage.setItem('heIsRisenGameState', JSON.stringify(corruptedState));
                 }
