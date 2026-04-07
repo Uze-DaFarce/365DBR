@@ -2365,6 +2365,9 @@ class SectionHunt extends Phaser.Scene {
          if (this.renderStamp.texture.key !== fallbackKey) {
              this.renderStamp.setTexture(fallbackKey);
          }
+         if (this.renderStamp.frame.name !== '__BASE') {
+             this.renderStamp.setFrame('__BASE');
+         }
          baseScaleX = this.bgScale || (this.game.config.width / this.renderStamp.width);
          baseScaleY = this.bgScale || (this.game.config.height / this.renderStamp.height);
     }

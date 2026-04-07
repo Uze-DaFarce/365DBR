@@ -2306,6 +2306,9 @@ class SectionHunt extends Phaser.Scene {
         if (this.renderStamp.texture.key !== key) {
             this.renderStamp.setTexture(key);
         }
+        if (this.renderStamp.frame.name !== '__BASE') {
+            this.renderStamp.setFrame('__BASE');
+        }
     }
 
     // Ensure stamp is scaled and positioned correctly relative to the "world"
