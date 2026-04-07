@@ -50,6 +50,7 @@ def run_full_game_loop(is_mobile=False):
             page.keyboard.press("Space")
             time.sleep(4)
             th.assert_not_blank_screen(page, "Main Menu failed to render")
+            page.screenshot(path=f"verification_screenshots/{'mobile' if is_mobile else 'desktop'}_1_main_menu.png")
             page.keyboard.press("Space")
 
             print("2. Waiting for Map Scene")
@@ -62,6 +63,8 @@ def run_full_game_loop(is_mobile=False):
             page.evaluate(f"() => window.game.scene.getScenes(true)[0].scene.start('SectionHunt', {{ sectionName: '{random_section}' }})")
 
             th.wait_for_active_scene(page, "SectionHunt")
+            time.sleep(2)
+            page.screenshot(path=f"verification_screenshots/{'mobile' if is_mobile else 'desktop'}_3_section_hunt.png")
             eggs = tce.get_eggs_for_section(page, random_section)
 
             if len(eggs) == 0:
@@ -122,6 +125,7 @@ def run_full_game_loop(is_mobile=False):
             th.assert_not_blank_screen(page, "EggZam Room failed to render")
 
             time.sleep(1)
+            page.screenshot(path=f"verification_screenshots/{'mobile' if is_mobile else 'desktop'}_4_eggzam_room.png")
 
             # Step 6: Verify sorting mechanics
             print("6. Sorting collected egg...")
