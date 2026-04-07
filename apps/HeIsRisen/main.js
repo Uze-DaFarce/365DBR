@@ -2156,7 +2156,7 @@ class SectionHunt extends Phaser.Scene {
 
     // Render Stamp (reused for drawing video/bg/eggs into lens)
     // Key: if using video, we swap texture dynamically. If image, we set it here.
-    const thumbKey = `${this.sectionName}-thumb`;
+    // thumbKey is already declared earlier in this method
     const stampKey = (this.isUsingVideo && this.textures.exists(thumbKey)) ? thumbKey : (this.sectionImage ? this.sectionImage.texture.key : this.sectionName);
     this.renderStamp = this.make.image({ x: 0, y: 0, key: stampKey, add: false });
 
