@@ -370,3 +370,7 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-04-06 - Apply Juicy Tweens to Ad-Hoc Game Sprites
 **Learning:** Sometimes interactive sprites (like Categorization Buttons in HeIsRisen) only handle hover frames manually but miss out on the global `addButtonInteraction` haptic squeeze effect. Setting `baseScaleX` and `baseScaleY` prior to calling the helper seamlessly adds juice to previously rigid elements without overlapping audio if we pass `null`.
 **Action:** Always check newly discovered interactive sprites for the standard juice helpers, ensuring scale bases are set so standard tweens function properly.
+
+## 2026-04-07 - Container Scale Tweens
+**Learning:** Phaser 3 `Container` objects lack an `origin` property (unlike standard sprites/images) and implicitly scale from their `(0,0)` local coordinates (top-left). Applying a direct `scale` tween to a container causes it to visually grow down and to the right, which feels unpolished for modals.
+**Action:** To create a "juicy" pop-in that scales from the visual center, either nest the content within a second container offset by `-width/2, -height/2`, OR dynamically offset the container's `x/y` position by half its dimensions and tween those coordinates back to their original position alongside the `scale` tween.
