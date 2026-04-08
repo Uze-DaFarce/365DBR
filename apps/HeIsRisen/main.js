@@ -103,9 +103,16 @@ class Confirmation extends Phaser.GameObjects.Container {
         this.scene.add.existing(this);
 
         // 🎨 Palette: Add a juicy pop-in animation to the confirmation dialog
+        // Scale from the visual center by offsetting position initially and tweening it back
+        const cx = this.scene.cameras.main.width / 2;
+        const cy = this.scene.cameras.main.height / 2;
+        this.setPosition(cx, cy);
         this.setScale(0);
+
         this.scene.tweens.add({
             targets: this,
+            x: 0,
+            y: 0,
             scaleX: 1,
             scaleY: 1,
             duration: 300,
