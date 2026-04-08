@@ -27,18 +27,23 @@ class Confirmation extends Phaser.GameObjects.Container {
             .setInteractive();
         this.add(overlay);
 
-        const panel = this.scene.add.rectangle(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2, 400, 200, 0x333333)
-            .setStrokeStyle(4, 0xffffff);
-        this.add(panel);
+        const cx = this.scene.cameras.main.width / 2;
+        const cy = this.scene.cameras.main.height / 2;
 
-        const title = this.scene.add.text(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2 - 50, text, {
+        const panelContainer = this.scene.add.container(cx, cy);
+
+        const panel = this.scene.add.rectangle(0, 0, 400, 200, 0x333333)
+            .setStrokeStyle(4, 0xffffff);
+        panelContainer.add(panel);
+
+        const title = this.scene.add.text(0, -50, text, {
             fontSize: '24px',
             fontFamily: 'Comic Sans MS',
             fill: '#ffffff'
         }).setOrigin(0.5);
-        this.add(title);
+        panelContainer.add(title);
 
-        const yesBtnContainer = this.scene.add.container(this.scene.cameras.main.width / 2 - 100, this.scene.cameras.main.height / 2 + 50);
+        const yesBtnContainer = this.scene.add.container(-100, 50);
         const yesBg = this.scene.add.graphics();
         yesBg.fillStyle(0x00ff00, 1);
         yesBg.fillRoundedRect(-50, -25, 100, 50, 10);
@@ -53,14 +58,19 @@ class Confirmation extends Phaser.GameObjects.Container {
         yesBtnContainer.add([yesBg, yesText]);
         yesBtnContainer.setSize(100, 50);
         yesBtnContainer.setInteractive();
+
+        yesBtnContainer.baseScaleX = 1;
+        yesBtnContainer.baseScaleY = 1;
         addButtonInteraction(this.scene, yesBtnContainer, 'menu-click');
         yesBtnContainer.on('pointerdown', () => {
-            if (this.onYes) this.onYes();
-            this.destroy();
+            this.scene.time.delayedCall(150, () => {
+                if (this.onYes) this.onYes();
+                this.destroy();
+            });
         });
-        this.add(yesBtnContainer);
+        panelContainer.add(yesBtnContainer);
 
-        const noBtnContainer = this.scene.add.container(this.scene.cameras.main.width / 2 + 100, this.scene.cameras.main.height / 2 + 50);
+        const noBtnContainer = this.scene.add.container(100, 50);
         const noBg = this.scene.add.graphics();
         noBg.fillStyle(0xff0000, 1);
         noBg.fillRoundedRect(-50, -25, 100, 50, 10);
@@ -75,12 +85,19 @@ class Confirmation extends Phaser.GameObjects.Container {
         noBtnContainer.add([noBg, noText]);
         noBtnContainer.setSize(100, 50);
         noBtnContainer.setInteractive();
+
+        noBtnContainer.baseScaleX = 1;
+        noBtnContainer.baseScaleY = 1;
         addButtonInteraction(this.scene, noBtnContainer, 'menu-click');
         noBtnContainer.on('pointerdown', () => {
-            if (this.onNo) this.onNo();
-            this.destroy();
+            this.scene.time.delayedCall(150, () => {
+                if (this.onNo) this.onNo();
+                this.destroy();
+            });
         });
-        this.add(noBtnContainer);
+        panelContainer.add(noBtnContainer);
+
+        this.add(panelContainer);
 
         this.escListener = (e) => {
             if (e.code === 'Escape') {
@@ -103,10 +120,10 @@ class Confirmation extends Phaser.GameObjects.Container {
 
         this.scene.add.existing(this);
 
-        // 🎨 Palette: Add a juicy pop-in animation to the confirmation dialog
-        this.setScale(0);
+        // 🎨 Palette: Add a juicy pop-in animation to the confirmation dialog panel
+        panelContainer.setScale(0);
         this.scene.tweens.add({
-            targets: this,
+            targets: panelContainer,
             scaleX: 1,
             scaleY: 1,
             duration: 300,
@@ -2366,6 +2383,7 @@ class SectionHunt extends Phaser.Scene {
          const fallbackKey = (this.isUsingVideo && this.textures.exists(thumbKey)) ? thumbKey : this.sectionName;
          if (this.renderStamp.texture.key !== fallbackKey) {
              this.renderStamp.setTexture(fallbackKey);
+             this.renderStamp.setFrame('__BASE');
          }
          baseScaleX = this.bgScale || (this.game.config.width / this.renderStamp.width);
          baseScaleY = this.bgScale || (this.game.config.height / this.renderStamp.height);
