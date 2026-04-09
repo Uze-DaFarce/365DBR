@@ -123,3 +123,7 @@
 ## 2026-04-07 - Retaining Video Scaling in Update Loop
 **Learning:** While static resize event listeners are generally preferred over continuous checks, removing the "robust video scaling check" from the `SectionHunt.update()` loop in HeIsRisen causes an immediate visual regression. Phaser video objects sometimes require these continuous dimension guards to maintain exact fit constraints during playback.
 **Action:** Do not remove the `this.isUsingVideo` scaling block from the `update()` loop in HeIsRisen's `SectionHunt` scene, as it is critical for rendering stability.
+
+## 2026-04-08 - Closure Allocations in Touch Handlers
+**Learning:** In mobile environments, high-frequency global event listeners like `touchmove` are heavily penalized by garbage collection when using methods that require closure allocations, such as `.map()` combined with `Array.from()`. The creation of new arrays and function scopes 60+ times a second causes significant micro-stuttering on underpowered devices.
+**Action:** Always pre-allocate plain arrays (`new Array(len)`) and use standard `for` loops in global `touchmove` or `pointermove` handlers, hoisting any invariant property lookups (like `window.innerWidth`) outside the loop to eliminate GC pressure.
