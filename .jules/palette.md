@@ -374,3 +374,9 @@ Whenever adding `addButtonInteraction` to a button that transitions or unloads t
 ## 2026-04-07 - Container Scale Tweens
 **Learning:** Phaser 3 `Container` objects lack an `origin` property (unlike standard sprites/images) and implicitly scale from their `(0,0)` local coordinates (top-left). Applying a direct `scale` tween to a container causes it to visually grow down and to the right, which feels unpolished for modals.
 **Action:** To create a "juicy" pop-in that scales from the visual center, either nest the content within a second container offset by `-width/2, -height/2`, OR dynamically offset the container's `x/y` position by half its dimensions and tween those coordinates back to their original position alongside the `scale` tween.
+
+## 2026-04-10 - Animate Modal Dismissals
+**Learning:**
+Instantly destroying modals (like `Confirmation`) using `this.destroy()` immediately upon button click feels abrupt and lacks "juice". Adding a quick shrink animation before destruction significantly improves the micro-UX.
+**Action:**
+When dismissing sudden UI components like pop-ups or confirmation dialogs, always apply a 150-200ms `scale: 0` tween using `Back.in` easing, and place the `this.destroy()` call inside the tween's `onComplete` handler. Ensure you use a boolean guard (`isDismissing`) on the button click handlers to prevent double-firing events during the animation duration.
