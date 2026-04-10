@@ -3054,6 +3054,9 @@ class EggZamRoom extends Phaser.Scene {
                     iframeOverlay.style.flexDirection = 'column';
                     iframeOverlay.style.alignItems = 'center';
                     iframeOverlay.style.justifyContent = 'center';
+                    // 🎨 Palette: Smooth UI toggle transition
+                    iframeOverlay.style.opacity = '0';
+                    iframeOverlay.style.transition = 'opacity 0.2s ease-out';
                     // Override the global cursor: none !important to show custom finger cursor
                     iframeOverlay.style.setProperty('cursor', "url('assets/cursor/pointer-finger-pointer.png'), auto", 'important');
 
@@ -3066,6 +3069,8 @@ class EggZamRoom extends Phaser.Scene {
                     iframe.style.backgroundColor = 'white';
 
                     const closeBtn = document.createElement('button');
+                    // 🎨 Palette: Added missing ARIA label to close button
+                    closeBtn.setAttribute('aria-label', 'Close Scripture Reference');
                     closeBtn.textContent = '\u2716';
                     closeBtn.style.position = 'absolute';
                     closeBtn.style.top = '10px';
@@ -3086,8 +3091,11 @@ class EggZamRoom extends Phaser.Scene {
                     closeBtn.style.justifyContent = 'center';
 
                     const closeIframe = () => {
-                        iframeOverlay.remove();
-                        window.removeEventListener('keydown', iframeKeyHandler);
+                        iframeOverlay.style.opacity = '0';
+                        setTimeout(() => {
+                            iframeOverlay.remove();
+                            window.removeEventListener('keydown', iframeKeyHandler);
+                        }, 200);
                     };
 
                     closeBtn.onclick = closeIframe;
@@ -3103,6 +3111,10 @@ class EggZamRoom extends Phaser.Scene {
                     iframeOverlay.appendChild(iframe);
                     const targetContainer = document.fullscreenElement || document.webkitFullscreenElement || document.body;
                     targetContainer.appendChild(iframeOverlay);
+
+                    requestAnimationFrame(() => {
+                        iframeOverlay.style.opacity = '1';
+                    });
                 }
             });
 
