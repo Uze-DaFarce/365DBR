@@ -162,46 +162,89 @@ function initializeGameData(registry, cache, forceNew = false) {
                     console.warn('Invalid saved game state in localStorage', e);
                 }
                 if (savedState && typeof savedState === 'object' && Array.isArray(savedState.eggData) && Array.isArray(savedState.sections)) {
-                    registry.set('eggData', savedState.eggData);
-                    registry.set('sections', savedState.sections);
+                    // Deep array validation
+                    const isEggDataValid = savedState.eggData.every(egg =>
+                        egg && typeof egg === 'object' &&
+                        typeof egg.eggId === 'number' &&
+                        typeof egg.section === 'string' &&
+                        typeof egg.x === 'number' &&
+                        typeof egg.y === 'number' &&
+                        typeof egg.collected === 'boolean' &&
+                        (egg.symbol === null || typeof egg.symbol === 'object')
+                    );
 
-                    registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
-                    registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
+                    const isSectionsValid = savedState.sections.every(sec =>
+                        sec && typeof sec === 'object' &&
+                        typeof sec.name === 'string' &&
+                        Array.isArray(sec.eggs)
+                    );
 
-                    let loadedCorrect = (savedState.correctCategorizations !== null && savedState.correctCategorizations !== undefined && String(savedState.correctCategorizations).trim() !== '' && typeof savedState.correctCategorizations !== 'object' && !Array.isArray(savedState.correctCategorizations)) ? Number(savedState.correctCategorizations) : NaN;
-                    if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
-                    registry.set('correctCategorizations', loadedCorrect);
+                    if (!isEggDataValid || !isSectionsValid) {
+                        console.warn('Deep array validation failed for saved state. Rejecting corruption.');
+                        savedState = null;
+                    }
 
-                    let loadedScore = (savedState.currentScore !== null && savedState.currentScore !== undefined && String(savedState.currentScore).trim() !== '' && typeof savedState.currentScore !== 'object' && !Array.isArray(savedState.currentScore)) ? Number(savedState.currentScore) : NaN;
-                    if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) loadedScore = 0;
-                    registry.set('currentScore', loadedScore);
-
-                    // Always ensure highScore is loaded/initialized correctly
-                    try {
-                        let highScoreVal = null;
-                        try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
-                        let loadedScore = (highScoreVal !== null && highScoreVal !== undefined && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object' && !Array.isArray(highScoreVal)) ? Number(highScoreVal) : NaN;
-                        if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
-                            loadedScore = 0;
+                    if (savedState) {
+                        let safeFoundEggs = [];
+                        if (Array.isArray(savedState.foundEggs)) {
+                            const isFoundEggsValid = savedState.foundEggs.every(egg =>
+                                egg && typeof egg === 'object' &&
+                                typeof egg.eggId === 'number' &&
+                                typeof egg.section === 'string' &&
+                                typeof egg.x === 'number' &&
+                                typeof egg.y === 'number' &&
+                                typeof egg.collected === 'boolean'
+                            );
+                            if (isFoundEggsValid) safeFoundEggs = savedState.foundEggs;
                         }
-                        registry.set('highScore', loadedScore);
-                    } catch (e) {
-                        registry.set('highScore', 0);
-                    }
 
-                    // We also need to restore symbols from cache just in case the scene needs them
-                    const symbolsData = cache.json.get('symbols');
-                    if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
-                        const validSymbols = symbolsData.symbols.filter(s => {
-                            return s && typeof s === 'object' &&
-                                   typeof s.filename === 'string' &&
-                                   !s.filename.includes('..') &&
-                                   /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
-                        });
-                        symbolsData.symbols = validSymbols;
-                        registry.set('symbols', symbolsData);
+                        let safeStampedSections = [];
+                        if (Array.isArray(savedState.stampedSections)) {
+                            const isStampedValid = savedState.stampedSections.every(stamp => typeof stamp === 'string');
+                            if (isStampedValid) safeStampedSections = savedState.stampedSections;
+                        }
+
+                        registry.set('eggData', savedState.eggData);
+                        registry.set('sections', savedState.sections);
+
+                        registry.set('foundEggs', safeFoundEggs);
+                        registry.set('stampedSections', safeStampedSections);
+
+                        let loadedCorrect = (savedState.correctCategorizations !== null && savedState.correctCategorizations !== undefined && String(savedState.correctCategorizations).trim() !== '' && typeof savedState.correctCategorizations !== 'object' && !Array.isArray(savedState.correctCategorizations)) ? Number(savedState.correctCategorizations) : NaN;
+                        if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
+                        registry.set('correctCategorizations', loadedCorrect);
+
+                        let loadedScore = (savedState.currentScore !== null && savedState.currentScore !== undefined && String(savedState.currentScore).trim() !== '' && typeof savedState.currentScore !== 'object' && !Array.isArray(savedState.currentScore)) ? Number(savedState.currentScore) : NaN;
+                        if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) loadedScore = 0;
+                        registry.set('currentScore', loadedScore);
+
+                        // Always ensure highScore is loaded/initialized correctly
+                        try {
+                            let highScoreVal = null;
+                            try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
+                            let loadedScore = (highScoreVal !== null && highScoreVal !== undefined && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object' && !Array.isArray(highScoreVal)) ? Number(highScoreVal) : NaN;
+                            if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
+                                loadedScore = 0;
+                            }
+                            registry.set('highScore', loadedScore);
+                        } catch (e) {
+                            registry.set('highScore', 0);
+                        }
+
+                        // We also need to restore symbols from cache just in case the scene needs them
+                        const symbolsData = cache.json.get('symbols');
+                        if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+                            const validSymbols = symbolsData.symbols.filter(s => {
+                                return s && typeof s === 'object' &&
+                                       typeof s.filename === 'string' &&
+                                       !s.filename.includes('..') &&
+                                       /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
+                            });
+                            symbolsData.symbols = validSymbols;
+                            registry.set('symbols', symbolsData);
+                        }
+                        return; // Successfully loaded from save
                     }
-                    return; // Successfully loaded from save
                 }
             }
         } catch (e) {
