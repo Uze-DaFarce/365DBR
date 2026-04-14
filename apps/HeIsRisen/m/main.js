@@ -163,7 +163,29 @@ function initializeGameData(registry, cache, forceNew = false) {
                     console.warn('Invalid saved game state in localStorage', e);
                 }
                 if (savedState && typeof savedState === 'object' && Array.isArray(savedState.eggData) && Array.isArray(savedState.sections)) {
-                    registry.set('eggData', savedState.eggData);
+                    // Deep validation for eggData
+                    const isValidEggData = savedState.eggData.every(item =>
+                        item && typeof item === 'object' &&
+                        typeof item.eggId === 'number' &&
+                        typeof item.x === 'number' &&
+                        typeof item.y === 'number'
+                    );
+
+                    // Deep validation for sections
+                    const isValidSections = savedState.sections.every(section =>
+                        section && typeof section === 'object' &&
+                        typeof section.name === 'string' &&
+                        Array.isArray(section.eggs) &&
+                        section.eggs.every(eggId => typeof eggId === 'number')
+                    );
+
+                    if (!isValidEggData || !isValidSections) {
+                        console.warn("Deep validation failed for savedState eggData or sections. Falling back to fresh state.");
+                        savedState = null;
+                    }
+
+                    if (savedState) {
+                        registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
 
                     registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
@@ -203,6 +225,7 @@ function initializeGameData(registry, cache, forceNew = false) {
                         registry.set('symbols', symbolsData);
                     }
                     return; // Successfully loaded from save
+                    }
                 }
             }
         } catch (e) {

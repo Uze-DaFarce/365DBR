@@ -56,10 +56,10 @@ def run_state_corruption_test(is_mobile=False):
 
                     // Tamper with the main game state
                     const corruptedState = {
-                        eggData: "not an array",
-                        sections: { wrong: "type" },
-                        foundEggs: "should be array",
-                        stampedSections: 12345,
+                        eggData: [{eggId: "NaN", x: "infinity", y: null, section: 123, collected: "yes"}],
+                        sections: [{name: 123, eggs: ["NaN"]}],
+                        foundEggs: [{id: "NaN"}],
+                        stampedSections: [{name: "invalid"}],
                         correctCategorizations: [],
                         currentScore: []
                     };
@@ -129,10 +129,14 @@ def run_state_corruption_test(is_mobile=False):
             egg_data = page.evaluate("() => window.game.scene.scenes[0].registry.get('eggData')")
             if not isinstance(egg_data, list):
                 raise AssertionError(f"eggData is not a list. Got {type(egg_data)}")
+            if len(egg_data) != 60:
+                raise AssertionError(f"eggData failed to reset to fresh state upon deep corruption. Expected 60 items, got {len(egg_data)}")
 
             sections = page.evaluate("() => window.game.scene.scenes[0].registry.get('sections')")
             if not isinstance(sections, list):
                 raise AssertionError(f"sections is not a list. Got {type(sections)}")
+            if len(sections) == 0:
+                 raise AssertionError(f"sections failed to reset properly upon deep corruption. Expected non-empty fallback. Got {len(sections)}")
 
             print("SUCCESS: State corruption was safely rejected and game defaulted to stable values (or valid backups).")
 
