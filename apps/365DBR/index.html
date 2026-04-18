@@ -583,6 +583,31 @@ const CopyButton = ({ text, reference, version, ...props }) => {
     );
 };
 
+  // Helper to resolve scroll targets, ensuring focal slot visibility on mobile
+  const calculateScrollTarget = (el) => {
+    let targetY = window.scrollY + el.getBoundingClientRect().top - 125;
+
+    // Mobile optimization: Align the focal slot (3rd slot) just above the footer
+    if (window.innerWidth < 1024) {
+      const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
+      if (focalSlot) {
+        const focalRect = focalSlot.getBoundingClientRect();
+        // Calculate the absolute bottom of the focal slot
+        const focalAbsoluteBottom = window.scrollY + focalRect.bottom;
+
+        // Find the footer element to get its exact height, fallback to estimated 60px
+        const footer = document.getElementById('footer');
+        const footerHeight = footer ? footer.offsetHeight : 60;
+
+        // Target scroll Y places the bottom of the focal slot just above the footer
+        // Added 10px of padding for visual breathing room
+        targetY = focalAbsoluteBottom - window.innerHeight + footerHeight + 10;
+      }
+    }
+    return targetY;
+  };
+
+
 const BookmarkButton = React.memo(({ onBookmark, ...props }) => {
     return (
         <button {...props} onClick={(e) => { e.stopPropagation(); onBookmark(); }} type="button" className="ml-1 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 print:hidden" aria-label="Bookmark verse" title="Bookmark verse">
@@ -609,9 +634,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
         const el = document.getElementById(`verse-${vid}`);
         if (el) {
-            const rect = el.getBoundingClientRect();
-            const absoluteTop = window.scrollY + rect.top;
-            const targetY = absoluteTop - 125;
+            const targetY = calculateScrollTarget(el);
             window.scrollTo({ top: targetY, behavior: 'smooth' });
         }
     };
@@ -1340,6 +1363,7 @@ const ScrollToTop = React.memo(() => {
 });
 
 const App = () => {
+
   // Helper to resolve initial state from URL -> LocalStorage -> Today
   const getInitialState = () => {
     // 1. Load Saved Session First (to get preferences & history)
@@ -1624,9 +1648,7 @@ const App = () => {
       if (!loading && targetScrollVerse && verseMap) {
           const el = document.getElementById(`verse-${targetScrollVerse}`);
           if (el) {
-              const rect = el.getBoundingClientRect();
-              const absoluteTop = window.scrollY + rect.top;
-              const targetY = absoluteTop - 125;
+              const targetY = calculateScrollTarget(el);
               window.scrollTo({ top: targetY, behavior: 'smooth' });
               setTargetScrollVerse(null);
           }
@@ -1938,9 +1960,7 @@ const App = () => {
     // Scroll to the LEADER vid container
     const el = document.getElementById(`verse-${leaderVid}`);
     if (el) {
-        const rect = el.getBoundingClientRect();
-        const absoluteTop = window.scrollY + rect.top;
-        const targetY = absoluteTop - 125;
+        const targetY = calculateScrollTarget(el);
         window.scrollTo({ top: targetY, behavior: 'smooth' });
     }
 
@@ -2103,10 +2123,7 @@ const App = () => {
 
         const el = document.getElementById(`verse-${nextVid}`);
         if (el) {
-            // Align with Reading Zone (approx 125px from top) to trigger IntersectionObserver correctly
-            const rect = el.getBoundingClientRect();
-            const absoluteTop = window.scrollY + rect.top;
-            const targetY = absoluteTop - 125;
+            const targetY = calculateScrollTarget(el);
             window.scrollTo({ top: targetY, behavior: 'smooth' });
         }
     }
@@ -2119,9 +2136,7 @@ const App = () => {
     if (targetVid) {
       const el = document.getElementById(`verse-${targetVid}`);
       if (el) {
-          const rect = el.getBoundingClientRect();
-          const absoluteTop = window.scrollY + rect.top;
-          const targetY = absoluteTop - 125;
+          const targetY = calculateScrollTarget(el);
           window.scrollTo({ top: targetY, behavior: 'smooth' });
       }
     }
