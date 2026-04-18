@@ -588,7 +588,7 @@ const CopyButton = ({ text, reference, version, ...props }) => {
     let targetY = window.scrollY + el.getBoundingClientRect().top - 125;
 
     // Mobile optimization: Align the focal slot (3rd slot) just above the footer
-    if (window.innerWidth < 1024) {
+    if (window.innerWidth < 1024 && window.innerHeight < 600) { // Target landscape mobile
       const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
       if (focalSlot) {
         const focalRect = focalSlot.getBoundingClientRect();
