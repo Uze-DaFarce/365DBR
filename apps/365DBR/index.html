@@ -583,29 +583,73 @@ const CopyButton = ({ text, reference, version, ...props }) => {
     );
 };
 
-  // Helper to resolve scroll targets, ensuring focal slot visibility on mobile
+
+// Helper to resolve scroll targets, ensuring focal slot visibility on mobile
   const calculateScrollTarget = (el) => {
+    // Default offset for desktop is 125px to accommodate larger headers and visual breathing room.
     let targetY = window.scrollY + el.getBoundingClientRect().top - 125;
 
-    // Mobile optimization: Align the focal slot (3rd slot) just above the footer
-    if (window.innerWidth < 1024 && window.innerHeight < 600) { // Target landscape mobile
-      const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
-      if (focalSlot) {
-        const focalRect = focalSlot.getBoundingClientRect();
-        // Calculate the absolute bottom of the focal slot
-        const focalAbsoluteBottom = window.scrollY + focalRect.bottom;
+    if (window.innerWidth < 1024) {
+      // Use a much tighter offset for mobile/landscape to align the verse right under the header
+      // This eliminates the "massive gap" between the header and Slot 1.
+      // We set this as our absolute minimum scroll target (highest on page we want to scroll to).
+      const minTargetY = window.scrollY + el.getBoundingClientRect().top - 60;
+      targetY = minTargetY;
 
-        // Find the footer element to get its exact height, fallback to estimated 60px
-        const footer = document.getElementById('footer');
-        const footerHeight = footer ? footer.offsetHeight : 60;
+      if (window.innerHeight < 600) {
+        const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
+        if (focalSlot) {
+           const focalRect = focalSlot.getBoundingClientRect();
+           const focalAbsoluteBottom = window.scrollY + focalRect.bottom;
+           const footer = document.getElementById('footer');
 
-        // Target scroll Y places the bottom of the focal slot just above the footer
-        // Added 10px of padding for visual breathing room
-        targetY = focalAbsoluteBottom - window.innerHeight + footerHeight + 10;
+           // Ensure we get the actual full height of the footer.
+           const footerHeight = footer ? footer.getBoundingClientRect().height : 60;
+
+           // alignBottomTarget pushes the scroll position down until the focal slot clears the footer.
+           const alignBottomTarget = focalAbsoluteBottom - window.innerHeight + footerHeight + 20;
+
+           // If the standard offset still leaves the focal verse cut off by the footer,
+           // we override it with the bottom-aligned target.
+           if (alignBottomTarget > targetY) {
+               targetY = alignBottomTarget;
+           }
+
+           // SECURITY BOUNDS CHECK:
+           // If the verse is incredibly long, aligning the bottom to the footer might push the top of the verse
+           // so high up that the beginning of the text is hidden under the sticky header.
+           // We must enforce that targetY never goes below `minTargetY`, which guarantees the top is visible.
+           // Wait, pushing scroll *down* means `targetY` increases.
+           // If `targetY` increases too much, the verse goes UP on the screen.
+           // Wait, `window.scrollTo({top: targetY})`
+           // If targetY = 100, we scroll down 100px.
+           // If we push targetY down to 500, we scroll down 500px, which pushes the element HIGHER up the screen.
+           // So if `targetY > minTargetY`, it means we are pushing it higher up the screen to reveal the bottom.
+           // Wait, we need to enforce that the top of the *focal verse* does not go under the header!
+           // The header is at the top of the screen. We want `window.scrollY + focalRect.top` to be >= `window.scrollY + headerHeight`.
+           // But actually, the top of the *entire verse block* is what matters.
+           // `minTargetY` is the position where the top of the *entire verse block* is exactly 60px below the top of the screen.
+           // Wait. If targetY > minTargetY, then when we scroll to targetY, the top of the verse block is HIGHER than 60px from the top.
+           // If targetY > minTargetY, the top of the verse block is `window.scrollY + el.getBoundingClientRect().top - targetY`.
+           // So if targetY = minTargetY, the top of the block is 60px from the screen top.
+           // If targetY = minTargetY + 50, the top of the block is 10px from the screen top.
+           // If targetY = minTargetY + 60, the top of the block is at the top of the screen (0px).
+           // If targetY > minTargetY + 60, the top of the block is UNDER the sticky header.
+           // To protect the focal verse: The absolute top of the FOCAL VERSE is `focalAbsoluteTop = window.scrollY + focalRect.top`.
+           // We want to ensure that `focalAbsoluteTop - targetY` is >= 60 (or whatever header height is).
+           // So `targetY` must be <= `focalAbsoluteTop - 60`.
+           // Let's add this bounds check:
+           const focalAbsoluteTop = window.scrollY + focalRect.top;
+           const maxAllowedTargetY = focalAbsoluteTop - 60;
+
+           // Ensure we don't push it so far down that the focal verse's top is cut off.
+           targetY = Math.min(targetY, maxAllowedTargetY);
+        }
       }
     }
     return targetY;
   };
+
 
 
 const BookmarkButton = React.memo(({ onBookmark, ...props }) => {
