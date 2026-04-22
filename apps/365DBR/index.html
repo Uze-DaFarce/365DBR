@@ -611,7 +611,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
         if (el) {
             const rect = el.getBoundingClientRect();
             const absoluteTop = window.scrollY + rect.top;
-            const targetY = absoluteTop - 125;
+            const targetY = absoluteTop - 60;
             window.scrollTo({ top: targetY, behavior: 'smooth' });
         }
     };
@@ -1626,7 +1626,7 @@ const App = () => {
           if (el) {
               const rect = el.getBoundingClientRect();
               const absoluteTop = window.scrollY + rect.top;
-              const targetY = absoluteTop - 125;
+              const targetY = absoluteTop - 60;
               window.scrollTo({ top: targetY, behavior: 'smooth' });
               setTargetScrollVerse(null);
           }
@@ -1940,7 +1940,7 @@ const App = () => {
     if (el) {
         const rect = el.getBoundingClientRect();
         const absoluteTop = window.scrollY + rect.top;
-        const targetY = absoluteTop - 125;
+        const targetY = absoluteTop - 60;
         window.scrollTo({ top: targetY, behavior: 'smooth' });
     }
 
@@ -2106,7 +2106,7 @@ const App = () => {
             // Align with Reading Zone (approx 125px from top) to trigger IntersectionObserver correctly
             const rect = el.getBoundingClientRect();
             const absoluteTop = window.scrollY + rect.top;
-            const targetY = absoluteTop - 125;
+            const targetY = absoluteTop - 60;
             window.scrollTo({ top: targetY, behavior: 'smooth' });
         }
     }
@@ -2121,7 +2121,7 @@ const App = () => {
       if (el) {
           const rect = el.getBoundingClientRect();
           const absoluteTop = window.scrollY + rect.top;
-          const targetY = absoluteTop - 125;
+          const targetY = absoluteTop - 60;
           window.scrollTo({ top: targetY, behavior: 'smooth' });
       }
     }

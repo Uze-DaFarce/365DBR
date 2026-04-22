@@ -273,7 +273,7 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
             } else {
                 const rect = el.getBoundingClientRect();
                 const absoluteTop = window.scrollY + rect.top;
-                targetY = absoluteTop - 125;
+                targetY = absoluteTop - 60;
             }
 
             window.dispatchEvent(new CustomEvent('scrolllock'));
@@ -758,6 +758,8 @@ function App() {
 
   // Track scroll lock across hook remounts
   const isScrollLockedRef = useRef(false);
+  const isNavigatingRef = useRef(false);
+  const navigationTimeoutRef = useRef(null);
   const scrollLockTimeoutRef = useRef(null);
 
   // Bookmarks State
@@ -1108,7 +1110,7 @@ function App() {
                       } else {
                           const rect = el.getBoundingClientRect();
                           const absoluteTop = window.scrollY + rect.top;
-                          targetY = absoluteTop - 125;
+                          targetY = absoluteTop - 60;
                       }
 
                       window.dispatchEvent(new CustomEvent('scrolllock'));
@@ -1261,7 +1263,7 @@ function App() {
     const observerMargin = isIframe ? '200px 0px -40% 0px' : '-15% 0px -70% 0px';
 
     const observer = new IntersectionObserver((entries) => {
-      if (isScrollLockedRef.current) return;
+      if (isScrollLockedRef.current || isNavigatingRef.current) return;
       // Check if we are at the absolute bottom of the page first to prevent bounce-back
       // Use scrollHeight and Math.ceil/floor tolerance for cross-browser sub-pixel accuracy
       if (Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
@@ -1297,6 +1299,7 @@ function App() {
         window.removeEventListener('verseclicked', handleVerseClickedEvent);
         window.removeEventListener('scrolllock', handleScrollLock);
         if (scrollLockTimeoutRef.current) clearTimeout(scrollLockTimeoutRef.current);
+        if (navigationTimeoutRef.current) clearTimeout(navigationTimeoutRef.current);
         observer.disconnect();
         window.removeEventListener('scroll', handleScroll);
     };
@@ -1324,7 +1327,7 @@ function App() {
       if (el) {
           const rect = el.getBoundingClientRect();
           const absoluteTop = window.scrollY + rect.top;
-          const targetY = absoluteTop - 125;
+          const targetY = absoluteTop - 60;
           window.scrollTo({ top: targetY, behavior: 'smooth' });
       }
   };
@@ -1367,28 +1370,38 @@ function App() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [selectedBook, selectedChapter, availableBooks]);
 
-  const navigateVerse = (direction) => {
+  const navigateVerse = useCallback((direction) => {
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       if (!sortedVids || sortedVids.length === 0) return;
+      
       let currentIndex = -1;
       if (activeVerseIdRef.current) currentIndex = sortedVids.indexOf(activeVerseIdRef.current);
       if (currentIndex === -1 && direction > 0) currentIndex = -1;
       else if (currentIndex === -1 && direction < 0) currentIndex = 0;
+      
       let nextIndex = currentIndex + direction;
+      
       if (nextIndex < 0) nextIndex = 0;
       if (nextIndex >= sortedVids.length) nextIndex = sortedVids.length - 1;
+      
       if (nextIndex !== currentIndex) {
           const nextVid = sortedVids[nextIndex];
           setActiveVerseId(nextVid);
+          
+          // Suspend IntersectionObserver during programmatic smooth scroll (approx 500ms-800ms)
+          isNavigatingRef.current = true;
+          if (navigationTimeoutRef.current) clearTimeout(navigationTimeoutRef.current);
+          navigationTimeoutRef.current = setTimeout(() => { isNavigatingRef.current = false; }, 800);
+          
           const el = document.getElementById(`verse-${nextVid}`);
           if (el) {
               const rect = el.getBoundingClientRect();
               const absoluteTop = window.scrollY + rect.top;
-              const targetY = absoluteTop - 125;
+              const targetY = absoluteTop - 60;
               window.scrollTo({ top: targetY, behavior: 'smooth' });
           }
       }
-  };
+  }, [sortedVids]);
 
   const handleToggle = () => {
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
@@ -1423,7 +1436,7 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sortedVids, playbackStatus, navigateChapter]);
+  }, [sortedVids, playbackStatus, navigateChapter, navigateVerse]);
 
   return (
     <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
