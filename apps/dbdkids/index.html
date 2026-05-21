@@ -5,128 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Day By Day Kids</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="images/handprint.svg" type="image/svg+xml">
-    <!-- Google Fonts for fun, kid-friendly typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Top Hero Section: Treehouse -->
-    <section id="hero" class="section hero-section">
-        <div class="background-image treehouse-bg"></div>
-        <div class="content-container">
-            <h1 class="bounce-in">Day by Day Kids</h1>
-            <div class="hero-characters">
-                <img src="images/treehouse_cutout.png" alt="Treehouse" class="hero-image float-anim">
+    <div id="app-container">
+
+        <!-- GLOBAL PERSISTENT HEADER (Shows on all pages except Page 1 if desired, but requirements say "all consecutive pages and link back to the Home page". I'll put it outside the pages and hide it on page 1, or just duplicate it on page 2 and up. Putting it inside page 2 for now, or global) -->
+        <a href="#" id="global-home-link" class="element" style="display: none;">
+            <div id="sign-day-by-day-kids">
+                <span style="color:#FFF000; -webkit-text-stroke: 1px #000; text-shadow: 2px 2px 0px #000;">Day</span>
+                <span style="color:#FFF000; -webkit-text-stroke: 1px #000; text-shadow: 2px 2px 0px #000;">by</span>
+                <span style="color:#FFF000; -webkit-text-stroke: 1px #000; text-shadow: 2px 2px 0px #000;">Day</span><br>
+                <span style="color:#FFF000; -webkit-text-stroke: 1px #000; text-shadow: 2px 2px 0px #000;">Kids</span>
+            </div>
+            <img src="images/handprint.svg" id="img-handprint" alt="Handprint">
+        </a>
+
+        <!-- PAGE 1 -->
+        <div id="page-1" class="page">
+
+            <!-- 1. Title -->
+            <div id="title-dbdk" class="element">
+                Day by<br>Day Kids
             </div>
 
-            <div class="call-to-action">
-                <a href="#clubhouse" class="btn primary-btn pulse">ENTER CLUBHOUSE</a>
+            <!-- 2. (Tx7) Link -->
+            <a href="#" id="link-tx7" class="element anim-rise">
+                (Tx7)
+            </a>
+
+            <!-- 3. ENTER CLUBHOUSE Button -->
+            <button id="btn-enter" class="element">
+                ENTER CLUBHOUSE
+            </button>
+
+            <!-- 4. Closed Bible -->
+            <img src="images/bible_closed.png" id="img-bible" class="element anim-breathe-bible" alt="Closed Bible">
+
+            <!-- 5. introducing Bekah text -->
+            <div id="txt-bekah-intro" class="element anim-breathe-intro">
+                introducing Bekah:<br>your new p.a.l.
             </div>
-            <p class="subtitle fade-in">introducing Bekah:<br>your new p.a.l.</p>
+
+            <!-- 6. Bekah (armor of God) -->
+            <img src="images/armor_of_god.png" id="img-bekah" class="element" alt="Bekah in Armor of God">
+
+            <!-- 7. footprints -->
+            <img src="images/footprints.png" id="img-footprints" class="element" alt="Footprints">
+
         </div>
-    </section>
 
-    <!-- P.A.L. Section -->
-    <section id="pal" class="section pal-section">
-        <div class="content-container flex-row">
-            <div class="text-content slide-in-left">
-                <h2>What is a P.A.L. anyway?</h2>
-                <p>A P.A.L. is your Playing And Learning buddy – Bekah has studied God’s word diligently; she even equips herself every day with the Armor of God! She set out on a quest to discover how to learn while having fun, and she discovered having fun learning.</p>
-                <div class="flex-buttons">
-                    <a href="#learn-more" class="btn secondary-btn hover-pop">Learn More</a>
+
+        <!-- PAGE 2 -->
+        <div id="page-2" class="page">
+
+            <!-- Top Left Navigation (Day by Day Kids sign with handprint) -->
+            <a href="#" id="nav-home-p2" class="element" onclick="goToPage(1)">
+                <div class="nav-bg-yellow"></div>
+                <img src="images/handprint.svg" class="nav-handprint-p2" alt="Handprint">
+                <div class="nav-text-p2">
+                    Day by<br>Day Kids
                 </div>
-            </div>
-            <div class="image-content slide-in-right">
-                <img src="images/armor_of_god.png" alt="Armor of God" class="wobble-hover">
-            </div>
-        </div>
-    </section>
+            </a>
 
-    <!-- Learn to Play Section -->
-    <section id="learn-play" class="section learn-play-section">
-        <div class="background-image wood-bg"></div>
-        <div class="content-container text-center">
-            <h2 class="rotate-in">Learn to Play<br>Play to Learn!</h2>
-            <div class="board-frame">
-                <p>We are hard at work building out this site and creating fun Bible based games, activities, and growing together as brothers and sisters in Christ. The Bible says there is one race, and that every human was created in God’s image.</p>
-                <h3 class="highlight-text wiggle">LOOK OUT!! You learned something already!</h3>
-            </div>
-            <div class="flex-buttons center">
-                <a href="#play-now" class="btn primary-btn zoom-hover">PLAY NOW!</a>
-                <a href="#learn-more-2" class="btn secondary-btn zoom-hover">Learn More</a>
-            </div>
-        </div>
-        <img src="images/footprints.png" alt="Footprints" class="decorative footprint left">
-        <img src="images/footprints.png" alt="Footprints" class="decorative footprint right">
-    </section>
+            <!-- Armor of God -->
+            <a href="#" id="link-bekah-p3" class="element">
+                <img src="images/armor_of_god.png" id="img-bekah-p2" alt="Bekah in Armor of God">
+            </a>
 
-    <!-- Club News Section (Computer Desk/Whiteboard) -->
-    <section id="club-news" class="section news-section">
-        <div class="content-container">
-            <div class="desk-container">
-                <img src="images/computer_desk.png" alt="Computer Desk" class="bg-layer">
-                <div class="screen-content">
-                    <h2 class="typewriter">Club News: 5.12.2025</h2>
-                    <p>Please pray for us and check back daily. We are trying to get fun scriptural content for kids up as fast as we can. Here are our current priorities:</p>
-                    <ul class="priority-list">
-                        <li>Reproduce this website externally required for Bible integration step below.</li>
-                        <li>Get the searchable / readable KJV Bible functional. Later drops will add original Hebrew OT and Greek NT to KJV. The more a child learns from the Bible the better. Think how they teach tellers to spot fake bills, they spend hours and hours using the real thing.</li>
-                        <li>Bekah’s video introduction</li>
-                        <li>Add a few quizzes and other games that can be done daily.</li>
-                        <li><strong>Start on:</strong> “Born free at great cost – Hunting for the meaning of July 4th with P.A.L.”</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
+            <!-- Clubhouse Bible Text -->
+            <a href="https://mt-sin.ai/365DBR/bible.html" target="_blank" id="txt-clubhouse-bible-p2" class="element">Clubhouse Bible</a>
 
-    <!-- Top Ten Section (Chalkboard) -->
-    <section id="top-ten" class="section top-ten-section">
-        <div class="content-container">
-            <div class="chalkboard-container">
-                <img src="images/chalkboard.png" alt="Chalkboard" class="bg-layer">
-                <div class="chalk-content">
-                    <h2 class="chalk-text">This Tuesday’s Top Ten<br>Terrific Thinking Things</h2>
-                    <h3 class="chalk-text yellow">Did you know the Bible reveals wondrous truths?</h3>
-                    <ul class="chalk-list">
-                        <li>How Did People Translate the Bible into English?</li>
-                        <li>Why is Genesis 1–11 Foundational for Everything?</li>
-                        <li>Why Do People Have Different Skin Shades?</li>
-                        <li>Devotion - Week One - God is Great! (Duh!?)</li>
-                        <li>Where is the Garden of Eden?</li>
-                    </ul>
+            <!-- Open Bible -->
+            <a href="https://mt-sin.ai/365DBR/bible.html" target="_blank" id="link-open-bible-p2" class="element">
+                <img src="images/bible_open.png" id="img-open-bible-p2" alt="Open Bible">
+            </a>
 
-                    <h3 class="chalk-text green">God's Word in Our World:</h3>
-                    <ul class="chalk-list">
-                        <li>Space Tastes like Raspberries?</li>
-                        <li>Two By Tuesday</li>
-                        <li>How Can I Be Sure I’m Going to Heaven?</li>
-                        <li>What Do You Do If You Find a Baby Bird?</li>
-                        <li>Hop to It</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="revere-images">
-                <img src="images/paul_revere.png" alt="Paul Revere" class="float-anim">
-                <img src="images/paul_revere_2.png" alt="Paul Revere 2" class="float-anim delay-1">
-            </div>
         </div>
-    </section>
+</div>
 
-    <!-- Footer / Bible Section -->
-    <section id="bible-section" class="section footer-section">
-        <div class="content-container text-center">
-            <div class="bible-toggle hover-pop">
-                <img src="images/bible_closed.png" alt="Closed Bible" class="bible-img closed">
-                <img src="images/bible_open.png" alt="Open Bible" class="bible-img open" style="display:none;">
-            </div>
-            <h2>KJV Bible</h2>
-            <p>Your Clubhouse Bible will be added soon!!<br>So you would always have one on your phone and computer.</p>
-            <div class="logo-footer">
-                <img src="images/he_is_risen.png" alt="He Is Risen" class="footer-logo pulse">
-            </div>
-        </div>
-    </section>
+    </div>
 
     <script src="script.js"></script>
 </body>

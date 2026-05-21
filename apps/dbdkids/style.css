@@ -1,506 +1,422 @@
-/* style.css - Day By Day Kids */
-
-:root {
-    --primary-color: #dc3c4d;   /* Red */
-    --secondary-color: #304254; /* Navy Blue */
-    --accent-color: #f8c000;    /* Yellow/Orange */
-    --light-yellow: #fff880;
-    --bg-light: #f5f5ef;
-    --bg-white: #ffffff;
-    --text-dark: #222222;
-    --text-light: #ffffff;
-
-    /* Fun Fonts */
-    --font-heading: 'Fredoka One', cursive, sans-serif;
-    --font-subheading: 'Comic Neue', cursive, sans-serif;
-    --font-body: 'Nunito', sans-serif;
-}
-
+/* Reset and Base */
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
-html {
-    scroll-behavior: smooth;
+@font-face {
+    font-family: 'Comic Sans MS';
+    src: url('fonts/ComicSansMS.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
 
-body {
-    font-family: var(--font-body);
-    color: var(--text-dark);
-    background-color: var(--bg-light);
-    line-height: 1.6;
-    overflow-x: hidden;
+@font-face {
+    font-family: 'Comic Sans MS';
+    src: url('fonts/ComicSansMSBold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
 }
 
-h1, h2, h3, h4 {
-    font-family: var(--font-heading);
-    margin-bottom: 1rem;
-}
-
-p {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-}
-
-.section {
-    position: relative;
+/* Ensure we load our downloaded font explicitly */
+/* Ensure we load our downloaded font explicitly */
+body, html {
     width: 100%;
-    min-height: 100vh;
-    padding: 4rem 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #2b2b2b;
+    font-family: "Comic Sans MS", cursive;
+}
+
+/* Main App Container */
+#app-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('images/treehouse_bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     overflow: hidden;
 }
 
-.content-container {
-    position: relative;
-    z-index: 10;
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
-}
-
-.text-center {
-    text-align: center;
-}
-
-/* Flex Layouts */
-.flex-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-}
-
-.flex-row > div {
-    flex: 1;
-    min-width: 300px;
-}
-
-.flex-buttons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.flex-buttons.center {
-    justify-content: center;
-}
-
-/* Buttons */
-.btn {
-    display: inline-block;
-    padding: 1rem 2rem;
-    font-family: var(--font-heading);
-    font-size: 1.2rem;
-    text-decoration: none;
-    border-radius: 50px;
-    border: 4px solid #fff;
-    box-shadow: 0 8px 0 rgba(0,0,0,0.2);
-    transition: all 0.2s ease;
-    cursor: pointer;
-    text-transform: uppercase;
-}
-
-.btn:active {
-    transform: translateY(8px);
-    box-shadow: 0 0 0 rgba(0,0,0,0.2);
-}
-
-.primary-btn {
-    background-color: var(--primary-color);
-    color: var(--text-light);
-}
-
-.secondary-btn {
-    background-color: var(--accent-color);
-    color: var(--text-dark);
-    border-color: var(--secondary-color);
-}
-
-/* Backgrounds */
-.background-image {
+/* Page Management */
+.page {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
-    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
 }
 
-.treehouse-bg {
-    background-image: url('images/treehouse_bg.jpg');
+.page.active {
+    opacity: 1;
+    pointer-events: auto;
 }
 
-.wood-bg {
-    background-image: url('images/wood_texture.jpg');
+/* Common Element Positioning */
+.element {
+    position: absolute;
+    transform-origin: top left;
+    flex-shrink: 0;
 }
 
-/* Section Specifics */
+/* Animations */
+@keyframes riseDown {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+    100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
 
-/* Hero Section */
-.hero-section {
-    color: var(--text-light);
+@keyframes breatheOutBible {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.05) rotate(0deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes breatheOutIntro {
+    0% { transform: scale(1) rotate(-8.7deg); }
+    50% { transform: scale(1.05) rotate(-8.7deg); }
+    100% { transform: scale(1) rotate(-8.7deg); }
+}
+
+.anim-rise {
+    animation: riseDown 1s ease-out both;
+}
+
+.anim-breathe-bible {
+    animation: breatheOutBible 4s infinite ease-in-out;
+}
+
+.anim-breathe-intro {
+    animation: breatheOutIntro 4s infinite ease-in-out;
+}
+
+/*
+  Specific Elements - Page 1
+*/
+
+/* 1. Title "Day by Day Kids" */
+#title-dbdk {
+    font-size: 128px;
+    font-weight: bold;
+    transform: rotate(-9.6deg);
+    line-height: 1.1;
     text-align: center;
+    white-space: nowrap;
+
+    left: 10px;
+    top: 30px;
+
+    color: transparent;
+    -webkit-text-stroke: 4px #FFF000;
+    text-shadow: 4px 4px 0px #FF0000;
 }
 
-.hero-section h1 {
-    font-size: 4rem;
-    color: var(--accent-color);
-    text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-    margin-bottom: 2rem;
-}
-
-.hero-characters {
-    margin: 2rem 0;
-}
-
-.hero-image {
-    max-width: 80%;
-    height: auto;
-    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
-}
-
-.hero-section .subtitle {
-    font-family: var(--font-subheading);
-    font-size: 1.8rem;
+/* 2. (Tx7) Link */
+#link-tx7 {
+    font-size: 75px;
     font-weight: bold;
-    margin-top: 2rem;
-    background: rgba(0,0,0,0.5);
-    display: inline-block;
-    padding: 1rem 2rem;
-    border-radius: 20px;
-    border: 3px dashed var(--accent-color);
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+
+    right: 15px;
+    top: 15px;
+    left: auto;
+
+    color: #8080FF;
+    -webkit-text-stroke: 0px;
+
+    text-shadow:
+        1px 1px 0px #FF0000,
+        2px 1px 0px #FF0000,
+        1px 2px 0px #FF0000,
+        2px 2px 0px #FF0000,
+        3px 2px 0px #FF0000,
+        2px 3px 0px #FF0000,
+        3px 3px 0px #FF0000;
 }
 
-/* PAL Section */
-.pal-section {
-    background-color: var(--bg-white);
-}
-
-.pal-section h2 {
-    font-size: 3rem;
-    color: var(--primary-color);
-}
-
-.pal-section p {
-    font-size: 1.3rem;
-}
-
-.pal-section img {
-    max-width: 100%;
-    height: auto;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
-}
-
-/* Learn to Play Section */
-.learn-play-section {
-    color: var(--text-light);
-}
-
-.learn-play-section h2 {
-    font-size: 3.5rem;
-    text-shadow: 2px 2px 0 var(--secondary-color);
-}
-
-.board-frame {
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--text-dark);
-    padding: 3rem;
-    border-radius: 20px;
-    border: 15px solid #8B4513; /* Wood color border */
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.5);
-    margin: 2rem auto;
-    max-width: 800px;
-    position: relative;
-}
-
-.board-frame p {
-    font-family: var(--font-subheading);
-    font-size: 1.4rem;
+/* 3. ENTER CLUBHOUSE Button */
+#btn-enter {
+    color: #FFF000;
+    font-size: 22px;
     font-weight: bold;
+    padding: 5px 15px;
+    left: 873.8px;
+    top: 415.4px;
+    transform: rotate(-4.2deg);
+
+    background-color: #0000FF;
+    border: 2px solid #FFF000;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
-.highlight-text {
-    color: var(--primary-color);
-    font-size: 1.8rem;
-    margin-top: 2rem;
+/* 4. Closed Bible */
+#img-bible {
+    width: 275.7px;
+    height: 299.3px;
+    left: 41.7px;
+    top: 404.7px;
+    cursor: pointer;
 }
 
-.footprint {
-    position: absolute;
-    width: 120px;
-    opacity: 0.3;
-    z-index: 2;
+/* 5. introducing Bekah: your new p.a.l.
+   Bekah Text needs to move left another 10px.
+   (was 1019.8px -> now 1009.8px)
+*/
+#txt-bekah-intro {
+    text-transform: uppercase;
+    color: #FFF000;
+    font-size: 32px;
+    font-weight: bold;
+    width: 350px;
+    left: 1009.8px; /* Moved left 10px */
+    top: 470.7px;
+    transform: rotate(-8.7deg);
+    text-align: center;
+    line-height: 1.2;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
 }
 
-.footprint.left {
-    bottom: 10%;
-    left: 5%;
-    transform: rotate(-30deg);
+/* 6. Bekah (armor of God) */
+#img-bekah {
+    width: 442px;
+    height: 249.8px;
+    left: 1038px;
+    top: 527.3px;
+    cursor: pointer;
 }
 
-.footprint.right {
-    top: 20%;
-    right: 5%;
-    transform: rotate(45deg);
+/* 7. footprints */
+#img-footprints {
+    width: 59px;
+    height: 191px;
+    left: 813px;
+    top: 602.5px;
+    transform: rotate(-22.5deg);
 }
 
-/* News Section */
-.news-section {
-    background-color: #87CEEB; /* Sky blue */
+/*
+  Specific Elements - Page 2
+*/
+
+/* Top Left Navigation */
+#nav-home {
+    left: 20px;
+    top: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transform: rotate(-5deg);
+    z-index: 10;
 }
 
-.desk-container {
-    position: relative;
-    max-width: 1000px;
-    margin: 0 auto;
+.nav-text {
+    font-size: 32px;
+    font-weight: bold;
+    color: transparent;
+    -webkit-text-stroke: 1.5px #FFF000;
+    text-shadow: 2px 2px 0px #FF0000;
+    line-height: 1;
+    text-align: center;
+    margin-right: 10px;
 }
 
-.desk-container .bg-layer {
-    width: 100%;
-    height: auto;
-    display: block;
+.nav-handprint {
+    width: 60px;
+    height: 60px;
 }
 
-.screen-content {
-    position: absolute;
-    top: 15%;
-    left: 10%;
-    width: 80%;
-    height: 50%;
-    background: #fff;
-    padding: 2rem;
-    overflow-y: auto;
-    border-radius: 5px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-    /* specific layout for monitor screen */
-}
-
-.screen-content h2 {
-    color: var(--secondary-color);
-    border-bottom: 2px dashed var(--primary-color);
-    padding-bottom: 0.5rem;
-}
-
-.priority-list {
-    margin-left: 2rem;
-    margin-top: 1rem;
-}
-
-.priority-list li {
-    margin-bottom: 0.5rem;
-    font-family: var(--font-subheading);
-}
-
-/* Top Ten Section */
-.top-ten-section {
-    background-color: var(--secondary-color);
-}
-
-.chalkboard-container {
-    position: relative;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.chalkboard-container .bg-layer {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.chalk-content {
-    position: absolute;
-    top: 12%;
-    left: 12%;
-    width: 76%;
-    height: 76%;
-    padding: 2rem;
-    overflow-y: auto;
-}
-
-.chalk-text {
-    font-family: 'Comic Neue', cursive;
-    color: #fff;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
-}
-
-.chalk-text.yellow { color: var(--light-yellow); }
-.chalk-text.green { color: #a8ffb2; margin-top: 1.5rem; }
-
-.chalk-list {
-    color: #fff;
-    font-family: 'Comic Neue', cursive;
-    font-size: 1.2rem;
-    margin-left: 2rem;
-    list-style-type: square;
-}
-
-.chalk-list li { margin-bottom: 0.5rem; }
-
-.revere-images {
+/* Wood Background Panel */
+#wood-panel {
+    width: 1100px;
+    height: 600px;
+    left: 133px;
+    top: 84px;
+    background-image: url('images/wood_texture.jpg');
+    background-size: cover;
+    border: 8px solid #5C4033;
+    border-radius: 20px;
+    box-shadow: 10px 10px 15px rgba(0,0,0,0.6);
     display: flex;
     justify-content: space-around;
-    margin-top: -5%;
+    align-items: center;
+}
+
+/* Open Bible Link */
+#link-open-bible {
+    text-decoration: none;
     position: relative;
-    z-index: 20;
-}
-
-.revere-images img {
-    width: 250px;
-    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
-}
-
-/* Footer Section */
-.footer-section {
-    background-color: var(--bg-white);
-    min-height: 60vh;
-}
-
-.bible-toggle {
-    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     cursor: pointer;
-    display: inline-block;
+    left: 150px;
+    top: 150px;
 }
 
-.bible-img {
-    max-width: 300px;
+#img-open-bible {
+    width: 400px;
     height: auto;
-    filter: drop-shadow(0 15px 20px rgba(0,0,0,0.2));
+    transition: transform 0.2s ease;
 }
 
-.footer-logo {
-    max-width: 400px;
-    margin-top: 3rem;
+#link-open-bible:hover #img-open-bible {
+    transform: scale(1.05);
 }
 
-/* --- ANIMATIONS ("The Juice") --- */
-
-.bounce-in {
-    animation: bounceIn 1s cubic-bezier(0.280, 0.840, 0.420, 1) forwards;
+#txt-clubhouse-bible {
+    font-size: 48px;
+    font-weight: bold;
+    color: #FFF000;
+    text-align: center;
+    margin-top: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    -webkit-text-stroke: 1px #000;
 }
 
-@keyframes bounceIn {
-    0% { transform: scale(0.1); opacity: 0; }
-    60% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); }
+/* Bekah Link to Page 3 */
+#link-bekah-p3 {
+    text-decoration: none;
+    position: relative;
+    cursor: pointer;
+    left: 650px;
+    top: 200px;
 }
 
-.float-anim {
-    animation: float 4s ease-in-out infinite;
+#img-bekah-p2 {
+    width: 300px;
+    height: auto;
+    transition: transform 0.2s ease;
 }
 
-.float-anim.delay-1 {
-    animation-delay: 2s;
+#link-bekah-p3:hover #img-bekah-p2 {
+    transform: scale(1.05) rotate(5deg);
 }
 
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-    100% { transform: translateY(0px); }
+/*
+  Specific Elements - Page 2
+*/
+
+#nav-home-p2 {
+    left: 0;
+    top: 0;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 10;
 }
 
-.pulse {
-    animation: pulse 2s infinite;
+/* Picture frame image filled with yellow background */
+.nav-bg-yellow {
+    position: absolute;
+    width: 328.6px;
+    height: 306.5px;
+    left: -28.4px;
+    top: -43.3px;
+    transform: rotate(-6.7deg);
+    background-color: #FFF000;
+    border: 5px solid #000;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+    background-image: url('images/chalkboard.png'); /* If we had a picture frame, fallback to chalkboard or just solid yellow */
+    background-blend-mode: overlay;
+    border-radius: 10px;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+/* Green Hand */
+.nav-handprint-p2 {
+    position: absolute;
+    width: 72.9px;
+    height: 75.2px;
+    left: 198.2px;
+    top: 20.9px;
+    transform: rotate(0deg);
+    z-index: 12;
 }
 
-.hover-pop:hover {
-    transform: scale(1.1) rotate(-3deg);
-    transition: all 0.3s ease;
+/* Day by Day Kids text */
+.nav-text-p2 {
+    position: absolute;
+    font-size: 30.9pt;
+    font-weight: bold;
+    width: 225.4px;
+    height: 105.8px;
+    left: 34.4px;
+    top: 77.6px;
+    transform: rotate(-7.1deg);
+    color: transparent;
+    -webkit-text-stroke: 1.5px #FFF000;
+    text-shadow: 2px 2px 0px #FF0000;
+    line-height: 1;
+    text-align: center;
+    z-index: 11;
 }
 
-.wobble-hover:hover {
-    animation: wobble 1s ease-in-out infinite;
+/* Armor of God */
+#link-bekah-p3 {
+    position: absolute;
+    width: 317.6px;
+    height: 315.8px;
+    left: 1016.6px;
+    top: 68.2px;
+    transform: rotate(0deg);
+    z-index: 5;
+    cursor: pointer;
 }
 
-@keyframes wobble {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
-    75% { transform: rotate(-3deg); }
+#img-bekah-p2 {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
-.rotate-in {
-    animation: rotateIn 1s ease-out forwards;
+/* Clubhouse Bible Text */
+#txt-clubhouse-bible-p2 {
+    text-decoration: none;
+    cursor: pointer;
+    position: absolute;
+    font-size: 96.2pt;
+    font-weight: bold;
+    width: 961.9px;
+    height: 153.3px;
+    left: 202px;
+    top: 341px;
+    transform: rotate(0deg);
+    color: #FFF000;
+    text-align: center;
+    -webkit-text-stroke: 2px #000;
+    text-shadow: 4px 4px 0px #FF0000;
+    z-index: 5;
+    line-height: 1;
 }
 
-@keyframes rotateIn {
-    0% { transform: rotate(-90deg) scale(0); opacity: 0; }
-    100% { transform: rotate(0) scale(1); opacity: 1; }
+/* Open Bible */
+#link-open-bible-p2 {
+    position: absolute;
+    width: 1368.1px;
+    height: 378.2px;
+    left: -9.1px;
+    top: 368.9px;
+    transform: rotate(0deg);
+    z-index: 6;
+    cursor: pointer;
 }
 
-.wiggle {
-    animation: wiggle 2s infinite;
-}
-
-@keyframes wiggle {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-
-.zoom-hover:hover {
-    transform: scale(1.15);
-}
-
-.typewriter {
-    overflow: hidden;
-    white-space: nowrap;
-    border-right: .15em solid var(--primary-color);
-    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
-}
-
-@keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
-}
-
-@keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: var(--primary-color); }
-}
-
-.slide-in-left {
-    animation: slideInLeft 1s ease-out forwards;
-}
-
-.slide-in-right {
-    animation: slideInRight 1s ease-out forwards;
-}
-
-@keyframes slideInLeft {
-    from { transform: translateX(-100px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideInRight {
-    from { transform: translateX(100px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .hero-section h1 { font-size: 2.5rem; }
-    .hero-image { max-width: 100%; }
-    .pal-section h2 { font-size: 2rem; }
-    .learn-play-section h2 { font-size: 2.5rem; }
-    .screen-content { top: 10%; left: 5%; width: 90%; height: 60%; }
-    .chalk-content { top: 8%; left: 8%; width: 84%; height: 84%; padding: 1rem; }
-    .chalk-text { font-size: 1.2rem; }
-    .chalk-list { font-size: 1rem; margin-left: 1rem; }
-    .revere-images img { width: 150px; }
+#img-open-bible-p2 {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
