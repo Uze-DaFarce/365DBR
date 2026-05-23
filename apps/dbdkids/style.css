@@ -221,6 +221,8 @@ body, html {
     text-decoration: none;
     cursor: pointer;
     z-index: 10;
+    transform: scale(0.5);
+    transform-origin: top left;
 }
 
 /* Picture frame image filled with yellow background */
@@ -234,7 +236,8 @@ body, html {
     background-color: #FFF000;
     border: 5px solid #000;
     box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
-    background-image: url('images/chalkboard.png'); /* If we had a picture frame, fallback to chalkboard or just solid yellow */
+    background-image: url('images/whiteboard_frame.png');
+    background-size: 100% 100%; /* If we had a picture frame, fallback to chalkboard or just solid yellow */
     background-blend-mode: overlay;
     border-radius: 10px;
 }
@@ -271,8 +274,8 @@ body, html {
 /* Armor of God */
 #link-bekah-p3 {
     position: absolute;
-    width: 317.6px;
-    height: 315.8px;
+    width: 476.4px;
+    height: 473.7px;
     left: 1016.6px;
     top: 68.2px;
     transform: rotate(0deg);
@@ -302,7 +305,7 @@ body, html {
     text-align: center;
     -webkit-text-stroke: 2px #000;
     text-shadow: 4px 4px 0px #FF0000;
-    z-index: 5;
+    z-index: 10;
     line-height: 1;
 }
 
@@ -322,4 +325,10 @@ body, html {
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+
+#page-2 {
+    background-image: url('images/wood_texture.jpg');
+    background-size: cover;
+    background-position: center;
 }
