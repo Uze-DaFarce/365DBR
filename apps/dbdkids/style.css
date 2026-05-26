@@ -221,8 +221,6 @@ body, html {
     text-decoration: none;
     cursor: pointer;
     z-index: 10;
-    transform: scale(0.5);
-    transform-origin: top left;
 }
 
 /* Picture frame image filled with yellow background */
@@ -237,9 +235,9 @@ body, html {
     border: 5px solid #000;
     box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
     background-image: url('images/whiteboard_frame.png');
-    background-size: 100% 100%; /* If we had a picture frame, fallback to chalkboard or just solid yellow */
     background-blend-mode: overlay;
     border-radius: 10px;
+    background-size: 100% 100%;
 }
 
 /* Green Hand */
