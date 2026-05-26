@@ -192,12 +192,18 @@ body, html {
 }
 
 /* 6. Bekah (armor of God) */
-#img-bekah {
+#link-bekah-p1 {
     width: 442px;
     height: 249.8px;
     left: 1038px;
     top: 527.3px;
     cursor: pointer;
+}
+
+#img-bekah {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 /* 7. footprints */
@@ -221,6 +227,8 @@ body, html {
     text-decoration: none;
     cursor: pointer;
     z-index: 10;
+    transform: scale(0.5);
+    transform-origin: top left;
 }
 
 /* Picture frame image filled with yellow background */
