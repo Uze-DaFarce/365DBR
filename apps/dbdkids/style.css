@@ -332,3 +332,9 @@ body, html {
     background-size: cover;
     background-position: center;
 }
+
+#page-2 {
+    background-image: url('images/wood_texture.jpg');
+    background-size: cover;
+    background-position: center;
+}
