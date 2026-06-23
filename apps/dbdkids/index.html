@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day By Day Kids</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+
+
+
+        <!-- PAGE 1 -->
+        <div id="page-1" class="page">
+
+            <!-- 1. Title -->
+            <div id="title-dbdk" class="element">
+                Day by<br>Day Kids
+            </div>
+
+            <!-- 2. (Tx7) Link -->
+            <a href="#" id="link-tx7" class="element anim-rise">
+                (Tx7)
+            </a>
+
+            <!-- 3. ENTER CLUBHOUSE Button -->
+            <button id="btn-enter" class="element">
+                ENTER CLUBHOUSE
+            </button>
+
+            <!-- 4. Closed Bible -->
+            <img src="images/bible_closed.png" id="img-bible" class="element anim-breathe-bible" alt="Closed Bible">
+
+            <!-- 5. introducing Bekah text -->
+            <div id="txt-bekah-intro" class="element anim-breathe-intro">
+                introducing Bekah:<br>your new p.a.l.
+            </div>
+
+            <!-- 6. Bekah (armor of God) -->
+            <a href="#" id="link-bekah-p1" class="element" onclick="goToPage(3)">
+                <img src="images/armor_of_god.png" id="img-bekah" alt="Bekah in Armor of God">
+            </a>
+
+            <!-- 7. footprints -->
+            <img src="images/footprints.png" id="img-footprints" class="element" alt="Footprints">
+
+        </div>
+
+
+        <!-- PAGE 2 -->
+        <div id="page-2" class="page">
+
+            <!-- Top Left Navigation (Day by Day Kids sign with handprint) -->
+            <a href="#" id="nav-home-p2" class="element" onclick="goToPage(1)">
+                <div class="nav-bg-yellow"></div>
+                <img src="images/handprint.svg" class="nav-handprint-p2" alt="Handprint">
+                <div class="nav-text-p2">
+                    Day by<br>Day Kids
+                </div>
+            </a>
+
+            <!-- Armor of God -->
+            <a href="#" id="link-bekah-p3" class="element" onclick="goToPage(3)">
+                <img src="images/armor_of_god.png" id="img-bekah-p2" alt="Bekah in Armor of God">
+            </a>
+
+            <!-- Clubhouse Bible Text -->
+            <a href="https://mt-sin.ai/365DBR/bible.html" target="_blank" id="txt-clubhouse-bible-p2" class="element">Clubhouse Bible</a>
+
+            <!-- Open Bible -->
+            <a href="https://mt-sin.ai/365DBR/bible.html" target="_blank" id="link-open-bible-p2" class="element">
+                <img src="images/bible_open.png" id="img-open-bible-p2" alt="Open Bible">
+            </a>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

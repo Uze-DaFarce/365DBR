@@ -1,0 +1,346 @@
+/* Reset and Base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@font-face {
+    font-family: 'Comic Sans MS';
+    src: url('fonts/ComicSansMS.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Comic Sans MS';
+    src: url('fonts/ComicSansMSBold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Ensure we load our downloaded font explicitly */
+/* Ensure we load our downloaded font explicitly */
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #2b2b2b;
+    font-family: "Comic Sans MS", cursive;
+}
+
+/* Main App Container */
+#app-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('images/treehouse_bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+/* Page Management */
+.page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.page.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Common Element Positioning */
+.element {
+    position: absolute;
+    transform-origin: top left;
+    flex-shrink: 0;
+}
+
+/* Animations */
+@keyframes riseDown {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+    100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
+
+@keyframes breatheOutBible {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.05) rotate(0deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes breatheOutIntro {
+    0% { transform: scale(1) rotate(-8.7deg); }
+    50% { transform: scale(1.05) rotate(-8.7deg); }
+    100% { transform: scale(1) rotate(-8.7deg); }
+}
+
+.anim-rise {
+    animation: riseDown 1s ease-out both;
+}
+
+.anim-breathe-bible {
+    animation: breatheOutBible 4s infinite ease-in-out;
+}
+
+.anim-breathe-intro {
+    animation: breatheOutIntro 4s infinite ease-in-out;
+}
+
+/*
+  Specific Elements - Page 1
+*/
+
+/* 1. Title "Day by Day Kids" */
+#title-dbdk {
+    font-size: 128px;
+    font-weight: bold;
+    transform: rotate(-9.6deg);
+    line-height: 1.1;
+    text-align: center;
+    white-space: nowrap;
+
+    left: 10px;
+    top: 30px;
+
+    color: transparent;
+    -webkit-text-stroke: 4px #FFF000;
+    text-shadow: 4px 4px 0px #FF0000;
+}
+
+/* 2. (Tx7) Link */
+#link-tx7 {
+    font-size: 75px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+
+    right: 15px;
+    top: 15px;
+    left: auto;
+
+    color: #8080FF;
+    -webkit-text-stroke: 0px;
+
+    text-shadow:
+        1px 1px 0px #FF0000,
+        2px 1px 0px #FF0000,
+        1px 2px 0px #FF0000,
+        2px 2px 0px #FF0000,
+        3px 2px 0px #FF0000,
+        2px 3px 0px #FF0000,
+        3px 3px 0px #FF0000;
+}
+
+/* 3. ENTER CLUBHOUSE Button */
+#btn-enter {
+    color: #FFF000;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 5px 15px;
+    left: 873.8px;
+    top: 415.4px;
+    transform: rotate(-4.2deg);
+
+    background-color: #0000FF;
+    border: 2px solid #FFF000;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* 4. Closed Bible */
+#img-bible {
+    width: 275.7px;
+    height: 299.3px;
+    left: 41.7px;
+    top: 404.7px;
+    cursor: pointer;
+}
+
+/* 5. introducing Bekah: your new p.a.l.
+   Bekah Text needs to move left another 10px.
+   (was 1019.8px -> now 1009.8px)
+*/
+#txt-bekah-intro {
+    text-transform: uppercase;
+    color: #FFF000;
+    font-size: 32px;
+    font-weight: bold;
+    width: 350px;
+    left: 1009.8px; /* Moved left 10px */
+    top: 470.7px;
+    transform: rotate(-8.7deg);
+    text-align: center;
+    line-height: 1.2;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+/* 6. Bekah (armor of God) */
+#link-bekah-p1 {
+    width: 442px;
+    height: 249.8px;
+    left: 1038px;
+    top: 527.3px;
+    cursor: pointer;
+}
+
+#img-bekah {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* 7. footprints */
+#img-footprints {
+    width: 59px;
+    height: 191px;
+    left: 813px;
+    top: 602.5px;
+    transform: rotate(-22.5deg);
+}
+
+
+
+/*
+  Specific Elements - Page 2
+*/
+
+#nav-home-p2 {
+    left: 0;
+    top: 0;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 10;
+    transform: scale(0.5);
+    transform-origin: top left;
+}
+
+/* Picture frame image filled with yellow background */
+.nav-bg-yellow {
+    position: absolute;
+    width: 328.6px;
+    height: 306.5px;
+    left: -28.4px;
+    top: -43.3px;
+    transform: rotate(-6.7deg);
+    background-color: #FFF000;
+    border: 5px solid #000;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+    background-image: url('images/whiteboard_frame.png');
+    background-blend-mode: overlay;
+    border-radius: 10px;
+    background-size: 100% 100%;
+}
+
+/* Green Hand */
+.nav-handprint-p2 {
+    position: absolute;
+    width: 72.9px;
+    height: 75.2px;
+    left: 198.2px;
+    top: 20.9px;
+    transform: rotate(0deg);
+    z-index: 12;
+}
+
+/* Day by Day Kids text */
+.nav-text-p2 {
+    position: absolute;
+    font-size: 30.9pt;
+    font-weight: bold;
+    width: 225.4px;
+    height: 105.8px;
+    left: 34.4px;
+    top: 77.6px;
+    transform: rotate(-7.1deg);
+    color: transparent;
+    -webkit-text-stroke: 1.5px #FFF000;
+    text-shadow: 2px 2px 0px #FF0000;
+    line-height: 1;
+    text-align: center;
+    z-index: 11;
+}
+
+/* Armor of God */
+#link-bekah-p3 {
+    position: absolute;
+    width: 476.4px;
+    height: 473.7px;
+    left: 1016.6px;
+    top: 68.2px;
+    transform: rotate(0deg);
+    z-index: 5;
+    cursor: pointer;
+}
+
+#img-bekah-p2 {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Clubhouse Bible Text */
+#txt-clubhouse-bible-p2 {
+    text-decoration: none;
+    cursor: pointer;
+    position: absolute;
+    font-size: 96.2pt;
+    font-weight: bold;
+    width: 961.9px;
+    height: 153.3px;
+    left: 202px;
+    top: 341px;
+    transform: rotate(0deg);
+    color: #FFF000;
+    text-align: center;
+    -webkit-text-stroke: 2px #000;
+    text-shadow: 4px 4px 0px #FF0000;
+    z-index: 10;
+    line-height: 1;
+}
+
+/* Open Bible */
+#link-open-bible-p2 {
+    position: absolute;
+    width: 1368.1px;
+    height: 378.2px;
+    left: -9.1px;
+    top: 368.9px;
+    transform: rotate(0deg);
+    z-index: 6;
+    cursor: pointer;
+}
+
+#img-open-bible-p2 {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#page-2 {
+    background-image: url('images/wood_texture.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+#page-2 {
+    background-image: url('images/wood_texture.jpg');
+    background-size: cover;
+    background-position: center;
+}
