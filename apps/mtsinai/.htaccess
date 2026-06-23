@@ -1,3 +1,20 @@
+# daybydaykids.com device-based redirect - at top for priority
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Desktop → mt-sin.ai/HeIsRisen/
+# Mobile  → mt-sin.ai/m/
+RewriteCond %{HTTP_HOST} ^(www\.)?daybydaykids\.com$ [NC]
+
+# Mobile detection first
+RewriteCond %{HTTP_USER_AGENT} "android|iphone|ipad|ipod|blackberry|windows phone|iemobile|opera mini|mobile" [NC]
+RewriteRule ^(.*)$ https://mt-sin.ai/m/ [R=302,L]
+
+# Desktop fallback
+RewriteCond %{HTTP_HOST} ^(www\.)?daybydaykids\.com$ [NC]
+RewriteRule ^(.*)$ https://mt-sin.ai/HeIsRisen/ [R=302,L]
+</IfModule>
+
 # 🛡️ Sentinel: Server Hardening
 # Prevent server version information leakage
 ServerSignature Off
