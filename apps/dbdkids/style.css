@@ -339,7 +339,193 @@ body, html {
     background-position: center;
 }
 
+/* New page styles - positioned absolutely to match Canva style. Adjust coords using your watermarked screenshots. */
+#pal-title, #learn-title, #tx7-title {
+    font-size: 48px;
+    font-weight: bold;
+    color: #FFF000;
+    text-shadow: 2px 2px 0px #FF0000;
+    left: 100px;
+    top: 100px;
+}
+
+#pal-text, #learn-text, #tx7-intro {
+    font-size: 24px;
+    color: #FFF000;
+    width: 600px;
+    left: 100px;
+    top: 200px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+#learn-more-p3 {
+    font-size: 28px;
+    color: #FFF000;
+    left: 100px;
+    top: 500px;
+}
+
+#computer-link {
+    width: 300px;
+    height: 200px;
+    left: 100px;
+    top: 400px;
+}
+
+#heisrisen-label {
+    font-size: 24px;
+    color: #FFF000;
+    left: 420px;
+    top: 450px;
+}
+
+#heisrisen-mobile {
+    font-size: 18px;
+    color: #FFF000;
+    left: 420px;
+    top: 480px;
+}
+
+#tx7-list {
+    font-size: 20px;
+    color: #FFF000;
+    left: 100px;
+    top: 300px;
+    width: 800px;
+}
+
+.tx7-item {
+    margin: 5px 0;
+}
+
+/* Nav for new pages */
+.nav-handprint-p3, .nav-handprint-p4, .nav-handprint-p6 {
+    position: absolute;
+    width: 72.9px;
+    height: 75.2px;
+    left: 198.2px;
+    top: 20.9px;
+    transform: rotate(0deg);
+    z-index: 12;
+}
+
+.nav-text-p3, .nav-text-p4, .nav-text-p6 {
+    position: absolute;
+    font-size: 30.9pt;
+    font-weight: bold;
+    width: 225.4px;
+    height: 105.8px;
+    left: 34.4px;
+    top: 77.6px;
+    transform: rotate(-7.1deg);
+    color: transparent;
+    -webkit-text-stroke: 1.5px #FFF000;
+    text-shadow: 2px 2px 0px #FF0000;
+    line-height: 1;
+    text-align: center;
+    z-index: 11;
+}
+
+#page-3, #page-4, #page-6 {
+    background-image: url('images/wood_texture.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
 #page-2 {
+    background-image: url('images/wood_texture.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+/* New page styles - positioned absolutely to match Canva style. Adjust coords using your watermarked screenshots. */
+#pal-title, #learn-title, #tx7-title {
+    font-size: 48px;
+    font-weight: bold;
+    color: #FFF000;
+    text-shadow: 2px 2px 0px #FF0000;
+    left: 100px;
+    top: 100px;
+}
+
+#pal-text, #learn-text, #tx7-intro {
+    font-size: 24px;
+    color: #FFF000;
+    width: 600px;
+    left: 100px;
+    top: 200px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+#learn-more-p3 {
+    font-size: 28px;
+    color: #FFF000;
+    left: 100px;
+    top: 500px;
+}
+
+#computer-link {
+    width: 300px;
+    height: 200px;
+    left: 100px;
+    top: 400px;
+}
+
+#heisrisen-label {
+    font-size: 24px;
+    color: #FFF000;
+    left: 420px;
+    top: 450px;
+}
+
+#heisrisen-mobile {
+    font-size: 18px;
+    color: #FFF000;
+    left: 420px;
+    top: 480px;
+}
+
+#tx7-list {
+    font-size: 20px;
+    color: #FFF000;
+    left: 100px;
+    top: 300px;
+    width: 800px;
+}
+
+.tx7-item {
+    margin: 5px 0;
+}
+
+/* Nav for new pages */
+.nav-handprint-p3, .nav-handprint-p4, .nav-handprint-p6 {
+    position: absolute;
+    width: 72.9px;
+    height: 75.2px;
+    left: 198.2px;
+    top: 20.9px;
+    transform: rotate(0deg);
+    z-index: 12;
+}
+
+.nav-text-p3, .nav-text-p4, .nav-text-p6 {
+    position: absolute;
+    font-size: 30.9pt;
+    font-weight: bold;
+    width: 225.4px;
+    height: 105.8px;
+    left: 34.4px;
+    top: 77.6px;
+    transform: rotate(-7.1deg);
+    color: transparent;
+    -webkit-text-stroke: 1.5px #FFF000;
+    text-shadow: 2px 2px 0px #FF0000;
+    line-height: 1;
+    text-align: center;
+    z-index: 11;
+}
+
+#page-3, #page-4, #page-6 {
     background-image: url('images/wood_texture.jpg');
     background-size: cover;
     background-position: center;

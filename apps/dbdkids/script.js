@@ -5,11 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnEnter) {
         btnEnter.addEventListener('click', (e) => {
             e.preventDefault();
-            goToPage(2);
+            goToPage(4);
         });
     }
 
-    const navHomes = document.querySelectorAll('.nav-home, #nav-home');
+    // General nav to home for any nav with class or id containing nav-home
+    const navHomes = document.querySelectorAll('[id*="nav-home"], .nav-home');
     navHomes.forEach(el => {
         el.addEventListener('click', (e) => {
             e.preventDefault();
