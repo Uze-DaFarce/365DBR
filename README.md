@@ -10,59 +10,46 @@ This monorepo contains the collected source code for all of Mt. Sinai LLC's web-
 
 ## Applications
 
-This repository is organized into the following applications:
+This repository is organized into the following applications (see `docs/` for centralized, up-to-date documentation):
 
-*   **/apps/365dbr**: A "Read the Bible in a Year" plan that takes less than 15 minutes a day.
-*   **/apps/heisrisen**: An interactive Christian Easter Egg Hunt game.
-*   **/apps/mtsinai**: The main corporate website for Mt. Sinai LLC.
+*   **365DBR** (`/apps/365DBR`): A structured daily Bible reading plan (<15 min/day) with advanced browser features. Foundation for Scriptural Intelligence (S.I.). See [docs/INDEX.md](docs/INDEX.md) and [docs/365DBR_AGENTS.md](docs/365DBR_AGENTS.md).
+*   **HeIsRisen** (`/apps/HeIsRisen` and `/m/`): Interactive Christian Easter Egg Hunt game (desktop + mobile versions).
+*   **mtsinai** (`/apps/mtsinai`): The main corporate website for Mt. Sinai LLC.
+*   **dbdkids** (`/apps/dbdkids`): In development (no documentation yet).
 
-## 365DBR: Technical Overview
+## 365DBR
 
-The `365DBR` application includes Python scripts to generate and manage a balanced 365-day Bible reading plan.
+See the centralized documentation for full details:
 
-### Key Files (`apps/365dbr`)
+* [docs/INDEX.md](docs/INDEX.md)
+* [docs/365DBR_AGENTS.md](docs/365DBR_AGENTS.md)
+* [Project Blueprint for Scriptural Intelligence (S.I.)](docs/Project%20Blueprint_%20Scriptural%20Intelligence%20(SI).md)
 
-*   **`generate_readings.py`**: Calculates the daily reading schedule.
-*   **`fetch_readings.py`**: Downloads scripture data from `api.bible`.
-*   **`compile_site.py`**: Generates the static HTML for the application.
-*   **`data/readings.json`**: The master schedule for the reading plan.
+**Current Status (2026-06-30)**:
+- Primary data via api.bible (LSV focal).
+- LSB access obtained but integration pending clarification from 316 Publishing on LLC setup.
+- Planned expansions: WEB (no data yet), NKJV, ESV (when accessible/affordable).
+- Transitioning from static JSON to highly relational database (far beyond Book/Chapter/Verse; includes original languages, speaker/subject/timing/context, multi-translation support).
+- Deployed at: https://mt-sin.ai/365DBR/ (interactive) and static data endpoints for crawlers.
 
-### Setup Instructions
+**Note**: Full technical details, setup, and usage are maintained in `docs/`. The high-level overview below is intentionally brief.
 
-1.  **Prerequisites**: Python 3.x installed.
-2.  **API Key**: You need a free API Key from [api.bible](https://scripture.api.bible/).
-3.  **Environment Variable**: Set your API key in your terminal.
-    *   **PowerShell:** `$env:API_BIBLE_KEY = "your_32_char_api_key"`
-    *   **Bash/Linux:** `export API_BIBLE_KEY="your_32_char_api_key"`
-4.  **Install Dependencies**:
-    ```bash
-    pip install -r apps/365dbr/requirements.txt
-    playwright install
-    ```
+### High-Level Components
+- Python pipeline for plan generation and data fetching.
+- React-based frontend (single-file via CDN) with advanced browser features.
+- Strong focus on accessibility, performance, and Biblical fidelity.
 
-### Usage
+See `docs/` for current scripts, data model, deployment details, and S.I. integration plans.
 
-All commands should be run from the root of the monorepo.
+## Documentation
 
-1.  **Generate Plan** (Optional):
-    ```bash
-    python apps/365dbr/generate_readings.py
-    ```
-2.  **Fetch Readings**:
-    ```bash
-    # Fetch a single day
-    python apps/365dbr/fetch_readings.py --day 0201
+All shared documentation lives in the `docs/` directory at the monorepo root (centralized to reduce repetition and capture cross-app context).
 
-    # Fetch a full month
-    python apps/365dbr/fetch_readings.py --month 02
+* Start here: [docs/INDEX.md](docs/INDEX.md)
+* 365DBR-specific constraints: [docs/365DBR_AGENTS.md](docs/365DBR_AGENTS.md)
+* Scriptural Intelligence (S.I.) vision: [docs/Project Blueprint_ Scriptural Intelligence (SI).md](docs/Project%20Blueprint_%20Scriptural%20Intelligence%20(SI).md)
 
-    # Fetch the entire year
-    python apps/365dbr/fetch_readings.py --all
-    ```
-3.  **Compile Site**:
-    ```bash
-    python apps/365dbr/compile_site.py
-    ```
+App-specific documentation (when it exists) will be in `docs/<app>/`.
 
 ## Contact
 
