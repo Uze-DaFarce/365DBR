@@ -256,7 +256,7 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-07-01 (Dedicated Database PM session: core docs + prod data analysis + initial schema + migration plan + INDEX refresh)
+**Last Updated**: 2026-07-01 (Dedicated Database PM session + follow-ups: core docs + prod data + initial schema + migration plan + NT/Greek review + handoff merged into `docs/Roles/365DBR-DEV.md` for simple session startup + INDEX refresh)
 
 **Current Phase**: DB design phase — initial schema design + tech rec + high-level migration strategy complete. (See Database Strategy above + `docs/365DBR/Database-Schema.md` and `Migration-Plan.md`.) Prototyping / implementation kickoff next.
 
@@ -265,7 +265,7 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 - [x] Current model analysis (api.bible nested + verseMap BCV processing, 365-day plan, pipeline integrity). Explicit contrast: Hebrew (strong-tagged words) vs Greek (running text, no strongs in current sources).
 - [x] Tech recommendation (PostgreSQL) + initial highly-relational schema (books/verses/tokens/translations/annotations/daily) documented. NT/Greek handling section + updates added after review.
 - [x] High-level migration plan (6 phases...) + risks. ETL notes updated for Greek/Hebrew token parsing branch.
-- [ ] Phase 1 handoff to DEV: infra + schema bootstrap + basic validation (scoped prompt referencing docs).
+- [x] Phase 1 handoff merged directly into `docs/Roles/365DBR-DEV.md` (new sessions start by reading the role file; it now includes full scoped Phase 1 task + required docs list). Separate handoff file reduced to redirect note.
 - [ ] Sample population (1+ days) + strict verification against prod data.
 - [ ] Iterate schema from feedback; seed minimal annotations for speaker/theme demo.
 - [ ] LSB integration (blocked pending 316 Publishing clarification); add WEB etc.
@@ -281,6 +281,6 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 5. Update INDEX + 365DBR/ docs with results, any schema adjustments, and new TODOs.
 6. Expand 365DBR-specific docs; keep 100% focus here until data fully leveraged for S.I.
 
-**Handoff guidance**: When spinning DEV (or future), always include: "Begin by reading docs/INDEX.md (full), docs/Project Blueprint_ Scriptural Intelligence (SI).md, docs/365DBR/Data-Sources.md, docs/365DBR_AGENTS.md, docs/365DBR/Database-Schema.md, docs/365DBR/Migration-Plan.md. Use production data only."
+**Handoff guidance**: When spinning DEV (or future), new sessions simply start by reading `docs/Roles/365DBR-DEV.md` (it now contains the current Phase 1 handoff + required reading list). It instructs to also read docs/INDEX.md (full), docs/Project Blueprint_ Scriptural Intelligence (SI).md, docs/365DBR/Data-Sources.md, docs/365DBR/Database-Schema.md, and docs/365DBR/Migration-Plan.md. Use production data only.
 
 This document will be maintained as the single source of truth to minimize repetition. Never repeat analysis — reference the 365DBR/ files.
