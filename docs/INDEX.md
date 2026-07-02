@@ -134,17 +134,21 @@ See also:
 
 ## Database Strategy
 
-**Note**: This is a large, complex topic requiring dedicated discussion and research refresh.
+**Note**: Dedicated session completed 2026-07-01 (see role-driven analysis). Research refresh + initial design produced.
 
-- Must be **highly relational**.
-- Support complex queries across translations, original languages, and contextual metadata.
-- Key challenges:
-  - Man-made chapter/verse divisions.
-  - Need for speaker, subject, timing, literary context, etc.
-  - Multiple entry points (text search, semantic, thematic, speaker-based, etc.).
-- Integration with 365DBR for daily reading + S.I. backend.
-- Potential tech: PostgreSQL or similar (example in Blueprint); full evaluation needed.
-- **Next**: Schedule dedicated session. User will re-research and document findings.
+- Must be **highly relational** (implemented in design).
+- Support complex queries across translations, original languages, and contextual metadata (original_tokens + annotations + ranges).
+- Key challenges addressed in design:
+  - Man-made chapter/verse divisions → verse alignment for practicality + tokens + annotations for literary/context independence.
+  - Need for speaker, subject, timing, literary context, etc. → dedicated `annotations` + `cross_references` tables with ranges.
+  - Multiple entry points (text search, semantic, thematic, speaker-based, etc.) → tsvector, strongs indexes, range queries, daily + plan tables.
+- Integration with 365DBR for daily reading + S.I. backend (daily_readings + daily_passages + verse_translations).
+- Tech: **PostgreSQL** recommended (rationale + trade-offs in docs). Matches Blueprint.
+- **Current artifacts** (read these):
+  - `docs/365DBR/Database-Schema.md` (DDL, ERD mermaid, decisions, S.I. alignment, v0.1 scope).
+  - `docs/365DBR/Migration-Plan.md` (phases 0-6, ETL sketch from prod data only, validation, risks, success criteria, handoff guidance).
+
+**Status**: Initial schema + high-level migration plan complete. Ready for prototyping / DEV handoff on Phase 1 (infra + schema bootstrap). See full details and iterative updates in the 365DBR/ docs above.
 
 ---
 
@@ -232,12 +236,12 @@ See also:
 ## Short & Long-Term Goals
 
 ### Short-Term
-- Stabilize documentation in `docs/` to eliminate repetition.
-- Complete LSB access (pending Diana M).
+- Stabilize documentation in `docs/` to eliminate repetition. (Centralization largely complete.)
+- Complete LSB access (pending Diana M / 316 Publishing).
 - Add WEB data support.
-- Begin relational DB design discussions and prototyping.
-- Review and integrate key .jules learnings.
-- Update all references (README, etc.) to point to docs/.
+- Relational DB design + initial schema/migration plan complete (2026-07-01 session); move to prototyping + sample population.
+- Review and integrate key .jules learnings (data/validation patterns already extracted to relevant docs).
+- Update all references (README, etc.) to point to docs/. Expand 365DBR/ docs as design evolves.
 
 ### Long-Term (S.I. Focused)
 - Build "Deep Thought" — secure, validated Scriptural Intelligence app.
@@ -252,12 +256,31 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-06-30 (by Grok, based on user input)
+**Last Updated**: 2026-07-01 (Dedicated Database PM session: core docs + prod data analysis + initial schema + migration plan + INDEX refresh)
 
-**Next Steps**: 
-- Expand 365DBR-specific docs.
-- Review .jules for extraction.
-- Schedule DB deep-dive.
-- Continue code familiarization for 365DBR expertise.
+**Current Phase**: DB design phase — initial schema design + tech rec + high-level migration strategy complete. (See Database Strategy above + `docs/365DBR/Database-Schema.md` and `Migration-Plan.md`.) Prototyping / implementation kickoff next.
 
-This document will be maintained as the single source of truth to minimize repetition.
+**TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
+- [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).
+- [x] Current model analysis (api.bible nested + verseMap BCV processing, 365-day plan, pipeline integrity). Explicit contrast: Hebrew (strong-tagged words) vs Greek (running text, no strongs in current sources).
+- [x] Tech recommendation (PostgreSQL) + initial highly-relational schema (books/verses/tokens/translations/annotations/daily) documented. NT/Greek handling section + updates added after review.
+- [x] High-level migration plan (6 phases...) + risks. ETL notes updated for Greek/Hebrew token parsing branch.
+- [ ] Phase 1 handoff to DEV: infra + schema bootstrap + basic validation (scoped prompt referencing docs).
+- [ ] Sample population (1+ days) + strict verification against prod data.
+- [ ] Iterate schema from feedback; seed minimal annotations for speaker/theme demo.
+- [ ] LSB integration (blocked pending 316 Publishing clarification); add WEB etc.
+- [ ] Full 365 + rich metadata + S.I. query prototypes.
+- [ ] Update pipeline to DB-primary (or dual); maintain 365DBR daily UX.
+- Blockers: LSB access finalization; any hosting/DB provisioning details.
+
+**Next Steps (explicit)**:
+1. Top-Level Program Lead review of Database-Schema.md + Migration-Plan.md.
+2. Database PM / Lead: produce clean handoff prompt for 365DBR DEV role (instruct to load INDEX + Blueprint + Data-Sources + Schema + Migration-Plan first). Hand off Phase 1 (Postgres setup + DDL + books/translations seed + migrations).
+3. DEV executes scoped increment; run tests + prod data verification; report status.
+4. Populate sample day from https://mt-sin.ai/365DBR/data/0701/ (or chosen) with full validation.
+5. Update INDEX + 365DBR/ docs with results, any schema adjustments, and new TODOs.
+6. Expand 365DBR-specific docs; keep 100% focus here until data fully leveraged for S.I.
+
+**Handoff guidance**: When spinning DEV (or future), always include: "Begin by reading docs/INDEX.md (full), docs/Project Blueprint_ Scriptural Intelligence (SI).md, docs/365DBR/Data-Sources.md, docs/365DBR_AGENTS.md, docs/365DBR/Database-Schema.md, docs/365DBR/Migration-Plan.md. Use production data only."
+
+This document will be maintained as the single source of truth to minimize repetition. Never repeat analysis — reference the 365DBR/ files.
