@@ -84,11 +84,9 @@ NT_BOOKS = ALL_BOOKS[39:]  # MAT to REV
 # but per spec we need to exclude them from the sequential OT reading.
 OT_SEQUENTIAL_BOOKS = [b for b in OT_BOOKS if b not in ["PSA", "PRO"]]
 
-# Known Omissions in Critical Texts (SBLGNT, NA28, etc.) which API.Bible follows for Greek NT (7644de2e4c5188e5-01).
-# Note: These verses ARE present in Textus Receptus based translations (KJV, LSV),
-# but since our app drives the reading plan from the Greek text (SBLGNT), the API returns them as missing/empty.
-# To avoid "Verse Count Mismatch" errors during validation, we treat them as omitted in our plan.
-KNOWN_OMISSIONS = {
+# Historical: verses often ABSENT in critical Greek (SBLGNT / NA) but present in TR-line English (KJV/LSV).
+# Kept for documentation and for optional critical-text mode. Primary NT is now GRCTR (Textus Receptus).
+CRITICAL_TEXT_OMISSIONS = {
     "MAT.17.21", "MAT.18.11", "MAT.23.14",
     "MRK.7.16", "MRK.9.44", "MRK.9.46", "MRK.11.26", "MRK.15.28",
     "LUK.17.36", "LUK.23.17",
@@ -97,6 +95,12 @@ KNOWN_OMISSIONS = {
     "ROM.14.24", "ROM.14.25", "ROM.14.26",
     "ROM.16.24"
 }
+
+# Active omission-injection set. Empty under Textus Receptus primary:
+# real Greek text should be present; do NOT inject placeholder "original" Greek.
+# If you temporarily switch NT_GREEK_ID back to LEGACY_NT_CRITICAL_ID, set:
+#   KNOWN_OMISSIONS = set(CRITICAL_TEXT_OMISSIONS)
+KNOWN_OMISSIONS = set()
 
 BOOK_NAMES = {
     "GEN": "Genesis", "EXO": "Exodus", "LEV": "Leviticus", "NUM": "Numbers", "DEU": "Deuteronomy",
@@ -200,8 +204,18 @@ def is_verse_in_range(vid, start_book, start_chap, start_verse, end_book, end_ch
 # CONSTANTS (From fetch_readings.py)
 # =============================================================================
 
+# Original-language sources (api.bible Open Access)
+# OT: Westminster Leningrad Codex (hboWLC) — Masoretic Hebrew
 OT_HEBREW_ID = "0b262f1ed7f084a6-01"
-NT_GREEK_ID = "7644de2e4c5188e5-01"
+OT_HEBREW_LABEL = "Hebrew Bible, Westminster Leningrad Codex (hboWLC)"
+
+# NT: Greek Textus Receptus (GRCTR) — aligned with KJV verse inventory for S.I. integrity
+NT_GREEK_ID = "3aefb10641485092-01"
+NT_GREEK_LABEL = "Greek Textus Receptus (GRCTR)"
+
+# Legacy critical Greek (SBLGNT-class) — secondary/comparison only; do not use as primary
+LEGACY_NT_CRITICAL_ID = "7644de2e4c5188e5-01"
+
 PARALLEL_IDS = [
     "de4e12af7f28f599-01",  # KJV
     "01b29f4b342acc35-01"   # LSV
@@ -422,13 +436,21 @@ def count_expected_verses(range_str):
 
 def inject_missing_verses(data, range_str):
     """
-    Injects missing verses from the cache directly into the API payload.
-    Modifies data in-place.
+    Injects missing verses from the cache into the API payload (in-place).
+
+    Under Textus Receptus primary (KNOWN_OMISSIONS empty), this is a no-op.
+    When used with a critical-text Greek id, only injects IDs that are still
+    actually missing from the response (avoids duplicates if the source has them).
+    Never invents Greek as Tier-1 when TR is primary.
     """
+    if not KNOWN_OMISSIONS:
+        return
+
     if 'data' not in data or 'content' not in data['data']:
         return
 
     content_list = data['data']['content']
+    already_present = set(extract_verse_ids(content_list))
 
     if '-' in range_str:
         start_str, end_str = range_str.split('-')
@@ -440,6 +462,8 @@ def inject_missing_verses(data, range_str):
 
     verses_to_inject = []
     for omitted_vid in KNOWN_OMISSIONS:
+        if omitted_vid in already_present:
+            continue
         if is_verse_in_range(omitted_vid, s_book, s_chap, s_verse, e_book, e_chap, e_verse):
             verses_to_inject.append(omitted_vid)
 
@@ -529,7 +553,8 @@ def validate_content_integrity(data, range_str, inject_missing=True):
     Validates that the fetched content has the expected number of verses
     AND that the content belongs to the expected books.
     """
-    # 0. Pre-Process: Inject Missing Verses (Fix for SBLGNT omissions)
+    # 0. Pre-Process: inject only when KNOWN_OMISSIONS is non-empty (critical-text mode).
+    # TR primary: KNOWN_OMISSIONS is empty — fail loudly on real gaps instead of fake Greek.
     if inject_missing:
         inject_missing_verses(data, range_str)
 
@@ -589,8 +614,8 @@ def validate_content_integrity(data, range_str, inject_missing=True):
 
 
     # 4. Compare Counts
-    # Due to variations in critical Greek texts (SBLGNT) merging or omitting verses differently than KJV,
-    # data validation incorporates a tolerance of +/- 1 verse per chapter.
+    # Tolerance of +/- 1 verse per chapter covers minor versification / boundary edge cases
+    # (historical note: was needed heavily under SBLGNT; TR should usually match BIBLE_DATA closely).
     unique_chapters = set()
     for vid in actual_vids:
         b, c, _ = vid.split('.')

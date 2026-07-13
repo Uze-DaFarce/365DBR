@@ -12,3 +12,18 @@ node_modules/
 playwright-report/
 test-results/
 .playwright/
+
+# Local dev secrets / environment (never commit real passwords)
+db/.env
+.env.local
+*.local
+
+# Docker volumes / build artifacts (optional but common)
+*.log
+
+# 365DBR: local fetch / FTP staging — NEVER commit real scripture day packs.
+# Run fetch_readings.py from apps/365DBR; day folders stay on disk only.
+# Keep data/readings.json tracked (plan metadata, not passage text).
+apps/365DBR/data/[0-9][0-9][0-9][0-9]/
+apps/365DBR/data/omissions_cache.json
+

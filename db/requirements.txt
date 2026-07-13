@@ -1,0 +1,6 @@
+# 365DBR Database development dependencies (Phase 1+)
+# Install: pip install -r db/requirements.txt
+# Use binary wheels for easy Windows install (no compiler needed).
+
+psycopg[binary]>=3.2
+python-dotenv>=1.0

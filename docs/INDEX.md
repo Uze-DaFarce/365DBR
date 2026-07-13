@@ -256,9 +256,9 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-07-01 (Dedicated Database PM session + follow-ups: core docs + prod data + initial schema + migration plan + NT/Greek review + handoff merged into `docs/Roles/365DBR-DEV.md` for simple session startup + INDEX refresh)
+**Last Updated**: 2026-07-02 (Phase 1 DEV complete: local Postgres + v0.1 schema + books/translations seed + verify PASSED; docs/DEV-Logs updated)
 
-**Current Phase**: DB design phase — initial schema design + tech rec + high-level migration strategy complete. (See Database Strategy above + `docs/365DBR/Database-Schema.md` and `Migration-Plan.md`.) Prototyping / implementation kickoff next.
+**Current Phase**: Phase 1 (DB infra + schema bootstrap) **complete**. Next: Phase 2 — sample population from production data + strict validation. See `docs/365DBR/Migration-Plan.md`, `db/README.md`, `docs/365DBR/DEV-Logs.md`.
 
 **TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
 - [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).
@@ -266,7 +266,8 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 - [x] Tech recommendation (PostgreSQL) + initial highly-relational schema (books/verses/tokens/translations/annotations/daily) documented. NT/Greek handling section + updates added after review.
 - [x] High-level migration plan (6 phases...) + risks. ETL notes updated for Greek/Hebrew token parsing branch.
 - [x] Phase 1 handoff merged directly into `docs/Roles/365DBR-DEV.md` (new sessions start by reading the role file; it now includes full scoped Phase 1 task + required docs list). Separate handoff file reduced to redirect note.
-- [ ] Sample population (1+ days) + strict verification against prod data.
+- [x] Phase 1 implemented: Docker Postgres 16, `db/migrations/001_initial_schema.sql`, apply/seed/verify scripts, 66 books + LSV/KJV seeds; `verify_schema.py` **PASSED** (66 books, translations, Hebrew+Greek sample inserts).
+- [ ] Sample population (1+ days) + strict verification against prod data. (Phase 2)
 - [ ] Iterate schema from feedback; seed minimal annotations for speaker/theme demo.
 - [ ] LSB integration (blocked pending 316 Publishing clarification); add WEB etc.
 - [ ] Full 365 + rich metadata + S.I. query prototypes.
@@ -274,12 +275,10 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 - Blockers: LSB access finalization; any hosting/DB provisioning details.
 
 **Next Steps (explicit)**:
-1. Top-Level Program Lead review of Database-Schema.md + Migration-Plan.md.
-2. Database PM / Lead: produce clean handoff prompt for 365DBR DEV role (instruct to load INDEX + Blueprint + Data-Sources + Schema + Migration-Plan first). Hand off Phase 1 (Postgres setup + DDL + books/translations seed + migrations).
-3. DEV executes scoped increment; run tests + prod data verification; report status.
-4. Populate sample day from https://mt-sin.ai/365DBR/data/0701/ (or chosen) with full validation.
-5. Update INDEX + 365DBR/ docs with results, any schema adjustments, and new TODOs.
-6. Expand 365DBR-specific docs; keep 100% focus here until data fully leveraged for S.I.
+1. ~~Phase 1 handoff + DEV execution~~ — **done** (verify PASSED 2026-07-02).
+2. Phase 2: populate sample day from https://mt-sin.ai/365DBR/data/0701/ (or chosen) with full validation against prod JSON (Hebrew tokens + Greek surface + LSV/KJV + omissions awareness).
+3. Optional Phase 1.1: explicit `verse_source_status` for KNOWN_OMISSIONS / misalignment if desired before ETL.
+4. Update INDEX + 365DBR/ docs after each Phase 2 milestone; keep 100% focus on 365DBR until data fully leveraged for S.I.
 
 **Handoff guidance**: When spinning DEV (or future), new sessions simply start by reading `docs/Roles/365DBR-DEV.md` (it now contains the current Phase 1 handoff + required reading list). It instructs to also read docs/INDEX.md (full), docs/Project Blueprint_ Scriptural Intelligence (SI).md, docs/365DBR/Data-Sources.md, docs/365DBR/Database-Schema.md, and docs/365DBR/Migration-Plan.md. Use production data only.
 

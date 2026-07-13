@@ -1,0 +1,35 @@
+# Docker Compose for local 365DBR Postgres development
+# Recommended for reproducible, version-pinned environment (postgres:16).
+# Run: docker compose up -d
+# Stop/reset data: docker compose down -v
+#
+# See db/README.md for full instructions (PowerShell + cross platform).
+# Bible is Tier 1 truth. Schema + data must be handled with absolute fidelity.
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: mt-sinai-365dbr-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mt_sinai_365dbr}
+      POSTGRES_USER: ${POSTGRES_USER:-365dbr_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_change_me}
+      # UTF8 and C locale for consistent text/linguistic behavior (Hebrew/Greek handling)
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - 365dbr_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-365dbr_dev} -d ${POSTGRES_DB:-mt_sinai_365dbr}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  365dbr_pgdata:
+    # Persistent local dev data. Remove volume for full reset.

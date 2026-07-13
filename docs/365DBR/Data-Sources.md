@@ -54,6 +54,16 @@ Each passage JSON follows the standard api.bible content structure (paragraphs, 
 - The interactive app (`/365DBR/index.html` and `/bible.html`) loads from these prod data endpoints (or compiled static versions).
 - The static `data/MMDD/index.html` versions are specifically for search engines and AI crawlers.
 
-**Last documented**: 2026-06-30
+## Original-language sources (api.bible — used by local fetch pipeline)
+
+| Role | Edition | api.bible id |
+|------|---------|--------------|
+| OT original | Westminster Leningrad Codex (hboWLC) | `0b262f1ed7f084a6-01` |
+| NT original | **Greek Textus Receptus (GRCTR)** | `3aefb10641485092-01` |
+| English | KJV, LSV (parallels) | `de4e12af7f28f599-01`, `01b29f4b342acc35-01` |
+
+**Changed**: NT primary switched from critical Greek (SBLGNT-class `7644de2e4c5188e5-01`) to **GRCTR** for truth/alignment with KJV verse inventory and S.I. integrity. Constants live in `apps/365DBR/bible_common.py` (`NT_GREEK_ID`, `OT_HEBREW_ID`).
+
+**Last documented**: 2026-07-02 (GRCTR switch)
 
 See also: docs/INDEX.md (365DBR section) and the relational DB migration plans.
