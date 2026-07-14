@@ -99,3 +99,27 @@ VERIFICATION SUMMARY
 **Not in scope / still open**: Phase 2 sample population from prod (e.g. 0701), omissions ETL table (optional), frontend, full 365.
 
 **Bible is primary. All artifacts serve faithful representation of the text.**
+
+---
+
+## 2026-07-13 — Phase 2 kickoff: sample day ETL (local GRCTR/WLC)
+
+**Context**: Phase 1 complete. NT original switched to GRCTR; local day packs refreshed. User has API credits remaining; began Phase 2 population.
+
+**Implemented**:
+- `db/etl/parse_passage.py` — Hebrew Strong's word walk; Greek verse surface → tokens; KJV/LSV parallel text
+- `db/scripts/populate_day.py` — transactional day load; `--source local|prod|auto`; integrity via `bible_common.validate_content_integrity` before insert
+- `db/scripts/verify_population.py` — verse counts, token counts, LSV/KJV sample text match, Hebrew/Greek reconstruct checks
+
+**Verified days (source=local, all PASS)**:
+| Day | Verses | Tokens | Notes |
+|-----|--------|--------|--------|
+| 0123 | 86 | 1234 | GEN + MAT (GRCTR) + PSA + PRO |
+| 0702 | 84 | 1265 | 2KI + ACT (GRCTR) + PSA + PRO |
+| 0823 | 87 | 1440 | EST + ROM.14.1–23 (TR fix) + PSA + PRO |
+
+**Source policy**: Prefer **local** verified fetches (GRCTR + WLC). Production URL optional until FTP catches up. `omissions_cache` not used in ETL.
+
+**PowerShell note**: Quote day ids (`--day "0702"`) so leading zeros are not stripped.
+
+**Next**: more days / full 365 when ready; Phase 3 broader reconciliation.

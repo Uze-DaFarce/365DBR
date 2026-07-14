@@ -51,7 +51,9 @@ BIBLE_DATA = {
   "LUK": [80, 52, 38, 44, 39, 49, 50, 56, 62, 42, 54, 59, 35, 35, 32, 31, 36, 43, 48, 47, 38, 71, 56, 53],
   "JHN": [51, 25, 36, 54, 47, 71, 53, 59, 41, 42, 57, 50, 38, 31, 27, 33, 26, 40, 42, 31, 25],
   "ACT": [26, 47, 26, 37, 42, 15, 60, 39, 43, 48, 30, 25, 52, 28, 40, 40, 34, 28, 41, 38, 40, 30, 35, 26, 27, 32, 44, 31],
-  "ROM": [32, 29, 31, 25, 21, 23, 25, 39, 33, 21, 36, 21, 14, 26, 33, 24],
+  # Romans: TR/KJV/GRCTR versification (ch14 ends at 23; doxology is 16:25-27; includes 16:24).
+  # Old critical-text shaped counts (14=26, 16=24) moved the doxology onto ch14 — do not use that with GRCTR.
+  "ROM": [32, 29, 31, 25, 21, 23, 25, 39, 33, 21, 36, 21, 14, 23, 33, 27],
   "1CO": [31, 16, 23, 21, 13, 20, 40, 13, 27, 33, 34, 31, 13, 40, 58, 24],
   "2CO": [24, 17, 18, 18, 21, 18, 16, 24, 15, 18, 33, 21, 14],
   "GAL": [24, 21, 29, 31, 26, 18],
@@ -86,13 +88,13 @@ OT_SEQUENTIAL_BOOKS = [b for b in OT_BOOKS if b not in ["PSA", "PRO"]]
 
 # Historical: verses often ABSENT in critical Greek (SBLGNT / NA) but present in TR-line English (KJV/LSV).
 # Kept for documentation and for optional critical-text mode. Primary NT is now GRCTR (Textus Receptus).
+# Note: ROM.14.24-26 are NOT TR verse IDs — under GRCTR/KJV the doxology is ROM.16.25-27 (ch14 ends at 23).
 CRITICAL_TEXT_OMISSIONS = {
     "MAT.17.21", "MAT.18.11", "MAT.23.14",
     "MRK.7.16", "MRK.9.44", "MRK.9.46", "MRK.11.26", "MRK.15.28",
     "LUK.17.36", "LUK.23.17",
     "JHN.5.4",
     "ACT.8.37", "ACT.15.34", "ACT.19.41", "ACT.24.7", "ACT.28.29",
-    "ROM.14.24", "ROM.14.25", "ROM.14.26",
     "ROM.16.24"
 }
 

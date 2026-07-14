@@ -185,13 +185,46 @@ psycopg 3 handles the URL natively.
 - Basic indexes + tsvector + trigram readiness.
 - Verification that proves the foundation is correct.
 
-**Do not populate real verses/tokens/daily data yet.** That is Phase 2 (ETL from production manifests).
+## Phase 2: Populate sample days (ETL)
 
-## Next after Phase 1 success
+After Phase 1 (schema + seeds), load real day packs into the DB.
 
-- Update `docs/INDEX.md` TODO tracker (via Top-Level Lead or the DEV reporting status).
-- Handoff for Phase 2 sample population (e.g. day 0701 + validation against prod JSON).
-- Create `docs/365DBR/DEV-Logs.md` entries.
+**Preferred source:** local `apps/365DBR/data/MMDD/` after a verified `fetch_readings.py` run (GRCTR Greek + WLC Hebrew).  
+**Fallback:** `--source prod` pulls `https://mt-sin.ai/365DBR/data/MMDD/` (may lag behind local until you FTP).
+
+```powershell
+# From monorepo root (quote days so PowerShell keeps leading zeros)
+python db/scripts/populate_day.py --day "0123" --source local
+python db/scripts/verify_population.py --day "0123" --source local
+
+# Multiple days
+python db/scripts/populate_day.py --day "0123,0702,0823" --source local
+python db/scripts/verify_population.py --day "0123,0702,0823" --source local
+
+# All 365 days (local packs; no api.bible cost)
+python db/scripts/populate_day.py --all --source local --continue-on-error
+python db/scripts/verify_population.py --day "0101,0702,1225" --source local
+# optional full verify (slower):
+# python db/scripts/verify_population.py --all --source local
+```
+
+What is loaded per day:
+- `verses` for all BCV ids in the pack
+- `original_tokens` (Hebrew + Strong's; Greek surface words from GRCTR)
+- `verse_translations` (LSV + KJV)
+- `daily_readings` + `daily_passages` (4 sections)
+- `data_sources` provenance rows
+
+Scripts:
+- `db/etl/parse_passage.py` — JSON walkers
+- `db/scripts/populate_day.py` — load
+- `db/scripts/verify_population.py` — compare DB to source JSON (fail on mismatch)
+
+## Next after Phase 2 sample success
+
+- Expand to more / all 365 days when ready
+- Phase 3 full reconciliation + optional query prototypes
+- Keep static JSON pipeline working until dual-write / cutover
 
 ## Troubleshooting
 

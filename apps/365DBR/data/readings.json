@@ -2107,10 +2107,10 @@
   },
   {
     "day": "0823",
-    "api_format": "EST.4.1-EST.7.10,ROM.14.1-ROM.14.26,PSA.102.15-PSA.102.21,PRO.21.5-PRO.21.6",
-    "text_friendly": "Esther 4:1 \u2013 7:10, Romans 14:1\u201326, Psalms 102:15\u201321, Proverbs 21:5\u20136",
+    "api_format": "EST.4.1-EST.7.10,ROM.14.1-ROM.14.23,PSA.102.15-PSA.102.21,PRO.21.5-PRO.21.6",
+    "text_friendly": "Esther 4:1 \u2013 7:10, Romans 14:1\u201323, Psalms 102:15\u201321, Proverbs 21:5\u20136",
     "ot_verse_count": 55,
-    "nt_verse_count": 26,
+    "nt_verse_count": 23,
     "ps_verse_count": 7,
     "pr_verse_count": 2
   },
@@ -2137,7 +2137,7 @@
     "api_format": "JOB.4.1-JOB.5.27,ROM.16.11-1CO.1.8,PSA.103.8-PSA.103.14,PRO.21.12-PRO.21.13",
     "text_friendly": "Job 4:1 \u2013 5:27, Romans 16:11 \u2013 1 Corinthians 1:8, Psalms 103:8\u201314, Proverbs 21:12\u201313",
     "ot_verse_count": 48,
-    "nt_verse_count": 22,
+    "nt_verse_count": 25,
     "ps_verse_count": 7,
     "pr_verse_count": 2
   },

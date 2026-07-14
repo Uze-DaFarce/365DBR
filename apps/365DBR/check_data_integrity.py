@@ -118,9 +118,11 @@ def verify_local_content(readings_path):
     with open(readings_path, 'r', encoding='utf-8') as f:
         readings = json.load(f)
 
-    data_dir = os.path.dirname(readings_path)
+    data_dir = os.path.dirname(readings_path) or "."
     errors = 0
     checked_files = 0
+    days_with_data = 0
+    days_skipped = 0
 
     for day in readings:
         day_id = day['day']
@@ -136,7 +138,10 @@ def verify_local_content(readings_path):
             # OR if we want to enforce all days must exist (but that might be too strict if incremental).
             if os.path.exists(day_dir):
                  raise ValueError(f"❌ {day_id}: Day directory exists but manifest is missing!")
+            days_skipped += 1
             continue
+
+        days_with_data += 1
 
         try:
             with open(manifest_path, 'r', encoding='utf-8') as f:
@@ -180,9 +185,14 @@ def verify_local_content(readings_path):
             except Exception as e:
                  raise ValueError(f"❌ {day_id}/{filename}: Unexpected Error: {e}") from e
 
+    print(
+        f"   Days with local data: {days_with_data}; "
+        f"days not fetched yet (skipped): {days_skipped}; "
+        f"passage files checked: {checked_files}"
+    )
     if errors == 0:
         if checked_files == 0:
-            print("⚠️ No content files found to verify.")
+            print("⚠️ No content files found to verify (fetch days first with fetch_readings.py).")
         else:
             print(f"✅ Local content verification passed ({checked_files} files checked).")
         return True
@@ -272,30 +282,85 @@ def verify_with_api(readings_path, day_limit=1, random_days=False):
     return True
 
 def main():
-    parser = argparse.ArgumentParser(description="Sentinel Data Integrity Checker")
-    parser.add_argument("--local", action="store_true", help="Run local consistency check")
-    parser.add_argument("--content", action="store_true", help="Verify local file content integrity")
-    parser.add_argument("--api", action="store_true", help="Run API verification")
-    parser.add_argument("--days", type=int, default=1, help="Number of days to verify via API")
-    parser.add_argument("--random", action="store_true", help="Randomly select days to verify with API")
-    parser.add_argument("--readings", default="data/readings.json", help="Path to readings.json (default: data/readings.json)")
+    parser = argparse.ArgumentParser(
+        description="Sentinel Data Integrity Checker for 365DBR.",
+        epilog=(
+            "With no mode flags, runs --local and --content (no API calls). "
+            "Examples:\n"
+            "  python check_data_integrity.py\n"
+            "  python check_data_integrity.py --local --content\n"
+            "  python check_data_integrity.py --api --days 3 --random"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--local",
+        action="store_true",
+        help="Check readings.json counts/sections against BIBLE_DATA",
+    )
+    parser.add_argument(
+        "--content",
+        action="store_true",
+        help="Validate local data/MMDD passage JSON (only days already fetched)",
+    )
+    parser.add_argument(
+        "--api",
+        action="store_true",
+        help="Live-check day(s) against api.bible (uses API_BIBLE_KEY / credits)",
+    )
+    parser.add_argument("--days", type=int, default=1, help="Number of days to verify via API (default: 1)")
+    parser.add_argument("--random", action="store_true", help="Randomly select days for --api")
+    parser.add_argument(
+        "--readings",
+        default="data/readings.json",
+        help="Path to readings.json (default: data/readings.json)",
+    )
     args = parser.parse_args()
+
+    # Default: local plan + local files only (safe after fetch; zero API cost).
+    run_local = args.local
+    run_content = args.content
+    run_api = args.api
+    if not (run_local or run_content or run_api):
+        run_local = True
+        run_content = True
+        print("No mode flags given — running default: --local --content")
+        print("(Use --api only when you intentionally want live api.bible checks.)")
+        print()
+
+    print("=== 365DBR Data Integrity Check ===")
+    print(f"readings: {args.readings}")
+    modes = []
+    if run_local:
+        modes.append("local")
+    if run_content:
+        modes.append("content")
+    if run_api:
+        modes.append(f"api(days={args.days}, random={args.random})")
+    print(f"modes:    {', '.join(modes)}")
+    print()
 
     success = True
 
-    if args.local:
+    if run_local:
         if not verify_local_integrity(args.readings):
             success = False
+        print()
 
-    if args.content:
+    if run_content:
         if not verify_local_content(args.readings):
             success = False
+        print()
 
-    if args.api:
+    if run_api:
         if not verify_with_api(args.readings, args.days, args.random):
             success = False
+        print()
 
-    if not success:
+    if success:
+        print("=== RESULT: PASS ===")
+    else:
+        print("=== RESULT: FAIL ===")
         sys.exit(1)
 
 if __name__ == "__main__":
