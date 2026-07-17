@@ -123,3 +123,79 @@ VERIFICATION SUMMARY
 **PowerShell note**: Quote day ids (`--day "0702"`) so leading zeros are not stripped.
 
 **Next**: more days / full 365 when ready; Phase 3 broader reconciliation.
+
+---
+
+## 2026-07-14 — Phase 3 kickoff: verify_db.py + TR count fixes
+
+**Implemented**: `db/scripts/verify_db.py` — full reconciliation:
+1. Seeds (66 books, LSV/KJV)
+2. Book-level ids vs `BIBLE_DATA` (missing/extra)
+3. Daily plan 365 × 4
+4. Translation coverage
+5. Hebrew Strong's 100%; Greek tokens present
+6. TR samples (MAT.17.21, JHN.5.4, ACT.8.37, ROM.16.24–27; no ROM.14.24–26)
+7. Day load perf baseline (~194ms for 0101 LSV)
+8. S.I. smokes (H430, GEN.1.1, JHN.1.1)
+9. Local JSON LSV spot-check
+
+**Findings fixed/in progress**:
+- `BIBLE_DATA` ACT ch8 **39→40** (TR includes 8:37; ACT.8.40 is real end of chapter)
+- Plan gap: **EXO.6.30** skipped (0131 ended at 6:29). `readings.json` fixed to `EXO.4.30-EXO.6.30`; needs **re-fetch 0131** + `populate_day --day 0131` for full canonical coverage
+- Re-ran `export_bible_meta.py` after ACT fix
+
+**Status**: Phase 3 tool green on almost everything; sign-off blocked only on EXO.6.30 until 0131 refresh.
+
+---
+
+## 2026-07-16 — Phase 3 PASS + Phase 4 Option A (DB query layer)
+
+**Context**: User session as 365DBR-DEV. Phase 1–2 already done; Phase 3 reconcile was previously blocked on EXO.6.30. Current DB snapshot fully reconciles.
+
+**Phase 3 verification (this session)**:
+```
+python db/scripts/verify_db.py
+→ PASSED: 56  FAILED: 0  WARNINGS: 0
+→ OVERALL: PASS
+```
+- verses=31167 (full BIBLE_DATA coverage)
+- LSV=KJV=30785; ACT ch8=40 TR; ROM 14=23 / 16=27
+- Hebrew Strong's 100%; Greek tokens present (GRCTR)
+- JSON↔DB LSV spot 0101/0702/1225 mismatches=0
+- Day 0101 LSV load ~55ms
+
+**Phase 4 deliverable (Option A — low risk)**: Optional DB-backed query capability **without** changing live reader.
+
+| Artifact | Role |
+|----------|------|
+| `db/query/connection.py` | Shared `DATABASE_URL` / `.env` connection |
+| `db/query/day_load.py` | `load_day`, `load_verse`, `search_strong`, `dual_read_day` |
+| `db/scripts/query_db.py` | CLI: `day` / `verse` / `strong` / `dual-read` |
+| `db/scripts/test_query_phase4.py` | Smoke tests against live local DB + local packs |
+
+**verseMap contract (for future Option B readiness)**:
+- Keys: BCV strings; translation keys lowercase (`lsv`, `kjv`) + `original`
+- English `text` is a **flattened string** (not array) — matches `loadDailyBread` post-flatten
+- `original.tokens[]` carries Strong's for Hebrew; Greek surface words (strong often null)
+- **No changes** to `index.html` / `bible.html` / `playVerse` this increment
+
+**Verified**:
+```
+python db/scripts/test_query_phase4.py   # ALL PASS
+python db/scripts/query_db.py dual-read --day "0101,0702,1225" --source local
+→ DUAL-READ OVERALL: PASS (210+168+170 English cells checked, 0 mismatches)
+python db/scripts/query_db.py strong --num H430 --limit 5 --compact
+→ 2245 verses (Elohim)
+```
+
+**Docs updated**: `docs/INDEX.md` TODO, `db/README.md` Phase 4 section, this log.
+
+**Not done / next Phase 4 increments**:
+- No browser UI Strong's tooltip yet
+- No HTTP API (CLI + library only)
+- Option B (DB as `loadDailyBread` source) deferred until needed + AGENTS audio verify
+- No LSB
+
+**Git note**: Working tree already had Phase 3 artifacts unstaged (`verify_db.py`, bible_meta, readings.json, etc.). New files under `db/query/` + scripts.
+
+**Bible is primary. Static JSON remains primary for daily UX. DB is optional capability + truth diagnostic.**

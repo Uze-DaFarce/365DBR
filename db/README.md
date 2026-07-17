@@ -220,10 +220,44 @@ Scripts:
 - `db/scripts/populate_day.py` — load
 - `db/scripts/verify_population.py` — compare DB to source JSON (fail on mismatch)
 
-## Next after Phase 2 sample success
+## Phase 3: Full DB reconciliation
 
-- Expand to more / all 365 days when ready
-- Phase 3 full reconciliation + optional query prototypes
+```powershell
+python db/scripts/verify_db.py
+python db/scripts/verify_db.py --json-spot-days "0101,0702,1225"
+```
+
+Checks book-level counts vs `bible_common.BIBLE_DATA`, plan coverage, TR samples, Strong's, performance, S.I. smoke queries.
+
+## Phase 4: Optional DB query layer (static JSON remains primary)
+
+**Constraint**: Live `index.html` / `bible.html` still load day packs from static JSON.
+This layer does **not** change `loadDailyBread` / `verseMap` / `playVerse`.
+
+```powershell
+# Day pack from DB (verseMap-compatible; use --compact for summary)
+python db/scripts/query_db.py day --day "0101" --compact
+
+# Single verse + Strong's tokens
+python db/scripts/query_db.py verse --id GEN.1.1
+
+# Strong's search (H430 = Elohim)
+python db/scripts/query_db.py strong --num H430 --limit 10 --compact
+
+# Dual-read: local JSON pack English vs DB (fail on mismatch)
+python db/scripts/query_db.py dual-read --day "0101,0702,1225" --source local
+
+# Smoke tests (requires populated DB)
+python db/scripts/test_query_phase4.py
+```
+
+Library: `db/query/` (`load_day`, `load_verse`, `search_strong`, `dual_read_day`).
+
+## Next after Phase 4
+
+- Optional: thin HTTP API or UI Strong's tooltip (still non-primary)
+- Option B only if small + AGENTS verified (`loadDailyBread` from DB)
+- Phase 5: annotations / S.I. metadata
 - Keep static JSON pipeline working until dual-write / cutover
 
 ## Troubleshooting

@@ -256,9 +256,9 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-07-13 (Phase 2 sample ETL: populate + verify PASS for days 0123, 0702, 0823 from local GRCTR/WLC packs)
+**Last Updated**: 2026-07-16 (Phase 4 Option A: `db/query/` + `query_db.py` dual-read; Phase 3 verify_db OVERALL PASS)
 
-**Current Phase**: Phase 2 **sample population complete** (3 days). Next: expand day coverage and/or Phase 3 reconciliation. See `db/README.md`, `docs/365DBR/DEV-Logs.md`, `docs/365DBR/Migration-Plan.md`.
+**Current Phase**: Phase 4 **started** (Option A — low risk). Static JSON remains primary for live daily reader. Optional DB query layer + dual-read diagnostic landed. Phase 3 reconciliation **PASS** (56/56; verses=31167; full canonical coverage).
 
 **TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
 - [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).
@@ -269,17 +269,21 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 - [x] Phase 1 implemented: Docker Postgres 16, `db/migrations/001_initial_schema.sql`, apply/seed/verify scripts, 66 books + LSV/KJV seeds; `verify_schema.py` **PASSED**.
 - [x] Phase 2 sample population: `db/scripts/populate_day.py` + `verify_population.py`; days **0123, 0702, 0823** PASS (local GRCTR + WLC; LSV/KJV text match; Hebrew Strong's + Greek tokens).
 - [x] Phase 2 full load: **365/365 days** populated from local packs (`--all --source local`); spot-verify PASS (0101, 0615, 1225, 1231).
+- [x] Phase 3 tool: `db/scripts/verify_db.py` (book counts, plan, TR samples, Strong's, perf, S.I. smoke, JSON spot).
+- [x] Phase 3 sign-off: `verify_db.py` **OVERALL PASS** (56/56); full canonical coverage; LSV=KJV=30785; TR samples OK.
+- [x] Phase 4 Option A (first increment): `db/query/` library + `db/scripts/query_db.py` (day / verse / Strong's / dual-read JSON↔DB); smoke `test_query_phase4.py` PASS; **no frontend change** (verseMap / loadDailyBread untouched).
+- [ ] Phase 4 next: optional UI/API surface for Strong's (still non-primary); Option B only if small + AGENTS verified.
 - [ ] Iterate schema from feedback; seed minimal annotations for speaker/theme demo.
 - [ ] LSB integration (blocked pending 316 Publishing clarification); add WEB etc.
-- [ ] Full 365 + rich metadata + S.I. query prototypes.
-- [ ] Update pipeline to DB-primary (or dual); maintain 365DBR daily UX.
+- [ ] Full rich metadata + S.I. query prototypes; dual-write / cutover later.
 - Blockers: LSB access finalization; any hosting/DB provisioning details.
 
 **Next Steps (explicit)**:
-1. ~~Phase 1~~ done. ~~Phase 2 sample ETL~~ done (3 days).
-2. Expand ETL to more days (quote MMDD in PowerShell: `--day "0702"`). Prefer local packs post-GRCTR; prod URL after FTP.
-3. Phase 3: broader reconciliation (book-level counts, query smoke tests).
-4. Keep 100% focus on 365DBR until data fully leveraged for S.I.
+1. ~~Phase 1–3~~ done (schema + full 365 load + reconciliation PASS).
+2. ~~Phase 4 Option A first increment~~ done (`query_db.py` + dual-read).
+3. Phase 4 follow-ups: optional Strong's UI or thin read API; keep static JSON primary.
+4. Phase 5 when ready: minimal annotations seed for S.I. demos.
+5. Keep 100% focus on 365DBR until data fully leveraged for S.I.
 
 **Handoff guidance**: When spinning DEV (or future), new sessions simply start by reading `docs/Roles/365DBR-DEV.md` (it now contains the current Phase 1 handoff + required reading list). It instructs to also read docs/INDEX.md (full), docs/Project Blueprint_ Scriptural Intelligence (SI).md, docs/365DBR/Data-Sources.md, docs/365DBR/Database-Schema.md, and docs/365DBR/Migration-Plan.md. Use production data only.
 

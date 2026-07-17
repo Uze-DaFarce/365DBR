@@ -271,9 +271,9 @@
   },
   {
     "day": "0131",
-    "api_format": "EXO.4.30-EXO.6.29,MAT.22.17-MAT.22.38,PSA.18.36-PSA.18.42,PRO.4.7-PRO.4.9",
-    "text_friendly": "Exodus 4:30 \u2013 6:29, Matthew 22:17\u201338, Psalms 18:36\u201342, Proverbs 4:7\u20139",
-    "ot_verse_count": 54,
+    "api_format": "EXO.4.30-EXO.6.30,MAT.22.17-MAT.22.38,PSA.18.36-PSA.18.42,PRO.4.7-PRO.4.9",
+    "text_friendly": "Exodus 4:30 \u2013 6:30, Matthew 22:17\u201338, Psalms 18:36\u201342, Proverbs 4:7\u20139",
+    "ot_verse_count": 55,
     "nt_verse_count": 22,
     "ps_verse_count": 7,
     "pr_verse_count": 3
@@ -1660,7 +1660,7 @@
     "api_format": "2KI.20.1-2KI.21.26,ACT.8.32-ACT.9.13,PSA.79.1-PSA.79.7,PRO.16.23-PRO.16.25",
     "text_friendly": "2 Kings 20:1 \u2013 21:26, Acts 8:32 \u2013 9:13, Psalms 79:1\u20137, Proverbs 16:23\u201325",
     "ot_verse_count": 47,
-    "nt_verse_count": 21,
+    "nt_verse_count": 22,
     "ps_verse_count": 7,
     "pr_verse_count": 3
   },

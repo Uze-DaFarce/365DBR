@@ -89,6 +89,12 @@
 - **Constraint**: Daily reading must remain functional and fast throughout. Audio, navigation, focus, accessibility unchanged or improved.
 - **DEV scope**: Small, reviewable increments. Always test with prod data dates.
 
+**Progress (2026-07-16)**:
+- [x] Option A first increment: `db/query/` + `db/scripts/query_db.py` (`day`, `verse`, `strong`, `dual-read`).
+- [x] Dual-read diagnostic: local JSON pack LSV/KJV vs DB (0101/0702/1225 PASS).
+- [x] Smoke: `db/scripts/test_query_phase4.py`.
+- [ ] Optional UI/API for Strong's; Option B deferred (AGENTS verify required).
+
 ### Phase 5: Rich Metadata & S.I. Enablement
 - Curate / import annotations (speakers, chronology, themes, cross-refs).
   - Start small: obvious cases (e.g. "Jesus" for direct quotes in Gospels via known ranges; "God" for "And God said"; Psalm attributions from headings).
