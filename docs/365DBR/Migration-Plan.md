@@ -93,7 +93,8 @@
 - [x] Option A first increment: `db/query/` + `db/scripts/query_db.py` (`day`, `verse`, `strong`, `dual-read`).
 - [x] Dual-read diagnostic: local JSON pack LSV/KJV vs DB (0101/0702/1225 PASS).
 - [x] Smoke: `db/scripts/test_query_phase4.py`.
-- [ ] Optional UI/API for Strong's; Option B deferred (AGENTS verify required).
+- [x] Option A second increment: local read-only HTTP API `db/scripts/serve_query_api.py` + `test_query_api_phase4.py` (stdlib, bind 127.0.0.1; wraps same library).
+- [ ] Optional browser Strong's UI (feature-detect API); Option B deferred (AGENTS verify required).
 
 ### Phase 5: Rich Metadata & S.I. Enablement
 - Curate / import annotations (speakers, chronology, themes, cross-refs).

@@ -131,19 +131,22 @@ def cmd_dual_read(args) -> int:
             status = "PASS" if report["ok"] else "FAIL"
             print(
                 f"  [{status}] checked={report['checked']} "
+                f"plan={report.get('plan_checked', '?')} "
+                f"spillover={report.get('spillover_checked', 0)} "
                 f"mismatches={report['mismatch_count']} "
                 f"db_verses={report['db_verse_count']} "
                 f"json_lsv={report['json_lsv_count']} "
                 f"json_kjv={report['json_kjv_count']}"
             )
             print(f"  label: {report['label']}")
-            if report["missing_in_db_count"]:
-                print(f"  missing_in_db: {report['missing_in_db_count']}")
-            if report["missing_in_json_count"]:
+            for note in report.get("notes") or []:
+                print(f"  [NOTE] {note}")
+            missing_en = report.get("plan_missing_english_count") or 0
+            if missing_en:
+                sample = report.get("plan_missing_english_sample") or []
                 print(
-                    f"  [INFO] in DB plan but not in JSON pack LSV: "
-                    f"{report['missing_in_json_count']} "
-                    f"(sample: {report['missing_in_json_sample'][:5]})"
+                    f"  [INFO] plan verses without English in DB: {missing_en} "
+                    f"(sample: {sample[:5]})"
                 )
             if report["mismatches"]:
                 for m in report["mismatches"][:10]:

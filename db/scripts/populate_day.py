@@ -126,7 +126,19 @@ def load_day_files(day: str, source: str) -> tuple[dict, list[tuple[str, dict]],
     return manifest, files, base_url
 
 
-def ensure_verse(cur, verse_id: str, verse_order_map: dict[str, int]):
+def ensure_verse(
+    cur,
+    verse_id: str,
+    verse_order_map: dict[str, int],
+    *,
+    order_hint: int | None = None,
+    quiet: bool = False,
+):
+    """
+    Upsert a verses row. English-primary BCVs may not exist in Hebrew-oriented
+    BIBLE_DATA (e.g. GEN.31.55 English vs GEN.31 max 54 in WLC inventory).
+    Those are still valid display keys — insert with order_hint or synthetic order.
+    """
     parts = verse_id.split(".")
     if len(parts) != 3:
         raise ValueError(f"Bad verse id: {verse_id}")
@@ -134,10 +146,33 @@ def ensure_verse(cur, verse_id: str, verse_order_map: dict[str, int]):
     if book not in bible_common.BIBLE_DATA:
         raise ValueError(f"Unknown book in verse id: {verse_id}")
     vo = verse_order_map.get(verse_id)
+    if vo is None and order_hint is not None:
+        vo = order_hint
     if vo is None:
-        # still insert with high order for rare edge cases, but warn
-        vo = 90_000_000 + ch * 1000 + v
-        print(f"  [warn] verse_order not in BIBLE_DATA map: {verse_id} (using {vo})")
+        # English-only / Protestant BCV not in BIBLE_DATA — keep near chapter
+        # using a synthetic order that sorts after known verses in that chapter.
+        base = None
+        for prev in range(v - 1, 0, -1):
+            base = verse_order_map.get(f"{book}.{ch}.{prev}")
+            if base is not None:
+                break
+        if base is None:
+            for nxt in range(v + 1, v + 50):
+                base = verse_order_map.get(f"{book}.{ch}.{nxt}")
+                if base is not None:
+                    base = base - 1
+                    break
+        if base is not None:
+            vo = base  # same continuum slot as neighbor; unique id still differs
+        else:
+            vo = 90_000_000 + bible_common.ALL_BOOKS.index(book) * 100_000 + ch * 200 + v
+        if not quiet:
+            print(
+                f"  [info] English/display BCV not in BIBLE_DATA inventory: {verse_id} "
+                f"(verse_order={vo}; Hebrew/org counts differ — expected for English-primary)"
+            )
+    # Never overwrite verse_order on conflict for existing BIBLE_DATA rows —
+    # clobbering caused REV.22.1 and REV.21.27 to share order and broke ranges.
     cur.execute(
         """
         INSERT INTO verses (id, book_code, chapter, verse, verse_order)
@@ -145,8 +180,7 @@ def ensure_verse(cur, verse_id: str, verse_order_map: dict[str, int]):
         ON CONFLICT (id) DO UPDATE SET
             book_code = EXCLUDED.book_code,
             chapter = EXCLUDED.chapter,
-            verse = EXCLUDED.verse,
-            verse_order = EXCLUDED.verse_order
+            verse = EXCLUDED.verse
         """,
         (verse_id, book, ch, v, vo),
     )
@@ -173,7 +207,8 @@ def populate_one_day(conn, day: str, source: str, verse_order_map: dict[str, int
         raise ValueError(f"{day}: api_format must have 4 sections, got {len(ranges)}")
 
     parsed_files = []
-    all_verse_ids: set[str] = set()
+    all_verse_ids: set[str] = set()  # English-primary display ids
+    all_source_ids: set[str] = set()  # org/source ids from original content
     for fname, raw in file_payloads:
         # integrity vs filename range (no inject)
         range_str = fname.replace(".json", "")
@@ -186,11 +221,19 @@ def populate_one_day(conn, day: str, source: str, verse_order_map: dict[str, int
         p = parse_passage_payload(raw, fname)
         parsed_files.append(p)
         all_verse_ids.update(p["verse_ids"])
+        all_source_ids.update(p.get("source_verse_ids") or [])
+        n_align = len(p.get("alignments") or [])
+        n_titles = len(p.get("titles") or [])
         print(
-            f"  {fname}: lang={p['language']} verses={len(p['verse_ids'])} "
+            f"  {fname}: lang={p['language']} display_verses={len(p['verse_ids'])} "
+            f"source_verses={len(p.get('source_verse_ids') or [])} "
             f"tokens={len(p['tokens'])} trans={list(p['translations'].keys())} "
-            f"bibleId={p['bible_id']}"
+            f"alignments={n_align} titles={n_titles} bibleId={p['bible_id']}"
         )
+        if p.get("org_to_english"):
+            # compact sample of map for audit
+            sample = list(p["org_to_english"].items())[:3]
+            print(f"    org→english sample: {sample} (via {p.get('alignment_established_by')})")
 
     with conn.cursor() as cur:
         trans_ids = get_translation_ids(cur)
@@ -198,26 +241,67 @@ def populate_one_day(conn, day: str, source: str, verse_order_map: dict[str, int
             if code not in trans_ids:
                 raise RuntimeError(f"Translation {code} not seeded — run seed_books + migrations")
 
-        # Verses
-        for vid in sorted(all_verse_ids):
-            ensure_verse(cur, vid, verse_order_map)
+        # Build order hints: English display id → source org verse_order when mapped
+        order_hints: dict[str, int] = {}
+        for p in parsed_files:
+            for a in p.get("alignments") or []:
+                eng, src = a["english_verse_id"], a["source_verse_id"]
+                svo = verse_order_map.get(src)
+                if svo is not None:
+                    order_hints[eng] = svo
 
-        # Tokens: replace per verse for this day load (delete existing tokens for these verses then insert)
-        for vid in all_verse_ids:
+        # Verses: ALWAYS ensure English-primary + source ids (not only BIBLE_DATA keys).
+        # Skipping non-map ids caused FK failures on GEN.31.55, EXO.8.29, etc.
+        extra_english = 0
+        for vid in sorted(all_verse_ids | all_source_ids):
+            was_extra = vid not in verse_order_map
+            ensure_verse(
+                cur,
+                vid,
+                verse_order_map,
+                order_hint=order_hints.get(vid),
+                quiet=not was_extra,
+            )
+            if was_extra and vid in all_verse_ids:
+                extra_english += 1
+        if extra_english:
+            print(
+                f"  [info] ensured {extra_english} English/display BCV(s) "
+                f"outside BIBLE_DATA inventory (Protestant vs Hebrew counts)"
+            )
+
+        # Clear tokens for both display and prior source keys (re-run safe)
+        clear_ids = all_verse_ids | all_source_ids
+        for vid in clear_ids:
             cur.execute("DELETE FROM original_tokens WHERE verse_id = %s", (vid,))
+            cur.execute(
+                "DELETE FROM original_tokens WHERE source_verse_id = %s",
+                (vid,),
+            )
 
         token_rows = 0
         for p in parsed_files:
             for t in p["tokens"]:
+                src = t.get("source_verse_id") or t["verse_id"]
+                # Defensive: token display id must exist in verses
+                ensure_verse(
+                    cur,
+                    t["verse_id"],
+                    verse_order_map,
+                    order_hint=order_hints.get(t["verse_id"]) or verse_order_map.get(src),
+                    quiet=True,
+                )
                 cur.execute(
                     """
                     INSERT INTO original_tokens
-                        (verse_id, word_order, language, surface_text, strong_number, lemma, morph, extra)
-                    VALUES (%s, %s, %s, %s, %s, NULL, NULL, '{}'::jsonb)
+                        (verse_id, word_order, language, surface_text, strong_number,
+                         lemma, morph, extra, source_verse_id)
+                    VALUES (%s, %s, %s, %s, %s, NULL, NULL, '{}'::jsonb, %s)
                     ON CONFLICT (verse_id, word_order) DO UPDATE SET
                         language = EXCLUDED.language,
                         surface_text = EXCLUDED.surface_text,
-                        strong_number = EXCLUDED.strong_number
+                        strong_number = EXCLUDED.strong_number,
+                        source_verse_id = EXCLUDED.source_verse_id
                     """,
                     (
                         t["verse_id"],
@@ -225,22 +309,26 @@ def populate_one_day(conn, day: str, source: str, verse_order_map: dict[str, int
                         t["language"],
                         t["surface_text"],
                         t["strong_number"],
+                        src,
                     ),
                 )
                 token_rows += 1
 
-        # Translations
+        # Translations — English verseId is storage key (modern numbering)
         vt_rows = 0
         for p in parsed_files:
             for code, verse_map in p["translations"].items():
                 tid = trans_ids[code]
                 for vid, text in verse_map.items():
-                    if vid not in all_verse_ids:
-                        # parallel may include slight neighbor bleed — only store for known day verses
-                        continue
                     if not text or not text.strip():
                         continue
-                    ensure_verse(cur, vid, verse_order_map)
+                    ensure_verse(
+                        cur,
+                        vid,
+                        verse_order_map,
+                        order_hint=order_hints.get(vid),
+                        quiet=True,
+                    )
                     cur.execute(
                         """
                         INSERT INTO verse_translations (verse_id, translation_id, text, source_note)
@@ -252,6 +340,83 @@ def populate_one_day(conn, day: str, source: str, verse_order_map: dict[str, int
                         (vid, tid, text.strip(), p["source_note"]),
                     )
                     vt_rows += 1
+
+        # Alignments from api.bible verseOrgIds
+        align_rows = 0
+        for p in parsed_files:
+            for a in p.get("alignments") or []:
+                eng, src = a["english_verse_id"], a["source_verse_id"]
+                ensure_verse(
+                    cur,
+                    eng,
+                    verse_order_map,
+                    order_hint=order_hints.get(eng) or verse_order_map.get(src),
+                    quiet=True,
+                )
+                cur.execute(
+                    """
+                    INSERT INTO verse_alignments
+                        (english_verse_id, source_verse_id, source_system, established_by, note)
+                    VALUES (%s, %s, 'api.bible-org', %s, %s)
+                    ON CONFLICT (english_verse_id, source_verse_id, source_system) DO UPDATE SET
+                        established_by = EXCLUDED.established_by,
+                        note = EXCLUDED.note
+                    """,
+                    (
+                        eng,
+                        src,
+                        a.get("established_by") or None,
+                        f"from {p['file_ref']}",
+                    ),
+                )
+                align_rows += 1
+        if align_rows:
+            print(f"  [info] verse_alignments upserted: {align_rows}")
+
+        # Titles / superscriptions → annotations (not fused into verse body by us)
+        title_rows = 0
+        for p in parsed_files:
+            for t in p.get("titles") or []:
+                text = (t.get("text") or "").strip()
+                if not text:
+                    continue
+                # Anchor to first display verse of this file if available
+                anchor = (p["verse_ids"][0] if p.get("verse_ids") else None)
+                if not anchor or anchor not in verse_order_map:
+                    continue
+                ensure_verse(cur, anchor, verse_order_map)
+                # Idempotent-ish: delete same type/value/range for re-run
+                cur.execute(
+                    """
+                    DELETE FROM annotations
+                    WHERE annotation_type = %s
+                      AND start_verse_id = %s AND end_verse_id = %s
+                      AND value = %s
+                    """,
+                    (t.get("annotation_type") or "title", anchor, anchor, text),
+                )
+                cur.execute(
+                    """
+                    INSERT INTO annotations
+                        (annotation_type, start_verse_id, end_verse_id, value, metadata, source)
+                    VALUES (%s, %s, %s, %s, %s::jsonb, %s)
+                    """,
+                    (
+                        t.get("annotation_type") or "title",
+                        anchor,
+                        anchor,
+                        text,
+                        json.dumps({
+                            "style": t.get("style"),
+                            "from_parallel": t.get("source"),
+                            "file_ref": p["file_ref"],
+                        }),
+                        f"api.bible-title:{t.get('source') or 'original'}",
+                    ),
+                )
+                title_rows += 1
+        if title_rows:
+            print(f"  [info] title/superscription annotations: {title_rows}")
 
         # Daily reading + passages
         label = manifest.get("label") or plan.get("text_friendly") or day

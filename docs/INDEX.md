@@ -256,9 +256,9 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-07-16 (Phase 4 Option A: `db/query/` + `query_db.py` dual-read; Phase 3 verify_db OVERALL PASS)
+**Last Updated**: 2026-07-27 (Phase 4 Option A solid: English-primary alignment, full 365 re-populate, stress tests; handoff ready)
 
-**Current Phase**: Phase 4 **started** (Option A — low risk). Static JSON remains primary for live daily reader. Optional DB query layer + dual-read diagnostic landed. Phase 3 reconciliation **PASS** (56/56; verses=31167; full canonical coverage).
+**Current Phase**: Phase 4 **Option A complete enough for next increment**. Static JSON remains primary for live daily reader. DB: English-primary BCV + `verseOrgIds` alignment; 365/365 days populated; stress dual-read PASS. See `docs/365DBR/Verse-Identity-and-Alignment.md` and latest `DEV-Logs.md`. **Next session prompt**: `docs/365DBR/Handoff-Next-Session.md`.
 
 **TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
 - [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).
@@ -271,8 +271,11 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 - [x] Phase 2 full load: **365/365 days** populated from local packs (`--all --source local`); spot-verify PASS (0101, 0615, 1225, 1231).
 - [x] Phase 3 tool: `db/scripts/verify_db.py` (book counts, plan, TR samples, Strong's, perf, S.I. smoke, JSON spot).
 - [x] Phase 3 sign-off: `verify_db.py` **OVERALL PASS** (56/56); full canonical coverage; LSV=KJV=30785; TR samples OK.
-- [x] Phase 4 Option A (first increment): `db/query/` library + `db/scripts/query_db.py` (day / verse / Strong's / dual-read JSON↔DB); smoke `test_query_phase4.py` PASS; **no frontend change** (verseMap / loadDailyBread untouched).
-- [ ] Phase 4 next: optional UI/API surface for Strong's (still non-primary); Option B only if small + AGENTS verified.
+- [x] Phase 4.1 Option A: `db/query/` + `query_db.py` (day / verse / Strong's / dual-read); smoke `test_query_phase4.py` PASS; commit `1b39639`.
+- [x] Phase 4.2 Option A: local read-only HTTP API `serve_query_api.py` (127.0.0.1:8765) + `test_query_api_phase4.py` PASS; **still no frontend change**.
+- [x] Verse identity: English-primary + `verseOrgIds` alignment (`002_verse_alignment.sql`, parse/populate/load_day); titles → annotations; sample days re-populated; dual-read PASS. **Do not blame api.bible without repro** — trust and verify.
+- [x] Full 365 re-populate with alignment: **365/365 OK** after English-only BCV `ensure_verse` FK fix; `repair_verse_order.py`; stress tests (`test_query_stress_phase4.py`) month-ends/alignment edges — not only 0101/GEN.1.1.
+- [ ] Phase 4 next: optional browser Strong's UI (feature-detect API; non-primary); Option B only if small + AGENTS verified.
 - [ ] Iterate schema from feedback; seed minimal annotations for speaker/theme demo.
 - [ ] LSB integration (blocked pending 316 Publishing clarification); add WEB etc.
 - [ ] Full rich metadata + S.I. query prototypes; dual-write / cutover later.
@@ -280,11 +283,11 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 **Next Steps (explicit)**:
 1. ~~Phase 1–3~~ done (schema + full 365 load + reconciliation PASS).
-2. ~~Phase 4 Option A first increment~~ done (`query_db.py` + dual-read).
-3. Phase 4 follow-ups: optional Strong's UI or thin read API; keep static JSON primary.
-4. Phase 5 when ready: minimal annotations seed for S.I. demos.
-5. Keep 100% focus on 365DBR until data fully leveraged for S.I.
+2. ~~Phase 4 Option A backend~~ done (CLI, local API, English-primary alignment, 365 re-populate, stress tests).
+3. Phase 4 follow-up candidates: optional Strong's UI (feature-detect API); tighten empty-original English edges; optional dual-write notes.
+4. Phase 5 when ready: minimal speaker/theme annotations for S.I. demos.
+5. Keep 100% focus on 365DBR until data fully leveraged for S.I. LSB still blocked.
 
-**Handoff guidance**: When spinning DEV (or future), new sessions simply start by reading `docs/Roles/365DBR-DEV.md` (it now contains the current Phase 1 handoff + required reading list). It instructs to also read docs/INDEX.md (full), docs/Project Blueprint_ Scriptural Intelligence (SI).md, docs/365DBR/Data-Sources.md, docs/365DBR/Database-Schema.md, and docs/365DBR/Migration-Plan.md. Use production data only.
+**Handoff guidance**: New sessions: read `docs/365DBR/Handoff-Next-Session.md` first (scoped next work), then `docs/Roles/365DBR-DEV.md` + INDEX + Verse-Identity + latest DEV-Logs. Prefer stress tests over toy 0101/GEN.1.1. Trust api.bible; verify with payload fields before blaming API.
 
 This document will be maintained as the single source of truth to minimize repetition. Never repeat analysis — reference the 365DBR/ files.

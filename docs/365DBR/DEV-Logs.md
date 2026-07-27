@@ -199,3 +199,147 @@ python db/scripts/query_db.py strong --num H430 --limit 5 --compact
 **Git note**: Working tree already had Phase 3 artifacts unstaged (`verify_db.py`, bible_meta, readings.json, etc.). New files under `db/query/` + scripts.
 
 **Bible is primary. Static JSON remains primary for daily UX. DB is optional capability + truth diagnostic.**
+
+---
+
+## 2026-07-16 (cont.) — Phase 4.2 local query HTTP API
+
+**Context**: Phase 4.1 CLI checked in as `1b39639`. Continue Option A with thin local read-only HTTP surface; no frontend / `loadDailyBread` changes.
+
+**Deliverable**:
+| Artifact | Role |
+|----------|------|
+| `db/scripts/serve_query_api.py` | stdlib `ThreadingHTTPServer`; default `127.0.0.1:8765` |
+| `db/scripts/test_query_api_phase4.py` | In-process server + real DB endpoint smoke |
+
+**Endpoints** (JSON, CORS `*` for local UI experiments only):
+- `GET /health`
+- `GET /verse/{BCV}` — translations + original tokens / Strong's
+- `GET /strong/{num}?limit=N`
+- `GET /day/{MMDD}?compact=1` — verseMap-compatible (flattened string `text`)
+- `GET /dual-read/{MMDD}?source=local|prod` — 200 match / 409 mismatch
+
+**Constraints respected**:
+- Static JSON still primary for live reader
+- No edits to `index.html` / `bible.html` / audio path
+- Fail-fast: DB connect check at startup; bad Strong's → 400; unknown path → 404
+
+**Verified**:
+```
+python db/scripts/test_query_api_phase4.py  # ALL PASS (13 checks)
+python db/scripts/test_query_phase4.py      # ALL PASS (regression)
+```
+
+**Docs**: INDEX TODO 4.2 checked; `db/README.md` Phase 4.2 section; Migration-Plan progress.
+
+**Next**: optional browser Strong's panel that feature-detects `http://127.0.0.1:8765` (or future hosted API) without making DB required for daily reading. Option B still deferred.
+
+**Bible is primary.**
+
+---
+
+## 2026-07-16 (cont.) — dual-read 0228 diagnosis + clearer API report
+
+**User hit**: `http://127.0.0.1:8765/dual-read/0228?compact=1` → incomplete-looking `{` (actually HTTP **409** body; dual-read failed).
+
+**Root cause (truth / data, not server crash)**:
+- Plan day 0228 PSA = `PSA.31.19–31.25` (Hebrew WLC / BIBLE_DATA = **25** verses in ch. 31).
+- Local pack English (LSV/KJV) for that file is labeled **`PSA.31.18–31.24`** (English 24-verse numbering / superscription drift).
+- ETL `populate_day.py` only stores English when `verseId ∈ original verse_ids` for that day → drops spillover `PSA.31.18` English and never stores English for plan `PSA.31.25`.
+- DB: `PSA.31.18` and `PSA.31.25` have **original tokens** but **no LSV/KJV** rows. Same pattern likely at other Psalm superscription boundaries (e.g. `PSA.31.11` also empty English).
+
+**Fixes this session**:
+- `dual_read_day`: classify **plan** vs **spillover**; global lookup for spillover; report `plan_missing_english`.
+- API: dual-read always **HTTP 200** with `ok: true|false` (full JSON in browser); honor `?compact=1`.
+
+**Restart required** for running `serve_query_api.py` to pick up code.
+
+**Open (next increment)**: Psalm Hebrew↔English verse alignment in ETL (do not silently drop English; document superscription mapping). Not fixed by dual-read reporting alone.
+
+---
+
+## 2026-07-20 — Fix dual-read 0228 / PSA.31.18 missing English
+
+**User report**: dual-read 0228 `ok:false` with `PSA.31.18` LSV+KJV `missing_in_db`.
+
+**Cause**:
+1. Day plan PSA is `31:19–25` (Hebrew/WLC; ch. 31 has **25** verses).
+2. api.bible English parallels for that file are labeled `31:18–24` (English **24**-verse chapter / superscription drift).
+3. ETL skipped any parallel `verseId` not in the original-language verse set → **dropped real LSV/KJV text** for `PSA.31.18`.
+
+**Fix**:
+- `populate_day.py`: store English for every **canonical** BCV (`verse_order_map`); log spillover cells.
+- Re-populated `0225–0228` from local packs.
+- `dual_read_day`: plan vs spillover classification; hard-fail only when JSON English is missing/mismatched in DB; plan-missing-English is informational.
+- `query_db.py` dual-read CLI updated for new report keys.
+
+**Verified**:
+```
+python db/scripts/query_db.py dual-read --day "0228" --source local  → PASS (160 cells)
+PSA.31.18 now has LSV + KJV in DB
+verify_population 0228 PASS
+```
+
+**Note (still open)**: Full-corpus re-populate still needed for days not yet re-run with alignment.
+
+**Bible is primary.**
+
+---
+
+## 2026-07-20 — English-primary alignment via api.bible `verseOrgIds` (not API blame)
+
+**User correction**: Do not attribute versification differences to api.bible errors without proof. Past issues have been ours (params, filters, ignoring fields). Trust and verify.
+
+**Root cause of PSA.31 dual-read / “mismatch”** (ours):
+- Fetch already uses `use-org-id=true`.
+- English parallels carry `verseId` (modern English) + `verseOrgIds` (original/org for same content).
+- ETL stored Hebrew under org ids and English under English ids, **ignored `verseOrgIds`**, and sometimes dropped English cells.
+
+**Verified from local pack** (api.bible payload is coherent):
+```text
+PSA.31 English: verseId PSA.31.18, verseOrgIds [PSA.31.19]
+→ same content; two numbering systems, not corruption.
+```
+
+**Implemented**:
+- `docs/365DBR/Verse-Identity-and-Alignment.md` — principles + watch-list
+- `db/migrations/002_verse_alignment.sql` — `verse_alignments`, `original_tokens.source_verse_id`
+- `db/etl/parse_passage.py` — org→English map from `verseOrgIds`; titles from style `d`/`s`; English-primary tokens
+- `populate_day.py` — alignments + title annotations; English storage keys
+- `load_day` — plan org range → English display set via `verse_alignments`
+
+**Verified after re-populate 0101,0126,0212,0227,0228**:
+```text
+dual-read 0228/0101/0126/0212 → PASS
+PSA.31.18 original Hebrew now “mute lying lips…” matching English (was wrongly “let me not be ashamed” under bare BCV equality)
+PSA.18.2→PSA.18.1 map; superscription annotation on PSA.18 / PSA.23
+```
+
+**Follow-up**: `populate_day.py --all --source local` to realign full 365; optional live UI later (static JSON still primary).
+
+**Bible is primary. Numbering serves readers. Alignment from the payload, not invented offsets.**
+
+---
+
+## 2026-07-27 — FK fix for English-only BCVs + real-world stress tests
+
+**User report**: `--all` populate 327 OK / **38 failed** with  
+`original_tokens_verse_id_fkey` on keys like `GEN.31.55`, `EXO.8.29`, `MAL.4.*` pattern edges.
+
+**Cause (ours, not api.bible)**: English-primary remap correctly produced Protestant BCVs that are **outside** Hebrew-oriented `BIBLE_DATA` chapter lengths (e.g. GEN.31 max 54 in inventory). Populate only `ensure_verse`’d ids **in** the map → no `verses` row → FK on token insert.
+
+**Fixes**:
+1. `populate_day.ensure_verse` for **all** display/source ids (not only BIBLE_DATA keys).
+2. Do **not** overwrite `verse_order` on conflict (had clobbered `REV.22.1` = `REV.21.27` order → broken ranges).
+3. `load_day`: per-source alignment resolve (map if present else keep plan BCV) — never replace whole day with partial map subset.
+4. `repair_verse_order.py` — re-apply canonical order from `BIBLE_DATA`.
+5. **`test_query_stress_phase4.py`**: month-ends, leap-ish days, English edges, offset alignments, 60-day dual-read sample, complex plans — **not** only 0101/GEN.1.1/JHN.1.1. Smoke suite retargeted to non-toy days.
+
+**Verified**:
+```
+populate --all: 365 OK / 0 failed
+stress: PASS (60/60 dual-read, ~10k cells; load_day 1231=71; GEN.31.55 present)
+dual-read 1231,0117,0222,0319,0819 PASS
+```
+
+**Bible is primary.**

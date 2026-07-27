@@ -229,6 +229,18 @@ python db/scripts/verify_db.py --json-spot-days "0101,0702,1225"
 
 Checks book-level counts vs `bible_common.BIBLE_DATA`, plan coverage, TR samples, Strong's, performance, S.I. smoke queries.
 
+## Verse identity (English-primary)
+
+See **`docs/365DBR/Verse-Identity-and-Alignment.md`**.
+
+- User-facing / translation keys: **modern English** `verseId` (KJV/LSV-style).
+- Original tokens: remapped using api.bible **`verseOrgIds`** (org/source id → English id). We do **not** invent Psalm offsets.
+- Titles/superscriptions: `annotations` (`superscription` / `title`), not invented verse numbers.
+- Migration: `002_verse_alignment.sql` (`verse_alignments`, `original_tokens.source_verse_id`).
+- After pull: `python db/scripts/apply_migrations.py` then re-populate days (ideally `--all`).
+
+**api.bible**: trust and verify. Past numbering “bugs” were ETL ignoring `verseOrgIds` / filtering parallels — not proven API text errors.
+
 ## Phase 4: Optional DB query layer (static JSON remains primary)
 
 **Constraint**: Live `index.html` / `bible.html` still load day packs from static JSON.
@@ -247,15 +259,44 @@ python db/scripts/query_db.py strong --num H430 --limit 10 --compact
 # Dual-read: local JSON pack English vs DB (fail on mismatch)
 python db/scripts/query_db.py dual-read --day "0101,0702,1225" --source local
 
-# Smoke tests (requires populated DB)
+# Smoke tests (requires populated DB) — prefer stress suite over toy 0101/GEN.1.1
 python db/scripts/test_query_phase4.py
+python db/scripts/test_query_stress_phase4.py --dual-read-limit 60
+python db/scripts/test_query_api_phase4.py
+
+# If verse_order was clobbered, re-apply BIBLE_DATA order:
+python db/scripts/repair_verse_order.py
 ```
+
+**English BCVs outside Hebrew `BIBLE_DATA`** (e.g. `GEN.31.55`, `MAL.4.1`, `EXO.8.29`): valid Protestant display keys. Populate **ensures** `verses` rows for them (FK fix). Alignment still from api.bible `verseOrgIds`, not invented offsets.
 
 Library: `db/query/` (`load_day`, `load_verse`, `search_strong`, `dual_read_day`).
 
+### Phase 4.2: Local read-only HTTP API
+
+Thin stdlib server wrapping the same library. **Local/dev only** (default `127.0.0.1:8765`). Does not replace static JSON for the live reader.
+
+```powershell
+python db/scripts/serve_query_api.py
+# other terminal / browser:
+#   http://127.0.0.1:8765/health
+#   http://127.0.0.1:8765/verse/GEN.1.1
+#   http://127.0.0.1:8765/strong/H430?limit=5
+#   http://127.0.0.1:8765/day/0101?compact=1
+#   http://127.0.0.1:8765/dual-read/0101?source=local
+```
+
+| Method | Path | Notes |
+|--------|------|--------|
+| GET | `/health` | Liveness + endpoint list |
+| GET | `/verse/{BCV}` | LSV/KJV + original tokens / Strong's |
+| GET | `/strong/{H####\|G####}?limit=N` | Verse hits with LSV snippet |
+| GET | `/day/{MMDD}?compact=1` | verseMap-compatible day pack |
+| GET | `/dual-read/{MMDD}?source=local\|prod` | 200 if match, 409 if mismatch |
+
 ## Next after Phase 4
 
-- Optional: thin HTTP API or UI Strong's tooltip (still non-primary)
+- Optional: browser Strong's UI hook (feature-detect API; keep static primary)
 - Option B only if small + AGENTS verified (`loadDailyBread` from DB)
 - Phase 5: annotations / S.I. metadata
 - Keep static JSON pipeline working until dual-write / cutover

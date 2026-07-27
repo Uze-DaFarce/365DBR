@@ -122,7 +122,8 @@ def load_day(conn, day: str) -> dict[str, Any]:
                 f"day {day}: expected 4 daily_passages, got {len(passages)}"
             )
 
-        # All verses in plan ranges (via verse_order continuum)
+        # Plan ranges are often org/source numbering (Hebrew fetch + use-org-id).
+        # Resolve to English-primary display ids via verse_alignments when present.
         cur.execute(
             """
             SELECT DISTINCT v.id AS verse_id, v.verse_order, v.book_code
@@ -135,10 +136,59 @@ def load_day(conn, day: str) -> dict[str, Any]:
             """,
             (day,),
         )
+        plan_range_rows = cur.fetchall()
+        plan_range_ids = [r["verse_id"] for r in plan_range_rows]
+        if not plan_range_ids:
+            raise RuntimeError(f"day {day}: no verses in plan ranges")
+
+        # Per-source resolve: if org→English map exists for that source id, use
+        # English display id(s); otherwise keep the plan BCV (1:1).
+        # NEVER replace the whole day with only the subset that has map rows
+        # (that produced load_day 1231 → 1 verse when only REV.21.27 was mapped).
+        cur.execute(
+            """
+            SELECT source_verse_id, english_verse_id
+            FROM verse_alignments
+            WHERE source_verse_id = ANY(%s)
+            """,
+            (plan_range_ids,),
+        )
+        src_to_eng: dict[str, list[str]] = defaultdict(list)
+        for row in cur.fetchall():
+            src_to_eng[row["source_verse_id"]].append(row["english_verse_id"])
+
+        display_ids: list[str] = []
+        seen: set[str] = set()
+        for sid in plan_range_ids:
+            targets = src_to_eng.get(sid)
+            if targets:
+                for eid in targets:
+                    if eid not in seen:
+                        seen.add(eid)
+                        display_ids.append(eid)
+            else:
+                if sid not in seen:
+                    seen.add(sid)
+                    display_ids.append(sid)
+
+        cur.execute(
+            """
+            SELECT v.id AS verse_id, v.verse_order, v.book_code
+            FROM verses v
+            WHERE v.id = ANY(%s)
+            ORDER BY v.verse_order, v.id
+            """,
+            (display_ids,),
+        )
         verse_rows = cur.fetchall()
+        # Preserve plan order if some ids missing from verses table
+        if len(verse_rows) < len(display_ids):
+            by_id = {r["verse_id"]: r for r in verse_rows}
+            verse_rows = [by_id[i] for i in display_ids if i in by_id]
+
         verse_ids = [r["verse_id"] for r in verse_rows]
         if not verse_ids:
-            raise RuntimeError(f"day {day}: no verses in plan ranges")
+            raise RuntimeError(f"day {day}: no display verses after alignment")
 
         # Translations (LSV + KJV)
         cur.execute(
@@ -152,10 +202,11 @@ def load_day(conn, day: str) -> dict[str, Any]:
         )
         trans_rows = cur.fetchall()
 
-        # Original tokens
+        # Original tokens (English-primary verse_id after ETL remap)
         cur.execute(
             """
-            SELECT verse_id, word_order, language, surface_text, strong_number
+            SELECT verse_id, word_order, language, surface_text, strong_number,
+                   source_verse_id
             FROM original_tokens
             WHERE verse_id = ANY(%s)
             ORDER BY verse_id, word_order
@@ -192,10 +243,19 @@ def load_day(conn, day: str) -> dict[str, Any]:
                         "surface": t["surface_text"] or "",
                         "strong": t["strong_number"],
                         "language": t["language"],
+                        "source_verse_id": t.get("source_verse_id"),
                     }
                     for t in toks
                 ],
             }
+            # Provenance when English id ≠ org/source id
+            src_ids = {
+                t.get("source_verse_id")
+                for t in toks
+                if t.get("source_verse_id") and t.get("source_verse_id") != vid
+            }
+            if src_ids:
+                entry["original"]["source_verse_ids"] = sorted(src_ids)
         else:
             entry["original"] = {"text": "", "tokens": []}
 
@@ -264,7 +324,8 @@ def load_verse(conn, verse_id: str) -> dict[str, Any]:
 
         cur.execute(
             """
-            SELECT word_order, language, surface_text, strong_number, lemma, morph
+            SELECT word_order, language, surface_text, strong_number, lemma, morph,
+                   source_verse_id
             FROM original_tokens
             WHERE verse_id = %s
             ORDER BY word_order
@@ -273,8 +334,35 @@ def load_verse(conn, verse_id: str) -> dict[str, Any]:
         )
         tokens = cur.fetchall()
 
+        cur.execute(
+            """
+            SELECT source_verse_id, established_by
+            FROM verse_alignments
+            WHERE english_verse_id = %s
+            """,
+            (verse_id,),
+        )
+        alignments = cur.fetchall()
+
+        cur.execute(
+            """
+            SELECT annotation_type, value, metadata, source
+            FROM annotations
+            WHERE start_verse_id = %s AND end_verse_id = %s
+              AND annotation_type IN ('superscription', 'title')
+            ORDER BY id
+            """,
+            (verse_id, verse_id),
+        )
+        titles = cur.fetchall()
+
     book = vrow["book_code"] or _book_of(verse_id)
     lang = language_for_book(book)
+    src_ids = sorted({
+        t.get("source_verse_id")
+        for t in tokens
+        if t.get("source_verse_id")
+    })
     return {
         "verse_id": verse_id,
         "book_code": book,
@@ -285,6 +373,7 @@ def load_verse(conn, verse_id: str) -> dict[str, Any]:
         "original": {
             "text": _join_original(tokens, lang),
             "language": lang,
+            "source_verse_ids": src_ids,
             "tokens": [
                 {
                     "order": t["word_order"],
@@ -293,10 +382,26 @@ def load_verse(conn, verse_id: str) -> dict[str, Any]:
                     "lemma": t["lemma"],
                     "morph": t["morph"],
                     "language": t["language"],
+                    "source_verse_id": t.get("source_verse_id"),
                 }
                 for t in tokens
             ],
         },
+        "alignments": [
+            {
+                "source_verse_id": a["source_verse_id"],
+                "established_by": a["established_by"],
+            }
+            for a in alignments
+        ],
+        "titles": [
+            {
+                "type": t["annotation_type"],
+                "text": t["value"],
+                "source": t["source"],
+            }
+            for t in titles
+        ],
         "source": "db",
     }
 
@@ -432,6 +537,22 @@ def _load_prod_pack_translations(day: str) -> dict[str, dict[str, str]]:
     return out
 
 
+def _lookup_translation_global(conn, verse_id: str, code: str) -> str | None:
+    """Look up LSV/KJV text anywhere in DB (not limited to day plan)."""
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT vt.text
+            FROM verse_translations vt
+            JOIN translations t ON t.id = vt.translation_id
+            WHERE vt.verse_id = %s AND t.code = %s
+            """,
+            (verse_id, code.upper()),
+        )
+        row = cur.fetchone()
+    return row["text"] if row else None
+
+
 def dual_read_day(
     conn,
     day: str,
@@ -442,7 +563,14 @@ def dual_read_day(
     """
     Compare JSON day pack (local or prod) English texts vs DB.
 
-    Fail-fast report: mismatches list every differing verse_id + code.
+    Classification (truth-first):
+    - **plan_match / plan_mismatch / plan_missing_in_db**: JSON verse is inside
+      this day's plan ranges (what load_day returns).
+    - **spillover_***: JSON parallel includes a verse *outside* the plan range
+      (common for Psalms superscription / numbering drift, e.g. PSA.31 25 vs 24).
+      Spillover is checked against *global* verse_translations when present.
+    - **plan_verse_missing_english**: plan verse has original tokens but no LSV/KJV.
+
     Does not mutate frontend paths — diagnostic only.
     """
     day = day.strip()
@@ -456,11 +584,14 @@ def dual_read_day(
 
     db_payload = load_day(conn, day)
     verse_map = db_payload["verseMap"]
+    plan_ids = set(verse_map.keys())
 
     checked = 0
+    plan_checked = 0
+    spillover_checked = 0
     mismatches: list[dict[str, Any]] = []
-    missing_in_db: list[str] = []
-    missing_in_json: list[str] = []
+    spillovers: list[dict[str, Any]] = []
+    plan_missing_english: list[str] = []
 
     for code in ("LSV", "KJV"):
         jmap = pack.get(code) or {}
@@ -469,53 +600,106 @@ def dual_read_day(
             if sample_limit is not None and checked >= sample_limit:
                 break
             checked += 1
-            db_entry = verse_map.get(vid)
-            if not db_entry or key not in db_entry:
-                missing_in_db.append(f"{code}:{vid}")
-                mismatches.append(
-                    {
-                        "verse_id": vid,
-                        "translation": code,
-                        "reason": "missing_in_db",
-                        "json": norm_ws(jtext)[:120],
-                        "db": None,
-                    }
-                )
-                continue
-            dtext = db_entry[key]["text"]
-            if norm_ws(jtext) != norm_ws(dtext):
-                mismatches.append(
-                    {
-                        "verse_id": vid,
-                        "translation": code,
-                        "reason": "text_mismatch",
-                        "json": norm_ws(jtext)[:120],
-                        "db": norm_ws(dtext)[:120],
-                    }
-                )
+            in_plan = vid in plan_ids
 
-    # DB verses with LSV not present in JSON pack (plan range may be wider than pack files)
-    json_lsv_ids = set((pack.get("LSV") or {}).keys())
-    for vid, entry in verse_map.items():
-        if "lsv" in entry and vid not in json_lsv_ids:
-            missing_in_json.append(vid)
+            if in_plan:
+                plan_checked += 1
+                db_entry = verse_map.get(vid)
+                if not db_entry or key not in db_entry:
+                    mismatches.append(
+                        {
+                            "verse_id": vid,
+                            "translation": code,
+                            "reason": "plan_missing_in_db",
+                            "json": norm_ws(jtext)[:120],
+                            "db": None,
+                        }
+                    )
+                    continue
+                dtext = db_entry[key]["text"]
+                if norm_ws(jtext) != norm_ws(dtext):
+                    mismatches.append(
+                        {
+                            "verse_id": vid,
+                            "translation": code,
+                            "reason": "plan_text_mismatch",
+                            "json": norm_ws(jtext)[:120],
+                            "db": norm_ws(dtext)[:120],
+                        }
+                    )
+            else:
+                # Neighbor bleed / numbering drift — not part of this day's plan
+                spillover_checked += 1
+                global_text = _lookup_translation_global(conn, vid, code)
+                entry = {
+                    "verse_id": vid,
+                    "translation": code,
+                    "json": norm_ws(jtext)[:120],
+                    "db": norm_ws(global_text)[:120] if global_text else None,
+                }
+                if global_text is None:
+                    entry["reason"] = "spillover_missing_in_db"
+                    entry["note"] = (
+                        "JSON parallel has this BCV outside day plan; "
+                        "no verse_translations row in DB (often Psalm numbering drift)"
+                    )
+                    spillovers.append(entry)
+                    # Truth: English text exists in pack for a valid BCV but never stored
+                    mismatches.append(entry)
+                elif norm_ws(jtext) != norm_ws(global_text):
+                    entry["reason"] = "spillover_text_mismatch"
+                    spillovers.append(entry)
+                    mismatches.append(entry)
+                else:
+                    entry["reason"] = "spillover_ok_global"
+                    spillovers.append(entry)
 
-    # missing_in_json is informational (plan may include verses outside pack files).
-    # Fail only on text mismatch or JSON verses absent from DB.
-    ok = checked > 0 and len(mismatches) == 0 and not missing_in_db
+    # Plan verses lacking English (informational — pack may also lack them when
+    # Hebrew 25-verse / English 24-verse Psalms diverge). Not a dual-read hard fail;
+    # dual-read judges JSON English cells vs DB only.
+    for vid in sorted(plan_ids):
+        entry = verse_map[vid]
+        for key, code in (("lsv", "LSV"), ("kjv", "KJV")):
+            if key not in entry:
+                plan_missing_english.append(f"{code}:{vid}")
+
+    # Hard fail only when JSON has English text that DB lacks or mismatches.
+    hard_mismatch_reasons = {
+        "plan_missing_in_db",
+        "plan_text_mismatch",
+        "spillover_missing_in_db",
+        "spillover_text_mismatch",
+    }
+    hard = [m for m in mismatches if m.get("reason") in hard_mismatch_reasons]
+    ok = checked > 0 and len(hard) == 0
+
+    notes: list[str] = []
+    if spillovers:
+        notes.append(
+            f"{len(spillovers)} JSON English verse(s) outside day plan "
+            "(Psalms superscription/numbering drift is a common cause)."
+        )
+    if plan_missing_english:
+        notes.append(
+            f"{len(plan_missing_english)} plan verse(s) lack LSV/KJV in DB "
+            "(often Hebrew-only numbering, e.g. PSA.31.25 vs English 24-verse chapter)."
+        )
 
     return {
         "day": day,
         "source": source,
         "ok": ok,
         "checked": checked,
-        "mismatch_count": len(mismatches),
-        "mismatches": mismatches[:50],  # cap report size
-        "missing_in_db_count": len(missing_in_db),
-        "missing_in_json_count": len(missing_in_json),
-        "missing_in_json_sample": missing_in_json[:20],
+        "plan_checked": plan_checked,
+        "spillover_checked": spillover_checked,
+        "mismatch_count": len(hard),
+        "mismatches": hard[:50],
+        "spillovers": spillovers[:30],
+        "plan_missing_english_count": len(plan_missing_english),
+        "plan_missing_english_sample": plan_missing_english[:20],
         "db_verse_count": db_payload["verseCount"],
         "json_lsv_count": len(pack.get("LSV") or {}),
         "json_kjv_count": len(pack.get("KJV") or {}),
         "label": db_payload["label"],
+        "notes": notes,
     }
