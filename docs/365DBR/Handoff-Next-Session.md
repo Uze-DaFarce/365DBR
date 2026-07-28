@@ -34,7 +34,8 @@ Skip full Blueprint/schema re-read unless design choice requires it.
 - Live index.html / bible.html / loadDailyBread UNTOUCHED — static JSON still primary
 
 ## Env
-- Monorepo root worktree. docker compose up -d (postgres, DB mt_sinai_365dbr)
+- Prefer primary monorepo: `D:\Users\uzeda\Mt. Sinai LLC\monorepo` on **main** only (see docs/Git-For-You.md). Agent handles git; user does not manage branches.
+- docker compose up -d (postgres, DB mt_sinai_365dbr)
 - db/.env + DATABASE_URL; never commit secrets
 - PowerShell: quote days --day "0131"; no && use ;
 - apps/365DBR for fetch/check; monorepo root for db/scripts/*
