@@ -11,12 +11,36 @@
  *   do not invent maps (Truth/Accuracy). See docs/365DBR/Word-Study-and-Alignment.md.
  *
  * Override API base: ?queryApi=… or localStorage 365dbr_query_api
+ *
+ * Production (e.g. mt-sin.ai on GoDaddy): do NOT default-probe 127.0.0.1.
+ * Host CSP (connect-src 'self' + esm.sh …) and HTTPS→HTTP mixed content would block
+ * it and spam the console. Localhost/127.0.0.1 still default to the local API.
+ * Explicit queryApi / localStorage always attempted (must also be allowed by CSP).
  */
 (function (global) {
   "use strict";
 
   var DEFAULT_QUERY_API = "http://127.0.0.1:8765";
 
+  /** True when the page itself is served from this machine (local dev). */
+  function isLocalPageHost() {
+    try {
+      var h = (global.location && global.location.hostname) || "";
+      return (
+        h === "localhost" ||
+        h === "127.0.0.1" ||
+        h === "[::1]" ||
+        h === ""
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /**
+   * Resolve API base, or null if Word study should not probe.
+   * Priority: ?queryApi= → localStorage → (local page only) default 127.0.0.1:8765
+   */
   function resolveQueryApiBase() {
     try {
       var params = new URLSearchParams(global.location.search);
@@ -35,15 +59,22 @@
     } catch (_) {
       /* ignore */
     }
+    // Production static host: skip probe (no fetch → no CSP console noise).
+    if (!isLocalPageHost()) {
+      return null;
+    }
     return DEFAULT_QUERY_API;
   }
 
   /**
    * Probe GET /health. Returns base URL string if ok, else null.
    * Feature-detect only — Word study shows when API is up (no opt-in).
+   * No network call when base is null (production without override).
    */
   function probeQueryApi(base, timeoutMs) {
-    base = base || resolveQueryApiBase();
+    if (base === undefined || base === null || base === "") {
+      base = resolveQueryApiBase();
+    }
     timeoutMs = timeoutMs == null ? 700 : timeoutMs;
     if (!base) return Promise.resolve(null);
     var ctrl =
@@ -144,6 +175,7 @@
 
   global.__DBR_STRONGs__ = {
     DEFAULT_QUERY_API: DEFAULT_QUERY_API,
+    isLocalPageHost: isLocalPageHost,
     resolveQueryApiBase: resolveQueryApiBase,
     probeQueryApi: probeQueryApi,
     fetchVerseDetail: fetchVerseDetail,

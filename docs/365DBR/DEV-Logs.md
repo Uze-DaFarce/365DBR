@@ -442,6 +442,24 @@ python db/scripts/serve_query_api.py
 
 ---
 
+## 2026-07-29 — Prod CSP: skip Word study localhost probe on remote hosts
+
+**Owner report**: On `mt-sin.ai`, console CSP blocked  
+`connect-src` for `http://127.0.0.1:8765/health` (GoDaddy: `'self' https://esm.sh https://csp.secureserver.net`).
+
+**Behavior before**: Probe always defaulted to 127.0.0.1 → CSP (and mixed-content on HTTPS) → noisy console; Word study still correctly stayed off.
+
+**Fix** (`strongs_optional.js`):
+- Default local API **only** when page host is localhost / 127.0.0.1 / ::1.
+- On production hosts: `resolveQueryApiBase()` returns `null` → **no fetch** unless `?queryApi=` or `localStorage 365dbr_query_api`.
+- Reading path unchanged (static JSON primary).
+
+**Deploy**: re-FTP `strongs_optional.js` (and any HTML that loads it). No DB required on GoDaddy.
+
+**Future public API**: needs HTTPS endpoint **and** CSP `connect-src` allowlist update on host — not on shared FTP alone.
+
+---
+
 ## 2026-07-29 — Phase 5 minimal: curated speaker/theme annotations
 
 **Session start**: Read handoff-only set. Smoke green before code:

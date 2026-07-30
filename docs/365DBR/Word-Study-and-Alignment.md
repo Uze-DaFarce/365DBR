@@ -10,8 +10,10 @@
 
 | Capability | Status |
 |------------|--------|
-| Feature-detect `http://127.0.0.1:8765` (or `?queryApi=` / `localStorage 365dbr_query_api`) | Yes |
-| Word study control when API healthy | **On by default** (no opt-in) |
+| Feature-detect API when page is **localhost** (default `http://127.0.0.1:8765`) | Yes |
+| On **production** hosts (e.g. mt-sin.ai): no default localhost probe | Yes — avoids GoDaddy CSP / mixed-content console noise; Word study stays off |
+| Override: `?queryApi=` or `localStorage 365dbr_query_api` | Yes (must also be allowed by host CSP `connect-src`) |
+| Word study control when API healthy | **On** when probe succeeds (no separate opt-in flag) |
 | Interactive **original** tokens + Strong’s search | Yes (OT Hebrew Strong’s present; Greek often surface-only) |
 | Human verse refs (`2 Kings 10:17`) | Yes |
 | Hover **English** word → original + Strong’s for *that* word | **Not yet** — no honest EN↔token map in DB |
