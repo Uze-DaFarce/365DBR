@@ -270,13 +270,31 @@ def populate_one_day(conn, day: str, source: str, verse_order_map: dict[str, int
                 f"outside BIBLE_DATA inventory (Protestant vs Hebrew counts)"
             )
 
-        # Clear tokens for both display and prior source keys (re-run safe)
-        clear_ids = all_verse_ids | all_source_ids
-        for vid in clear_ids:
+        # Clear tokens for this day's English-primary display ids only, plus
+        # stale unmapped rows still parked under pure org BCVs (verse_id == org).
+        #
+        # CRITICAL: do NOT `DELETE WHERE source_verse_id = X` for every X in
+        # all_source_ids / all_verse_ids. Adjacent days share org ids as
+        # *provenance* (e.g. day 0117 stores GEN.31.55 tokens with
+        # source_verse_id=GEN.32.1; day 0118 owns English GEN.32.1 from org
+        # GEN.32.2). A global source_verse_id wipe clobbers the earlier day's
+        # English-primary tokens → empty originals on boundary BCVs.
+        for vid in all_verse_ids:
             cur.execute("DELETE FROM original_tokens WHERE verse_id = %s", (vid,))
+        for src in all_source_ids:
+            if src in all_verse_ids:
+                # Already cleared above as a display id.
+                continue
+            # Only remove tokens still keyed by the org id itself (pre-remap
+            # or failed remap), not tokens on a *different* English verse_id
+            # that legitimately cites this org as source_verse_id.
             cur.execute(
-                "DELETE FROM original_tokens WHERE source_verse_id = %s",
-                (vid,),
+                """
+                DELETE FROM original_tokens
+                WHERE verse_id = %s
+                  AND (source_verse_id IS NULL OR source_verse_id = %s)
+                """,
+                (src, src),
             )
 
         token_rows = 0

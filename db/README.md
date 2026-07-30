@@ -264,11 +264,16 @@ python db/scripts/test_query_phase4.py
 python db/scripts/test_query_stress_phase4.py --dual-read-limit 60
 python db/scripts/test_query_api_phase4.py
 
+# Empty-original dual-claim audit (should exit 0; dual_claim=0)
+python db/scripts/audit_empty_originals.py
+
 # If verse_order was clobbered, re-apply BIBLE_DATA order:
 python db/scripts/repair_verse_order.py
 ```
 
 **English BCVs outside Hebrew `BIBLE_DATA`** (e.g. `GEN.31.55`, `MAL.4.1`, `EXO.8.29`): valid Protestant display keys. Populate **ensures** `verses` rows for them (FK fix). Alignment still from api.bible `verseOrgIds`, not invented offsets.
+
+**Token clear rule**: Never `DELETE WHERE source_verse_id = X` for the whole day set — adjacent days share org ids as provenance and that wipe emptied English-primary tokens (fixed 2026-07-27).
 
 Library: `db/query/` (`load_day`, `load_verse`, `search_strong`, `dual_read_day`).
 
@@ -294,9 +299,22 @@ python db/scripts/serve_query_api.py
 | GET | `/day/{MMDD}?compact=1` | verseMap-compatible day pack |
 | GET | `/dual-read/{MMDD}?source=local\|prod` | 200 if match, 409 if mismatch |
 
+### Optional Word study (browser)
+
+When the query API is up, `index.html` / `bible.html` feature-detect `/health` and show **Word study** (original tokens + Strong’s search). No opt-in flag.
+
+**Today**: original-first (matches stored data).  
+**Later (free/open data only)**: English-word hover if honest alignment becomes available — see `docs/365DBR/Word-Study-and-Alignment.md`.
+
+```powershell
+python db/scripts/serve_query_api.py
+# open apps/365DBR over HTTP; Word study appears when /health is OK
+# optional: ?queryApi=http://127.0.0.1:8765
+```
+
 ## Next after Phase 4
 
-- Optional: browser Strong's UI hook (feature-detect API; keep static primary)
+- Residual empty originals (English split / placeholder) — optional later design
 - Option B only if small + AGENTS verified (`loadDailyBread` from DB)
 - Phase 5: annotations / S.I. metadata
 - Keep static JSON pipeline working until dual-write / cutover

@@ -74,6 +74,16 @@ Daily plan ranges may still be requested in **org** form for Hebrew fetches (`us
 - Query: `db/query/day_load.py`
 - Schema: `db/migrations/002_verse_alignment.sql`
 
+## Populate clear rule (cross-day safety)
+
+When re-loading a day, **do not** delete all tokens that mention a `source_verse_id` used by that day. Adjacent days share org ids as provenance only (e.g. `GEN.31.55` ← org `GEN.32.1` on day 0117; English `GEN.32.1` ← org `GEN.32.2` on day 0118). A global `DELETE … WHERE source_verse_id = X` wipes the earlier English-primary tokens.
+
+Safe clear: delete by this day’s **display** `verse_id`s; only remove stale rows still parked under pure org BCVs (`verse_id = org` and `source_verse_id` null or equal org). See `populate_day.py` and `audit_empty_originals.py`.
+
+## Residual empty originals (expected small)
+
+After the wipe fix, a handful of English BCVs may still have LSV/KJV with `tokens=0` (e.g. English split of one org verse, first-wins org→English map; or placeholder text like LSV `REV.12.18` = `-`). Dual-claim empties (tokens living under the claimed source BCV from a *different* org) should stay at **0**.
+
 ## Non-goals (this increment)
 
 - Changing live `index.html` / `loadDailyBread` (static JSON remains primary for UI).

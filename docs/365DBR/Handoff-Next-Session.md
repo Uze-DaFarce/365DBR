@@ -1,8 +1,10 @@
-# 365DBR-DEV — Next Session Handoff (post Phase 4 Option A)
+# 365DBR-DEV — Next Session Handoff
 
-**Date frozen**: 2026-07-27  
+**Date frozen**: 2026-07-28  
 **Priority**: Truth/Accuracy > Safety > Performance. Bible is Tier-1 truth.  
-**Copy the “Session start prompt” block below into a new agent session.**
+**Branch policy**: Owner works on **main** only (`docs/Git-For-You.md`). Agents handle git.
+
+**Copy the “Session start prompt” block into a new agent session.**
 
 ---
 
@@ -14,108 +16,100 @@ You are 365DBR-DEV for Mt. Sinai monorepo. Bible is Tier-1 truth. Truth/Accuracy
 ## Read first (only these — do not re-research Phases 1–3 history)
 1. docs/Roles/365DBR-DEV.md (role + principles; Phase 1 “do not ETL” is obsolete)
 2. docs/INDEX.md (Current Phase + TODO tracker)
-3. docs/365DBR/Handoff-Next-Session.md (this file — full state + next options)
-4. docs/365DBR/Verse-Identity-and-Alignment.md (English-primary + verseOrgIds — non-negotiable)
-5. docs/365DBR_AGENTS.md (verseMap / loadDailyBread / playVerse / audio — non-negotiable)
+3. docs/365DBR/Handoff-Next-Session.md (this file)
+4. docs/365DBR/Verse-Identity-and-Alignment.md
+5. docs/365DBR_AGENTS.md + docs/365DBR/Word-Study-and-Alignment.md
 6. docs/365DBR/Data-Sources.md (prod https://mt-sin.ai/365DBR/data/MMDD/; local packs gitignored)
 7. db/README.md + docs/365DBR/DEV-Logs.md (latest entries only)
 8. docs/365DBR/Migration-Plan.md (Phase 4–5 only)
+9. docs/Git-For-You.md (main-only for owner)
 
 Skip full Blueprint/schema re-read unless design choice requires it.
 
 ## What’s done (do not redo)
-- Phase 1–3: Postgres 16 docker, schema 001+002, seeds, full 365 ETL, verify_db OVERALL PASS historically
-- NT original: GRCTR 3aefb10641485092-01; OT: WLC 0b262f1ed7f084a6-01 (bible_common.py)
-- Phase 4 Option A: db/query + query_db.py + serve_query_api.py (127.0.0.1:8765)
-- English-primary BCV: store/display modern English verseId; original tokens remapped via api.bible verseOrgIds (NOT invented Psalm offsets)
-- Titles/superscriptions → annotations (type superscription/title); do not blame api.bible without repro
-- Full re-populate --all: 365/365 OK after ensure_verse for English-only BCVs (GEN.31.55, MAL.4.1, etc.)
-- Tests: test_query_stress_phase4.py (prefer over toy 0101/GEN.1.1); repair_verse_order.py if order clobbered
-- Live index.html / bible.html / loadDailyBread UNTOUCHED — static JSON still primary
+- Phase 1–3: Postgres 16, schema 001+002, full 365 ETL, verify historically green
+- NT: GRCTR 3aefb10641485092-01; OT: WLC 0b262f1ed7f084a6-01
+- Phase 4 Option A: db/query + query_db.py + serve_query_api.py (:8765)
+- English-primary BCV + verseOrgIds; titles → annotations; trust api.bible and verify
+- Empty-original dual-claim wipe fixed (safe populate clear); residual empties ≈4
+- audit_empty_originals.py + stress section I (dual-claim regression)
+- Word study UI: feature-detect API (ON when /health OK, no opt-in); original-first
+- Owner tested index.html + bible.html — looks good
+- Free-path English-hover Strong’s documented (no paid RI budget)
 
 ## Env
-- Prefer primary monorepo: `D:\Users\uzeda\Mt. Sinai LLC\monorepo` on **main** only (see docs/Git-For-You.md). Agent handles git; user does not manage branches.
-- docker compose up -d (postgres, DB mt_sinai_365dbr)
-- db/.env + DATABASE_URL; never commit secrets
+- Prefer primary monorepo: `D:\Users\uzeda\Mt. Sinai LLC\monorepo` on **main**
+- docker compose up -d; db/.env + DATABASE_URL; never commit secrets
 - PowerShell: quote days --day "0131"; no && use ;
-- apps/365DBR for fetch/check; monorepo root for db/scripts/*
 
 ## Key commands
 docker compose up -d
-python db/scripts/apply_migrations.py
-python db/scripts/repair_verse_order.py
-python db/scripts/populate_day.py --day "MMDD" --source local
-python db/scripts/populate_day.py --all --source local --continue-on-error
-python db/scripts/verify_db.py
-python db/scripts/query_db.py dual-read --day "0228,1231,0117" --source local
 python db/scripts/serve_query_api.py
+cd apps/365DBR; python -m http.server 5500
+# then http://127.0.0.1:5500/index.html and bible.html
 python db/scripts/test_query_stress_phase4.py --dual-read-limit 60 --seed 7
-python db/scripts/test_query_phase4.py
-python apps/365DBR/export_bible_meta.py   # after BIBLE_DATA changes
-python apps/365DBR/check_data_integrity.py
+python db/scripts/audit_empty_originals.py
+python db/scripts/populate_day.py --all --source local --continue-on-error
 
 ## First actions this session
-1. git status; confirm Docker up; smoke: test_query_stress_phase4.py (or dual-read sample) — NOT only 0101/GEN.1.1
-2. Propose ONE minimal next increment; get alignment if ambiguous
-3. Implement, test with hard days (month-ends, English edges, MAL.4 / PSA offset), document INDEX + DEV-Logs
+1. git status on main; Docker up; quick smoke (stress or dual-read + API health)
+2. Propose ONE minimal next increment; align if ambiguous
+3. Implement, test, document INDEX + DEV-Logs; check in on main when done
 
-## Recommended next increments (pick one; small + reviewable)
-A. Optional Strong’s UI in bible.html/index.html that feature-detects http://127.0.0.1:8765 (or future API); MUST keep static JSON primary; verify playVerse/audio per AGENTS.md
-B. Tighten empty-original English edge rows (some English BCVs have LSV/KJV but tokens=0) — content alignment audit, not blame API
+## Recommended next increments (pick one)
 C. Phase 5 minimal: seed a few curated annotations (speaker/theme) with source field; no LSB
-D. Option B loadDailyBread from DB ONLY if small + AGENTS verified + dual-read green on stress sample
+D. Option B loadDailyBread from DB ONLY if small + AGENTS verified + dual-read green
+E. Free/open EN↔token alignment research only when prioritized (no paid sources)
+F. Small polish only if owner reports a concrete bug
 
-Constraints: no LSB until 316 Publishing unblocked; improve tests with real local packs; fail fast on data corruption.
+Constraints: no LSB until 316 unblocked; do not invent EN↔Strong's maps; no global source_verse_id token wipe on populate clear; static JSON primary for daily reader until Option B deliberate.
 
 Bible primary. Docs secondary memory.
 ```
 
 ---
 
-## State snapshot (2026-07-27)
+## State snapshot (2026-07-28)
 
-### Architecture decisions (locked)
+### Locked decisions
 | Decision | Detail |
 |----------|--------|
 | User-facing BCV | Modern English (KJV/LSV-compatible) |
-| Original wording | Aligned via payload `verseOrgIds` → English id; keep `source_verse_id` |
-| Titles | `annotations` superscription/title — not long-term “glue into v1 only” model |
-| api.bible | Trust and verify; past “numbering bugs” were ETL/params/ignored fields |
-| Live reader | Static JSON primary until Option B deliberately chosen |
+| Original wording | `verseOrgIds` → English id; keep `source_verse_id` |
+| Live reader | Static JSON primary |
+| Word study | Original-first when API up; improve EN-hover only with free/open data |
+| Token clear | Never global `DELETE WHERE source_verse_id = X` |
+
+### How to smoke-test apps
+1. `docker compose up -d`
+2. `python db/scripts/serve_query_api.py` (Word study)
+3. `cd apps/365DBR; python -m http.server 5500`
+4. http://127.0.0.1:5500/index.html and bible.html  
+5. Readings: local `data/MMDD/` or fallback prod `https://mt-sin.ai/365DBR/data/`
 
 ### Key paths
 | Path | Role |
 |------|------|
-| `db/migrations/001_initial_schema.sql` | Core schema |
-| `db/migrations/002_verse_alignment.sql` | `verse_alignments`, `original_tokens.source_verse_id` |
-| `db/etl/parse_passage.py` | Parse + org→English + titles |
-| `db/scripts/populate_day.py` | ETL; ensures English-only BCVs |
-| `db/query/` | `load_day`, `load_verse`, `search_strong`, `dual_read_day` |
-| `db/scripts/query_db.py` | CLI |
-| `db/scripts/serve_query_api.py` | Local read-only API :8765 |
-| `db/scripts/repair_verse_order.py` | Fix clobbered `verse_order` |
-| `db/scripts/test_query_stress_phase4.py` | Real-world tests |
-| `docs/365DBR/Verse-Identity-and-Alignment.md` | Identity principles |
+| `apps/365DBR/strongs_optional.js` | Word study client |
+| `apps/365DBR/index.html` / `bible.html` | Readers + Aa Word study |
+| `db/scripts/serve_query_api.py` | Local API :8765 |
+| `db/scripts/populate_day.py` | ETL + safe token clear |
+| `db/scripts/audit_empty_originals.py` | Dual-claim empty audit |
+| `docs/365DBR/Word-Study-and-Alignment.md` | Word study + free alignment roadmap |
 
-### Last verification (do re-run after pull)
+### Last known green
 ```
-populate --all: 365 OK / 0 failed
-stress --dual-read-limit 60: PASS (~10k cells)
-dual-read hard days (1231, 0117, 0222, 0319, 0819): PASS
+populate --all: 365 OK (after wipe fix)
+empty originals: dual_claim=0 residual≈4
+stress dual-read sample: PASS
+owner UI test: index + bible + Word study OK
 ```
-
-### Open / known minor
-- Some English edge BCVs may show LSV/KJV with `tokens=0` (original under mapped source history) — audit optional.
-- Greek Strong’s largely absent in current GRCTR token data (surface tokens only).
-- LSB blocked (316 Publishing).
-- Detached HEAD / branch policy: attach commits to intended branch when checking in.
 
 ### Do not
-- Re-bootstrap Phase 1 schema from scratch without need
-- Treat repo `apps/365DBR/data/` placeholders as authority (local packs are real fetches gitignored; prod URL is published authority)
-- Invent Psalm ±1 offsets when `verseOrgIds` present
-- Change `verseMap` / `playVerse` without AGENTS verification
-- Use only 0101 / GEN.1.1 / JHN.1.1 as proof of correctness
+- Invent English↔token alignment
+- Pay for reverse interlinear unless owner budgets later
+- Option B without AGENTS audio verify
+- Reintroduce global source_verse_id day clear
 
 ---
 

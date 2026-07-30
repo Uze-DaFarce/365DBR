@@ -422,6 +422,74 @@ def main() -> int:
             # English-only BCVs may use neighbor order now; synthetic still ok to note
             print(f"  [INFO] verses with synthetic high verse_order: {synthetic}")
 
+        # --- I. Empty-original dual-claim regression ---
+        # Adjacent-day populate must not wipe tokens via DELETE source_verse_id.
+        # Dual-claim = English has LSV/KJV, tokens=0, but claimed source BCV holds
+        # tokens from a *different* org (those belong to English-source, not us).
+        print("\n--- I. Empty-original dual-claim (cross-day wipe) ---")
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT COUNT(*) AS c
+                FROM (
+                    SELECT v.id AS eng
+                    FROM verses v
+                    JOIN verse_translations vt ON vt.verse_id = v.id
+                    LEFT JOIN original_tokens ot ON ot.verse_id = v.id
+                    GROUP BY v.id
+                    HAVING COUNT(ot.id) = 0
+                ) empty
+                JOIN verse_alignments va ON va.english_verse_id = empty.eng
+                    AND va.source_verse_id <> empty.eng
+                WHERE EXISTS (
+                    SELECT 1 FROM original_tokens ot2
+                    WHERE ot2.verse_id = va.source_verse_id
+                      AND (ot2.source_verse_id IS NULL
+                           OR ot2.source_verse_id <> va.source_verse_id)
+                )
+                """
+            )
+            dual_claim = cur.fetchone()["c"]
+            check(
+                "no dual-claim empty originals (cross-day wipe)",
+                dual_claim == 0,
+                f"dual_claim={dual_claim}",
+            )
+            # Spot known boundary that was wiped before the clear fix
+            cur.execute(
+                "SELECT count(*) AS c FROM original_tokens WHERE verse_id = 'GEN.31.55'"
+            )
+            gen_tok = cur.fetchone()["c"]
+            check(
+                "GEN.31.55 has original tokens after adjacent-day populate",
+                gen_tok > 0,
+                f"tokens={gen_tok}",
+            )
+            cur.execute(
+                """
+                SELECT COUNT(*) AS c FROM (
+                    SELECT v.id
+                    FROM verses v
+                    JOIN verse_translations vt ON vt.verse_id = v.id
+                    LEFT JOIN original_tokens ot ON ot.verse_id = v.id
+                    GROUP BY v.id
+                    HAVING COUNT(ot.id) = 0
+                ) e
+                """
+            )
+            empty_n = cur.fetchone()["c"]
+            # Residual empties (English split / placeholder) are ok in small number
+            if empty_n > 20:
+                warn(
+                    "many English verses still tokens=0",
+                    f"count={empty_n} (investigate; dual_claim should be 0)",
+                )
+            else:
+                print(
+                    f"  [INFO] residual English-with-text tokens=0: {empty_n} "
+                    f"(expected small: splits/placeholders; run audit_empty_originals.py)"
+                )
+
     finally:
         conn.close()
 

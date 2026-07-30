@@ -256,9 +256,9 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-07-27 (Phase 4 Option A solid: English-primary alignment, full 365 re-populate, stress tests; handoff ready)
+**Last Updated**: 2026-07-28 (Phase 4 Option A + Word study checked in on main; ready for Phase 5 or next pick)
 
-**Current Phase**: Phase 4 **Option A complete enough for next increment**. Static JSON remains primary for live daily reader. DB: English-primary BCV + `verseOrgIds` alignment; 365/365 days populated; stress dual-read PASS. See `docs/365DBR/Verse-Identity-and-Alignment.md` and latest `DEV-Logs.md`. **Next session prompt**: `docs/365DBR/Handoff-Next-Session.md`.
+**Current Phase**: Phase 4 Option A **solid** (DB query, dual-read, Word study original-first). Static JSON primary for live reader. **Next**: see `docs/365DBR/Handoff-Next-Session.md` (recommend Phase 5 minimal annotations, or Option B only if deliberate).
 
 **TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
 - [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).
@@ -275,7 +275,11 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 - [x] Phase 4.2 Option A: local read-only HTTP API `serve_query_api.py` (127.0.0.1:8765) + `test_query_api_phase4.py` PASS; **still no frontend change**.
 - [x] Verse identity: English-primary + `verseOrgIds` alignment (`002_verse_alignment.sql`, parse/populate/load_day); titles → annotations; sample days re-populated; dual-read PASS. **Do not blame api.bible without repro** — trust and verify.
 - [x] Full 365 re-populate with alignment: **365/365 OK** after English-only BCV `ensure_verse` FK fix; `repair_verse_order.py`; stress tests (`test_query_stress_phase4.py`) month-ends/alignment edges — not only 0101/GEN.1.1.
-- [ ] Phase 4 next: optional browser Strong's UI (feature-detect API; non-primary); Option B only if small + AGENTS verified.
+- [x] Empty-original audit: dual-claim cross-day wipe fixed in `populate_day` clear; 181→4 residual; `audit_empty_originals.py` + stress section I.
+- [x] Query API + browser Word study (feature-detect API; original-first; on when API up). See `docs/365DBR/Word-Study-and-Alignment.md`.
+- [ ] Improve Word study toward English-word hover when **free/open** alignment data exists (no paid reverse interlinear budget).
+- [ ] Option B `loadDailyBread` from DB only if small + AGENTS verified.
+- [ ] Residual empty originals (English split / first-wins map / REV.12.18 placeholder) — optional multi-English→one-org design later.
 - [ ] Iterate schema from feedback; seed minimal annotations for speaker/theme demo.
 - [ ] LSB integration (blocked pending 316 Publishing clarification); add WEB etc.
 - [ ] Full rich metadata + S.I. query prototypes; dual-write / cutover later.
@@ -284,9 +288,11 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 **Next Steps (explicit)**:
 1. ~~Phase 1–3~~ done (schema + full 365 load + reconciliation PASS).
 2. ~~Phase 4 Option A backend~~ done (CLI, local API, English-primary alignment, 365 re-populate, stress tests).
-3. Phase 4 follow-up candidates: optional Strong's UI (feature-detect API); tighten empty-original English edges; optional dual-write notes.
-4. Phase 5 when ready: minimal speaker/theme annotations for S.I. demos.
-5. Keep 100% focus on 365DBR until data fully leveraged for S.I. LSB still blocked.
+3. ~~Empty-original dual-claim wipe~~ done (safe clear + re-populate; residual 4 documented).
+4. ~~Optional Strong's UI~~ done (feature-detect API; static primary).
+5. Phase 4 follow-up: optional English-split token sharing; Option B only if AGENTS verified.
+6. Phase 5 when ready: minimal speaker/theme annotations for S.I. demos.
+7. Keep 100% focus on 365DBR until data fully leveraged for S.I. LSB still blocked.
 
 **Handoff guidance**: New sessions: read `docs/365DBR/Handoff-Next-Session.md` first (scoped next work), then `docs/Roles/365DBR-DEV.md` + INDEX + Verse-Identity + latest DEV-Logs. Prefer stress tests over toy 0101/GEN.1.1. Trust api.bible; verify with payload fields before blaming API.
 

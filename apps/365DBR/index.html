@@ -107,10 +107,30 @@
 <body class="antialiased">
     <div id="root"></div>
 
+    <!-- Optional Strong's helpers (window.__DBR_STRONGs__); classic script for esm.sh/run -->
+    <script src="strongs_optional.js"></script>
     <!-- Application Code -->
     <script type="text/tsx">
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
+
+// Optional DB Strong's — loaded via classic <script src="strongs_optional.js"> (not ES import;
+// esm.sh/run rewrites ./relative imports under script-0.tsx/… and breaks resolution).
+const {
+  probeQueryApi,
+  fetchVerseDetail,
+  fetchStrongHits,
+  resolveQueryApiBase,
+  formatVerseRef: formatVerseRefRaw,
+} = window.__DBR_STRONGs__ || {
+  probeQueryApi: async () => null,
+  fetchVerseDetail: async () => { throw new Error('strongs_optional.js not loaded'); },
+  fetchStrongHits: async () => { throw new Error('strongs_optional.js not loaded'); },
+  resolveQueryApiBase: () => 'http://127.0.0.1:8765',
+  formatVerseRef: (vid) => vid,
+};
+// BOOK_NAMES is defined later; wrap so call sites can use formatVerseRef(vid).
+const formatVerseRef = (vid) => formatVerseRefRaw(vid, typeof BOOK_NAMES !== 'undefined' ? BOOK_NAMES : undefined);
 
 /** --- CONFIGURATION --- **/
 const TRANSLATION_REGISTRY = {
@@ -591,7 +611,252 @@ const BookmarkButton = React.memo(({ onBookmark, ...props }) => {
     );
 });
 
-const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying, onBookmark }) => {
+/** Word study control — only when local query API is available. */
+const StrongsButton = React.memo(({ onOpen, ...props }) => (
+    <button
+        {...props}
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onOpen(); }}
+        className="ml-1 p-1 rounded hover:bg-black/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 print:hidden"
+        aria-label="Word study — original words and Strong's numbers"
+        title="Word study"
+    >
+        <span className="text-[8px] md:text-[9px] font-black tracking-tighter text-amber-700/80 hover:text-amber-800">Aa</span>
+    </button>
+));
+
+/**
+ * Word study sheet: interactive original words (hover highlight, click to find other uses).
+ * Results strip only after a word is chosen — not a debug/API dump.
+ * Static JSON remains primary for the reader.
+ */
+function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse }) {
+    const [status, setStatus] = useState('loading'); // loading | ready | error
+    const [error, setError] = useState(null);
+    const [payload, setPayload] = useState(null);
+    const [hoverKey, setHoverKey] = useState(null);
+    const [selected, setSelected] = useState(null); // { strong, surface, order }
+    const [strongHits, setStrongHits] = useState(null);
+    const [strongLoading, setStrongLoading] = useState(false);
+    const panelRef = useRef(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        setStatus('loading');
+        setError(null);
+        setPayload(null);
+        setSelected(null);
+        setStrongHits(null);
+        setHoverKey(null);
+        (async () => {
+            try {
+                const data = await fetchVerseDetail(verseId, apiBase);
+                if (!cancelled) {
+                    setPayload(data);
+                    setStatus('ready');
+                }
+            } catch (e) {
+                if (!cancelled) {
+                    setError(e.message || String(e));
+                    setStatus('error');
+                }
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [verseId, apiBase]);
+
+    useEffect(() => {
+        const onKey = (e) => {
+            if (e.key === 'Escape') {
+                if (selected) {
+                    setSelected(null);
+                    setStrongHits(null);
+                } else {
+                    onClose();
+                }
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [onClose, selected]);
+
+    useEffect(() => {
+        try { panelRef.current?.focus(); } catch (_) { /* ignore */ }
+    }, [verseId]);
+
+    const loadStrong = useCallback(async (token) => {
+        if (!token?.strong || !apiBase) return;
+        setSelected({ strong: token.strong, surface: token.surface, order: token.order });
+        setStrongLoading(true);
+        setStrongHits(null);
+        try {
+            setStrongHits(await fetchStrongHits(token.strong, apiBase, 12));
+        } catch (e) {
+            setStrongHits({ error: e.message || String(e) });
+        } finally {
+            setStrongLoading(false);
+        }
+    }, [apiBase]);
+
+    const tokens = payload?.original?.tokens || [];
+    const withStrong = tokens.some((t) => t.strong);
+    const isHeb = (payload?.original?.language || '') === 'hebrew';
+    const titleText = payload?.titles?.[0]?.text;
+    const humanRef = formatVerseRef(verseId);
+
+    return (
+        <div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="false"
+            aria-label={`Word study for ${humanRef}`}
+            tabIndex={-1}
+            className="fixed bottom-0 inset-x-0 z-[60] print:hidden outline-none"
+        >
+            <div className="max-w-7xl mx-auto px-2 pb-2 md:pb-3">
+                <div className="bg-white border border-stone-200 shadow-2xl rounded-t-xl md:rounded-xl max-h-[48vh] md:max-h-[52vh] flex flex-col overflow-hidden">
+                    <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-stone-100 bg-stone-50 shrink-0">
+                        <div className="min-w-0">
+                            <div className="text-[10px] uppercase font-bold tracking-wide text-stone-400">Word study</div>
+                            <div className="text-sm font-serif font-bold truncate text-stone-900">{humanRef}</div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="shrink-0 px-2.5 py-1 text-[11px] font-semibold text-stone-600 hover:text-stone-900 border border-stone-200 rounded-md bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                            aria-label="Done"
+                        >
+                            Done
+                        </button>
+                    </div>
+                    <div className="overflow-y-auto p-3 md:p-4 space-y-3 text-stone-800">
+                        {status === 'loading' && (
+                            <p className="text-sm text-stone-500 font-serif italic">Loading…</p>
+                        )}
+                        {status === 'error' && (
+                            <p className="text-sm text-red-600">Word study is unavailable right now.</p>
+                        )}
+                        {status === 'ready' && (
+                            <>
+                                {titleText && (
+                                    <p className="text-sm text-stone-500 italic">{titleText}</p>
+                                )}
+                                {tokens.length === 0 ? (
+                                    <p className="text-sm text-stone-500">No original-language words are stored for this verse.</p>
+                                ) : (
+                                    <div>
+                                        {withStrong && (
+                                            <p className="text-[11px] text-stone-400 mb-2">
+                                                Hover a word to highlight · click a word to find other uses
+                                            </p>
+                                        )}
+                                        {/* Flowing original line — RTL for Hebrew, LTR for Greek */}
+                                        <p
+                                            className={`text-lg md:text-2xl leading-relaxed ${isHeb ? 'hebrew' : 'greek'}`}
+                                            dir={isHeb ? 'rtl' : 'ltr'}
+                                            style={{ textAlign: isHeb ? 'right' : 'left', unicodeBidi: 'isolate' }}
+                                        >
+                                            {tokens.map((t, i) => {
+                                                const hasS = !!t.strong;
+                                                const key = `${t.order}-${t.strong || ''}-${i}`;
+                                                const isHover = hoverKey === key;
+                                                const isSel = selected && selected.order === t.order && selected.strong === t.strong;
+                                                const tip = hasS
+                                                    ? `${t.surface} · Strong’s ${t.strong} — click for other uses`
+                                                    : t.surface;
+                                                const Tag = hasS ? 'button' : 'span';
+                                                return (
+                                                    <React.Fragment key={key}>
+                                                        {i > 0 && !isHeb && ' '}
+                                                        <Tag
+                                                            type={hasS ? 'button' : undefined}
+                                                            onClick={(e) => {
+                                                                if (!hasS) return;
+                                                                e.stopPropagation();
+                                                                loadStrong(t);
+                                                            }}
+                                                            onMouseEnter={() => setHoverKey(key)}
+                                                            onMouseLeave={() => setHoverKey(null)}
+                                                            onFocus={() => setHoverKey(key)}
+                                                            onBlur={() => setHoverKey(null)}
+                                                            title={tip}
+                                                            aria-label={tip}
+                                                            className={`inline rounded-sm px-0.5 transition-colors duration-100 align-baseline ${
+                                                                hasS
+                                                                    ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500'
+                                                                    : 'cursor-default'
+                                                            } ${
+                                                                isSel
+                                                                    ? 'bg-amber-300 text-stone-900 ring-1 ring-amber-500'
+                                                                    : isHover && hasS
+                                                                      ? 'bg-amber-200 text-stone-900'
+                                                                      : hasS
+                                                                        ? 'hover:bg-amber-100'
+                                                                        : ''
+                                                            }`}
+                                                            style={{ unicodeBidi: 'isolate' }}
+                                                        >
+                                                            {t.surface}
+                                                        </Tag>
+                                                    </React.Fragment>
+                                                );
+                                            })}
+                                        </p>
+                                        {!withStrong && (
+                                            <p className="text-[11px] text-stone-400 mt-2">
+                                                Word numbers are not available for these original words.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                                {/* Results only after a word is clicked */}
+                                {selected && (
+                                    <div className="border-t border-stone-100 pt-3 mt-1">
+                                        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mb-2">
+                                            <span className={`text-base ${isHeb ? 'hebrew' : 'greek'}`} dir={isHeb ? 'rtl' : 'ltr'}>
+                                                {selected.surface}
+                                            </span>
+                                            <span className="text-xs font-semibold text-amber-800" dir="ltr">
+                                                Strong’s {selected.strong}
+                                            </span>
+                                            {strongHits?.total_verses != null && (
+                                                <span className="text-xs text-stone-400">
+                                                    {strongHits.total_verses.toLocaleString()} place{strongHits.total_verses === 1 ? '' : 's'} in Scripture
+                                                </span>
+                                            )}
+                                        </div>
+                                        {strongLoading && <p className="text-sm text-stone-500">Finding other uses…</p>}
+                                        {strongHits?.error && <p className="text-sm text-red-600">Could not search right now.</p>}
+                                        {strongHits?.hits && (
+                                            <ul className="space-y-2 max-h-36 overflow-y-auto">
+                                                {strongHits.hits.map((h) => (
+                                                    <li key={`${h.verse_id}-${h.surface}`} className="text-sm leading-snug">
+                                                        <button
+                                                            type="button"
+                                                            className="font-serif font-bold text-amber-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded text-left"
+                                                            onClick={() => onJumpVerse?.(h.verse_id)}
+                                                        >
+                                                            {formatVerseRef(h.verse_id)}
+                                                        </button>
+                                                        {h.lsv && (
+                                                            <span className="block text-stone-600 pl-0.5 line-clamp-2 font-serif">{h.lsv}</span>
+                                                        )}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying, onBookmark, onOpenStrongs, strongsAvailable }) => {
     const vid = group[0];
     const book = vid.substring(0, 3);
     const sectionIndex = getSectionIndex(vid);
@@ -765,6 +1030,13 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                                     tabIndex={isActive ? 0 : -1}
                                     aria-hidden={!isActive}
                                 />
+                                {strongsAvailable && onOpenStrongs && (
+                                    <StrongsButton
+                                        onOpen={() => onOpenStrongs(vid)}
+                                        tabIndex={isActive ? 0 : -1}
+                                        aria-hidden={!isActive}
+                                    />
+                                )}
                             </span>
                         )}
                     </div>
@@ -1435,6 +1707,29 @@ const App = () => {
   const [bookmarkDialogTarget, setBookmarkDialogTarget] = useState(null);
 
   const closeBookmarkDialog = useCallback(() => setBookmarkDialogTarget(null), []);
+
+  // Optional Strong's (feature-detect local query API). Null base ⇒ UI hidden.
+  const [queryApiBase, setQueryApiBase] = useState(null);
+  const [strongsVerseId, setStrongsVerseId] = useState(null);
+  const openStrongs = useCallback((vid) => {
+    if (!vid) return;
+    setStrongsVerseId(vid);
+  }, []);
+  const closeStrongs = useCallback(() => setStrongsVerseId(null), []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const base = await probeQueryApi(resolveQueryApiBase());
+      if (!cancelled) setQueryApiBase(base);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Close Strong's panel during audio playback (do not fight playVerse UX)
+  useEffect(() => {
+    if (playbackStatus === 'playing') setStrongsVerseId(null);
+  }, [playbackStatus]);
 
   // Load bookmarks on mount
   useEffect(() => {
@@ -2187,11 +2482,30 @@ const App = () => {
                     // ⚡ Bolt Optimization: Pass state setter directly instead of inline arrow function
                     // to maintain stable reference and prevent O(N) re-renders of React.memo component
                     onBookmark={setBookmarkDialogTarget}
+                    onOpenStrongs={openStrongs}
+                    strongsAvailable={!!queryApiBase}
                 />
             );
         })}
         
       </main>
+
+      {strongsVerseId && queryApiBase && (
+        <StrongsPanel
+          verseId={strongsVerseId}
+          apiBase={queryApiBase}
+          onClose={closeStrongs}
+          onJumpVerse={(vid) => {
+            setStrongsVerseId(vid);
+            const el = document.getElementById(`verse-${vid}`);
+            if (el) {
+              const rect = el.getBoundingClientRect();
+              window.scrollTo({ top: window.scrollY + rect.top - 60, behavior: 'smooth' });
+              setActiveVerseId(vid);
+            }
+          }}
+        />
+      )}
 
       <BookmarkDialog
           isOpen={!!bookmarkDialogTarget}

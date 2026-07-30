@@ -94,7 +94,9 @@
 - [x] Dual-read diagnostic: local JSON pack LSV/KJV vs DB (0101/0702/1225 PASS).
 - [x] Smoke: `db/scripts/test_query_phase4.py`.
 - [x] Option A second increment: local read-only HTTP API `db/scripts/serve_query_api.py` + `test_query_api_phase4.py` (stdlib, bind 127.0.0.1; wraps same library).
-- [ ] Optional browser Strong's UI (feature-detect API); Option B deferred (AGENTS verify required).
+- [x] Empty-original dual-claim wipe fix (`populate_day` clear); `audit_empty_originals.py`; stress section I; residual empties=4.
+- [x] Optional browser Strong's UI (`strongs_optional.js` + H# panel; feature-detect API; static JSON primary).
+- [ ] Option B deferred (AGENTS verify required).
 
 ### Phase 5: Rich Metadata & S.I. Enablement
 - Curate / import annotations (speakers, chronology, themes, cross-refs).

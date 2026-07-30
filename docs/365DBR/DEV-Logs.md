@@ -343,3 +343,99 @@ dual-read 1231,0117,0222,0319,0819 PASS
 ```
 
 **Bible is primary.**
+
+---
+
+## 2026-07-27 — Empty-original English edge audit + cross-day token wipe fix
+
+**Increment**: Option B from handoff (Truth/Accuracy) — tighten English BCVs with LSV/KJV but `tokens=0`.
+
+**Audit** (`db/scripts/audit_empty_originals.py`):
+| Class | Before fix | After fix + full re-populate |
+|-------|------------|------------------------------|
+| English + text, tokens=0 | **181** | **4** |
+| dual-claim (tokens under source BCV from *other* org) | **143** | **0** |
+| orphan_align (align source has no tokens) | 34 | 0 |
+| residual (splits / placeholder) | — | 4 |
+
+**Root cause (ours, not api.bible)**: `populate_day.py` cleared tokens with  
+`DELETE FROM original_tokens WHERE source_verse_id = %s` for every id in the day.  
+Adjacent plan days share org ids as *provenance* (e.g. day **0117** stores `GEN.31.55` tokens with `source_verse_id=GEN.32.1`; day **0118** owns English `GEN.32.1` from org `GEN.32.2`). The later day wiped the earlier English-primary tokens.
+
+**Fix**: Clear only (1) tokens for this day’s English display `verse_id`s, and (2) stale unmapped rows still parked under pure org BCVs (`verse_id = src AND source_verse_id IS NULL OR = src`). Never global-delete by `source_verse_id` alone.
+
+**Residual 4 (not dual-claim wipe — leave unless separate design)**:
+- `REV.12.18` — LSV text `'-'` (placeholder / omission); self-align empty
+- `PSA.13.6`, `ISA.64.2`, `NEH.7.69` — English text with no inbound `verseOrgIds` map (org id claimed by previous English verse; English split / first-wins 1:1 map)
+
+**Verified**:
+```
+populate --all: 365 OK / 0 failed
+audit_empty_originals: fixable=0 residual=4
+GEN.31.55 tokens=12 after 0117 then 0118
+stress (+ section I dual-claim): PASS
+dual-read 0228,1231,0117: PASS
+```
+
+**Artifacts**: `audit_empty_originals.py`; stress section I; `populate_day.py` clear logic.
+
+**Bible is primary.**
+
+---
+
+## 2026-07-27 — Phase 4 optional Strong's UI (feature-detect API)
+
+**Increment**: Option A from handoff — browser Strong's without making DB required for daily reading.
+
+**Deliverable**:
+| Artifact | Role |
+|----------|------|
+| `apps/365DBR/strongs_optional.js` | Probe `/health`, `fetchVerseDetail`, `fetchStrongHits`; base via `?queryApi=` or `localStorage 365dbr_query_api` (default `http://127.0.0.1:8765`) |
+| `index.html` / `bible.html` | H# button on focal slot (only if probe succeeds); bottom panel tokens + click Strong's → hit list |
+
+**Constraints respected (AGENTS)**:
+- `loadDailyBread` / `verseMap` flatten / `playVerse` **untouched**
+- Static JSON remains primary; panel is enrichment only
+- Panel closes when audio starts; Escape closes; no UI if API absent (prod-safe)
+
+**How to try**:
+```
+python db/scripts/serve_query_api.py
+# serve apps/365DBR over http, open index.html or bible.html
+# active verse → H# → tokens; click H#### for corpus hits
+```
+
+**Verified**: API `/health`, `/verse/GEN.1.1` (tokens + Strong's), `/strong/H430` smoke OK. Code review: playVerse/loadDailyBread markers intact.
+
+**Fix (same day)**: esm.sh/run cannot resolve `import … from './strongs_optional.js'` (rewrites to `script-0.tsx/strongs_optional.js`). Switched to classic `<script src="strongs_optional.js">` + `window.__DBR_STRONGs__` (same pattern as `bible_meta.js`).
+
+**UX pass (same day)**: End-user word study — human refs (`2 Kings 10:17`), no API/org/token jargon, flowing RTL original line, hover highlight + click search; results strip only after a word is chosen. Button **Aa** “Word study”.
+
+**Product park (same day, later reversed)**: Had considered opt-in only; owner kept Word study **on** (API feature-detect) as correct and helpful. English-hover remains a **future free/open-data** goal — see `Word-Study-and-Alignment.md` (no paid reverse-interlinear budget).
+
+---
+
+## 2026-07-28 — Word study re-enabled (no opt-in); free alignment roadmap
+
+**Owner**: Leave Word study available with real data (feature-detect API). Improve toward English-word hover **when possible without spending money**.
+
+**Code**: `strongs_optional.js` — no `wordStudy` gate; probe = `/health` only.
+
+**Docs**: `docs/365DBR/Word-Study-and-Alignment.md` (current vs desired; free/open avenues).
+
+**Bible is primary.**
+
+---
+
+## 2026-07-28 — Session close: check-in on main + handoff
+
+**Owner**: Testing index/bible + Word study looked good. Check in to **main**; button up next session.
+
+**This session deliverables (committed)**:
+- Safe `populate_day` token clear (cross-day wipe fix); `audit_empty_originals.py`; stress section I
+- Word study: `strongs_optional.js` + index/bible UI (feature-detect API, original-first, human refs)
+- Docs: Word-Study-and-Alignment.md (free/open EN-hover roadmap; no paid RI budget)
+
+**Next session**: paste prompt from `Handoff-Next-Session.md`. Suggested pick: **C** Phase 5 minimal annotations.
+
+**Bible is primary.**
