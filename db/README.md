@@ -312,11 +312,36 @@ python db/scripts/serve_query_api.py
 # optional: ?queryApi=http://127.0.0.1:8765
 ```
 
-## Next after Phase 4
+## Phase 5: Curated annotations (minimal S.I. metadata)
+
+Sparse speaker/theme rows with mandatory `source` provenance. **Not** full-Bible tagging.
+
+```powershell
+python db/scripts/apply_migrations.py   # includes 003_annotations_range_order
+python db/scripts/seed_annotations.py
+python db/scripts/test_annotations_phase5.py
+
+python db/scripts/query_db.py speaker --name Jesus --compact
+python db/scripts/query_db.py theme --name Creation --compact
+python db/scripts/query_db.py annotations --verse MAT.5.5 --compact
+python db/scripts/query_db.py si-demo --speaker God --strong H430 --compact
+```
+
+API (restart `serve_query_api.py` after pull):
+- `GET /speaker/Jesus`
+- `GET /theme/Creation`
+- `GET /annotations/MAT.5.5`
+- `GET /si-demo?speaker=God&strong=H430`
+
+Seed file: `db/seeds/phase5_curated_annotations.json` (replace only rows with `source_tag`).
+
+**Range note**: Annotation ranges use `verses.verse_order`, not lexical BCV string order (migration 003).
+
+## Next after Phase 4–5 minimal
 
 - Residual empty originals (English split / placeholder) — optional later design
 - Option B only if small + AGENTS verified (`loadDailyBread` from DB)
-- Phase 5: annotations / S.I. metadata
+- Expand curated annotations; free/open EN↔token alignment research when prioritized
 - Keep static JSON pipeline working until dual-write / cutover
 
 ## Troubleshooting

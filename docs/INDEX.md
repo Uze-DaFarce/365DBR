@@ -256,9 +256,9 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-07-28 (Phase 4 Option A + Word study checked in on main; ready for Phase 5 or next pick)
+**Last Updated**: 2026-07-29 (Phase 5 minimal curated speaker/theme annotations + S.I. demo query)
 
-**Current Phase**: Phase 4 Option A **solid** (DB query, dual-read, Word study original-first). Static JSON primary for live reader. **Next**: see `docs/365DBR/Handoff-Next-Session.md` (recommend Phase 5 minimal annotations, or Option B only if deliberate).
+**Current Phase**: Phase 4 Option A solid + **Phase 5 minimal annotations seeded**. Static JSON still primary for live reader. **Next**: more curated annotations, free EN-hover research, or Option B only if deliberate — see `docs/365DBR/Handoff-Next-Session.md`.
 
 **TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
 - [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).
@@ -277,12 +277,13 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 - [x] Full 365 re-populate with alignment: **365/365 OK** after English-only BCV `ensure_verse` FK fix; `repair_verse_order.py`; stress tests (`test_query_stress_phase4.py`) month-ends/alignment edges — not only 0101/GEN.1.1.
 - [x] Empty-original audit: dual-claim cross-day wipe fixed in `populate_day` clear; 181→4 residual; `audit_empty_originals.py` + stress section I.
 - [x] Query API + browser Word study (feature-detect API; original-first; on when API up). See `docs/365DBR/Word-Study-and-Alignment.md`.
+- [x] Phase 5 minimal: curated speaker/theme annotations (`phase5_curated_annotations.json`, seed script, migration 003 range-by-verse_order, query + si-demo). Sparse demo only — not full-Bible tagging.
 - [ ] Improve Word study toward English-word hover when **free/open** alignment data exists (no paid reverse interlinear budget).
 - [ ] Option B `loadDailyBread` from DB only if small + AGENTS verified.
 - [ ] Residual empty originals (English split / first-wins map / REV.12.18 placeholder) — optional multi-English→one-org design later.
-- [ ] Iterate schema from feedback; seed minimal annotations for speaker/theme demo.
+- [ ] Expand curated annotations (more speakers/themes; still require `source` + textual basis).
 - [ ] LSB integration (blocked pending 316 Publishing clarification); add WEB etc.
-- [ ] Full rich metadata + S.I. query prototypes; dual-write / cutover later.
+- [ ] Full rich metadata + deeper S.I. query prototypes; dual-write / cutover later.
 - Blockers: LSB access finalization; any hosting/DB provisioning details.
 
 **Next Steps (explicit)**:
@@ -290,9 +291,10 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 2. ~~Phase 4 Option A backend~~ done (CLI, local API, English-primary alignment, 365 re-populate, stress tests).
 3. ~~Empty-original dual-claim wipe~~ done (safe clear + re-populate; residual 4 documented).
 4. ~~Optional Strong's UI~~ done (feature-detect API; static primary).
-5. Phase 4 follow-up: optional English-split token sharing; Option B only if AGENTS verified.
-6. Phase 5 when ready: minimal speaker/theme annotations for S.I. demos.
-7. Keep 100% focus on 365DBR until data fully leveraged for S.I. LSB still blocked.
+5. ~~Phase 5 minimal annotations~~ done (15 curated rows + si-demo query; expand when ready).
+6. Phase 4 follow-up: optional English-split token sharing; Option B only if AGENTS verified.
+7. Expand Phase 5 curation; free/open EN-hover only when prioritized.
+8. Keep 100% focus on 365DBR until data fully leveraged for S.I. LSB still blocked.
 
 **Handoff guidance**: New sessions: read `docs/365DBR/Handoff-Next-Session.md` first (scoped next work), then `docs/Roles/365DBR-DEV.md` + INDEX + Verse-Identity + latest DEV-Logs. Prefer stress tests over toy 0101/GEN.1.1. Trust api.bible; verify with payload fields before blaming API.
 

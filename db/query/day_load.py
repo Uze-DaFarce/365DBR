@@ -356,6 +356,25 @@ def load_verse(conn, verse_id: str) -> dict[str, Any]:
         )
         titles = cur.fetchall()
 
+        # Phase 5: speaker/theme (etc.) whose verse_order range covers this BCV
+        cur.execute(
+            """
+            SELECT a.annotation_type, a.value, a.metadata, a.source,
+                   a.start_verse_id, a.end_verse_id
+            FROM annotations a
+            JOIN verses vs ON vs.id = a.start_verse_id
+            JOIN verses ve ON ve.id = a.end_verse_id
+            WHERE a.annotation_type IN (
+                'speaker', 'theme', 'audience', 'chronology',
+                'setting', 'genre', 'literary_unit'
+              )
+              AND %s BETWEEN vs.verse_order AND ve.verse_order
+            ORDER BY a.annotation_type, a.id
+            """,
+            (vrow["verse_order"],),
+        )
+        context_annos = cur.fetchall()
+
     book = vrow["book_code"] or _book_of(verse_id)
     lang = language_for_book(book)
     src_ids = sorted({
@@ -401,6 +420,17 @@ def load_verse(conn, verse_id: str) -> dict[str, Any]:
                 "source": t["source"],
             }
             for t in titles
+        ],
+        "annotations": [
+            {
+                "type": a["annotation_type"],
+                "value": a["value"],
+                "start_verse_id": a["start_verse_id"],
+                "end_verse_id": a["end_verse_id"],
+                "source": a["source"],
+                "metadata": a["metadata"] if isinstance(a["metadata"], dict) else {},
+            }
+            for a in context_annos
         ],
         "source": "db",
     }

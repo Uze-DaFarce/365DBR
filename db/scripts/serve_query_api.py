@@ -14,6 +14,10 @@ Endpoints (JSON):
   GET /strong/{num}?limit=20     e.g. /strong/H430?limit=5
   GET /day/{mmdd}?compact=1      e.g. /day/0101?compact=1
   GET /dual-read/{mmdd}?source=local
+  GET /speaker/{name}?limit=20   Phase 5 curated speaker ranges
+  GET /theme/{name}?limit=20     Phase 5 curated theme ranges
+  GET /annotations/{verse_id}    annotations covering verse
+  GET /si-demo?speaker=&theme=&strong=&limit=20
 
 Usage (monorepo root):
   python db/scripts/serve_query_api.py
@@ -23,6 +27,7 @@ Smoke (another shell):
   curl http://127.0.0.1:8765/health
   curl http://127.0.0.1:8765/verse/GEN.1.1
   curl "http://127.0.0.1:8765/strong/H430?limit=3"
+  curl "http://127.0.0.1:8765/speaker/Jesus"
 """
 
 from __future__ import annotations
@@ -39,11 +44,15 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "db"))
 
 from query import (  # noqa: E402
+    annotations_covering_verse,
     dual_read_day,
+    find_by_speaker,
+    find_by_theme,
     get_connection,
     load_day,
     load_verse,
     search_strong,
+    si_demo_query,
 )
 
 
@@ -108,7 +117,7 @@ class QueryAPIHandler(BaseHTTPRequestHandler):
                 {
                     "ok": True,
                     "service": "365DBR-query-api",
-                    "phase": "4-option-A",
+                    "phase": "4-option-A+5-annotations",
                     "note": "Static JSON remains primary for live daily reader",
                     "endpoints": [
                         "GET /health",
@@ -116,6 +125,10 @@ class QueryAPIHandler(BaseHTTPRequestHandler):
                         "GET /strong/{num}?limit=20",
                         "GET /day/{mmdd}?compact=1",
                         "GET /dual-read/{mmdd}?source=local",
+                        "GET /speaker/{name}?limit=20",
+                        "GET /theme/{name}?limit=20",
+                        "GET /annotations/{verse_id}",
+                        "GET /si-demo?speaker=&theme=&strong=&limit=20",
                     ],
                 },
             )
@@ -143,6 +156,26 @@ class QueryAPIHandler(BaseHTTPRequestHandler):
             source = (qs.get("source") or ["local"])[0]
             compact = (qs.get("compact") or ["0"])[0] in ("1", "true", "yes")
             self._handle_dual_read(parts[1], source=source, compact=compact)
+            return
+        if head == "speaker" and len(parts) == 2:
+            limit = int((qs.get("limit") or ["20"])[0])
+            self._handle_speaker(parts[1], limit=limit)
+            return
+        if head == "theme" and len(parts) == 2:
+            limit = int((qs.get("limit") or ["20"])[0])
+            self._handle_theme(parts[1], limit=limit)
+            return
+        if head == "annotations" and len(parts) == 2:
+            self._handle_annotations(parts[1])
+            return
+        if head in ("si-demo", "si_demo") and len(parts) == 1:
+            speaker = (qs.get("speaker") or [None])[0]
+            theme = (qs.get("theme") or [None])[0]
+            strong = (qs.get("strong") or [None])[0]
+            limit = int((qs.get("limit") or ["20"])[0])
+            self._handle_si_demo(
+                speaker=speaker, theme=theme, strong=strong, limit=limit
+            )
             return
 
         self._err(404, f"unknown path: {path}")
@@ -230,6 +263,62 @@ class QueryAPIHandler(BaseHTTPRequestHandler):
         except FileNotFoundError as e:
             self._err(404, str(e))
         except (KeyError, ValueError, RuntimeError) as e:
+            self._err(400, str(e))
+        finally:
+            conn.close()
+
+    def _handle_speaker(self, name: str, *, limit: int) -> None:
+        conn = get_connection()
+        try:
+            payload = find_by_speaker(conn, name, limit=limit)
+            self._send(200, {"ok": True, **payload})
+        except ValueError as e:
+            self._err(400, str(e))
+        finally:
+            conn.close()
+
+    def _handle_theme(self, name: str, *, limit: int) -> None:
+        conn = get_connection()
+        try:
+            # Path segment is literal; wrap for partial match like CLI
+            filt = name if "%" in name else f"%{name}%"
+            payload = find_by_theme(conn, filt, limit=limit)
+            self._send(200, {"ok": True, **payload})
+        except ValueError as e:
+            self._err(400, str(e))
+        finally:
+            conn.close()
+
+    def _handle_annotations(self, verse_id: str) -> None:
+        conn = get_connection()
+        try:
+            payload = annotations_covering_verse(conn, verse_id)
+            self._send(200, {"ok": True, **payload})
+        except KeyError as e:
+            self._err(404, str(e))
+        except ValueError as e:
+            self._err(400, str(e))
+        finally:
+            conn.close()
+
+    def _handle_si_demo(
+        self,
+        *,
+        speaker: str | None,
+        theme: str | None,
+        strong: str | None,
+        limit: int,
+    ) -> None:
+        conn = get_connection()
+        try:
+            th = theme
+            if th and "%" not in th:
+                th = f"%{th}%"
+            payload = si_demo_query(
+                conn, speaker=speaker, theme=th, strong=strong, limit=limit
+            )
+            self._send(200, {"ok": True, **payload})
+        except ValueError as e:
             self._err(400, str(e))
         finally:
             conn.close()

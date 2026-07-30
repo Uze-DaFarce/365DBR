@@ -108,6 +108,13 @@
 - Expose advanced queries (SQL views + later S.I. query builder).
 - **Metrics**: Enable sample "Deep Thought" style queries, e.g. "list all verses where speaker=Jesus containing strong for 'love' or theme mercy".
 
+**Progress (2026-07-29)**:
+- [x] Minimal curated seed: `db/seeds/phase5_curated_annotations.json` (15 rows; source=`curated-manual-phase5-v1`).
+- [x] `seed_annotations.py` (idempotent by source tag); `003_annotations_range_order.sql` (verse_order trigger; drop lexical BCV CHECK).
+- [x] Query: `db/query/annotations.py` + CLI/API (`speaker`, `theme`, `annotations`, `si-demo`); `load_verse` attaches covering annotations.
+- [x] Smoke: `test_annotations_phase5.py` PASS (Jesus/God/Creation ranges; God+H430 demo).
+- [ ] Expand curation; cross_references; frontend annotation display; full-Bible coverage (not in v1).
+
 ### Phase 6: Cutover, Deprecation, Ops
 - Switch primary source to DB for new S.I. components.
 - Maintain static snapshots or JSON export for 365DBR compatibility / offline / crawlers as needed.

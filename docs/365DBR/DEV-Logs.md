@@ -439,3 +439,55 @@ python db/scripts/serve_query_api.py
 **Next session**: paste prompt from `Handoff-Next-Session.md`. Suggested pick: **C** Phase 5 minimal annotations.
 
 **Bible is primary.**
+
+---
+
+## 2026-07-29 — Phase 5 minimal: curated speaker/theme annotations
+
+**Session start**: Read handoff-only set. Smoke green before code:
+- `audit_empty_originals`: dual_claim=0 residual=4
+- stress dual-read sample (20) + section I: **PASS**
+- query API `/health` OK
+- git clean @ `73771a5` (same tip as main)
+
+**Increment (pick C)**: Phase 5 minimal curated annotations — no LSB, no Option B, no invented EN↔token maps.
+
+**Deliverables**:
+| Artifact | Role |
+|----------|------|
+| `db/seeds/phase5_curated_annotations.json` | 15 rows (8 speaker + 7 theme); every row has `source` + basis |
+| `db/scripts/seed_annotations.py` | Idempotent replace by `source_tag=curated-manual-phase5-v1` |
+| `db/migrations/003_annotations_range_order.sql` | Drop broken lexical BCV CHECK; trigger validates `verse_order` |
+| `db/query/annotations.py` | covering-verse / speaker / theme / `si_demo_query` |
+| `query_db.py` + `serve_query_api.py` | CLI + HTTP: speaker, theme, annotations, si-demo |
+| `load_verse` | includes range-covering speaker/theme on verse payload |
+| `test_annotations_phase5.py` | seed + range + S.I. demo smoke |
+
+**Schema note (ours)**: `CHECK (start_verse_id <= end_verse_id)` is **lexical** and rejects real ranges (e.g. `MAT.5.3` > `MAT.5.12` as text). Fixed via migration 003 + `verse_order` trigger. Queries expand ranges by `verse_order`, not string compare.
+
+**Curated seed (high-certainty only)**:
+- Speakers: God (GEN.1.3, GEN.1.26), YHWH (GEN.12.1–3, EXO.20.1–17), Jesus (MAT.5.3–12 Beatitudes, JHN.14.6, MAT.28.18–20, REV.22.20)
+- Themes: Creation, Abrahamic covenant promise, Law/Decalogue, Messianic suffering (ISA.53.4–6), Gospel/salvation (JHN.3.16), Resurrection (MAT.28.1–10), Shepherd care (PSA.23)
+
+**Verified**:
+```
+apply_migrations → 003 applied
+seed_annotations → 15 inserted (speaker=8 theme=7)
+test_annotations_phase5 → PASS
+query_db speaker Jesus → 4 ranges
+si-demo God + H430 → GEN.1.3, GEN.1.26
+ETL superscription/title preserved (205)
+```
+
+**How to run**:
+```powershell
+python db/scripts/apply_migrations.py
+python db/scripts/seed_annotations.py
+python db/scripts/test_annotations_phase5.py
+python db/scripts/query_db.py speaker --name Jesus --compact
+python db/scripts/query_db.py si-demo --speaker God --strong H430 --compact
+```
+
+**Not in this increment**: Option B loadDailyBread; LSB; free EN↔token alignment; frontend annotation UI; full-Bible speaker tagging.
+
+**Bible is primary.**

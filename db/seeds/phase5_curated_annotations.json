@@ -1,0 +1,170 @@
+{
+  "version": "phase5-v1",
+  "source_tag": "curated-manual-phase5-v1",
+  "notes": [
+    "Minimal Phase 5 seed for S.I. demos. Not exhaustive.",
+    "English-primary BCV (KJV/LSV-compatible). Ranges verified against text.",
+    "source field is mandatory for every row. Do not invent speakers or themes.",
+    "Re-run seed_annotations.py to replace only this source_tag (idempotent)."
+  ],
+  "annotations": [
+    {
+      "annotation_type": "speaker",
+      "start_verse_id": "GEN.1.3",
+      "end_verse_id": "GEN.1.3",
+      "value": "God",
+      "metadata": {
+        "quote_type": "direct",
+        "certainty": 1.0,
+        "basis": "Text: And God said, Let there be light"
+      }
+    },
+    {
+      "annotation_type": "speaker",
+      "start_verse_id": "GEN.1.26",
+      "end_verse_id": "GEN.1.26",
+      "value": "God",
+      "metadata": {
+        "quote_type": "direct",
+        "certainty": 1.0,
+        "basis": "Text: And God said, Let us make man"
+      }
+    },
+    {
+      "annotation_type": "speaker",
+      "start_verse_id": "GEN.12.1",
+      "end_verse_id": "GEN.12.3",
+      "value": "YHWH",
+      "metadata": {
+        "quote_type": "direct",
+        "certainty": 1.0,
+        "basis": "Call of Abram; YHWH said unto Abram (GEN.12.1–3)"
+      }
+    },
+    {
+      "annotation_type": "speaker",
+      "start_verse_id": "EXO.20.1",
+      "end_verse_id": "EXO.20.17",
+      "value": "YHWH",
+      "metadata": {
+        "quote_type": "direct",
+        "certainty": 1.0,
+        "basis": "Decalogue; God spake all these words (EXO.20.1–17)"
+      }
+    },
+    {
+      "annotation_type": "speaker",
+      "start_verse_id": "MAT.5.3",
+      "end_verse_id": "MAT.5.12",
+      "value": "Jesus",
+      "metadata": {
+        "quote_type": "direct",
+        "certainty": 1.0,
+        "basis": "Beatitudes; Jesus opened his mouth and taught (MAT.5.2–12)"
+      }
+    },
+    {
+      "annotation_type": "speaker",
+      "start_verse_id": "JHN.14.6",
+      "end_verse_id": "JHN.14.6",
+      "value": "Jesus",
+      "metadata": {
+        "quote_type": "direct",
+        "certainty": 1.0,
+        "basis": "Text: Jesus saith… I am the way, the truth, and the life"
+      }
+    },
+    {
+      "annotation_type": "speaker",
+      "start_verse_id": "MAT.28.18",
+      "end_verse_id": "MAT.28.20",
+      "value": "Jesus",
+      "metadata": {
+        "quote_type": "direct",
+        "certainty": 1.0,
+        "basis": "Great Commission; Jesus came and spake unto them (MAT.28.18–20)"
+      }
+    },
+    {
+      "annotation_type": "speaker",
+      "start_verse_id": "REV.22.20",
+      "end_verse_id": "REV.22.20",
+      "value": "Jesus",
+      "metadata": {
+        "quote_type": "direct",
+        "certainty": 0.95,
+        "basis": "Surely I come quickly is the Lord's word; Amen response is John's"
+      }
+    },
+    {
+      "annotation_type": "theme",
+      "start_verse_id": "GEN.1.1",
+      "end_verse_id": "GEN.2.3",
+      "value": "Creation",
+      "metadata": {
+        "certainty": 1.0,
+        "basis": "Creation week narrative (GEN.1.1–2.3)"
+      }
+    },
+    {
+      "annotation_type": "theme",
+      "start_verse_id": "GEN.12.1",
+      "end_verse_id": "GEN.12.3",
+      "value": "Abrahamic covenant promise",
+      "metadata": {
+        "certainty": 1.0,
+        "basis": "Promise of land, nation, blessing to the nations"
+      }
+    },
+    {
+      "annotation_type": "theme",
+      "start_verse_id": "EXO.20.1",
+      "end_verse_id": "EXO.20.17",
+      "value": "Law / Decalogue",
+      "metadata": {
+        "certainty": 1.0,
+        "basis": "Ten Commandments"
+      }
+    },
+    {
+      "annotation_type": "theme",
+      "start_verse_id": "ISA.53.4",
+      "end_verse_id": "ISA.53.6",
+      "value": "Messianic suffering",
+      "metadata": {
+        "certainty": 1.0,
+        "basis": "He was wounded for our transgressions… (ISA.53.4–6)"
+      }
+    },
+    {
+      "annotation_type": "theme",
+      "start_verse_id": "JHN.3.16",
+      "end_verse_id": "JHN.3.16",
+      "value": "Gospel / salvation",
+      "metadata": {
+        "certainty": 1.0,
+        "basis": "For God so loved the world… (JHN.3.16)"
+      }
+    },
+    {
+      "annotation_type": "theme",
+      "start_verse_id": "MAT.28.1",
+      "end_verse_id": "MAT.28.10",
+      "value": "Resurrection",
+      "metadata": {
+        "certainty": 1.0,
+        "basis": "Empty tomb and first appearances (MAT.28.1–10)"
+      }
+    },
+    {
+      "annotation_type": "theme",
+      "start_verse_id": "PSA.23.1",
+      "end_verse_id": "PSA.23.6",
+      "value": "Shepherd care",
+      "metadata": {
+        "certainty": 1.0,
+        "basis": "The LORD is my shepherd (PSA.23)"
+      }
+    }
+  ]
+}
