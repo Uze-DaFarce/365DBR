@@ -1,58 +1,55 @@
-# Mt. Sinai LLC - Monorepo
+# Mt. Sinai LLC Architecture Ecosystem
+> **Mission:** Engineering an alternative, foundational AI framework that systematically prioritizes the Word of God (Sola Scriptura) over the unfiltered datasets of man.
 
-**Faith-Centered Business Services & Ethical AI**
+Welcome to the central repository for Mt. Sinai LLC technical assets. This ecosystem is dedicated to building lightweight, high-performance, and web-crawler-optimized data pipelines designed to anchor automated intelligence, educational software, and daily study tools inside a strict Biblical framework.
 
-This monorepo contains the collected source code for all of Mt. Sinai LLC's web-based ministry projects. We are dedicated to providing professional business services that honor God, specializing in ethical AI implementation, bookkeeping, web design, and application solutions.
+---
 
-## Mission
+## 🏛️ The Vision: Scripture-First Intelligence
+Standard large language models are trained on the sum of the secular internet—prioritizing crowd-sourced consensus, humanism, and noise. Mt. Sinai is a deliberate architectural pivot. 
 
-"Each task, even the most ordinary, is sacred when done for God. We are called to work with excellence, integrity, and devotion, knowing that Christ Himself is whom we serve as we serve our clients."
+We are constructing tools, data structures, and structural boundaries that force language models to audit their logic against historical and scriptural reality, ensuring truth, clarity, and absolute data integrity.
 
-## Applications
+---
 
-This repository is organized into the following applications (see `docs/` for centralized, up-to-date documentation):
+## 🚀 Active Apps & Production Engines (Monorepo)
+This repository is structured as a **monorepo**, housing the source code and localized data pipelines for multiple faith-anchored applications hosted across the `mt-sin.ai` ecosystem. 
 
-*   **365DBR** (`/apps/365DBR`): A structured daily Bible reading plan (<15 min/day) with advanced browser features. Foundation for Scriptural Intelligence (S.I.). See [docs/INDEX.md](docs/INDEX.md) and [docs/365DBR_AGENTS.md](docs/365DBR_AGENTS.md).
-*   **HeIsRisen** (`/apps/HeIsRisen` and `/m/`): Interactive Christian Easter Egg Hunt game (desktop + mobile versions).
-*   **mtsinai** (`/apps/mtsinai`): The main corporate website for Mt. Sinai LLC.
-*   **dbdkids** (`/apps/dbdkids`): In development (no documentation yet).
+Our current primary production applications include:
 
-## 365DBR
+### 📖 1. 365DBR (Daily Bible Reading & Study App)
+*   **Live Link:** `mt-sin.ai/365DBR/`
+*   **Purpose:** A fast, lightweight, and responsive daily Scripture reading and tracking application.
+*   **Architecture:** Engineered explicitly around flat-file arrays and strict JSON data models (such as `/data/0818/index.html` optimized for crawler and LLM search agent indexing). This design choice prioritizes maximum scraping speed and ultra-low search latency over heavy database infrastructure.
 
-See the centralized documentation for full details:
+### 🌅 2. He Is Risen (Interactive Easter Learning Game)
+*   **Live Link:** `mt-sin.ai/HeIsRisen/`
+*   **Purpose:** A lightweight, interactive learning experience designed for children's education and engagement with Biblical history.
+*   **Architecture:** Leverages efficient front-end logic and asset optimization to deliver reliable deployment across both desktop and mobile web environments.
 
-* [docs/INDEX.md](docs/INDEX.md)
-* [docs/365DBR_AGENTS.md](docs/365DBR_AGENTS.md)
-* [Project Blueprint for Scriptural Intelligence (S.I.)](docs/Project%20Blueprint_%20Scriptural%20Intelligence%20(SI).md)
+---
 
-**Current Status (2026-06-30)**:
-- Primary data via api.bible (LSV focal).
-- LSB access obtained but integration pending clarification from 316 Publishing on LLC setup.
-- Planned expansions: WEB (no data yet), NKJV, ESV (when accessible/affordable).
-- Transitioning from static JSON to highly relational database (far beyond Book/Chapter/Verse; includes original languages, speaker/subject/timing/context, multi-translation support).
-- Deployed at: https://mt-sin.ai/365DBR/ (interactive) and static data endpoints for crawlers.
+### 🛠️ Core Infrastructure & Design Philosophy
+Across all applications in this monorepo, we utilize unique architectural constraints:
+*   **Advanced AI-Human Orchestration:** Utilizes localized environment configurations and constraint tracking (`.jules` workflows). This allows a senior human generalist to aggressively manage prompt structures, catch systemic hallucinations, and pull automated workflows back to logical reality before progress drifts.
+*   **Legacy-to-Modern Bridge:** Combines modern Python automated script pipelines with foundational backend logic rules derived from decades of multi-environment engineering experience (C#, Perl, Unix).
 
-**Note**: Full technical details, setup, and usage are maintained in `docs/`. The high-level overview below is intentionally brief.
 
-### High-Level Components
-- Python pipeline for plan generation and data fetching.
-- React-based frontend (single-file via CDN) with advanced browser features.
-- Strong focus on accessibility, performance, and Biblical fidelity.
+### 🛠️ Technical Architecture & Design Decisions
+*   **Flat-File & JSON Pipeline Optimization:** Designed explicitly around static file arrays and strict JSON data models (located in `/data/0818/index.html` for crawlers and LLM search agents). This architecture prioritizes maximum indexing speed and ultra-low search latency over heavy, privacy-focused relational database servers.
+*   **Advanced AI-Human Orchestration:** Utilizes localized environment configurations and constraint tracking (`.jules` workflows). This allows a senior human generalist to aggressively manage prompt structures, catch systemic hallucinations, and pull automated workflows back to logical reality before progress drifts.
+*   **Legacy-to-Modern Bridge:** Combines modern Python automated script pipelines with foundational backend logic rules derived from decades of multi-environment engineering experience (C#, Perl, Unix).
 
-See `docs/` for current scripts, data model, deployment details, and S.I. integration plans.
+---
 
-## Documentation
+## 🧭 Roadmap & Core Capabilities
+1.  **Scripture-Rooted Benchmarking:** Developing automated test harnesses to evaluate LLM outputs against precise theological, logical, and structural constraints.
+2.  **Lightweight Educational Engines:** Expanding interactive learning tools (such as `mt-sin.ai/HeIsRisen/`) leveraging flat-file architectures for seamless distribution.
+3.  **Advanced Data Extraction:** Building ethical, high-fidelity prompt pipelines that format complex text historical documents into structured, machine-readable datasets without data drift.
 
-All shared documentation lives in the `docs/` directory at the monorepo root (centralized to reduce repetition and capture cross-app context).
+---
 
-* Start here: [docs/INDEX.md](docs/INDEX.md)
-* 365DBR-specific constraints: [docs/365DBR_AGENTS.md](docs/365DBR_AGENTS.md)
-* Scriptural Intelligence (S.I.) vision: [docs/Project Blueprint_ Scriptural Intelligence (SI).md](docs/Project%20Blueprint_%20Scriptural%20Intelligence%20(SI).md)
+## 👨‍💻 Engineering Identity
+This ecosystem is maintained and architected by a self-taught, Senior Systems Generalist with 20+ years of full-stack backend experience. We value uncompromising ethical standards, transparent communication, and software designed to serve God.
 
-App-specific documentation (when it exists) will be in `docs/<app>/`.
-
-## Contact
-
-*   **Email**: [truth@mt-sin.ai](mailto:truth@mt-sin.ai)
-*   **Phone**: (206) 718-9780
-*   **Location**: Conrad, MT
+*All project communications, code audits, and operational pipelines are managed natively through secure enterprise freelance and ministry application channels.*
