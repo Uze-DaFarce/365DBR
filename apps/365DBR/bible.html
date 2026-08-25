@@ -114,39 +114,111 @@ const FOCAL_THEMES = [
   { bg: 'bg-emerald-100', border: 'border-emerald-500', ring: 'ring-emerald-500/50', text: 'text-emerald-700', linkHover: 'hover:text-emerald-600', linkRing: 'focus-visible:ring-emerald-500' }
 ];
 
-/** --- DATA UTILITIES --- **/
-function walkItems(items, map, versionKey, useOrgId, buffer, context) {
+/** --- DATA UTILITIES (English-primary; titles not merged into body) --- **/
+const TITLE_PARA_STYLES = new Set(['d', 's', 's1', 's2', 's3', 'ms', 'ms1', 'ms2', 'mr', 'r', 'sp', 'qa']);
+function collectTextUnder(item) {
+  const parts = [];
+  if (!item || typeof item !== 'object') return '';
+  if (item.type === 'text' && item.text) parts.push(item.text);
+  (item.items || []).forEach((ch) => parts.push(collectTextUnder(ch)));
+  return parts.join('');
+}
+function ensureVerseEntry(map, vid, versionKey) {
+  if (!map[vid]) map[vid] = {};
+  if (versionKey && !map[vid][versionKey]) map[vid][versionKey] = { text: [], displayVid: vid };
+  return map[vid];
+}
+function walkEnglishItems(items, map, versionKey, orgToEnglish, orgToAll, context) {
   if (!items) return;
   for (const item of items) {
-    let previousActiveVid = context.activeVid;
-    if (item.attrs?.verseId) {
-      let keyVid = item.attrs.verseId;
-      if (useOrgId && item.attrs.verseOrgIds && item.attrs.verseOrgIds.length > 0) keyVid = item.attrs.verseOrgIds[0];
-      context.activeVid = keyVid;
-      context.lastSeenVid = keyVid;
-      if (!map[keyVid]) map[keyVid] = {};
-      if (!map[keyVid][versionKey]) map[keyVid][versionKey] = { text: [], displayVid: item.attrs.verseId };
-      if (buffer && buffer.text.length > 0) { map[keyVid][versionKey].text.push(...buffer.text); buffer.text = []; }
+    const attrs = item.attrs || {};
+    const style = attrs.style || '';
+    if (item.name === 'para' && TITLE_PARA_STYLES.has(style)) {
+      const titleText = collectTextUnder(item).trim();
+      if (titleText) context.pendingTitles.push(titleText);
+      continue;
+    }
+    const previousActiveVid = context.activeVid;
+    if (attrs.verseId) {
+      const engVid = attrs.verseId;
+      const orgs = attrs.verseOrgIds || [];
+      if (orgs.length > 0 && orgs[0]) {
+        const org = orgs[0];
+        if (!orgToEnglish[org]) orgToEnglish[org] = engVid;
+        if (!orgToAll[org]) orgToAll[org] = [];
+        if (!orgToAll[org].includes(engVid)) orgToAll[org].push(engVid);
+      }
+      context.activeVid = engVid;
+      context.lastSeenVid = engVid;
+      ensureVerseEntry(map, engVid, versionKey);
+      if (context.pendingTitles.length > 0) {
+        if (!map[engVid].titles) map[engVid].titles = [];
+        map[engVid].titles.push(...context.pendingTitles);
+        context.pendingTitles = [];
+      }
     }
     if (item.type === 'text' && item.text) {
-        if (context.activeVid) {
-            if (map[context.activeVid] && map[context.activeVid][versionKey]) map[context.activeVid][versionKey].text.push(item.text);
-        } else if (item.text.trim().length > 0) {
-            if (context.lastSeenVid) {
-                if (map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) map[context.lastSeenVid][versionKey].text.push(item.text);
-            } else if (buffer) { buffer.text.push(item.text); }
-        }
+      if (context.activeVid && map[context.activeVid] && map[context.activeVid][versionKey]) {
+        map[context.activeVid][versionKey].text.push(item.text);
+      } else if (item.text.trim().length > 0 && context.lastSeenVid && map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
+        map[context.lastSeenVid][versionKey].text.push(item.text);
+      }
     }
-    if (item.items && item.items.length > 0) walkItems(item.items, map, versionKey, useOrgId, buffer, context);
+    if (item.items && item.items.length > 0) walkEnglishItems(item.items, map, versionKey, orgToEnglish, orgToAll, context);
     context.activeVid = previousActiveVid;
   }
 }
-
-function processContent(contentArray, map, versionKey, useOrgId = false) {
+function walkOriginalItems(items, map, orgToEnglish, orgToAll, context) {
+  if (!items) return;
+  for (const item of items) {
+    const attrs = item.attrs || {};
+    const previousActiveVid = context.activeVid;
+    if (attrs.verseId) {
+      const orgVid = attrs.verseId;
+      context.activeVid = orgVid;
+      context.lastSeenVid = orgVid;
+      const targets = (orgToAll[orgVid] && orgToAll[orgVid].length) ? orgToAll[orgVid] : (orgToEnglish[orgVid] ? [orgToEnglish[orgVid]] : null);
+      if (targets) {
+        context.targets = targets;
+        targets.forEach((eng) => ensureVerseEntry(map, eng, 'original'));
+      } else if (map[orgVid] && (map[orgVid].lsv || map[orgVid].kjv)) {
+        context.targets = null;
+        context.superscriptionFor = orgVid;
+        if (!map[orgVid].titles) map[orgVid].titles = [];
+      } else {
+        context.targets = null;
+        context.superscriptionFor = null;
+      }
+    }
+    if (item.type === 'text' && item.text) {
+      if (context.targets && context.targets.length) {
+        context.targets.forEach((eng) => { if (map[eng] && map[eng].original) map[eng].original.text.push(item.text); });
+      } else if (context.superscriptionFor && map[context.superscriptionFor]) {
+        if (!context.superBuf) context.superBuf = {};
+        const k = context.superscriptionFor;
+        if (!context.superBuf[k]) context.superBuf[k] = [];
+        context.superBuf[k].push(item.text);
+      }
+    }
+    if (item.items && item.items.length > 0) walkOriginalItems(item.items, map, orgToEnglish, orgToAll, context);
+    context.activeVid = previousActiveVid;
+  }
+}
+function processEnglishContent(contentArray, map, versionKey, orgToEnglish, orgToAll) {
   if (!contentArray) return;
-  const buffer = { text: [] };
-  const context = { activeVid: null, lastSeenVid: null };
-  for (const section of contentArray) { if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context); }
+  const context = { activeVid: null, lastSeenVid: null, pendingTitles: [] };
+  for (const section of contentArray) { if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context); }
+}
+function processOriginalContent(contentArray, map, orgToEnglish, orgToAll) {
+  if (!contentArray) return;
+  const context = { activeVid: null, lastSeenVid: null, targets: null, superscriptionFor: null, superBuf: {} };
+  for (const section of contentArray) { if (section.items) walkOriginalItems(section.items, map, orgToEnglish, orgToAll, context); }
+  Object.keys(context.superBuf).forEach((vid) => {
+    const t = context.superBuf[vid].join('').trim();
+    if (!t || !map[vid]) return;
+    if (!map[vid].titles) map[vid].titles = [];
+    map[vid].titles.push(t);
+  });
 }
 
 function getBasePath() {
@@ -186,7 +258,8 @@ async function loadDailyBread(dateFolder) {
   results.forEach((source) => {
     const data = source.data;
     if (!data) return;
-    if (data.content) processContent(data.content, verseMap, 'original', false);
+    const orgToEnglish = {};
+    const orgToAll = {};
     if (data.parallels) {
       data.parallels.forEach(parallel => {
          const matchedKey = Object.keys(TRANSLATION_REGISTRY).find(key => {
@@ -197,11 +270,12 @@ async function loadDailyBread(dateFolder) {
             return false;
          });
          if (matchedKey && parallel.content) {
-            processContent(parallel.content, verseMap, matchedKey, true);
+            processEnglishContent(parallel.content, verseMap, matchedKey, orgToEnglish, orgToAll);
             availableKeys.add(matchedKey);
          }
       });
     }
+    if (data.content) processOriginalContent(data.content, verseMap, orgToEnglish, orgToAll);
   });
 
   const sortedKeys = Array.from(availableKeys).filter(k => k !== 'original');

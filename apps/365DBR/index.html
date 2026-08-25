@@ -171,83 +171,162 @@ const TRANSLATION_REGISTRY = {
 };
 
 /** --- DATA UTILITIES --- **/
-// Recursive walker with active verse context to safely handle nested structures and orphans
-const walkItems = (items, map, versionKey, useOrgId, buffer, context) => {
+/**
+ * English-primary verseMap (production / static JSON).
+ * - English (LSV/KJV): keyed by modern English verseId (NOT org/hebrew id).
+ * - Original: remapped onto those English keys via verseOrgIds.
+ * - USFM title paras (style d/s/…): stored as entry.titles[], NEVER appended into verse body.
+ * Fixes Psalms empty slots (org superscription with no English) and titles glued onto v.1 text.
+ */
+const TITLE_PARA_STYLES = new Set(['d', 's', 's1', 's2', 's3', 'ms', 'ms1', 'ms2', 'mr', 'r', 'sp', 'qa']);
+
+const collectTextUnder = (item) => {
+  const parts = [];
+  if (!item || typeof item !== 'object') return '';
+  if (item.type === 'text' && item.text) parts.push(item.text);
+  const kids = item.items || [];
+  for (let i = 0; i < kids.length; i++) parts.push(collectTextUnder(kids[i]));
+  return parts.join('');
+};
+
+const ensureVerseEntry = (map, vid, versionKey) => {
+  if (!map[vid]) map[vid] = {};
+  if (versionKey && !map[vid][versionKey]) {
+    map[vid][versionKey] = { text: [], displayVid: vid };
+  }
+  return map[vid];
+};
+
+/** Walk English parallel: key by verseId; capture title paras separately; fill org→English maps. */
+const walkEnglishItems = (items, map, versionKey, orgToEnglish, orgToAll, context) => {
   if (!items) return;
   for (const item of items) {
-    let previousActiveVid = context.activeVid; // Store stack for backtracking
+    const attrs = item.attrs || {};
+    const style = attrs.style || '';
 
-    // 1. Enter Verse Scope?
-    if (item.attrs?.verseId) {
-      let keyVid = item.attrs.verseId;
-      // If parallels have explicit mapping to original verse (verseOrgIds), use it.
-      if (useOrgId && item.attrs.verseOrgIds && item.attrs.verseOrgIds.length > 0) {
-        keyVid = item.attrs.verseOrgIds[0];
-      }
-      context.activeVid = keyVid;
-      context.lastSeenVid = keyVid; // Track linear progression across hierarchy
-
-      if (!map[keyVid]) map[keyVid] = {};
-      if (!map[keyVid][versionKey]) {
-         map[keyVid][versionKey] = {
-            text: [],
-            displayVid: item.attrs.verseId // Store the native ID for display (e.g. LEV.6.1)
-         };
-      }
-      
-      // Flush buffer if exists (orphaned content found BEFORE this verse belongs here, e.g. Titles)
-      if (buffer && buffer.text.length > 0) {
-         map[keyVid][versionKey].text.push(...buffer.text);
-         buffer.text = []; // Clear buffer
-      }
+    // Title / superscription para — do not merge into verse body text
+    if (item.name === 'para' && TITLE_PARA_STYLES.has(style)) {
+      const titleText = collectTextUnder(item).trim();
+      if (titleText) context.pendingTitles.push(titleText);
+      continue; // do not walk children as verse body
     }
 
-    // 2. Process Text Content
-    if (item.type === 'text' && item.text) {
-        if (context.activeVid) {
-            // Case A: Inside a verse container. Safe add.
-            if (map[context.activeVid] && map[context.activeVid][versionKey]) {
-                map[context.activeVid][versionKey].text.push(item.text);
-            }
-        } else {
-            // Case B: Orphaned Text (No active container)
-            if (item.text.trim().length > 0) {
-                if (context.lastSeenVid) {
-                    // Sub-case B1: We have seen a verse before. This orphan likely belongs to it (e.g. formatting sibling).
-                    // Append to PREVIOUS/LAST SEEN verse.
-                    if (map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
-                        map[context.lastSeenVid][versionKey].text.push(item.text);
-                    }
-                } else {
-                    // Sub-case B2: No verse seen yet (Start of file). This is likely a Title.
-                    // Buffer it for the NEXT verse.
-                    if (buffer) {
-                        buffer.text.push(item.text);
-                    }
-                }
-            }
+    const previousActiveVid = context.activeVid;
+    if (attrs.verseId) {
+      const engVid = attrs.verseId;
+      const orgs = attrs.verseOrgIds || [];
+      if (orgs.length > 0) {
+        const org = orgs[0];
+        if (org) {
+          if (!orgToEnglish[org]) orgToEnglish[org] = engVid;
+          if (!orgToAll[org]) orgToAll[org] = [];
+          if (!orgToAll[org].includes(engVid)) orgToAll[org].push(engVid);
         }
-    }
-    
-    // 3. Recurse
-    if (item.items && item.items.length > 0) {
-        walkItems(item.items, map, versionKey, useOrgId, buffer, context);
+      }
+      context.activeVid = engVid;
+      context.lastSeenVid = engVid;
+      ensureVerseEntry(map, engVid, versionKey);
+      if (context.pendingTitles.length > 0) {
+        if (!map[engVid].titles) map[engVid].titles = [];
+        map[engVid].titles.push(...context.pendingTitles);
+        context.pendingTitles = [];
+      }
     }
 
-    // 4. Exit Scope
+    if (item.type === 'text' && item.text) {
+      if (context.activeVid && map[context.activeVid] && map[context.activeVid][versionKey]) {
+        map[context.activeVid][versionKey].text.push(item.text);
+      } else if (item.text.trim().length > 0 && context.lastSeenVid &&
+                 map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
+        map[context.lastSeenVid][versionKey].text.push(item.text);
+      }
+    }
+
+    if (item.items && item.items.length > 0) {
+      walkEnglishItems(item.items, map, versionKey, orgToEnglish, orgToAll, context);
+    }
     context.activeVid = previousActiveVid;
   }
 };
 
-const processContent = (contentArray, map, versionKey, useOrgId = false) => {
-  if (!contentArray) return;
-  // Buffer context for this processing pass
-  const buffer = { text: [] }; 
-  // Context MUST be shared across the entire section to track lastSeenVid linearly
-  const context = { activeVid: null, lastSeenVid: null };
-  for (const section of contentArray) {
-      if (section.items) walkItems(section.items, map, versionKey, useOrgId, buffer, context); 
+/** Walk original language: attach under English keys via org maps; bare superscription → titles. */
+const walkOriginalItems = (items, map, orgToEnglish, orgToAll, context) => {
+  if (!items) return;
+  for (const item of items) {
+    const attrs = item.attrs || {};
+    const previousActiveVid = context.activeVid;
+
+    if (attrs.verseId) {
+      const orgVid = attrs.verseId;
+      context.activeVid = orgVid;
+      context.lastSeenVid = orgVid;
+      const targets = (orgToAll[orgVid] && orgToAll[orgVid].length)
+        ? orgToAll[orgVid]
+        : (orgToEnglish[orgVid] ? [orgToEnglish[orgVid]] : null);
+
+      if (targets) {
+        context.targets = targets;
+        targets.forEach((eng) => ensureVerseEntry(map, eng, 'original'));
+      } else if (map[orgVid] && (map[orgVid].lsv || map[orgVid].kjv)) {
+        // Same BCV string as an English verse, but this org content is superscription-only
+        context.targets = null;
+        context.superscriptionFor = orgVid;
+        if (!map[orgVid].titles) map[orgVid].titles = [];
+      } else {
+        // Unmapped org-only material — do not create empty English rows
+        context.targets = null;
+        context.superscriptionFor = null;
+      }
+    }
+
+    if (item.type === 'text' && item.text) {
+      if (context.targets && context.targets.length) {
+        context.targets.forEach((eng) => {
+          if (map[eng] && map[eng].original) map[eng].original.text.push(item.text);
+        });
+      } else if (context.superscriptionFor && map[context.superscriptionFor]) {
+        // Accumulate superscription surface into titles (join later)
+        if (!context.superBuf) context.superBuf = {};
+        const k = context.superscriptionFor;
+        if (!context.superBuf[k]) context.superBuf[k] = [];
+        context.superBuf[k].push(item.text);
+      }
+    }
+
+    if (item.items && item.items.length > 0) {
+      walkOriginalItems(item.items, map, orgToEnglish, orgToAll, context);
+    }
+    context.activeVid = previousActiveVid;
   }
+};
+
+const processEnglishContent = (contentArray, map, versionKey, orgToEnglish, orgToAll) => {
+  if (!contentArray) return;
+  const context = { activeVid: null, lastSeenVid: null, pendingTitles: [] };
+  for (const section of contentArray) {
+    if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context);
+  }
+};
+
+const processOriginalContent = (contentArray, map, orgToEnglish, orgToAll) => {
+  if (!contentArray) return;
+  const context = {
+    activeVid: null,
+    lastSeenVid: null,
+    targets: null,
+    superscriptionFor: null,
+    superBuf: {},
+  };
+  for (const section of contentArray) {
+    if (section.items) walkOriginalItems(section.items, map, orgToEnglish, orgToAll, context);
+  }
+  // Flush Hebrew superscription buffers into titles[]
+  Object.keys(context.superBuf).forEach((vid) => {
+    const t = context.superBuf[vid].join('').trim();
+    if (!t || !map[vid]) return;
+    if (!map[vid].titles) map[vid].titles = [];
+    map[vid].titles.push(t);
+  });
 };
 
 const getBasePath = () => {
@@ -330,15 +409,12 @@ const processResults = (results, verseMap, availableKeys) => {
     const data = source.data;
     if (!data) return;
 
-    // 1. Process Original Content (if present)
-    if (data.content) {
-      processContent(data.content, verseMap, 'original', false);
-    }
+    const orgToEnglish = {};
+    const orgToAll = {};
 
-    // 2. Process Parallels (Dynamic Discovery)
+    // 1. English parallels first (English-primary keys + org maps + titles[])
     if (data.parallels) {
       data.parallels.forEach(parallel => {
-         // Find which registry key matches this parallel's bibleId
          const matchedKey = Object.keys(TRANSLATION_REGISTRY).find(key => {
             const config = TRANSLATION_REGISTRY[key];
             if (!config.idPrefix) return false; // Skip 'original'
@@ -348,10 +424,15 @@ const processResults = (results, verseMap, availableKeys) => {
          });
 
          if (matchedKey && parallel.content) {
-            processContent(parallel.content, verseMap, matchedKey, true);
+            processEnglishContent(parallel.content, verseMap, matchedKey, orgToEnglish, orgToAll);
             availableKeys.add(matchedKey);
          }
       });
+    }
+
+    // 2. Original remapped onto English keys (no empty org-only rows)
+    if (data.content) {
+      processOriginalContent(data.content, verseMap, orgToEnglish, orgToAll);
     }
   });
 };
@@ -892,8 +973,12 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
             let displayLabel = '';
             const contributing = [];
 
+            const titleBits = [];
             group.forEach((gVid) => {
                 const data = verseMap[gVid];
+                if (data && Array.isArray(data.titles) && data.titles.length && slot.source !== 'original') {
+                    data.titles.forEach((t) => { if (t && !titleBits.includes(t)) titleBits.push(t); });
+                }
                 const slotData = data ? data[slot.source] : null;
                 if (slotData && slotData.text) {
                     // ⚡ Bolt Optimization: Text is now pre-joined in loadDailyBread
@@ -902,6 +987,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                     contributing.push(slotData.displayVid || gVid);
                 }
             });
+            const titleText = titleBits.join(' · ');
 
             if (contributing.length > 0) {
                 const first = contributing[0];
@@ -929,7 +1015,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                 displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
             }
 
-            return { text: fullText, displayLabel };
+            return { text: fullText, displayLabel, titleText };
         };
 
         const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
@@ -973,7 +1059,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
             {/* SLOT 2: MIDDLE (Secondary) */}
             {(() => {
-                const { text, displayLabel, label } = renderedSlots.middle;
+                const { text, displayLabel, label, titleText } = renderedSlots.middle;
                 return (
                 <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
                     <div className="flex justify-between items-center mb-0.5">
@@ -991,6 +1077,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                         )}
                     </div>
                     </div>
+                    {titleText ? <div className={`text-xs md:text-sm font-serif italic mb-0.5 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{titleText}</div> : null}
                     <div><span className={`text-base md:text-xl font-serif font-bold italic leading-tight tracking-tighter ${isActive ? 'text-stone-900' : 'text-stone-500'}`}>{text}</span></div>
                 </div>
                 );
@@ -998,7 +1085,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
             {/* SLOT 3: BOTTOM (Focal) */}
             {(() => {
-                const { text, displayLabel, label, attribution } = renderedSlots.bottom;
+                const { text, displayLabel, label, attribution, titleText } = renderedSlots.bottom;
                 return (
                 <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? `${focalTheme.bg} shadow-xl ${focalTheme.border} ring-1 ${focalTheme.ring}` : 'bg-white/40 border-transparent opacity-80'}`}>
                     <div className="flex justify-between items-center mb-0.5">
@@ -1041,6 +1128,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                         )}
                     </div>
                     </div>
+                    {titleText ? <div className={`text-sm md:text-base font-serif italic mb-1 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{titleText}</div> : null}
                     <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-500'}`}>{text}</div>
                 </div>
                 );
