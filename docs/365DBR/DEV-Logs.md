@@ -442,6 +442,39 @@ python db/scripts/serve_query_api.py
 
 ---
 
+## 2026-08-25 — Psalm titles + multi-claim English splits
+
+**Owner**: Fix Psalms (verse numbers, titles, residual empties) — full audit then fix.
+
+**Audit (before)**:
+- Mis-anchored superscriptions: **49** (Psalm N title parked on last verse of N−1)
+- English-no-tokens: **PSA.13.6** (and previously ISA.64.2 / NEH.7.69 same pattern)
+- Fused LSV v.1 bodies: ~80–97 (edition payload — not stripped)
+- Align offsets: 988 (expected with superscription numbering)
+
+**Root causes (ours)**:
+1. Titles anchored to **first verse of day file** → cross-psalm packs mis-label titles.
+2. org→English **first-wins only** → when LSV has both `PSA.13.5` and `PSA.13.6` claiming org `PSA.13.6`, tokens only under 13.5.
+
+**Fixes**:
+- `parse_passage.extract_titles`: `anchor_verse_id` = first `verseId` *after* title para
+- `org_to_all_english` + `apply_english_primary_alignment`: emit tokens under **all** claiming English ids
+- `populate_day`: use title anchor / source_verse_id; never delete titles by value alone (shared “A Psalm of David.” text)
+
+**After full `--all` re-populate (365 OK)**:
+- `audit_psalms.py`: **PASS** (0 empties, 0 mis-anchored superscriptions)
+- `audit_empty_originals`: residual **1** (`REV.12.18` placeholder `-` only)
+- dual-read 0105/0117/0120/0228: **PASS**
+- PSA.11.1 title correct; PSA.13.6 tokens=11
+
+**Still expected / not auto-fixed**:
+- LSV often embeds title phrase in v.1 body (trust edition; structured title also in annotations)
+- PSA 119 acrostic letter headings mid-chapter (not superscriptions)
+
+Artifact: `db/scripts/audit_psalms.py`
+
+---
+
 ## 2026-08-25 — Static Word study publish for GoDaddy ($0)
 
 **Owner**: Publishing is the goal; GoDaddy shared FTP cannot run Postgres. Do not wait on paid VPS.

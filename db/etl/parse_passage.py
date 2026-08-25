@@ -97,48 +97,62 @@ def _collect_text_under(item: dict) -> str:
 def extract_titles(content: list | None) -> list[dict[str, Any]]:
     """
     Extract superscription / heading paras (style d, s, …).
-    Returns list of {text, style, language_hint}.
+
+    Each title includes anchor_verse_id = first verseId appearing *after* the
+    title para in document order (KJV/LSV). Critical for Psalms: day packs often
+    start mid-psalm, so anchoring to the file's first verse wrongly attaches
+    Psalm N's title to the last verse of Psalm N-1.
     """
     titles: list[dict[str, Any]] = []
     if not content:
         return titles
 
-    def walk(items: list | None):
-        if not items:
-            return
-        for item in items:
-            if not isinstance(item, dict):
-                continue
-            attrs = item.get("attrs") or {}
-            style = attrs.get("style") or ""
-            if item.get("name") == "para" and style in TITLE_PARA_STYLES:
-                text = _collect_text_under(item)
-                if text:
-                    titles.append({
-                        "text": text,
-                        "style": style,
-                        "annotation_type": (
-                            "superscription" if style == "d" else "title"
-                        ),
-                    })
-            if "items" in item:
-                walk(item["items"])
-
-    walk(content)
+    # Flatten document order so we can look ahead for the next verseId.
+    flat = list(_walk(content))
+    for i, item in enumerate(flat):
+        if not isinstance(item, dict):
+            continue
+        attrs = item.get("attrs") or {}
+        style = attrs.get("style") or ""
+        if item.get("name") != "para" or style not in TITLE_PARA_STYLES:
+            continue
+        text = _collect_text_under(item)
+        if not text:
+            continue
+        anchor = None
+        for j in range(i + 1, len(flat)):
+            ja = flat[j].get("attrs") or {}
+            vid = ja.get("verseId")
+            if vid:
+                anchor = vid
+                break
+        titles.append({
+            "text": text,
+            "style": style,
+            "annotation_type": (
+                "superscription" if style == "d" else "title"
+            ),
+            "anchor_verse_id": anchor,
+        })
     return titles
 
 
-def extract_org_english_map_from_content(
+def extract_org_english_maps_from_content(
     content: list | None,
-) -> dict[str, str]:
+) -> tuple[dict[str, str], dict[str, list[str]]]:
     """
     From one English parallel content tree:
-      source/org id (verseOrgIds[0]) → english verseId
-    Only when both present and distinct or same (1:1 still recorded by caller).
+      primary: org → first english verseId (stable first-wins)
+      all:     org → ordered unique english ids that claim that org
+
+    Multi-claim happens when English splits one Hebrew verse (e.g. PSA.13.5 and
+    PSA.13.6 both carry verseOrgIds [PSA.13.6]). Tokens must be available under
+    every claiming English id — not only the first.
     """
     org_to_english: dict[str, str] = {}
+    org_to_all: dict[str, list[str]] = defaultdict(list)
     if not content:
-        return org_to_english
+        return org_to_english, {}
     for item in _walk(content):
         if item.get("type") != "text":
             continue
@@ -150,13 +164,19 @@ def extract_org_english_map_from_content(
         org = orgs[0]
         if not org:
             continue
-        # First wins within this content; prefer stable map
+        if eng not in org_to_all[org]:
+            org_to_all[org].append(eng)
         if org not in org_to_english:
             org_to_english[org] = eng
-        elif org_to_english[org] != eng:
-            # Conflicting map in same payload — keep first, caller may log
-            pass
-    return org_to_english
+    return org_to_english, dict(org_to_all)
+
+
+def extract_org_english_map_from_content(
+    content: list | None,
+) -> dict[str, str]:
+    """Backward-compatible: primary org→english map only."""
+    primary, _all = extract_org_english_maps_from_content(content)
+    return primary
 
 
 def extract_org_english_map_from_parallels(
@@ -164,10 +184,18 @@ def extract_org_english_map_from_parallels(
 ) -> tuple[dict[str, str], str | None]:
     """
     Prefer LSV, then KJV, then any known parallel.
-    Returns (org_to_english, established_by_code).
+    Returns (org_to_english primary map, established_by_code).
     """
+    primary, _all, code = extract_org_english_maps_from_parallels(parallels)
+    return primary, code
+
+
+def extract_org_english_maps_from_parallels(
+    parallels: list | None,
+) -> tuple[dict[str, str], dict[str, list[str]], str | None]:
+    """Prefer LSV, then KJV. Returns (primary, all_claims, established_by)."""
     if not parallels:
-        return {}, None
+        return {}, {}, None
 
     by_code: dict[str, list] = {}
     for par in parallels:
@@ -177,16 +205,18 @@ def extract_org_english_map_from_parallels(
 
     for code in ("LSV", "KJV"):
         if code in by_code:
-            m = extract_org_english_map_from_content(by_code[code])
-            if m:
-                return m, code
+            primary, all_map = extract_org_english_maps_from_content(by_code[code])
+            if primary:
+                return primary, all_map, code
 
     for par in parallels:
         code = translation_code_for_bible_id(par.get("bibleId")) or "UNK"
-        m = extract_org_english_map_from_content(par.get("content") or [])
-        if m:
-            return m, code
-    return {}, None
+        primary, all_map = extract_org_english_maps_from_content(
+            par.get("content") or []
+        )
+        if primary:
+            return primary, all_map, code
+    return {}, {}, None
 
 
 def collect_english_verse_text(content: list) -> dict[str, str]:
@@ -353,10 +383,14 @@ def extract_original_tokens(content: list, language: str) -> list[dict[str, Any]
 def apply_english_primary_alignment(
     tokens: list[dict[str, Any]],
     org_to_english: dict[str, str],
+    org_to_all_english: dict[str, list[str]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """
     Remap token verse_id to English-primary id using org→English map.
     Preserves source_verse_id (org/source label from original content).
+
+    When org_to_all_english lists multiple English ids for one org (English split
+    of one Hebrew verse), emit the token under *each* claiming English id.
 
     Returns (aligned_tokens, source_only_skipped).
     source_only_skipped: org verses not referenced by any English verseOrgIds
@@ -369,28 +403,35 @@ def apply_english_primary_alignment(
             t.setdefault("source_verse_id", t["verse_id"])
         return tokens, []
 
+    all_map = org_to_all_english or {}
     english_claimed = set(org_to_english.values())
+    for eng_list in all_map.values():
+        english_claimed.update(eng_list)
+
     out: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
     per_verse_orders: dict[str, int] = defaultdict(int)
 
     for t in tokens:
         src = t["verse_id"]
-        if src in org_to_english:
-            eng = org_to_english[src]
+        if src in all_map and all_map[src]:
+            targets = all_map[src]
+        elif src in org_to_english:
+            targets = [org_to_english[src]]
         elif src in english_claimed:
             # e.g. org PSA.18.1 superscription while English PSA.18.1 ← org PSA.18.2
             skipped.append({**t, "source_verse_id": src})
             continue
         else:
-            eng = src
-        per_verse_orders[eng] += 1
-        out.append({
-            **t,
-            "verse_id": eng,
-            "source_verse_id": src,
-            "word_order": per_verse_orders[eng],
-        })
+            targets = [src]
+        for eng in targets:
+            per_verse_orders[eng] += 1
+            out.append({
+                **t,
+                "verse_id": eng,
+                "source_verse_id": src,
+                "word_order": per_verse_orders[eng],
+            })
     return out, skipped
 
 
@@ -412,16 +453,32 @@ def parse_passage_payload(raw: dict, file_ref: str) -> dict[str, Any]:
     source_verse_ids = extract_verse_ids(content)
     tokens_raw = extract_original_tokens(content, language)
 
-    org_to_english, map_from = extract_org_english_map_from_parallels(
+    org_to_english, org_to_all, map_from = extract_org_english_maps_from_parallels(
         data.get("parallels") or []
     )
     tokens, source_only_skipped = apply_english_primary_alignment(
-        tokens_raw, org_to_english
+        tokens_raw, org_to_english, org_to_all
     )
 
-    # Alignments list for DB
+    # Alignments list for DB (every english claim of an org)
     alignments: list[dict[str, str]] = []
+    seen_align: set[tuple[str, str]] = set()
+    for org, eng_list in sorted(org_to_all.items()):
+        for eng in eng_list:
+            key = (eng, org)
+            if key in seen_align:
+                continue
+            seen_align.add(key)
+            alignments.append({
+                "english_verse_id": eng,
+                "source_verse_id": org,
+                "established_by": map_from or "",
+            })
     for org, eng in sorted(org_to_english.items()):
+        key = (eng, org)
+        if key in seen_align:
+            continue
+        seen_align.add(key)
         alignments.append({
             "english_verse_id": eng,
             "source_verse_id": org,
@@ -501,6 +558,7 @@ def parse_passage_payload(raw: dict, file_ref: str) -> dict[str, Any]:
         "translations": translations,
         "alignments": alignments,
         "org_to_english": org_to_english,
+        "org_to_all_english": org_to_all,
         "alignment_established_by": map_from,
         "titles": titles,
         "source_note": f"{file_ref} bibleId={bible_id}",

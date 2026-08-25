@@ -391,27 +391,52 @@ def populate_one_day(conn, day: str, source: str, verse_order_map: dict[str, int
         if align_rows:
             print(f"  [info] verse_alignments upserted: {align_rows}")
 
-        # Titles / superscriptions → annotations (not fused into verse body by us)
+        # Titles / superscriptions → annotations (not fused into verse body by us).
+        # Anchor priority (Psalms-critical):
+        # 1) explicit source_verse_id (org) remapped via org→English
+        # 2) anchor_verse_id from content (first verseId *after* title para)
+        # 3) never silently use file's first verse — that mis-labels Psalm N
+        #    titles onto the last verse of Psalm N-1 when packs cross psalms.
         title_rows = 0
         for p in parsed_files:
+            org_map = p.get("org_to_english") or {}
             for t in p.get("titles") or []:
                 text = (t.get("text") or "").strip()
                 if not text:
                     continue
-                # Anchor to first display verse of this file if available
-                anchor = (p["verse_ids"][0] if p.get("verse_ids") else None)
-                if not anchor or anchor not in verse_order_map:
+                anchor = None
+                src_vid = t.get("source_verse_id")
+                if src_vid:
+                    anchor = org_map.get(src_vid, src_vid)
+                if not anchor:
+                    anchor = t.get("anchor_verse_id")
+                if not anchor:
+                    print(
+                        f"  [warn] title without verse anchor skipped "
+                        f"({(text[:40] + '…') if len(text) > 40 else text!r} "
+                        f"in {p.get('file_ref')})"
+                    )
                     continue
+                # Ensure verse row exists even if outside BIBLE_DATA (English edge)
                 ensure_verse(cur, anchor, verse_order_map)
-                # Idempotent-ish: delete same type/value/range for re-run
+                # Idempotent for *this* anchor only. Do NOT delete by value alone —
+                # many Psalms share identical superscriptions ("A Psalm of David.").
+                src_tag = f"api.bible-title:{t.get('source') or 'original'}"
                 cur.execute(
                     """
                     DELETE FROM annotations
                     WHERE annotation_type = %s
                       AND start_verse_id = %s AND end_verse_id = %s
                       AND value = %s
+                      AND source = %s
                     """,
-                    (t.get("annotation_type") or "title", anchor, anchor, text),
+                    (
+                        t.get("annotation_type") or "title",
+                        anchor,
+                        anchor,
+                        text,
+                        src_tag,
+                    ),
                 )
                 cur.execute(
                     """
@@ -428,8 +453,10 @@ def populate_one_day(conn, day: str, source: str, verse_order_map: dict[str, int
                             "style": t.get("style"),
                             "from_parallel": t.get("source"),
                             "file_ref": p["file_ref"],
+                            "anchor_verse_id": t.get("anchor_verse_id"),
+                            "source_verse_id": t.get("source_verse_id"),
                         }),
-                        f"api.bible-title:{t.get('source') or 'original'}",
+                        src_tag,
                     ),
                 )
                 title_rows += 1

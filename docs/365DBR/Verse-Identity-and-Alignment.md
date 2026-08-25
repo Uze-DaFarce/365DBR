@@ -56,6 +56,8 @@ Daily plan ranges may still be requested in **org** form for Hebrew fetches (`us
 
 - Extract USFM-like paras (`style` in `d`, `s`, `s1`, `s2`, `ms`, …) into `annotations`.
 - KJV often ships title as separate `style=d`; some LSV verses embed a title phrase in v.1 body. Store structured titles when present; do not strip LSV body text without a verified rule (trust the edition payload).
+- **Anchor rule (2026-08-25)**: title attaches to the first `verseId` *after* the title para in the payload (or org `source_verse_id` remapped via `verseOrgIds`). Never use “first verse of the day file” — that mis-labels Psalm N titles onto the end of Psalm N−1 when packs cross psalms.
+- **Multi-claim org→English**: when two English verses share one org id (e.g. PSA.13.5 and PSA.13.6 both → org PSA.13.6), store original tokens under **both** English ids.
 
 ## Watch-list (similar issues)
 
