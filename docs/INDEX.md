@@ -256,9 +256,9 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-08-25 (Static Word study export for GoDaddy $0 publish + Phase 5 annotations)
+**Last Updated**: 2026-08-25 (Psalm title/alignment fixes + static Word study for GoDaddy)
 
-**Current Phase**: Phase 4–5 solid + **static `ws/` Word study** for shared hosting (no live DB required on mt-sin.ai). Static JSON still primary for daily reading. **Next**: FTP `ws/` + client; expand annotations; paid/cheap VPS later only if live S.I. needed — see `docs/365DBR/Handoff-Next-Session.md`.
+**Current Phase**: Phase 4–5 solid + static `ws/` Word study + **Psalm superscription anchors / multi-claim org splits fixed** (`audit_psalms` PASS). Static JSON still primary for daily reading. **Next**: FTP `ws/` (re-export after Psalm fix) + app files; UI title display polish; expand annotations — see `docs/365DBR/Handoff-Next-Session.md`.
 
 **TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
 - [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).
