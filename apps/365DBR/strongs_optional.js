@@ -1,26 +1,19 @@
 /**
- * Optional Strong's / original-token helpers via local Phase 4 query API.
+ * Optional Strong's / original-token helpers.
  *
- * Loaded as a classic <script> (not ES import) so esm.sh/run text/tsx pages work.
- * Exposes window.__DBR_STRONGs__ — same pattern as bible_meta.js / __BIBLE_META__.
+ * Sources (feature-detect, no opt-in flag):
+ * 1. Live local query API (localhost only by default) — http://127.0.0.1:8765
+ * 2. Static same-origin packs under ./ws/ (GoDaddy / mt-sin.ai — $0, CSP-safe)
+ * 3. Explicit ?queryApi= or localStorage 365dbr_query_api
  *
- * Word study UI (index.html / bible.html):
- * - ON when GET /health succeeds (feature-detect). No opt-in flag.
- * - Original-first: click original words → Strong's search (data we actually have).
- * - English-word hover → original/Strong's needs free open alignment data later;
- *   do not invent maps (Truth/Accuracy). See docs/365DBR/Word-Study-and-Alignment.md.
- *
- * Override API base: ?queryApi=… or localStorage 365dbr_query_api
- *
- * Production (e.g. mt-sin.ai on GoDaddy): do NOT default-probe 127.0.0.1.
- * Host CSP (connect-src 'self' + esm.sh …) and HTTPS→HTTP mixed content would block
- * it and spam the console. Localhost/127.0.0.1 still default to the local API.
- * Explicit queryApi / localStorage always attempted (must also be allowed by CSP).
+ * Exposes window.__DBR_STRONGs__.
+ * See docs/365DBR/Word-Study-and-Alignment.md and apps/365DBR/ws/README.md.
  */
 (function (global) {
   "use strict";
 
   var DEFAULT_QUERY_API = "http://127.0.0.1:8765";
+  var STATIC_MARKER = "static:";
 
   /** True when the page itself is served from this machine (local dev). */
   function isLocalPageHost() {
@@ -37,11 +30,29 @@
     }
   }
 
+  /** Absolute URL to apps/365DBR/ws/ (trailing slash). */
+  function resolveStaticWsBase() {
+    try {
+      return new URL("ws/", global.location.href).href;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function isStaticBase(base) {
+    return !!(base && String(base).indexOf(STATIC_MARKER) === 0);
+  }
+
+  function staticRoot(base) {
+    if (!isStaticBase(base)) return null;
+    return String(base).slice(STATIC_MARKER.length);
+  }
+
   /**
-   * Resolve API base, or null if Word study should not probe.
-   * Priority: ?queryApi= → localStorage → (local page only) default 127.0.0.1:8765
+   * Explicit live API override only (?queryApi / localStorage).
+   * Does not return the localhost default — that is handled in probe.
    */
-  function resolveQueryApiBase() {
+  function resolveExplicitLiveApi() {
     try {
       var params = new URLSearchParams(global.location.search);
       var fromQs = params.get("queryApi");
@@ -59,24 +70,16 @@
     } catch (_) {
       /* ignore */
     }
-    // Production static host: skip probe (no fetch → no CSP console noise).
-    if (!isLocalPageHost()) {
-      return null;
-    }
-    return DEFAULT_QUERY_API;
+    return null;
   }
 
-  /**
-   * Probe GET /health. Returns base URL string if ok, else null.
-   * Feature-detect only — Word study shows when API is up (no opt-in).
-   * No network call when base is null (production without override).
-   */
-  function probeQueryApi(base, timeoutMs) {
-    if (base === undefined || base === null || base === "") {
-      base = resolveQueryApiBase();
-    }
-    timeoutMs = timeoutMs == null ? 700 : timeoutMs;
-    if (!base) return Promise.resolve(null);
+  /** @deprecated Prefer probeWordStudySource; kept for call sites. */
+  function resolveQueryApiBase() {
+    return resolveExplicitLiveApi() || (isLocalPageHost() ? DEFAULT_QUERY_API : null);
+  }
+
+  function fetchJson(url, timeoutMs) {
+    timeoutMs = timeoutMs == null ? 8000 : timeoutMs;
     var ctrl =
       typeof AbortController !== "undefined" ? new AbortController() : null;
     var timer = setTimeout(function () {
@@ -86,35 +89,129 @@
         /* ignore */
       }
     }, timeoutMs);
-    return fetch(base + "/health", {
+    return fetch(url, {
       method: "GET",
       mode: "cors",
-      cache: "no-store",
+      cache: "default",
       signal: ctrl ? ctrl.signal : undefined,
     })
       .then(function (res) {
-        if (!res.ok) return null;
         return res.json().catch(function () {
           return null;
+        }).then(function (body) {
+          return { res: res, body: body };
         });
-      })
-      .then(function (body) {
-        if (body && body.ok === true) return base;
-        return null;
-      })
-      .catch(function () {
-        return null;
       })
       .finally(function () {
         clearTimeout(timer);
       });
   }
 
+  function probeLiveApi(base, timeoutMs) {
+    timeoutMs = timeoutMs == null ? 700 : timeoutMs;
+    if (!base) return Promise.resolve(null);
+    return fetchJson(base.replace(/\/$/, "") + "/health", timeoutMs)
+      .then(function (r) {
+        if (r.res.ok && r.body && r.body.ok === true) return base.replace(/\/$/, "");
+        return null;
+      })
+      .catch(function () {
+        return null;
+      });
+  }
+
+  function probeStaticWs(timeoutMs) {
+    var root = resolveStaticWsBase();
+    if (!root) return Promise.resolve(null);
+    return fetchJson(root + "manifest.json", timeoutMs == null ? 2500 : timeoutMs)
+      .then(function (r) {
+        if (r.res.ok && r.body && r.body.ok === true) {
+          return STATIC_MARKER + root;
+        }
+        return null;
+      })
+      .catch(function () {
+        return null;
+      });
+  }
+
+  /**
+   * Feature-detect Word study source.
+   * Returns live API base URL, or "static:https://…/ws/", or null.
+   */
+  function probeQueryApi(base, timeoutMs) {
+    // If caller passed an explicit base (including static:), honor probe paths
+    if (base && isStaticBase(base)) {
+      return Promise.resolve(base);
+    }
+    if (base && /^https?:\/\//i.test(base)) {
+      return probeLiveApi(base, timeoutMs);
+    }
+
+    var explicit = resolveExplicitLiveApi();
+    var chain = Promise.resolve(null);
+
+    if (explicit) {
+      chain = probeLiveApi(explicit, timeoutMs);
+    } else if (isLocalPageHost()) {
+      chain = probeLiveApi(DEFAULT_QUERY_API, timeoutMs);
+    }
+
+    return chain.then(function (live) {
+      if (live) return live;
+      // Production (and local fallback): same-origin static ws/
+      return probeStaticWs(timeoutMs);
+    });
+  }
+
+  function normalizeStrongKey(strong) {
+    if (!strong) return "";
+    var s = String(strong).trim().toUpperCase();
+    var m = s.match(/^([HG])0*(\d+)$/);
+    if (!m) return s;
+    return m[1] + String(parseInt(m[2], 10));
+  }
+
+  // In-memory book shard cache for static mode
+  var _bookCache = Object.create(null);
+
+  function loadStaticBook(root, book) {
+    if (_bookCache[book]) return _bookCache[book];
+    var p = fetchJson(root + "verse/" + encodeURIComponent(book) + ".json").then(
+      function (r) {
+        if (!r.res.ok || !r.body || typeof r.body !== "object") {
+          throw new Error("static verse book missing: " + book);
+        }
+        return r.body;
+      }
+    );
+    _bookCache[book] = p;
+    return p;
+  }
+
   function fetchVerseDetail(verseId, base) {
     if (!base || !verseId) {
       return Promise.reject(new Error("missing base or verseId"));
     }
-    var id = encodeURIComponent(String(verseId).trim());
+    var vid = String(verseId).trim();
+    var parts = vid.split(".");
+    if (parts.length >= 3) {
+      vid = parts[0].toUpperCase() + "." + parts[1] + "." + parts[2];
+    }
+
+    if (isStaticBase(base)) {
+      var root = staticRoot(base);
+      var book = vid.split(".")[0];
+      return loadStaticBook(root, book).then(function (map) {
+        var row = map[vid];
+        if (!row) {
+          throw new Error("verse not in static pack: " + vid);
+        }
+        return row;
+      });
+    }
+
+    var id = encodeURIComponent(vid);
     return fetch(base + "/verse/" + id, {
       method: "GET",
       mode: "cors",
@@ -138,6 +235,35 @@
       return Promise.reject(new Error("missing base or strong"));
     }
     limit = Math.max(1, Math.min(limit == null ? 12 : limit, 50));
+    var key = normalizeStrongKey(strong);
+
+    if (isStaticBase(base)) {
+      var root = staticRoot(base);
+      return fetchJson(root + "strong/" + encodeURIComponent(key) + ".json").then(
+        function (r) {
+          if (!r.res.ok || !r.body || r.body.ok === false) {
+            // No Strong's file (e.g. Greek surface-only) — empty hits, not hard fail
+            return {
+              ok: true,
+              query: key,
+              total_verses: 0,
+              returned: 0,
+              hits: [],
+              source: "static-ws",
+            };
+          }
+          var body = r.body;
+          if (body.hits && body.hits.length > limit) {
+            body = Object.assign({}, body, {
+              hits: body.hits.slice(0, limit),
+              returned: Math.min(limit, body.hits.length),
+            });
+          }
+          return body;
+        }
+      );
+    }
+
     var num = encodeURIComponent(String(strong).trim());
     return fetch(base + "/strong/" + num + "?limit=" + limit, {
       method: "GET",
@@ -159,7 +285,6 @@
 
   /**
    * User-facing BCV: "2KI.10.17" → "2 Kings 10:17".
-   * bookNames: optional map like { "2KI": "2 Kings", GEN: "Genesis", ... }.
    */
   function formatVerseRef(vid, bookNames) {
     if (!vid) return "";
@@ -175,11 +300,14 @@
 
   global.__DBR_STRONGs__ = {
     DEFAULT_QUERY_API: DEFAULT_QUERY_API,
+    STATIC_MARKER: STATIC_MARKER,
     isLocalPageHost: isLocalPageHost,
+    resolveStaticWsBase: resolveStaticWsBase,
     resolveQueryApiBase: resolveQueryApiBase,
     probeQueryApi: probeQueryApi,
     fetchVerseDetail: fetchVerseDetail,
     fetchStrongHits: fetchStrongHits,
     formatVerseRef: formatVerseRef,
+    normalizeStrongKey: normalizeStrongKey,
   };
 })(typeof window !== "undefined" ? window : globalThis);

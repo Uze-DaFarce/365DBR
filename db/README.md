@@ -312,6 +312,17 @@ python db/scripts/serve_query_api.py
 # optional: ?queryApi=http://127.0.0.1:8765
 ```
 
+## Static Word study for GoDaddy ($0 publish)
+
+Export DB tokens/Strong’s to same-origin JSON (no live API on shared hosting):
+
+```powershell
+python db/scripts/export_word_study_static.py
+# FTP apps/365DBR/ws/ + strongs_optional.js → https://mt-sin.ai/365DBR/
+```
+
+See `apps/365DBR/ws/README.md`. Client probes `ws/manifest.json` on production.
+
 ## Phase 5: Curated annotations (minimal S.I. metadata)
 
 Sparse speaker/theme rows with mandatory `source` provenance. **Not** full-Bible tagging.

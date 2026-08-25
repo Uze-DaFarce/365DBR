@@ -10,13 +10,23 @@
 
 | Capability | Status |
 |------------|--------|
-| Feature-detect API when page is **localhost** (default `http://127.0.0.1:8765`) | Yes |
-| On **production** hosts (e.g. mt-sin.ai): no default localhost probe | Yes — avoids GoDaddy CSP / mixed-content console noise; Word study stays off |
-| Override: `?queryApi=` or `localStorage 365dbr_query_api` | Yes (must also be allowed by host CSP `connect-src`) |
-| Word study control when API healthy | **On** when probe succeeds (no separate opt-in flag) |
+| Feature-detect live API on **localhost** (`http://127.0.0.1:8765`) | Yes |
+| **Static same-origin** packs `ws/` on production (GoDaddy, $0) | Yes — `manifest.json` + `verse/{BOOK}.json` + `strong/{H430}.json` |
+| Production: no localhost probe (CSP-safe); falls back to `ws/` | Yes |
+| Override live API: `?queryApi=` / `localStorage 365dbr_query_api` | Yes (must be in host CSP `connect-src`) |
+| Word study control when probe succeeds | **On** (no separate opt-in flag) |
 | Interactive **original** tokens + Strong’s search | Yes (OT Hebrew Strong’s present; Greek often surface-only) |
 | Human verse refs (`2 Kings 10:17`) | Yes |
 | Hover **English** word → original + Strong’s for *that* word | **Not yet** — no honest EN↔token map in DB |
+
+### Publish static Word study (GoDaddy)
+
+```powershell
+python db/scripts/export_word_study_static.py
+# FTP apps/365DBR/ws/ + strongs_optional.js to /365DBR/ on host
+```
+
+See `apps/365DBR/ws/README.md`.
 
 **Data we have:**
 

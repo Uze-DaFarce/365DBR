@@ -26,4 +26,11 @@ db/.env
 # Keep data/readings.json tracked (plan metadata, not passage text).
 apps/365DBR/data/[0-9][0-9][0-9][0-9]/
 apps/365DBR/data/omissions_cache.json
+apps/365DBR/data/_dual_read_fresh_vs_db.json
+
+# 365DBR: generated static Word study packs (export locally, FTP to host).
+# Keep apps/365DBR/ws/README.md tracked.
+apps/365DBR/ws/manifest.json
+apps/365DBR/ws/verse/
+apps/365DBR/ws/strong/
 

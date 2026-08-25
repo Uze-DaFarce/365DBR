@@ -256,9 +256,9 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-07-29 (Phase 5 minimal curated speaker/theme annotations + S.I. demo query)
+**Last Updated**: 2026-08-25 (Static Word study export for GoDaddy $0 publish + Phase 5 annotations)
 
-**Current Phase**: Phase 4 Option A solid + **Phase 5 minimal annotations seeded**. Static JSON still primary for live reader. **Next**: more curated annotations, free EN-hover research, or Option B only if deliberate — see `docs/365DBR/Handoff-Next-Session.md`.
+**Current Phase**: Phase 4–5 solid + **static `ws/` Word study** for shared hosting (no live DB required on mt-sin.ai). Static JSON still primary for daily reading. **Next**: FTP `ws/` + client; expand annotations; paid/cheap VPS later only if live S.I. needed — see `docs/365DBR/Handoff-Next-Session.md`.
 
 **TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
 - [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).

@@ -442,6 +442,19 @@ python db/scripts/serve_query_api.py
 
 ---
 
+## 2026-08-25 — Static Word study publish for GoDaddy ($0)
+
+**Owner**: Publishing is the goal; GoDaddy shared FTP cannot run Postgres. Do not wait on paid VPS.
+
+**Delivered**:
+- `db/scripts/export_word_study_static.py` → `apps/365DBR/ws/` (manifest + 66 book verse shards + 8625 Strong’s files)
+- `strongs_optional.js`: probe live API on localhost; else same-origin `ws/manifest.json` (CSP-safe)
+- Export smoke: 31097 verses, 439484 tokens; GEN.1.1 + H430 OK
+
+**Owner publish**: FTP `ws/` + updated `strongs_optional.js` to `/365DBR/`. Aa Word study works for public visitors with no cloud DB.
+
+---
+
 ## 2026-07-29 — Prod CSP: skip Word study localhost probe on remote hosts
 
 **Owner report**: On `mt-sin.ai`, console CSP blocked  
