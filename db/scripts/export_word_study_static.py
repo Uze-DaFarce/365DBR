@@ -122,6 +122,21 @@ def export_verses(conn, out_dir: Path) -> dict:
             for a in cur.fetchall():
                 titles_by[a["start_verse_id"]].append(a)
 
+            # English translations (for Word study context when focal is KJV/LSV/LSB)
+            cur.execute(
+                """
+                SELECT vt.verse_id, t.code, vt.text
+                FROM verse_translations vt
+                JOIN translations t ON t.id = vt.translation_id
+                WHERE vt.verse_id = ANY(%s)
+                ORDER BY vt.verse_id, t.code
+                """,
+                (ids,),
+            )
+            trans_by: dict[str, dict[str, str]] = defaultdict(dict)
+            for r in cur.fetchall():
+                trans_by[r["verse_id"]][r["code"]] = r["text"]
+
             # light annotations covering these verses (speaker/theme)
             cur.execute(
                 """
@@ -195,6 +210,7 @@ def export_verses(conn, out_dir: Path) -> dict:
                         }
                         for t in titles_by.get(vid, [])
                     ],
+                    "translations": trans_by.get(vid, {}),
                     "annotations": annos,
                     "source": "static-ws",
                 }
