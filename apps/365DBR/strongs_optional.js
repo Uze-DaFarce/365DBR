@@ -140,17 +140,30 @@
    * Returns live API base URL, or "static:https://…/ws/", or null.
    */
   function probeQueryApi(base, timeoutMs) {
-    // If caller passed an explicit base (including static:), honor probe paths
+    // If caller passed an explicit static base, use it.
     if (base && isStaticBase(base)) {
       return Promise.resolve(base);
     }
-    if (base && /^https?:\/\//i.test(base)) {
-      return probeLiveApi(base, timeoutMs);
-    }
 
     var explicit = resolveExplicitLiveApi();
-    var chain = Promise.resolve(null);
 
+    // Live HTTP(S) base passed in (often resolveQueryApiBase() → 127.0.0.1:8765).
+    // On failure: fall back to same-origin ws/ unless this was an explicit ?queryApi=
+    // override (then fail closed so a bad override is obvious).
+    if (base && /^https?:\/\//i.test(base)) {
+      return probeLiveApi(base, timeoutMs).then(function (live) {
+        if (live) return live;
+        if (
+          explicit &&
+          base.replace(/\/$/, "") === String(explicit).replace(/\/$/, "")
+        ) {
+          return null;
+        }
+        return probeStaticWs(timeoutMs);
+      });
+    }
+
+    var chain = Promise.resolve(null);
     if (explicit) {
       chain = probeLiveApi(explicit, timeoutMs);
     } else if (isLocalPageHost()) {
@@ -159,7 +172,7 @@
 
     return chain.then(function (live) {
       if (live) return live;
-      // Production (and local fallback): same-origin static ws/
+      // Production (and local when API down): same-origin static ws/
       return probeStaticWs(timeoutMs);
     });
   }
