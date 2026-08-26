@@ -595,8 +595,8 @@ python db/scripts/query_db.py si-demo --speaker God --strong H430 --compact
 **After**:
 - One italic **Heading** on the focal English slot only (same treatment as Word study).
 - Compare/original slots do not repeat it.
-- Display-only strip of a leading title from English body (verseMap / `playVerse` unchanged).
-- Duplicate KJV+LSV strings collapsed.
+- LSV/KJV verse **body is left as in the data** (no stripping). If LSV embeds the title in v.1, that text still shows in the LSV slot.
+- Duplicate KJV+LSV heading strings collapsed.
 
 **Verify**: Jan 23 / Psalm 17:1 “A Prayer of David.” once on focal LSV/KJV; same on `bible.html?book=PSA&chapter=17`.
 

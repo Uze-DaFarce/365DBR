@@ -143,16 +143,6 @@ function collectGroupTitles(group, verseMap) {
   }
   return uniqueTitleList(merged);
 }
-function stripLeadingTitles(body, titles) {
-  let t = body || '';
-  for (let i = 0; i < titles.length; i++) {
-    const title = titles[i];
-    if (!title) continue;
-    const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    t = t.replace(new RegExp('^\\s*' + escaped + '[\\s\\u00a0]*', 'i'), '');
-  }
-  return t;
-}
 function VerseHeading({ text, active }) {
   if (!text) return null;
   return (
@@ -472,13 +462,12 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const titleText = wsTitles.join(' · ');
     const translations = payload?.translations || {};
     const pref = (preferredTranslation || '').toUpperCase();
-    const englishRaw =
+    const englishBody =
         (pref && (translations[pref] || translations[pref.toLowerCase()])) ||
         translations.LSB || translations.lsb ||
         translations.LSV || translations.lsv ||
         translations.KJV || translations.kjv ||
         '';
-    const englishBody = wsTitles.length ? stripLeadingTitles(englishRaw, wsTitles) : englishRaw;
     const humanRef = formatVerseRef(verseId);
 
     return (
@@ -641,9 +630,6 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
                     contributing.push(slotData.displayVid || gVid);
                 }
             });
-            if (slot.source !== 'original' && groupTitles.length) {
-                fullText = stripLeadingTitles(fullText, groupTitles);
-            }
             if (contributing.length > 0) {
                 const s = contributing[0].split('.').map((p,i) => i>0 ? parseInt(p) : p);
                 const e = contributing[contributing.length - 1].split('.').map((p,i) => i>0 ? parseInt(p) : p);

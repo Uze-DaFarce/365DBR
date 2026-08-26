@@ -213,18 +213,6 @@ const collectGroupTitles = (group, verseMap) => {
   return uniqueTitleList(merged);
 };
 
-/** Display-only: drop a heading that the edition also glued onto v.1 body. verseMap/playVerse unchanged. */
-const stripLeadingTitles = (body, titles) => {
-  let t = body || '';
-  for (let i = 0; i < titles.length; i++) {
-    const title = titles[i];
-    if (!title) continue;
-    const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    t = t.replace(new RegExp('^\\s*' + escaped + '[\\s\\u00a0]*', 'i'), '');
-  }
-  return t;
-};
-
 const VerseHeading = ({ text, active }) => {
   if (!text) return null;
   return (
@@ -850,13 +838,12 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const translations = payload?.translations || {};
     // Prefer current focal English (kjv/lsv/lsb); fall back across known codes.
     const pref = (preferredTranslation || '').toUpperCase();
-    const englishRaw =
+    const englishBody =
         (pref && (translations[pref] || translations[pref.toLowerCase()])) ||
         translations.LSB || translations.lsb ||
         translations.LSV || translations.lsv ||
         translations.KJV || translations.kjv ||
         '';
-    const englishBody = wsTitles.length ? stripLeadingTitles(englishRaw, wsTitles) : englishRaw;
     const humanRef = formatVerseRef(verseId);
 
     return (
@@ -1062,10 +1049,6 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                     contributing.push(slotData.displayVid || gVid);
                 }
             });
-            if (slot.source !== 'original' && groupTitles.length) {
-                fullText = stripLeadingTitles(fullText, groupTitles);
-            }
-
             if (contributing.length > 0) {
                 const first = contributing[0];
                 const last = contributing[contributing.length - 1];
