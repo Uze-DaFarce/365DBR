@@ -116,6 +116,52 @@ const FOCAL_THEMES = [
 
 /** --- DATA UTILITIES (English-primary; titles not merged into body) --- **/
 const TITLE_PARA_STYLES = new Set(['d', 's', 's1', 's2', 's3', 'ms', 'ms1', 'ms2', 'mr', 'r', 'sp', 'qa']);
+function titlePlain(t) {
+  if (!t) return '';
+  if (typeof t === 'string') return t.trim();
+  return String(t.text || t.value || '').trim();
+}
+function uniqueTitleList(list) {
+  const out = [];
+  const seen = new Set();
+  if (!Array.isArray(list)) return out;
+  for (let i = 0; i < list.length; i++) {
+    const s = titlePlain(list[i]);
+    if (!s) continue;
+    const key = s.replace(/\s+/g, ' ').toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(s);
+  }
+  return out;
+}
+function collectGroupTitles(group, verseMap) {
+  const merged = [];
+  for (let i = 0; i < group.length; i++) {
+    const list = verseMap[group[i]] && verseMap[group[i]].titles;
+    if (Array.isArray(list)) merged.push(...list);
+  }
+  return uniqueTitleList(merged);
+}
+function stripLeadingTitles(body, titles) {
+  let t = body || '';
+  for (let i = 0; i < titles.length; i++) {
+    const title = titles[i];
+    if (!title) continue;
+    const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    t = t.replace(new RegExp('^\\s*' + escaped + '[\\s\\u00a0]*', 'i'), '');
+  }
+  return t;
+}
+function VerseHeading({ text, active }) {
+  if (!text) return null;
+  return (
+    <p className={`font-serif italic mb-1 leading-snug text-sm md:text-base ${active ? 'text-stone-700' : 'text-stone-400'}`}>
+      <span className="text-[10px] uppercase font-bold tracking-wide text-stone-400 not-italic mr-1.5">Heading</span>
+      {text}
+    </p>
+  );
+}
 function collectTextUnder(item) {
   const parts = [];
   if (!item || typeof item !== 'object') return '';
@@ -207,7 +253,15 @@ function walkOriginalItems(items, map, orgToEnglish, orgToAll, context) {
 function processEnglishContent(contentArray, map, versionKey, orgToEnglish, orgToAll) {
   if (!contentArray) return;
   const context = { activeVid: null, lastSeenVid: null, pendingTitles: [] };
-  for (const section of contentArray) { if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context); }
+  for (const section of contentArray) {
+    const style = (section.attrs || {}).style || '';
+    if (section.name === 'para' && TITLE_PARA_STYLES.has(style)) {
+      const titleText = collectTextUnder(section).trim();
+      if (titleText) context.pendingTitles.push(titleText);
+      continue;
+    }
+    if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context);
+  }
 }
 function processOriginalContent(contentArray, map, orgToEnglish, orgToAll) {
   if (!contentArray) return;
@@ -414,16 +468,17 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const tokens = payload?.original?.tokens || [];
     const withStrong = tokens.some((t) => t.strong);
     const isHeb = (payload?.original?.language || '') === 'hebrew';
-    const rawTitle = payload?.titles?.[0];
-    const titleText = typeof rawTitle === 'string' ? rawTitle : (rawTitle?.text || rawTitle?.value || '');
+    const wsTitles = uniqueTitleList(payload?.titles || []);
+    const titleText = wsTitles.join(' · ');
     const translations = payload?.translations || {};
     const pref = (preferredTranslation || '').toUpperCase();
-    const englishBody =
+    const englishRaw =
         (pref && (translations[pref] || translations[pref.toLowerCase()])) ||
         translations.LSB || translations.lsb ||
         translations.LSV || translations.lsv ||
         translations.KJV || translations.kjv ||
         '';
+    const englishBody = wsTitles.length ? stripLeadingTitles(englishRaw, wsTitles) : englishRaw;
     const humanRef = formatVerseRef(verseId);
 
     return (
@@ -442,12 +497,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                         {status === 'error' && <p className="text-sm text-red-600">Word study is unavailable right now.</p>}
                         {status === 'ready' && (
                             <>
-                                {titleText && (
-                                    <p className="text-sm text-stone-500 italic">
-                                        <span className="text-[10px] uppercase font-bold tracking-wide text-stone-400 not-italic mr-1">Heading</span>
-                                        {titleText}
-                                    </p>
-                                )}
+                                <VerseHeading text={titleText} active={true} />
                                 {englishBody && (
                                     <p className="text-sm md:text-base font-serif text-stone-800 leading-snug">{englishBody}</p>
                                 )}
@@ -578,6 +628,8 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
     };
 
     const renderedSlots = useMemo(() => {
+        const groupTitles = collectGroupTitles(group, verseMap);
+        const titleText = groupTitles.join(' · ');
         const getSlotContent = (slot) => {
             if (!slot || !slot.source) return { text: '', displayLabel: '' };
             let fullText = '', displayLabel = '', contributing = [];
@@ -589,6 +641,9 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
                     contributing.push(slotData.displayVid || gVid);
                 }
             });
+            if (slot.source !== 'original' && groupTitles.length) {
+                fullText = stripLeadingTitles(fullText, groupTitles);
+            }
             if (contributing.length > 0) {
                 const s = contributing[0].split('.').map((p,i) => i>0 ? parseInt(p) : p);
                 const e = contributing[contributing.length - 1].split('.').map((p,i) => i>0 ? parseInt(p) : p);
@@ -604,6 +659,7 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
         };
         const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
         return {
+            titleText,
             top: { ...getSlotContent(dynamicSlots.top), label: getLabel(dynamicSlots.top), config: dynamicSlots.top },
             middle: { ...getSlotContent(dynamicSlots.middle), label: getLabel(dynamicSlots.middle), config: dynamicSlots.middle },
             bottom: { ...getSlotContent(dynamicSlots.bottom), label: getLabel(dynamicSlots.bottom), config: dynamicSlots.bottom, attribution: dynamicSlots.bottom.attribution }
@@ -658,7 +714,7 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
                         <span>{renderedSlots.bottom.displayLabel}</span>
                         {!isPlaying && (
                             <div className="flex items-center opacity-100">
-                                <CopyButton text={renderedSlots.bottom.text} reference={renderedSlots.bottom.displayLabel} version={dynamicSlots.bottom.source.toUpperCase() + (dynamicSlots.bottom.source === 'lsv' ? '©' : '')} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                <CopyButton text={renderedSlots.titleText ? `${renderedSlots.titleText}\n${renderedSlots.bottom.text}` : renderedSlots.bottom.text} reference={renderedSlots.bottom.displayLabel} version={dynamicSlots.bottom.source.toUpperCase() + (dynamicSlots.bottom.source === 'lsv' ? '©' : '')} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
                                 <BookmarkButton onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
                                 {strongsAvailable && onOpenStrongs && (
                                     <StrongsButton onOpen={() => onOpenStrongs(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
@@ -667,6 +723,7 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
                         )}
                     </div>
                 </div>
+                <VerseHeading text={renderedSlots.titleText} active={isActive} />
                 <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-500'}`}>{renderedSlots.bottom.text}</div>
             </div>
             </div>

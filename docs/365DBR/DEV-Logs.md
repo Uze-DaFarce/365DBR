@@ -580,3 +580,24 @@ python db/scripts/query_db.py si-demo --speaker God --strong H430 --compact
 **Next logical step until paid hosting**: Surface those 15 speaker/theme annotations in the Word study panel (static-safe; no live DB required).
 
 **Bible is primary.**
+
+---
+
+## 2026-08-26 — Title display: one heading, both readers
+
+**Owner**: Production-only until DB unfrozen. Make titles visible and consistent.
+
+**Before**:
+- Daily reader (`index.html`) showed the same `titles[]` on compare **and** focal slots (duplicate).
+- Bible browser (`bible.html`) extracted titles but never rendered them.
+- LSV v.1 body often still contains the title phrase (edition payload).
+
+**After**:
+- One italic **Heading** on the focal English slot only (same treatment as Word study).
+- Compare/original slots do not repeat it.
+- Display-only strip of a leading title from English body (verseMap / `playVerse` unchanged).
+- Duplicate KJV+LSV strings collapsed.
+
+**Verify**: Jan 23 / Psalm 17:1 “A Prayer of David.” once on focal LSV/KJV; same on `bible.html?book=PSA&chapter=17`.
+
+**Bible is primary.**

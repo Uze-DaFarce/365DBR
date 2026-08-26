@@ -36,7 +36,7 @@ Skip full Blueprint/schema re-read unless design choice requires it.
 - Word study UI original-first; feature-detect local API; production uses static ws/
 - Phase 5 minimal curated speaker/theme annotations (source_tag curated-manual-phase5-v1)
 - Psalm superscription anchors + multi-claim org splits; audit_psalms PASS
-- Reader: USFM titles stored as entry.titles[] (not glued into v.1 body)
+- Reader: USFM titles stored as entry.titles[]; **Heading shown once on focal English** in index + bible (not compare/original)
 - **Static Word study for GoDaddy ($0)**: export_word_study_static.py → apps/365DBR/ws/
 
 ## Hosting freeze (do not fight this)
@@ -62,13 +62,12 @@ python db/scripts/audit_empty_originals.py
 python db/scripts/audit_psalms.py
 
 ## First actions this session
-1. git status on main; Docker up if DB workshop work is needed
-2. Default increment: surface the 15 speaker/theme annotations in Word study (static-safe)
+1. git status on main
+2. Default increment: surface the 15 speaker/theme annotations in Word study (static-safe) unless owner names a production bug
 3. Implement, test, document INDEX + DEV-Logs; check in on main when done
 
 ## Recommended next increments (pick one — all $0 / static-hosting-safe)
 G. Surface the 15 Phase 5 speaker/theme annotations in the Word study panel (payload already has annotations[]; UI ignores them)
-T. Title display polish in the daily reader if anything still looks off after published titles[]
 C2. Expand Phase 5 curated annotations (source + basis always) — local DB then re-export after G
 E. Free/open EN↔token alignment research only when prioritized (no paid RI)
 F. Small polish only if owner reports a concrete bug

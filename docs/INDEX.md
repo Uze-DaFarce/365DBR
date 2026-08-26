@@ -264,9 +264,9 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-08-26 (hosting freeze; Psalm titles + Word study published and owner-approved)
+**Last Updated**: 2026-08-26 (title display: one Heading on focal English in index + bible)
 
-**Current Phase**: **Static production freeze.** Phase 4–5 local work is solid. Psalm superscription / multi-claim splits and static `ws/` Word study are **on main, published to mt-sin.ai, and owner-tested**. Public 365DBR stays static JSON + `ws/` on GoDaddy. Option B / live API / Phase 6 **blocked by budget**. **Next**: surface the 15 curated speaker/theme annotations in Word study (data is in local DB + `ws/` JSON; UI does not show them yet) — see `docs/365DBR/Handoff-Next-Session.md` and `docs/365DBR/Hosting-and-Runtime.md`.
+**Current Phase**: **Static production freeze.** Psalm titles + Word study published. Titles now show **once** as Heading on the focal English slot in both readers (not on compare/original; LSV glued prefix stripped display-only). Option B / live API **blocked by budget**. **Next**: surface the 15 speaker/theme annotations in Word study, or owner FTP of this title UI — see `docs/365DBR/Handoff-Next-Session.md`.
 
 **TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
 - [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).
@@ -290,7 +290,7 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 - [x] Psalm titles + multi-claim English splits: `audit_psalms` PASS; reader stores USFM titles in `entry.titles[]` (not glued into v.1).
 - [x] **Hosting freeze documented**: no live relational DB on GoDaddy shared hosting (`docs/365DBR/Hosting-and-Runtime.md`).
 - [x] Owner FTP of latest `ws/` + `index.html` / `bible.html` / `strongs_optional.js` after Psalm/title work; spot-checked on mt-sin.ai (2026-08-26).
-- [ ] Title display polish in the daily reader if still needed after the published `titles[]` work.
+- [x] Title display: one Heading on focal English in `index.html` + `bible.html`; no duplicate on compare; display-only strip of glued LSV prefix.
 - [ ] Surface Phase 5 speaker/theme annotations in Word study UI (export already includes `annotations[]`; panel does not render them).
 - [ ] Improve Word study toward English-word hover when **free/open** alignment data exists (no paid reverse interlinear budget).
 - [ ] Residual empty originals (REV.12.18 placeholder) — optional later design.
