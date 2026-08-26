@@ -13,8 +13,8 @@ D:\Users\uzeda\Mt. Sinai LLC\monorepo
 ```
 
 - Branch: **main** only  
-- Phase 4 work is **already on main** (as of 2026-07-27)  
-- Local main is **ahead of GitHub** by ~10 commits until something pushes
+- Phase 4–5 local work, Psalm titles, and static Word study are **already on main** (published 2026-08-26).  
+- Public 365DBR stays **static files on GoDaddy** (no live database). See `docs/365DBR/Hosting-and-Runtime.md`.
 
 ## What you do (optional)
 

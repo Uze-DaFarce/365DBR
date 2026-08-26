@@ -50,8 +50,8 @@ III. Foundational Axioms (The "Source Code")
 IV. Technical Architecture
 
 * Local & Encrypted: To prevent secular "corruption" or external "safety" overrides, the SI must live on local, verified hardware.  
-* Relational Database: Migration from JSON to a relational DB (e.g., PostgreSQL) to ensure strict data integrity and rapid mapping between English, Greek, and Hebrew.  
-* Data Source: Integration with the 365DBR (Daily Bible Reading) static framework to ensure daily immersion in the text.
+* Relational Database: Local PostgreSQL is the workshop for strict integrity and mapping between English, Greek, and Hebrew. **Public 365DBR cannot host that database on GoDaddy shared hosting** (2026-08-26 freeze). Production stays the static JSON / `ws/` framework until Postgres-capable hosting is affordable. See `docs/365DBR/Hosting-and-Runtime.md`.
+* Data Source: Integration with the 365DBR (Daily Bible Reading) **static** framework to ensure daily immersion in the text.
 
 ---
 

@@ -2,6 +2,8 @@
 
 **Purpose:** Publish original-token + Strong’s Word study on GoDaddy shared hosting **without** a live database or paid API.
 
+GoDaddy shared hosting **cannot** run PostgreSQL or `serve_query_api.py`. These files *are* the public Word study runtime. Do not replace them with a live DB on this host. See `docs/365DBR/Hosting-and-Runtime.md`.
+
 ## Generate (on your PC)
 
 ```powershell

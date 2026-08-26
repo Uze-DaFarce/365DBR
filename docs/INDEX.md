@@ -4,7 +4,9 @@
 
 **Secondary Source**: This `docs/` knowledge base — for project history, technical details, agent learnings, and S.I. development. Use to avoid repetition of information.
 
-**Current Focus (as of 2026-07-01)**: 100% on 365DBR until its data is fully leveraged for the S.I. ("LLM"). Other apps (HeIsRisen/m, mtsinai, dbdkids) kept in mind for cross-app interactions, constraints (e.g., CSP, shared hosting), and potential future reuse, but not the active priority unless urgent.
+**Current Focus (as of 2026-08-26)**: 100% on 365DBR as a **static** public product on GoDaddy, using local Postgres only as a workshop (ETL / verify / export). Other apps (HeIsRisen/m, mtsinai, dbdkids) kept in mind for cross-app interactions, constraints (CSP, shared hosting), and potential future reuse, but not the active priority unless urgent.
+
+**Hosting freeze**: Production **cannot** run a relational database on GoDaddy shared hosting. Do not transition the live reader to Postgres, cPanel MySQL, or a public query API until the owner can afford a host that actually runs PostgreSQL. Canonical: [docs/365DBR/Hosting-and-Runtime.md](./365DBR/Hosting-and-Runtime.md).
 
 ## Current Documentation Structure
 - `docs/INDEX.md` (this file) — Master hub.
@@ -14,6 +16,7 @@
   - 365DBR-DEV.md (implementation, code changes, following architecture)
 - `docs/365DBR/` — Primary focus area.
   - `Data-Sources.md` — Critical: Production data only (repo data is placeholder).
+  - `Hosting-and-Runtime.md` — Canonical: GoDaddy = static files; no live DB on shared hosting.
   - `365DBR_AGENTS.md` — Code constraints (moved from mtsinai).
 - `docs/Agents/` — Historical Jules agent prompts (Bolt, Palette, Sentinel) with still-relevant principles extracted.
 - `docs/Project Blueprint_ Scriptural Intelligence (SI).md` — Core S.I. vision ("Deep Thought").
@@ -83,8 +86,8 @@ See full blueprint: [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 ### Current Focus
 - Daily structured Bible reading plan (<15 min/day).
 - Multi-translation support.
-- Transition from static JSON to highly relational database.
-- Foundation for S.I. (daily immersion + semantic/contextual data).
+- **Public product is static JSON + static Word study packs** on GoDaddy shared hosting. A live relational database is **not** the production runtime and cannot be until paid Postgres-capable hosting exists. See [Hosting-and-Runtime.md](./365DBR/Hosting-and-Runtime.md).
+- Local Docker Postgres remains the workshop for accuracy work and static export (foundation for S.I. later).
 
 ### Data Sources (Critical)
 **The real data is NOT in the repository.** 
@@ -115,7 +118,7 @@ See full blueprint: [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
   - ESV
 
 ### Database Requirements (High-Level)
-- Highly relational design.
+- Highly relational design **for the local workshop and future S.I.** — not for the current public host.
 - Multiple paths in and out.
 - **Far beyond** simple Book/Chapter/Verse.
 - Chapters and verses are man-made additions (vary between translations).
@@ -123,8 +126,8 @@ See full blueprint: [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
   - Original Hebrew/Greek text.
   - Contextual metadata: speaker, subject, timing, audience, etc.
   - Multiple translations.
-- Will support rich semantic queries for S.I. (e.g., "What did Jesus say about X?").
-- **Status**: Major discussion pending. Research done months ago but notes lost. To be documented iteratively (Document > Research > Re-document).
+- Will support rich semantic queries for S.I. (e.g., "What did Jesus say about X?") **once a host can run PostgreSQL**.
+- **Status (2026-08-26)**: Local schema + full 365 load + query layer **done**. Public cutover **blocked** by GoDaddy shared hosting. Do not port to cPanel MySQL. See [Hosting-and-Runtime.md](./365DBR/Hosting-and-Runtime.md).
 
 See also:
 - [365DBR_AGENTS.md](./365DBR_AGENTS.md) for code stability constraints (verseMap, audio playback, verification).
@@ -134,21 +137,24 @@ See also:
 
 ## Database Strategy
 
-**Note**: Dedicated session completed 2026-07-01 (see role-driven analysis). Research refresh + initial design produced.
+**Runtime freeze (2026-08-26)**: The public 365DBR site stays on **static files**. Local PostgreSQL is the workshop. Do not treat “move production onto a database” as active work. Canonical: [docs/365DBR/Hosting-and-Runtime.md](./365DBR/Hosting-and-Runtime.md).
 
-- Must be **highly relational** (implemented in design).
-- Support complex queries across translations, original languages, and contextual metadata (original_tokens + annotations + ranges).
+**Note**: Dedicated design session completed 2026-07-01. Phases 1–5 **local** work is implemented. Production cutover (Phase 4 Option B / Phase 6) is **blocked by hosting cost**, not by schema unreadiness.
+
+- Must be **highly relational** (implemented locally).
+- Support complex queries across translations, original languages, and contextual metadata (original_tokens + annotations + ranges) — **on the PC / future paid host**, not on GoDaddy.
 - Key challenges addressed in design:
   - Man-made chapter/verse divisions → verse alignment for practicality + tokens + annotations for literary/context independence.
   - Need for speaker, subject, timing, literary context, etc. → dedicated `annotations` + `cross_references` tables with ranges.
   - Multiple entry points (text search, semantic, thematic, speaker-based, etc.) → tsvector, strongs indexes, range queries, daily + plan tables.
-- Integration with 365DBR for daily reading + S.I. backend (daily_readings + daily_passages + verse_translations).
-- Tech: **PostgreSQL** recommended (rationale + trade-offs in docs). Matches Blueprint.
+- Integration with 365DBR today: **export** (static `data/` + `ws/`) from the local DB. Live `loadDailyBread` from DB is Option B and is frozen.
+- Tech: **PostgreSQL** for the workshop and for any future paid host. **Not** cPanel MySQL. Matches Blueprint when hosting allows.
 - **Current artifacts** (read these):
+  - `docs/365DBR/Hosting-and-Runtime.md` (what actually runs in production vs locally).
   - `docs/365DBR/Database-Schema.md` (DDL, ERD mermaid, decisions, S.I. alignment, v0.1 scope).
-  - `docs/365DBR/Migration-Plan.md` (phases 0-6, ETL sketch from prod data only, validation, risks, success criteria, handoff guidance).
+  - `docs/365DBR/Migration-Plan.md` (phases 0-6; Option B / Phase 6 blocked until Postgres-capable hosting).
 
-**Status**: Initial schema + high-level migration plan complete. Ready for prototyping / DEV handoff on Phase 1 (infra + schema bootstrap). See full details and iterative updates in the 365DBR/ docs above.
+**Status**: Local schema + 365 ETL + query API + static Word study export complete. Public site remains static on GoDaddy. Next work must ship as static files until hosting changes.
 
 ---
 
@@ -197,6 +203,7 @@ See also:
 - `docs/INDEX.md` (this file) — Master hub for shared knowledge.
 - `docs/365DBR/` — 365DBR-specific (focus area until S.I. data is leveraged).
   - `Data-Sources.md` — Production data access (repo data is placeholder only).
+  - `Hosting-and-Runtime.md` — Canonical production freeze (GoDaddy = static; local Postgres = workshop).
   - `365DBR_AGENTS.md` — Critical code constraints for 365DBR.
 - `docs/Agents/` — Historical agent prompts and knowledge.
 - `docs/Project Blueprint_ Scriptural Intelligence (SI).md` — Core S.I. vision ("Deep Thought").
@@ -230,6 +237,7 @@ See also:
 ### Other
 - Some code/docs still assume LSV-only or old data pipeline.
 - AGENTS.md moved from apps/mtsinai/ to docs/365DBR_AGENTS.md (completed).
+- **“Transition 365DBR to a relational database” as production work is obsolete (2026-08-26).** Public site stays static on GoDaddy. See `docs/365DBR/Hosting-and-Runtime.md`.
 
 ---
 
@@ -239,7 +247,7 @@ See also:
 - Stabilize documentation in `docs/` to eliminate repetition. (Centralization largely complete.)
 - Complete LSB access (pending Diana M / 316 Publishing).
 - Add WEB data support.
-- Relational DB design + initial schema/migration plan complete (2026-07-01 session); move to prototyping + sample population.
+- Local relational DB (schema + 365 ETL + query/export) complete; **production cutover frozen** until Postgres-capable hosting is affordable. Meanwhile ship static JSON + `ws/` packs on GoDaddy.
 - Review and integrate key .jules learnings (data/validation patterns already extracted to relevant docs).
 - Update all references (README, etc.) to point to docs/. Expand 365DBR/ docs as design evolves.
 
@@ -256,9 +264,9 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 
 ---
 
-**Last Updated**: 2026-08-25 (Psalm title/alignment fixes + static Word study for GoDaddy)
+**Last Updated**: 2026-08-26 (hosting freeze; Psalm titles + Word study published and owner-approved)
 
-**Current Phase**: Phase 4–5 solid + static `ws/` Word study + **Psalm superscription anchors / multi-claim org splits fixed** (`audit_psalms` PASS). Static JSON still primary for daily reading. **Next**: FTP `ws/` (re-export after Psalm fix) + app files; UI title display polish; expand annotations — see `docs/365DBR/Handoff-Next-Session.md`.
+**Current Phase**: **Static production freeze.** Phase 4–5 local work is solid. Psalm superscription / multi-claim splits and static `ws/` Word study are **on main, published to mt-sin.ai, and owner-tested**. Public 365DBR stays static JSON + `ws/` on GoDaddy. Option B / live API / Phase 6 **blocked by budget**. **Next**: surface the 15 curated speaker/theme annotations in Word study (data is in local DB + `ws/` JSON; UI does not show them yet) — see `docs/365DBR/Handoff-Next-Session.md` and `docs/365DBR/Hosting-and-Runtime.md`.
 
 **TODO / Progress Tracker (365DBR → S.I. DB foundation)**:
 - [x] Read required docs + git + prod data analysis (manifests 0701/0630 + Hebrew + **NT Greek** passages).
@@ -278,24 +286,31 @@ See full details in [Project Blueprint_ Scriptural Intelligence (SI).md](./Proje
 - [x] Empty-original audit: dual-claim cross-day wipe fixed in `populate_day` clear; 181→4 residual; `audit_empty_originals.py` + stress section I.
 - [x] Query API + browser Word study (feature-detect API; original-first; on when API up). See `docs/365DBR/Word-Study-and-Alignment.md`.
 - [x] Phase 5 minimal: curated speaker/theme annotations (`phase5_curated_annotations.json`, seed script, migration 003 range-by-verse_order, query + si-demo). Sparse demo only — not full-Bible tagging.
+- [x] Static Word study publish path for GoDaddy: `export_word_study_static.py` → `apps/365DBR/ws/`; CSP-safe (no localhost probe on production).
+- [x] Psalm titles + multi-claim English splits: `audit_psalms` PASS; reader stores USFM titles in `entry.titles[]` (not glued into v.1).
+- [x] **Hosting freeze documented**: no live relational DB on GoDaddy shared hosting (`docs/365DBR/Hosting-and-Runtime.md`).
+- [x] Owner FTP of latest `ws/` + `index.html` / `bible.html` / `strongs_optional.js` after Psalm/title work; spot-checked on mt-sin.ai (2026-08-26).
+- [ ] Title display polish in the daily reader if still needed after the published `titles[]` work.
+- [ ] Surface Phase 5 speaker/theme annotations in Word study UI (export already includes `annotations[]`; panel does not render them).
 - [ ] Improve Word study toward English-word hover when **free/open** alignment data exists (no paid reverse interlinear budget).
-- [ ] Option B `loadDailyBread` from DB only if small + AGENTS verified.
-- [ ] Residual empty originals (English split / first-wins map / REV.12.18 placeholder) — optional multi-English→one-org design later.
+- [ ] Residual empty originals (REV.12.18 placeholder) — optional later design.
 - [ ] Expand curated annotations (more speakers/themes; still require `source` + textual basis).
 - [ ] LSB integration (blocked pending 316 Publishing clarification); add WEB etc.
-- [ ] Full rich metadata + deeper S.I. query prototypes; dual-write / cutover later.
-- Blockers: LSB access finalization; any hosting/DB provisioning details.
+- [ ] Option B `loadDailyBread` from DB — **FROZEN** until Postgres-capable hosting is affordable **and** AGENTS audio verified. Do not start.
+- [ ] Full rich metadata + deeper S.I. query prototypes; dual-write / cutover — **FROZEN** (same hosting blocker).
+- Blockers: **GoDaddy cannot run this database** (budget); LSB access finalization.
 
 **Next Steps (explicit)**:
 1. ~~Phase 1–3~~ done (schema + full 365 load + reconciliation PASS).
 2. ~~Phase 4 Option A backend~~ done (CLI, local API, English-primary alignment, 365 re-populate, stress tests).
-3. ~~Empty-original dual-claim wipe~~ done (safe clear + re-populate; residual 4 documented).
-4. ~~Optional Strong's UI~~ done (feature-detect API; static primary).
+3. ~~Empty-original dual-claim wipe~~ done (safe clear + re-populate; residual placeholder documented).
+4. ~~Optional Strong's UI~~ done (feature-detect local API; static `ws/` on production).
 5. ~~Phase 5 minimal annotations~~ done (15 curated rows + si-demo query; expand when ready).
-6. Phase 4 follow-up: optional English-split token sharing; Option B only if AGENTS verified.
-7. Expand Phase 5 curation; free/open EN-hover only when prioritized.
-8. Keep 100% focus on 365DBR until data fully leveraged for S.I. LSB still blocked.
+6. ~~Psalm title/alignment + static Word study~~ done, checked in on main, published, owner-approved.
+7. Until new hosting: only static-safe increments. **Next: show the 15 speaker/theme annotations in Word study.**
+8. Option B / public API / Phase 6: **do not schedule** until the owner can afford a host that runs PostgreSQL.
+9. Keep 100% focus on 365DBR. LSB still blocked.
 
-**Handoff guidance**: New sessions: read `docs/365DBR/Handoff-Next-Session.md` first (scoped next work), then `docs/Roles/365DBR-DEV.md` + INDEX + Verse-Identity + latest DEV-Logs. Prefer stress tests over toy 0101/GEN.1.1. Trust api.bible; verify with payload fields before blaming API.
+**Handoff guidance**: New sessions: read `docs/365DBR/Handoff-Next-Session.md` first (scoped next work), then `docs/365DBR/Hosting-and-Runtime.md` (no live DB on GoDaddy), then `docs/Roles/365DBR-DEV.md` + INDEX + Verse-Identity + latest DEV-Logs. Prefer stress tests over toy 0101/GEN.1.1. Trust api.bible; verify with payload fields before blaming API.
 
 This document will be maintained as the single source of truth to minimize repetition. Never repeat analysis — reference the 365DBR/ files.

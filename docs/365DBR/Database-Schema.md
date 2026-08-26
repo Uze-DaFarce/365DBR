@@ -88,7 +88,7 @@ This was the explicit review requested; design remains sound and handles both fa
 - Advanced indexing (GIN, GiST, trigram for fuzzy/strongs search).
 - Mature ecosystem for Bible-scale data (millions of tokens ok).
 - Extensions: `pg_trgm`, `fuzzystrmatch`, future `pgvector` or similar for semantic embeddings in S.I. layer.
-- Hosting: self-managed, Docker, or managed (Neon, Supabase, AWS RDS, Render) – compatible with shared hosting constraints if needed for 365DBR static + API.
+- Hosting: **local Docker Postgres (workshop today)**. Production 365DBR is GoDaddy **shared hosting**, which **cannot** run PostgreSQL or this schema. Do not treat shared hosting as “compatible” with a live Bible DB. Do not port to cPanel MySQL. Future public runtime: a cheap VPS or managed Postgres (Neon, Supabase, AWS RDS, Render) **when the owner can afford it**. Canonical: `docs/365DBR/Hosting-and-Runtime.md`.
 - Tooling: Python (psycopg / SQLAlchemy / Alembic for migrations), easy ETL from existing JSON pipeline.
 - Proven for linguistic/scripture data (many open projects use PG or similar).
 
@@ -96,13 +96,13 @@ This was the explicit review requested; design remains sound and handles both fa
 - Vs SQLite: PG requires server (or libpq); SQLite simpler for pure client/embedded but weaker on concurrent writes, fulltext, JSON power, and future S.I. scale. Use SQLite only for throwaway prototypes.
 - Vs Mongo/JSON-only: Loses relational power for joins (e.g., "all Jesus words + their strongs + cross-refs"). We need **highly relational** per requirements.
 - Vs MySQL/Maria: PG superior text/JSON/indexing and standards compliance for this workload.
-- Cost/ops: For start, local Postgres + Docker; production use managed tier matching 365DBR hosting.
+- Cost/ops: Local Postgres + Docker is the **only** current DB. Matching 365DBR’s current host (GoDaddy shared) is **not possible** for this workload. Paid Postgres-capable hosting is a future budget item, not a now-task.
 - Future: Can add read replicas, partitioning by book/testament, materialized views for daily readings.
 
 **Other choices documented**:
 - ORM/Migrations: SQLAlchemy + Alembic (or raw SQL + versioned scripts for simplicity/auditability).
 - ETL: Extend existing Python (new `etl/` or integrate with `fetch_readings.py` / new `populate_db.py`). Use production endpoints or mirrored data/ snapshots.
-- Access layer (for apps/S.I.): Initially direct queries or views; later thin API (FastAPI/Flask) or PostgREST. Keep 365DBR daily experience working during transition (hybrid or pre-generated snapshots).
+- Access layer (for apps/S.I.): Local queries + `serve_query_api.py` on localhost. Public site uses **pre-generated static JSON** (`data/` + `ws/`). A public API is frozen until hosting can run Postgres + HTTPS + CSP allowlist.
 - Validation: Reuse/enhance `bible_common.py` logic + DB constraints/triggers.
 
 **Alternatives considered (and why deprioritized for v1)**: Pure JSONB document store (insufficient relations), graph DB (overkill initially; can layer later for themes), custom in-memory (no durability/integrity).
@@ -290,4 +290,4 @@ erDiagram
 
 See Migration-Plan.md for how to realize this schema.
 
-**Last updated**: 2026-07-01 (Database PM session). Update with any design evolution; reference in INDEX.md.
+**Last updated**: 2026-08-26 (hosting freeze: this schema is local-workshop + future paid host; not GoDaddy shared). Reference in INDEX.md.

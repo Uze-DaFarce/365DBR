@@ -21,6 +21,7 @@ Our current primary production applications include:
 *   **Live Link:** `mt-sin.ai/365DBR/`
 *   **Purpose:** A fast, lightweight, and responsive daily Scripture reading and tracking application.
 *   **Architecture:** Engineered explicitly around flat-file arrays and strict JSON data models (such as `/data/0818/index.html` optimized for crawler and LLM search agent indexing). This design choice prioritizes maximum scraping speed and ultra-low search latency over heavy database infrastructure.
+*   **Hosting freeze (2026-08-26):** Production stays on GoDaddy shared hosting (static JSON + `ws/` Word study packs). That host cannot run PostgreSQL. Local Docker Postgres is the workshop (ETL / verify / export), not the public runtime. Do not port the Bible DB to cPanel MySQL. See `docs/365DBR/Hosting-and-Runtime.md`.
 
 ### 🌅 2. He Is Risen (Interactive Easter Learning Game)
 *   **Live Link:** `mt-sin.ai/HeIsRisen/`

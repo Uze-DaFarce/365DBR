@@ -1,11 +1,14 @@
 # 365DBR Relational Database Migration Plan (High-Level)
 
-**Phase**: DB design discussions and prototyping kickoff (2026-07-01 context).  
+**Phase**: Local DB workshop complete (Phases 1–5 minimal). Public cutover **frozen**.  
 **Owner**: Database PM / Architect (this design); handoff scoped work to 365DBR DEV.  
-**Goal**: Turn current static JSON pipeline (Python + api.bible → date-based prod data/) into a durable, queryable relational foundation that powers both daily 365DBR reading **and** advanced S.I. ("Deep Thought") features.
+**Goal (long-term)**: Turn the static JSON pipeline into a durable, queryable relational foundation that powers daily 365DBR **and** S.I. ("Deep Thought").
+
+**Runtime freeze (2026-08-26)**: That goal is **not** the next production step. `mt-sin.ai` is GoDaddy shared hosting. Shared hosting cannot run PostgreSQL or a live query API. Do **not** port this schema to cPanel MySQL. Local Docker Postgres is the workshop; production stays static JSON + `ws/` packs until the owner can afford Postgres-capable hosting. Canonical: `docs/365DBR/Hosting-and-Runtime.md`.
 
 **Must read before any implementation or changes**:
 - `docs/INDEX.md`
+- `docs/365DBR/Hosting-and-Runtime.md` (production is static on GoDaddy; no live DB)
 - `docs/Project Blueprint_ Scriptural Intelligence (SI).md`
 - `docs/365DBR/Data-Sources.md` (production data rule is absolute)
 - `docs/365DBR/Database-Schema.md` (the target)
@@ -29,7 +32,7 @@
 - Data faithfully ingested: full original tokens + Strong's + LSV (primary) + other parallels texts, aligned at verse level.
 - 365 daily plan represented relationally.
 - Extension points for speaker/audience/timing/literary/theme/semantic metadata (initially sparse; curated over time).
-- Dual support during transition: static JSON continues to work; DB becomes source for new features + eventual replacement.
+- Dual support during any future transition: static JSON continues to work; DB becomes source for new features + eventual replacement **only after hosting can run PostgreSQL**. Until then, DB → static export only.
 - Strict validation at every step (counts, ranges, book membership, provenance).
 - Clear rollback / re-run path.
 
@@ -81,8 +84,8 @@
 - **Deliverable**: Signed-off "data matches production + validation passes" report. Update docs.
 
 ### Phase 4: 365DBR Integration (daily experience + browser)
-- Option A (low risk): Keep current static JSON serving for 365DBR. Add optional DB-backed endpoints or pre-generate enhanced JSON from DB.
-- Option B: Client or thin server layer queries DB for `loadDailyBread` equivalent (return same verseMap shape initially for zero frontend break).
+- Option A (low risk, **chosen and implemented locally**): Keep current static JSON serving for 365DBR. Pre-generate enhanced JSON from DB (`ws/` Word study packs). Local query API on localhost only.
+- Option B: Client or thin server layer queries DB for `loadDailyBread` equivalent (return same verseMap shape initially for zero frontend break). **Frozen 2026-08-26**: requires a public host that can run PostgreSQL. GoDaddy shared hosting cannot. Do not start.
 - Respect 365DBR_AGENTS.md: any change to data shape for audio/playVerse must be verified.
 - Add features powered by DB early: e.g. "show Strong's for this verse", "search strong H1234 across plan", speaker filter (once annotations seeded).
 - Update compile_site.py / static generation if needed to pull from DB.
@@ -96,7 +99,7 @@
 - [x] Option A second increment: local read-only HTTP API `db/scripts/serve_query_api.py` + `test_query_api_phase4.py` (stdlib, bind 127.0.0.1; wraps same library).
 - [x] Empty-original dual-claim wipe fix (`populate_day` clear); `audit_empty_originals.py`; stress section I; residual empties=4.
 - [x] Optional browser Strong's UI (`strongs_optional.js` + H# panel; feature-detect API; static JSON primary).
-- [ ] Option B deferred (AGENTS verify required).
+- [ ] Option B **FROZEN** until Postgres-capable hosting is affordable **and** AGENTS audio verified. Do not start on GoDaddy shared hosting.
 
 ### Phase 5: Rich Metadata & S.I. Enablement
 - Curate / import annotations (speakers, chronology, themes, cross-refs).
@@ -116,6 +119,9 @@
 - [ ] Expand curation; cross_references; frontend annotation display; full-Bible coverage (not in v1).
 
 ### Phase 6: Cutover, Deprecation, Ops
+**Blocked (2026-08-26)**: Requires a public host that runs PostgreSQL (or managed Postgres) with HTTPS. GoDaddy shared hosting cannot do this. Do not decommission the static pipeline. See `docs/365DBR/Hosting-and-Runtime.md`.
+
+When hosting exists:
 - Switch primary source to DB for new S.I. components.
 - Maintain static snapshots or JSON export for 365DBR compatibility / offline / crawlers as needed.
 - Backup strategy, read replicas if scale.
@@ -156,7 +162,7 @@
 - **Rich metadata quality**: Speaker/setting attribution is interpretive. Mitigation: source field, multiple possible values, Tier 1 priority (always show the actual text + attribution as derived). Bible text never altered.
 - **Volume / perf**: ~365*avg ~150 verses/day * words/verse + tokens = manageable (< few million rows). PG handles easily.
 - **Frontend coupling**: verseMap flattening + audio. Mitigation: keep output shape compatible; verify with Playwright/tests per AGENTS.md.
-- **Hosting / CSP / shared env**: Other apps constraints. DB access via backend API layer later if client-only model changes.
+- **Hosting / CSP / shared env**: **Hard blocker.** GoDaddy shared hosting cannot run PostgreSQL, a persistent Python API, or cPanel-MySQL as a substitute for this schema. Production remains static files. A future public API also needs HTTPS + CSP `connect-src` allowlist — not FTP alone. Canonical: `docs/365DBR/Hosting-and-Runtime.md`.
 - **Past notes lost**: Starting fresh – this plan + schema are the record. Update iteratively.
 - **Git / worktree**: Always check status. Changes only in scoped PRs.
 
@@ -177,23 +183,22 @@
 - DEV has clear, scoped next tasks (see Handoff section).
 - No breakage to live 365DBR.
 
-## Immediate Next Steps (as of 2026-07-01)
+## Immediate Next Steps (as of 2026-08-26)
 
 (See INDEX.md for the master TODO tracker.)
 
-1. Database PM: this design complete + INDEX update.
-2. Coordinate with Top-Level Program Lead: review schema/plan.
-3. Hand off Phase 1 (infra + schema) to 365DBR DEV with self-contained prompt (load docs first).
-4. DEV executes Phase 1; report back with verification.
-5. Iterate: populate sample day(s) → validation → schema tweaks.
-6. Seed initial annotations (small curated set) for S.I. demo value.
-7. Expand translations when LSB access confirmed.
-8. Re-document after each milestone.
+Phases 1–5 local are done. Public cutover is **not** next.
 
-**Blockers right now**: None for design/prototyping. LSB for full trans support.
+1. ~~Owner FTP of latest static `ws/` + app files~~ done (2026-08-26, owner-approved).
+2. Static-safe next: surface the 15 speaker/theme annotations in Word study UI (`annotations[]` already exported). Then title polish / more curation / free EN-hover research as picked.
+3. Do **not** start Option B, a public API, or a MySQL port.
+4. Expand translations when LSB access confirmed.
+5. Revisit Phase 6 only after Postgres-capable hosting is affordable.
+
+**Blockers right now**: GoDaddy shared hosting cannot run this database (budget). LSB for additional translations.
 
 **When handing off to DEV**: Provide focused prompt that instructs: read the 5 core docs + Database-Schema.md + Migration-Plan.md first, then implement only the scoped piece.
 
 Update this file + INDEX.md after every significant step. Never repeat prior analysis here; reference.
 
-**Last updated**: 2026-07-01 (initial high-level plan produced in dedicated DB design session).
+**Last updated**: 2026-08-26 (production cutover frozen: GoDaddy shared hosting cannot run this database).

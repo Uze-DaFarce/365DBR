@@ -53,6 +53,7 @@ Each passage JSON follows the standard api.bible content structure (paragraphs, 
 ## Relation to 365DBR App
 - The interactive app (`/365DBR/index.html` and `/bible.html`) loads from these prod data endpoints (or compiled static versions).
 - The static `data/MMDD/index.html` versions are specifically for search engines and AI crawlers.
+- **Production runtime is these static files on GoDaddy.** There is no live database behind `mt-sin.ai`. Local Docker Postgres is populated *from* this production JSON (or local mirrors of it) and can **export** Word study packs (`ws/`) back to the same host. See `docs/365DBR/Hosting-and-Runtime.md`.
 
 ## Original-language sources (api.bible — used by local fetch pipeline)
 
@@ -64,6 +65,6 @@ Each passage JSON follows the standard api.bible content structure (paragraphs, 
 
 **Changed**: NT primary switched from critical Greek (SBLGNT-class `7644de2e4c5188e5-01`) to **GRCTR** for truth/alignment with KJV verse inventory and S.I. integrity. Constants live in `apps/365DBR/bible_common.py` (`NT_GREEK_ID`, `OT_HEBREW_ID`).
 
-**Last documented**: 2026-07-02 (GRCTR switch)
+**Last documented**: 2026-08-26 (hosting freeze: production remains these static URLs; local DB is not the public source)
 
-See also: docs/INDEX.md (365DBR section) and the relational DB migration plans.
+See also: `docs/INDEX.md` (365DBR section), `docs/365DBR/Hosting-and-Runtime.md`, and the relational DB migration plans (local workshop only until paid Postgres hosting).

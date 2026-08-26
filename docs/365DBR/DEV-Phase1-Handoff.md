@@ -6,7 +6,7 @@
 
 See the "Active Handoff / Task for This Session: Phase 1" section in the role file for complete guidance.
 
-**Context** (historical reference): This was a clean, self-contained handoff from Database PM / Architect. Full current status is in `docs/INDEX.md`.
+**Context** (historical reference): This was a clean, self-contained handoff from Database PM / Architect. Full current status is in `docs/INDEX.md`. **Phase 1 is complete.** Production is still static on GoDaddy; see `docs/365DBR/Hosting-and-Runtime.md`.
 
 See `docs/Roles/365DBR-DEV.md` for the active merged instructions.
 

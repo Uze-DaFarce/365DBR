@@ -1,7 +1,8 @@
 # Word Study & English↔Original Alignment
 
-**Status**: Word study UI **enabled** when local query API is up (feature-detect `/health`).  
+**Status**: Word study UI **enabled** from local query API (localhost `/health`) **or** static same-origin `ws/` packs on production.  
 **Priority**: Truth/Accuracy > Safety > Performance.  
+**Hosting freeze (2026-08-26)**: Public Word study **must** stay static `ws/` files. GoDaddy shared hosting cannot run Postgres or the query API. Do not wait on a VPS. Canonical: `docs/365DBR/Hosting-and-Runtime.md`.  
 **Owner note (2026-07-28)**: Keep current original-first Word study available; **improve toward English-word hover when possible without paid data/licenses** (no budget for commercial reverse interlinears).
 
 ---
@@ -85,6 +86,7 @@ Static JSON remains primary for daily reading / `playVerse`. Word study is enric
 | `apps/365DBR/index.html` / `bible.html` | Word study sheet (Aa) |
 | `db/scripts/serve_query_api.py` | Local API `:8765` |
 | `docs/365DBR/Verse-Identity-and-Alignment.md` | Verse-level BCV identity |
+| `docs/365DBR/Hosting-and-Runtime.md` | GoDaddy = static; no live DB |
 | `docs/365DBR/DEV-Logs.md` | Session history |
 
 ---

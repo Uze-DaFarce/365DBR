@@ -40,7 +40,7 @@ These have been pulled from the agent prompts and .jules journals. They are now 
 ### Data & Validation (Strongly 365DBR / S.I. Relevant)
 - **Production data only**: Never rely on repo `data/` placeholders for 365DBR. Always fetch live from https://mt-sin.ai/365DBR/data/ (date-based manifests + passages). See docs/365DBR/Data-Sources.md.
 - **Fail fast on corruption**: Strict validation + isNaN/bounds checks on all external inputs (localStorage, API responses, DB data). No silent failures. (Sentinel)
-- **Contextual data model**: For relational DB, capture speaker, subject, timing, original languages, multiple translations. Chapters/verses are man-made; design paths beyond B/C/V. (S.I. Blueprint + journals)
+- **Contextual data model**: For the **local** relational DB (and future paid host), capture speaker, subject, timing, original languages, multiple translations. Chapters/verses are man-made; design paths beyond B/C/V. Public 365DBR stays static on GoDaddy until Postgres-capable hosting is affordable. See `docs/365DBR/Hosting-and-Runtime.md`. (S.I. Blueprint + journals)
 - **Permanent test improvement**: Enhance existing scripts in tests/ and verification/ folders. Make them more realistic with prod data. Do not delete/recreate or leave tests in root. (All agents)
 
 ### Performance (Bolt)

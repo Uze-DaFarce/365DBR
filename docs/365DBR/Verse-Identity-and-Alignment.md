@@ -1,7 +1,8 @@
 # Verse Identity & Alignment (English-primary, original-faithful)
 
-**Status**: Adopted 2026-07-20 (Phase 4 foundation).  
-**Priority**: Truth/Accuracy > Safety > Performance.
+**Status**: Adopted 2026-07-20 (Phase 4 foundation). Reader-side `titles[]` extraction added 2026-08-25.  
+**Priority**: Truth/Accuracy > Safety > Performance.  
+**Runtime**: This alignment lives in **local Postgres** and in the **static JSON reader**. It is not a reason to put a live DB on GoDaddy. See `docs/365DBR/Hosting-and-Runtime.md`.
 
 ## api.bible stance (trust and verify)
 

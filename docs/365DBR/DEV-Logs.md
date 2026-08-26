@@ -555,3 +555,28 @@ python db/scripts/query_db.py si-demo --speaker God --strong H430 --compact
 **Not in this increment**: Option B loadDailyBread; LSB; free EN↔token alignment; frontend annotation UI; full-Bible speaker tagging.
 
 **Bible is primary.**
+
+---
+
+## 2026-08-26 — Hosting freeze: no live DB on GoDaddy (docs)
+
+**Owner**: New session. Cannot transition public 365DBR onto a relational database: GoDaddy shared hosting is all that is currently affordable, and it cannot run PostgreSQL (or a live query API). Do not invent a cPanel MySQL port.
+
+**Canonical**: `docs/365DBR/Hosting-and-Runtime.md`
+
+**What this means**:
+- Public runtime = static JSON (`data/MMDD/`) + static Word study (`ws/`) + static HTML/JS
+- Local Docker Postgres = workshop only (ETL, verify, export)
+- Option B / public API / Phase 6 cutover = **frozen** until Postgres-capable hosting is affordable
+- Next work must ship as files the shared host can serve
+
+**Docs updated to match**: INDEX, Handoff, Migration-Plan, Database-Schema, Data-Sources, Word-Study, AGENTS, role prompts, db/README, root README, Blueprint architecture note, ws/README, Verse-Identity, DEV-Phase1 pointer.
+
+**Where the code actually is (status for the owner)**:
+- Psalm titles + static Word study: **on main, published to mt-sin.ai, owner-tested and approved** (2026-08-26).
+- Residual empty original: `REV.12.18` placeholder `-` only.
+- Phase 5: 15 curated speaker/theme rows exist in local DB (and in exported `ws/` verse JSON as `annotations[]`). The Word study UI does **not** render them yet.
+
+**Next logical step until paid hosting**: Surface those 15 speaker/theme annotations in the Word study panel (static-safe; no live DB required).
+
+**Bible is primary.**

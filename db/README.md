@@ -1,8 +1,10 @@
-# 365DBR Local Database Development (Phase 1)
+# 365DBR Local Database Development (workshop)
 
 **Priority order (per team guidance)**: Truth/Accuracy > Safety/Security > Performance.
 
-This setup provides a reproducible local PostgreSQL 16 environment for the v0.1 schema defined in:
+**This is not the public site.** Production 365DBR is static files on GoDaddy shared hosting. Shared hosting cannot run PostgreSQL. Do not port this schema to cPanel MySQL. Canonical freeze: `docs/365DBR/Hosting-and-Runtime.md`.
+
+This setup provides a reproducible **local** PostgreSQL 16 environment (ETL, verify, export static `ws/` packs) for the v0.1 schema defined in:
 
 - `docs/365DBR/Database-Schema.md`
 - `docs/365DBR/Migration-Plan.md`
@@ -348,12 +350,15 @@ Seed file: `db/seeds/phase5_curated_annotations.json` (replace only rows with `s
 
 **Range note**: Annotation ranges use `verses.verse_order`, not lexical BCV string order (migration 003).
 
-## Next after Phase 4–5 minimal
+## Next after Phase 4–5 minimal (static-hosting-safe)
 
-- Residual empty originals (English split / placeholder) — optional later design
-- Option B only if small + AGENTS verified (`loadDailyBread` from DB)
-- Expand curated annotations; free/open EN↔token alignment research when prioritized
-- Keep static JSON pipeline working until dual-write / cutover
+Until the owner can afford a host that runs PostgreSQL:
+
+- Psalm titles + Word study: published and owner-approved (2026-08-26)
+- **Next:** surface Phase 5 speaker/theme (`annotations[]` already in `ws/` verse JSON) in the Word study panel
+- Residual empty originals (placeholder) — optional later design
+- Expand curated annotations locally; free/open EN↔token alignment research when prioritized
+- Keep the static JSON pipeline as the **public** source. Option B / dual-write / cutover are **frozen** (hosting), not “next.”
 
 ## Troubleshooting
 
@@ -365,6 +370,7 @@ Seed file: `db/seeds/phase5_curated_annotations.json` (replace only rows with `s
 ## References
 
 - `docs/Roles/365DBR-DEV.md`
+- `docs/365DBR/Hosting-and-Runtime.md`
 - `docs/365DBR/Database-Schema.md`
 - `docs/365DBR/Migration-Plan.md`
 - `docs/365DBR/Data-Sources.md`
