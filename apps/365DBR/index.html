@@ -919,8 +919,8 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse }) {
                                                         >
                                                             {formatVerseRef(h.verse_id)}
                                                         </button>
-                                                        {h.lsv && (
-                                                            <span className="block text-stone-600 pl-0.5 line-clamp-2 font-serif">{h.lsv}</span>
+                                                        {(h.snippet || h.lsv || h.english) && (
+                                                            <span className="block text-stone-600 pl-0.5 line-clamp-2 font-serif">{h.snippet || h.lsv || h.english}</span>
                                                         )}
                                                     </li>
                                                 ))}
@@ -2024,18 +2024,24 @@ const App = () => {
   const isTransitioningRef = useRef(false);
   const playbackStatusRef = useRef('stopped'); // Track playback status in ref for callbacks
 
-  // Handler for Focal Translation change with auto-swap logic for Compare slot
+  // Focal change: previous focal moves to the middle (compare) slot.
+  // e.g. LSV focal + KJV middle → pick KJV focal ⇒ middle becomes LSV.
   const handleFocalChange = useCallback((newFocal) => {
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-    if (newFocal === compareTranslation) {
-        // If user picks a focal that matches current compare, we must change compare.
-        // Pick the first available key that is NOT the new focal.
-        const newCompare = availableTranslations.find(k => k !== newFocal);
-        setCompareTranslation(newCompare);
+    if (!newFocal || newFocal === focalTranslation) {
+      setIsFocalOpen(false);
+      return;
     }
+    const prevFocal = focalTranslation;
     setFocalTranslation(newFocal);
+    if (prevFocal && prevFocal !== newFocal && availableTranslations.includes(prevFocal)) {
+      setCompareTranslation(prevFocal);
+    } else if (newFocal === compareTranslation) {
+      const alt = availableTranslations.find((k) => k !== newFocal);
+      if (alt) setCompareTranslation(alt);
+    }
     setIsFocalOpen(false);
-  }, [compareTranslation, availableTranslations]);
+  }, [focalTranslation, compareTranslation, availableTranslations]);
 
   // getSectionIndex moved outside App
 

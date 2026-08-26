@@ -258,6 +258,10 @@ def export_strongs(conn, out_dir: Path, *, hit_limit: int) -> dict:
                 "surface": r["surface_text"],
                 "strong": key,
                 "language": r["language"],
+                # English context snippet only (not Strong's-per-translation).
+                # Field name "snippet"; keep "lsv" alias until packs are re-exported.
+                "snippet": (r["lsv_text"] or "")[:160] if r["lsv_text"] else None,
+                "snippet_translation": "LSV",
                 "lsv": (r["lsv_text"] or "")[:160] if r["lsv_text"] else None,
             }
         )

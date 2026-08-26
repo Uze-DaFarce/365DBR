@@ -505,7 +505,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse }) {
                                                         <button type="button" className="font-serif font-bold text-amber-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded text-left" onClick={() => onJumpVerse?.(h.verse_id)}>
                                                             {formatVerseRef(h.verse_id)}
                                                         </button>
-                                                        {h.lsv && <span className="block text-stone-600 pl-0.5 line-clamp-2 font-serif">{h.lsv}</span>}
+                                                        {(h.snippet || h.lsv || h.english) && <span className="block text-stone-600 pl-0.5 line-clamp-2 font-serif">{h.snippet || h.lsv || h.english}</span>}
                                                     </li>
                                                 ))}
                                             </ul>
@@ -1735,11 +1735,23 @@ function App() {
       }
   };
 
+  // Focal change: previous focal moves to the middle (compare) slot.
   const handleFocalChange = useCallback((newFocal) => {
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      if (!newFocal || newFocal === focalTranslation) {
+        setIsFocalOpen(false);
+        return;
+      }
+      const prevFocal = focalTranslation;
       setFocalTranslation(newFocal);
+      if (prevFocal && prevFocal !== newFocal && availableTranslations.includes(prevFocal)) {
+        setCompareTranslation(prevFocal);
+      } else if (newFocal === compareTranslation) {
+        const alt = availableTranslations.find((k) => k !== newFocal);
+        if (alt) setCompareTranslation(alt);
+      }
       setIsFocalOpen(false);
-  }, []);
+  }, [focalTranslation, compareTranslation, availableTranslations]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
