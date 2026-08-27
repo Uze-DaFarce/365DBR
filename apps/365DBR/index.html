@@ -341,6 +341,11 @@ const walkOriginalItems = (items, map, orgToEnglish, orgToAll, context) => {
     if (item.items && item.items.length > 0) {
       walkOriginalItems(item.items, map, orgToEnglish, orgToAll, context);
     }
+    if (attrs.strong && context.targets && context.targets.length) {
+      context.targets.forEach((eng) => {
+        if (map[eng] && map[eng].original) map[eng].original.hasStrong = true;
+      });
+    }
     context.activeVid = previousActiveVid;
   }
 };
@@ -1186,7 +1191,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                                     tabIndex={isActive ? 0 : -1}
                                     aria-hidden={!isActive}
                                 />
-                                {strongsAvailable && onOpenStrongs && (
+                                {strongsAvailable && onOpenStrongs && group.some((gVid) => verseMap[gVid] && verseMap[gVid].original && verseMap[gVid].original.hasStrong) && (
                                     <StrongsButton
                                         onOpen={() => onOpenStrongs(vid)}
                                         tabIndex={isActive ? 0 : -1}
