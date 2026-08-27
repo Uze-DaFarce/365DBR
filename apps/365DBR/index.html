@@ -765,7 +765,7 @@ const StrongsButton = React.memo(({ onOpen, ...props }) => (
  * Results strip only after a word is chosen — not a debug/API dump.
  * Static JSON remains primary for the reader.
  */
-function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTranslation }) {
+function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTranslation, verseMap, groupedVids }) {
     const [status, setStatus] = useState('loading'); // loading | ready | error
     const [error, setError] = useState(null);
     const [payload, setPayload] = useState(null);
@@ -836,16 +836,23 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const tokens = payload?.original?.tokens || [];
     const withStrong = tokens.some((t) => t.strong);
     const isHeb = (payload?.original?.language || '') === 'hebrew';
-    const translations = payload?.translations || {};
-    // Prefer current focal English (kjv/lsv/lsb); fall back across known codes.
-    // Do not render payload.titles (KJV style=d). Heading appears only if it is already in the LSV verse body.
-    const pref = (preferredTranslation || '').toUpperCase();
-    const englishBody =
-        (pref && (translations[pref] || translations[pref.toLowerCase()])) ||
-        translations.LSB || translations.lsb ||
-        translations.LSV || translations.lsv ||
-        translations.KJV || translations.kjv ||
-        '';
+    const src = preferredTranslation || '';
+    const group = (groupedVids && groupedVids.find((g) => g.includes(verseId))) || [verseId];
+    let englishBody = '';
+    if (verseMap && src) {
+        for (let i = 0; i < group.length; i++) {
+            const t = verseMap[group[i]] && verseMap[group[i]][src] && verseMap[group[i]][src].text;
+            if (!t) continue;
+            const s = Array.isArray(t) ? t.join(' ') : String(t);
+            if (s) englishBody += (englishBody ? ' ' : '') + s;
+        }
+    }
+    if (!englishBody && payload?.translations) {
+        const tr = payload.translations;
+        const pref = src.toUpperCase();
+        const raw = (pref && (tr[pref] || tr[pref.toLowerCase()])) || tr.LSV || tr.lsv || tr.KJV || tr.kjv || '';
+        englishBody = typeof raw === 'string' ? raw : String(raw.text || raw.value || '');
+    }
     const humanRef = formatVerseRef(verseId);
 
     return (
@@ -874,6 +881,11 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                         </button>
                     </div>
                     <div className="overflow-y-auto p-3 md:p-4 space-y-3 text-stone-800">
+                        {englishBody ? (
+                            <p className="text-sm md:text-base font-serif text-stone-800 leading-snug">
+                                {englishBody}
+                            </p>
+                        ) : null}
                         {status === 'loading' && (
                             <p className="text-sm text-stone-500 font-serif italic">Loading…</p>
                         )}
@@ -882,11 +894,6 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                         )}
                         {status === 'ready' && (
                             <>
-                                {englishBody && (
-                                    <p className="text-sm md:text-base font-serif text-stone-800 leading-snug">
-                                        {englishBody}
-                                    </p>
-                                )}
                                 {tokens.length === 0 ? (
                                     <p className="text-sm text-stone-500">No original-language words are stored for this verse.</p>
                                 ) : (
@@ -2651,6 +2658,8 @@ const App = () => {
           verseId={strongsVerseId}
           apiBase={queryApiBase}
           preferredTranslation={focalTranslation}
+          verseMap={verseMap}
+          groupedVids={groupedVids}
           onClose={closeStrongs}
           onJumpVerse={(vid) => {
             setStrongsVerseId(vid);
