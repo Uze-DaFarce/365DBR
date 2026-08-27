@@ -114,7 +114,7 @@ const FOCAL_THEMES = [
   { bg: 'bg-emerald-100', border: 'border-emerald-500', ring: 'ring-emerald-500/50', text: 'text-emerald-700', linkHover: 'hover:text-emerald-600', linkRing: 'focus-visible:ring-emerald-500' }
 ];
 
-/** --- DATA UTILITIES (English-primary; titles not merged into body) --- **/
+/** --- DATA UTILITIES (English-primary; titles per translation, not merged into body) --- **/
 const TITLE_PARA_STYLES = new Set(['d', 's', 's1', 's2', 's3', 'ms', 'ms1', 'ms2', 'mr', 'r', 'sp', 'qa']);
 function titlePlain(t) {
   if (!t) return '';
@@ -135,10 +135,12 @@ function uniqueTitleList(list) {
   }
   return out;
 }
-function collectGroupTitles(group, verseMap) {
+function collectGroupTitles(group, verseMap, source) {
   const merged = [];
+  if (!source) return merged;
   for (let i = 0; i < group.length; i++) {
-    const list = verseMap[group[i]] && verseMap[group[i]].titles;
+    const data = verseMap[group[i]];
+    const list = data && data[source] && data[source].titles;
     if (Array.isArray(list)) merged.push(...list);
   }
   return uniqueTitleList(merged);
@@ -188,8 +190,8 @@ function walkEnglishItems(items, map, versionKey, orgToEnglish, orgToAll, contex
       context.lastSeenVid = engVid;
       ensureVerseEntry(map, engVid, versionKey);
       if (context.pendingTitles.length > 0) {
-        if (!map[engVid].titles) map[engVid].titles = [];
-        map[engVid].titles.push(...context.pendingTitles);
+        if (!map[engVid][versionKey].titles) map[engVid][versionKey].titles = [];
+        map[engVid][versionKey].titles.push(...context.pendingTitles);
         context.pendingTitles = [];
       }
     }
@@ -220,7 +222,6 @@ function walkOriginalItems(items, map, orgToEnglish, orgToAll, context) {
       } else if (map[orgVid] && (map[orgVid].lsv || map[orgVid].kjv)) {
         context.targets = null;
         context.superscriptionFor = orgVid;
-        if (!map[orgVid].titles) map[orgVid].titles = [];
       } else {
         context.targets = null;
         context.superscriptionFor = null;
@@ -260,8 +261,9 @@ function processOriginalContent(contentArray, map, orgToEnglish, orgToAll) {
   Object.keys(context.superBuf).forEach((vid) => {
     const t = context.superBuf[vid].join('').trim();
     if (!t || !map[vid]) return;
-    if (!map[vid].titles) map[vid].titles = [];
-    map[vid].titles.push(t);
+    ensureVerseEntry(map, vid, 'original');
+    if (!map[vid].original.titles) map[vid].original.titles = [];
+    map[vid].original.titles.push(t);
   });
 }
 
@@ -617,7 +619,7 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
     };
 
     const renderedSlots = useMemo(() => {
-        const groupTitles = collectGroupTitles(group, verseMap);
+        const groupTitles = collectGroupTitles(group, verseMap, dynamicSlots.bottom && dynamicSlots.bottom.source);
         const titleText = groupTitles.join(' · ');
         const getSlotContent = (slot) => {
             if (!slot || !slot.source) return { text: '', displayLabel: '' };

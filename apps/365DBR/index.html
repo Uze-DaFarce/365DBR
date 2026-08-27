@@ -175,7 +175,8 @@ const TRANSLATION_REGISTRY = {
  * English-primary verseMap (production / static JSON).
  * - English (LSV/KJV): keyed by modern English verseId (NOT org/hebrew id).
  * - Original: remapped onto those English keys via verseOrgIds.
- * - USFM title paras (style d/s/…): stored as entry.titles[], NEVER appended into verse body.
+ * - USFM title paras (style d/s/…): stored on THAT translation's titles[], NEVER appended into verse body.
+ *   Heading is shown only if the focal slot's own source (lsv/kjv) had a title para.
  * Fixes Psalms empty slots (org superscription with no English) and titles glued onto v.1 text.
  */
 const TITLE_PARA_STYLES = new Set(['d', 's', 's1', 's2', 's3', 'ms', 'ms1', 'ms2', 'mr', 'r', 'sp', 'qa']);
@@ -187,7 +188,7 @@ const titlePlain = (t) => {
   return String(t.text || t.value || '').trim();
 };
 
-/** Dedupe heading strings (KJV + LSV often repeat the same superscription). */
+/** Dedupe heading strings within one translation. */
 const uniqueTitleList = (list) => {
   const out = [];
   const seen = new Set();
@@ -203,11 +204,13 @@ const uniqueTitleList = (list) => {
   return out;
 };
 
-/** Unique headings for a verse group, English-reader order. */
-const collectGroupTitles = (group, verseMap) => {
+/** Unique headings for a verse group from one translation slot (lsv/kjv/original). */
+const collectGroupTitles = (group, verseMap, source) => {
   const merged = [];
+  if (!source) return merged;
   for (let i = 0; i < group.length; i++) {
-    const list = verseMap[group[i]] && verseMap[group[i]].titles;
+    const data = verseMap[group[i]];
+    const list = data && data[source] && data[source].titles;
     if (Array.isArray(list)) merged.push(...list);
   }
   return uniqueTitleList(merged);
@@ -270,8 +273,8 @@ const walkEnglishItems = (items, map, versionKey, orgToEnglish, orgToAll, contex
       context.lastSeenVid = engVid;
       ensureVerseEntry(map, engVid, versionKey);
       if (context.pendingTitles.length > 0) {
-        if (!map[engVid].titles) map[engVid].titles = [];
-        map[engVid].titles.push(...context.pendingTitles);
+        if (!map[engVid][versionKey].titles) map[engVid][versionKey].titles = [];
+        map[engVid][versionKey].titles.push(...context.pendingTitles);
         context.pendingTitles = [];
       }
     }
@@ -314,7 +317,6 @@ const walkOriginalItems = (items, map, orgToEnglish, orgToAll, context) => {
         // Same BCV string as an English verse, but this org content is superscription-only
         context.targets = null;
         context.superscriptionFor = orgVid;
-        if (!map[orgVid].titles) map[orgVid].titles = [];
       } else {
         // Unmapped org-only material — do not create empty English rows
         context.targets = null;
@@ -371,12 +373,13 @@ const processOriginalContent = (contentArray, map, orgToEnglish, orgToAll) => {
   for (const section of contentArray) {
     if (section.items) walkOriginalItems(section.items, map, orgToEnglish, orgToAll, context);
   }
-  // Flush Hebrew superscription buffers into titles[]
+  // Flush Hebrew superscription buffers onto original.titles (never onto lsv/kjv)
   Object.keys(context.superBuf).forEach((vid) => {
     const t = context.superBuf[vid].join('').trim();
     if (!t || !map[vid]) return;
-    if (!map[vid].titles) map[vid].titles = [];
-    map[vid].titles.push(t);
+    ensureVerseEntry(map, vid, 'original');
+    if (!map[vid].original.titles) map[vid].original.titles = [];
+    map[vid].original.titles.push(t);
   });
 };
 
@@ -1030,7 +1033,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
     // on every render (e.g. during scroll/highlight transitions).
     // The content only changes if translations or data change, not when 'isActive' toggles.
     const renderedSlots = useMemo(() => {
-        const groupTitles = collectGroupTitles(group, verseMap);
+        const groupTitles = collectGroupTitles(group, verseMap, dynamicSlots.bottom && dynamicSlots.bottom.source);
         const titleText = groupTitles.join(' · ');
         const getSlotContent = (slot) => {
             if (!slot || !slot.source) return { text: '', displayLabel: '' };
