@@ -460,8 +460,6 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const tokens = payload?.original?.tokens || [];
     const withStrong = tokens.some((t) => t.strong);
     const isHeb = (payload?.original?.language || '') === 'hebrew';
-    const wsTitles = uniqueTitleList(payload?.titles || []);
-    const titleText = wsTitles.join(' · ');
     const translations = payload?.translations || {};
     const pref = (preferredTranslation || '').toUpperCase();
     const englishBody =
@@ -488,7 +486,6 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                         {status === 'error' && <p className="text-sm text-red-600">Word study is unavailable right now.</p>}
                         {status === 'ready' && (
                             <>
-                                <VerseHeading text={titleText} active={true} />
                                 {englishBody && (
                                     <p className="text-sm md:text-base font-serif text-stone-800 leading-snug">{englishBody}</p>
                                 )}

@@ -836,10 +836,9 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const tokens = payload?.original?.tokens || [];
     const withStrong = tokens.some((t) => t.strong);
     const isHeb = (payload?.original?.language || '') === 'hebrew';
-    const wsTitles = uniqueTitleList(payload?.titles || []);
-    const titleText = wsTitles.join(' · ');
     const translations = payload?.translations || {};
     // Prefer current focal English (kjv/lsv/lsb); fall back across known codes.
+    // Do not render payload.titles (KJV style=d). Heading appears only if it is already in the LSV verse body.
     const pref = (preferredTranslation || '').toUpperCase();
     const englishBody =
         (pref && (translations[pref] || translations[pref.toLowerCase()])) ||
@@ -883,7 +882,6 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                         )}
                         {status === 'ready' && (
                             <>
-                                <VerseHeading text={titleText} active={true} />
                                 {englishBody && (
                                     <p className="text-sm md:text-base font-serif text-stone-800 leading-snug">
                                         {englishBody}
