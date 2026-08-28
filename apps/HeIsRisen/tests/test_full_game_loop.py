@@ -62,6 +62,12 @@ def run_full_game_loop(is_mobile=False):
             page.evaluate(f"() => window.game.scene.getScenes(true)[0].scene.start('SectionHunt', {{ sectionName: '{random_section}' }})")
 
             th.wait_for_active_scene(page, "SectionHunt")
+
+            # Wait for video loading to begin to capture the fallback screen!
+            time.sleep(2)
+            suffix = "mobile" if is_mobile else "desktop"
+            th.assert_not_blank_screen(page, "Section Hunt failed to render", save_path=f"apps/HeIsRisen/tests/section_hunt_fallback_{suffix}.png")
+
             eggs = tce.get_eggs_for_section(page, random_section)
 
             if len(eggs) == 0:
