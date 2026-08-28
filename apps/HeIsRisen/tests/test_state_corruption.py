@@ -56,10 +56,10 @@ def run_state_corruption_test(is_mobile=False):
 
                     // Tamper with the main game state
                     const corruptedState = {
-                        eggData: "not an array",
-                        sections: { wrong: "type" },
-                        foundEggs: "should be array",
-                        stampedSections: 12345,
+                        eggData: [{eggId: "NaN", section: "test", x: "invalid", y: "invalid", symbol: {}, collected: "yes"}],
+                        sections: [{name: 123, eggs: ["NaN"]}],
+                        foundEggs: [{eggId: "NaN", section: "test", x: "invalid", y: "invalid", symbol: {}, collected: "yes"}],
+                        stampedSections: [{ "invalid": true }],
                         correctCategorizations: [],
                         currentScore: []
                     };
