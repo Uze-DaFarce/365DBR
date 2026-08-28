@@ -59,8 +59,12 @@ class Confirmation extends Phaser.GameObjects.Container {
         yesBtnContainer.setInteractive();
         addButtonInteraction(this.scene, yesBtnContainer, 'menu-click');
         yesBtnContainer.on('pointerdown', () => {
-            if (this.onYes) this.onYes();
-            this.destroy();
+            yesBtnContainer.disableInteractive();
+            noBtnContainer.disableInteractive();
+            this.scene.time.delayedCall(150, () => {
+                if (this.onYes) this.onYes();
+                this.destroy();
+            });
         });
         popupCont.add(yesBtnContainer);
 
@@ -81,8 +85,12 @@ class Confirmation extends Phaser.GameObjects.Container {
         noBtnContainer.setInteractive();
         addButtonInteraction(this.scene, noBtnContainer, 'menu-click');
         noBtnContainer.on('pointerdown', () => {
-            if (this.onNo) this.onNo();
-            this.destroy();
+            yesBtnContainer.disableInteractive();
+            noBtnContainer.disableInteractive();
+            this.scene.time.delayedCall(150, () => {
+                if (this.onNo) this.onNo();
+                this.destroy();
+            });
         });
         popupCont.add(noBtnContainer);
 
