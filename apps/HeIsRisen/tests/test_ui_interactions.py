@@ -110,6 +110,42 @@ def run_ui_interaction_test(is_mobile=False):
             page.screenshot(path=screenshot_open)
             print(f"Captured settings open screenshot: {screenshot_open}")
 
+            # 2.5 Test Confirmation Animation
+            print("Testing Confirmation Pop-in Animation...")
+            page.evaluate("""
+                () => {
+                    const uiScene = window.game.scene.getScene('UIScene');
+                    if (uiScene && uiScene.settingsContainer) {
+                         const resetBtn = uiScene.settingsContainer.list.find(c => c.type === 'Container' && c.list.find(child => child.type === 'Text' && child.text === 'Reset Game'));
+                         if (resetBtn) {
+                             resetBtn.emit('pointerdown');
+                         }
+                    }
+                }
+            """)
+            time.sleep(0.05) # Mid-tween
+            screenshot_confirm_mid = os.path.join(verification_dir, f"02a_confirmation_mid_{context_type}.png")
+            page.screenshot(path=screenshot_confirm_mid)
+            time.sleep(0.3) # Tween finished
+            screenshot_confirm_end = os.path.join(verification_dir, f"02b_confirmation_end_{context_type}.png")
+            page.screenshot(path=screenshot_confirm_end)
+            print(f"Captured confirmation dialog screenshots.")
+
+            # Dismiss the confirmation to continue the test
+            page.evaluate("""
+                () => {
+                    const uiScene = window.game.scene.getScene('UIScene');
+                    const confirmDialog = uiScene.children.list.find(c => c.constructor.name === 'Confirmation');
+                    if (confirmDialog) {
+                         const noBtn = confirmDialog.list.find(c => c.type === 'Container' && c.list.find(child => child.type === 'Text' && child.text === 'No'));
+                         if (noBtn) {
+                             noBtn.emit('pointerdown');
+                         }
+                    }
+                }
+            """)
+            time.sleep(0.5)
+
             # 3. Test Number Control Interaction (Arrows to change volume)
             print("Testing visual interactions for Ambient and SFX Volume controls...")
 
