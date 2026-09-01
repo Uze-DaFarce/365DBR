@@ -1,0 +1,856 @@
+{
+  "summary": {
+    "chapter_anomalies": 5,
+    "english_no_tokens": 1,
+    "align_offsets": 988,
+    "titles_total": 202,
+    "title_chapters_on_v1": 65,
+    "suspicious_title_anchors": 49,
+    "fused_lsv_v1_candidates": 81
+  },
+  "empties": [
+    {
+      "verse_id": "PSA.13.6",
+      "aligns": [],
+      "org_claimed_by": [
+        "PSA.13.5"
+      ],
+      "lsv": "I sing to YHWH, || For He has conferred benefits on me!"
+    }
+  ],
+  "suspicious_title_anchors": [
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.10.11",
+      "end_verse_id": "PSA.10.11",
+      "value": "To the chief Musician, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.11.2",
+      "end_verse_id": "PSA.11.2",
+      "value": "To the chief Musician upon Sheminith, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.119.173",
+      "end_verse_id": "PSA.119.173",
+      "value": "A Song of degrees.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.12.3",
+      "end_verse_id": "PSA.12.3",
+      "value": "To the chief Musician, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.13.2",
+      "end_verse_id": "PSA.13.2",
+      "value": "To the chief Musician, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.137.7",
+      "end_verse_id": "PSA.137.7",
+      "value": "A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.14.4",
+      "end_verse_id": "PSA.14.4",
+      "value": "A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.141.10",
+      "end_verse_id": "PSA.141.10",
+      "value": "Maschil of David; A Prayer when he was in the cave.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.142.4",
+      "end_verse_id": "PSA.142.4",
+      "value": "A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.143.10",
+      "end_verse_id": "PSA.143.10",
+      "value": "A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.15.4",
+      "end_verse_id": "PSA.15.4",
+      "value": "Michtam of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.16.10",
+      "end_verse_id": "PSA.16.10",
+      "value": "A Prayer of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.20.7",
+      "end_verse_id": "PSA.20.7",
+      "value": "To the chief Musician, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.21.11",
+      "end_verse_id": "PSA.21.11",
+      "value": "To the chief Musician upon Aijeleth Shahar, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.24.10",
+      "end_verse_id": "PSA.24.10",
+      "value": "A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.25.19",
+      "end_verse_id": "PSA.25.19",
+      "value": "A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.29.10",
+      "end_verse_id": "PSA.29.10",
+      "value": "A Psalm and Song at the dedication of the house of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.3.8",
+      "end_verse_id": "PSA.3.8",
+      "value": "To the chief Musician on Neginoth, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.30.10",
+      "end_verse_id": "PSA.30.10",
+      "value": "To the chief Musician, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.4.8",
+      "end_verse_id": "PSA.4.8",
+      "value": "To the chief Musician upon Nehiloth, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.40.14",
+      "end_verse_id": "PSA.40.14",
+      "value": "To the chief Musician, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.41.10",
+      "end_verse_id": "PSA.41.10",
+      "value": "To the chief Musician, Maschil, for the sons of Korah.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.45.14",
+      "end_verse_id": "PSA.45.14",
+      "value": "To the chief Musician for the sons of Korah, A Song upon Alamoth.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.47.7",
+      "end_verse_id": "PSA.47.7",
+      "value": "A Song and Psalm for the sons of Korah.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.48.11",
+      "end_verse_id": "PSA.48.11",
+      "value": "To the chief Musician, A Psalm for the sons of Korah.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.49.17",
+      "end_verse_id": "PSA.49.17",
+      "value": "A Psalm of Asaph.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.5.10",
+      "end_verse_id": "PSA.5.10",
+      "value": "To the chief Musician on Neginoth upon Sheminith, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.52.6",
+      "end_verse_id": "PSA.52.6",
+      "value": "To the chief Musician upon Mahalath, Maschil, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.53.3",
+      "end_verse_id": "PSA.53.3",
+      "value": "To the chief Musician on Neginoth, Maschil, A Psalm of David, when the Ziphims came and said to Saul",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.55.21",
+      "end_verse_id": "PSA.55.21",
+      "value": "To the chief Musician upon Jonath-elem-rechokim, Michtam of David, when the Philistines took him in ",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.56.11",
+      "end_verse_id": "PSA.56.11",
+      "value": "To the chief Musician, Al-taschith, Michtam of David, when he fled from Saul in the cave.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.59.14",
+      "end_verse_id": "PSA.59.14",
+      "value": "To the chief Musician upon Shushan-eduth, Michtam of David, to teach; when he strove with Aram-nahar",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.6.10",
+      "end_verse_id": "PSA.6.10",
+      "value": "Shiggaion of David, which he sang unto the LORD, concerning the words of Cush the Benjamite.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.60.10",
+      "end_verse_id": "PSA.60.10",
+      "value": "To the chief Musician upon Neginah, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.64.10",
+      "end_verse_id": "PSA.64.10",
+      "value": "To the chief Musician, A Psalm and Song of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.65.10",
+      "end_verse_id": "PSA.65.10",
+      "value": "To the chief Musician, A Song or Psalm.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.66.18",
+      "end_verse_id": "PSA.66.18",
+      "value": "To the chief Musician on Neginoth, A Psalm or Song.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.67.4",
+      "end_verse_id": "PSA.67.4",
+      "value": "To the chief Musician, A Psalm or Song of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.7.14",
+      "end_verse_id": "PSA.7.14",
+      "value": "To the chief Musician upon Gittith, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.71.22",
+      "end_verse_id": "PSA.71.22",
+      "value": "A Psalm for Solomon.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.75.10",
+      "end_verse_id": "PSA.75.10",
+      "value": "To the chief Musician on Neginoth, A Psalm or Song of Asaph.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.76.10",
+      "end_verse_id": "PSA.76.10",
+      "value": "To the chief Musician, to Jeduthun, A Psalm of Asaph.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.77.18",
+      "end_verse_id": "PSA.77.18",
+      "value": "Maschil of Asaph.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.8.4",
+      "end_verse_id": "PSA.8.4",
+      "value": "To the chief Musician upon Muthlabben, A Psalm of David.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.81.14",
+      "end_verse_id": "PSA.81.14",
+      "value": "A Psalm of Asaph.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.82.5",
+      "end_verse_id": "PSA.82.5",
+      "value": "A Song or Psalm of Asaph.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.86.15",
+      "end_verse_id": "PSA.86.15",
+      "value": "A Psalm or Song for the sons of Korah.",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.87.5",
+      "end_verse_id": "PSA.87.5",
+      "value": "A Song or Psalm for the sons of Korah, to the chief Musician upon Mahalath Leannoth, Maschil of Hema",
+      "source": "api.bible-title:KJV"
+    },
+    {
+      "annotation_type": "superscription",
+      "start_verse_id": "PSA.89.49",
+      "end_verse_id": "PSA.89.49",
+      "value": "A Prayer of Moses the man of God.",
+      "source": "api.bible-title:KJV"
+    }
+  ],
+  "fused_lsv_candidates": [
+    {
+      "verse_id": "PSA.3.1",
+      "lsv": "A PSALM OF DAVID, IN HIS FLEEING FROM THE FACE OF HIS SON ABSALOM. YHWH, how my distresses have multiplied! Many are ris"
+    },
+    {
+      "verse_id": "PSA.4.1",
+      "lsv": "TO THE OVERSEER. WITH STRINGED INSTRUMENTS. A PSALM OF DAVID. In my calling answer me, || O God of my righteousness. In "
+    },
+    {
+      "verse_id": "PSA.5.1",
+      "lsv": "TO THE OVERSEER. [BLOWN] INTO THE PIPES. A PSALM OF DAVID. Hear my sayings, O YHWH, || Consider my meditation."
+    },
+    {
+      "verse_id": "PSA.6.1",
+      "lsv": "TO THE OVERSEER. WITH STRINGED INSTRUMENTS, ON THE EIGHTH. A PSALM OF DAVID. O YHWH, do not reprove me in Your anger, ||"
+    },
+    {
+      "verse_id": "PSA.8.1",
+      "lsv": "TO THE OVERSEER. ON THE GITTITH. A PSALM OF DAVID. YHWH, our Lord, || How majestic [is] Your Name in all the earth, || W"
+    },
+    {
+      "verse_id": "PSA.9.1",
+      "lsv": "TO THE OVERSEER. [SET] ON “DEATH OF THE SON.” A PSALM OF DAVID. I confess, O YHWH, with all my heart, || I recount all Y"
+    },
+    {
+      "verse_id": "PSA.12.1",
+      "lsv": "TO THE OVERSEER. ON THE EIGHTH. A PSALM OF DAVID. Save, YHWH, for the saintly has failed, || For the steadfast have ceas"
+    },
+    {
+      "verse_id": "PSA.13.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. Until when, O YHWH, || Do You forget me forever? Until when do You hide Your face fro"
+    },
+    {
+      "verse_id": "PSA.15.1",
+      "lsv": "A PSALM OF DAVID. YHWH, who sojourns in Your tent? Who dwells in Your holy hill?"
+    },
+    {
+      "verse_id": "PSA.17.1",
+      "lsv": "A PRAYER OF DAVID. Hear, O YHWH, righteousness, attend my cry, || Give ear [to] my prayer, without lips of deceit."
+    },
+    {
+      "verse_id": "PSA.18.1",
+      "lsv": "TO THE OVERSEER. BY A SERVANT OF YHWH, BY DAVID, WHO HAS SPOKEN TO YHWH THE WORDS OF THIS SONG IN THE DAY YHWH DELIVERED"
+    },
+    {
+      "verse_id": "PSA.19.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. The heavens [are] recounting the glory of God, || And the expanse [is] declaring the "
+    },
+    {
+      "verse_id": "PSA.20.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. YHWH answers you, || In a day of adversity, || The Name of the God of Jacob sets you "
+    },
+    {
+      "verse_id": "PSA.21.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. YHWH, the king is joyful in Your strength, || How greatly he rejoices in Your salvati"
+    },
+    {
+      "verse_id": "PSA.22.1",
+      "lsv": "TO THE OVERSEER. [SET] ON “DOE OF THE MORNING.” A PSALM OF DAVID. My God, My God, why have You forsaken Me? Far from My "
+    },
+    {
+      "verse_id": "PSA.23.1",
+      "lsv": "A PSALM OF DAVID. YHWH [is] my shepherd, I do not lack,"
+    },
+    {
+      "verse_id": "PSA.24.1",
+      "lsv": "A PSALM OF DAVID. To YHWH [is] the earth and its fullness, || The world and the inhabitants in it."
+    },
+    {
+      "verse_id": "PSA.29.1",
+      "lsv": "A PSALM OF DAVID. Ascribe to YHWH, you sons of the mighty, || Ascribe to YHWH glory and strength."
+    },
+    {
+      "verse_id": "PSA.30.1",
+      "lsv": "A PSALM. A SONG OF THE DEDICATION OF THE HOUSE OF DAVID. I exalt You, O YHWH, || For You have drawn me up, || And have n"
+    },
+    {
+      "verse_id": "PSA.31.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. In You, O YHWH, I have trusted, || Do not let me be ashamed for all time, || In Your "
+    },
+    {
+      "verse_id": "PSA.38.1",
+      "lsv": "A PSALM OF DAVID. “TO CAUSE TO REMEMBER.” YHWH, do not reprove me in Your wrath, || Nor discipline me in Your fury."
+    },
+    {
+      "verse_id": "PSA.39.1",
+      "lsv": "TO THE OVERSEER. FOR JEDUTHUN. A PSALM OF DAVID. I have said, “I observe my ways, || Against sinning with my tongue, || "
+    },
+    {
+      "verse_id": "PSA.40.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. I have diligently expected YHWH, || And He inclines to me, and hears my cry,"
+    },
+    {
+      "verse_id": "PSA.41.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. O the blessedness of him || Who is acting wisely to the poor, || In a day of evil YHW"
+    },
+    {
+      "verse_id": "PSA.45.1",
+      "lsv": "TO THE OVERSEER. [SET] ON “LILIES.” AN INSTRUCTION OF THE SONS OF KORAH. A SONG OF LOVES. My heart has stirred a good wo"
+    },
+    {
+      "verse_id": "PSA.46.1",
+      "lsv": "TO THE OVERSEER. BY SONS OF KORAH. FOR GIRLS’ [VOICES]. A SONG. God [is] our refuge and strength, || A most sure help in"
+    },
+    {
+      "verse_id": "PSA.47.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF THE SONS OF KORAH. All you peoples, clap the hand, || Shout to God with a voice of singing,"
+    },
+    {
+      "verse_id": "PSA.48.1",
+      "lsv": "A SONG. A PSALM OF THE SONS OF KORAH. Great [is] YHWH, and greatly praised, || In the city of our God—His holy hill."
+    },
+    {
+      "verse_id": "PSA.49.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF THE SONS OF KORAH. Hear this, all you peoples, || Give ear, all you inhabitants of the world"
+    },
+    {
+      "verse_id": "PSA.50.1",
+      "lsv": "A PSALM OF ASAPH. The God of gods—YHWH—has spoken, || And He calls to the earth || From the rising of the sun to its goi"
+    },
+    {
+      "verse_id": "PSA.51.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID, IN THE COMING OF NATHAN THE PROPHET TO HIM WHEN HE HAS GONE IN TO BATHSHEBA. Favor me"
+    },
+    {
+      "verse_id": "PSA.55.1",
+      "lsv": "TO THE OVERSEER. WITH STRINGED INSTRUMENTS. AN INSTRUCTION OF DAVID. Give ear, O God, [to] my prayer, || And do not hide"
+    },
+    {
+      "verse_id": "PSA.61.1",
+      "lsv": "TO THE OVERSEER. ON STRINGED INSTRUMENTS. BY DAVID. Hear, O God, my loud cry, attend to my prayer."
+    },
+    {
+      "verse_id": "PSA.62.1",
+      "lsv": "TO THE OVERSEER. FOR JEDUTHUN. A PSALM OF DAVID. Toward God alone [is] my soul silent, || My salvation [is] from Him."
+    },
+    {
+      "verse_id": "PSA.63.1",
+      "lsv": "A PSALM OF DAVID, IN HIS BEING IN THE WILDERNESS OF JUDAH. O God, You [are] my God, earnestly I seek You, || My soul has"
+    },
+    {
+      "verse_id": "PSA.64.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. Hear, O God, my voice, in my meditation, || You keep my life from the fear of an enem"
+    },
+    {
+      "verse_id": "PSA.65.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. A SONG. To You, silence [and] praise, O God, in Zion, || And to You a vow is complete"
+    },
+    {
+      "verse_id": "PSA.66.1",
+      "lsv": "TO THE OVERSEER. A SONG. A PSALM. Shout to God, all the earth."
+    },
+    {
+      "verse_id": "PSA.67.1",
+      "lsv": "TO THE OVERSEER. WITH STRINGED INSTRUMENTS. A PSALM. A SONG. God favors us and blesses us, || [And] causes His face to s"
+    },
+    {
+      "verse_id": "PSA.68.1",
+      "lsv": "TO THE OVERSEER. A PSALM. A SONG OF DAVID. God rises [and] His enemies are scattered! And those hating Him flee from His"
+    },
+    {
+      "verse_id": "PSA.73.1",
+      "lsv": "A PSALM OF ASAPH. Surely God [is] good to Israel, to the clean of heart. And I—as a little thing, || My feet have been t"
+    },
+    {
+      "verse_id": "PSA.75.1",
+      "lsv": "TO THE OVERSEER. “DO NOT DESTROY.” A PSALM OF ASAPH. A SONG. We have given thanks to You, O God, || We have given thanks"
+    },
+    {
+      "verse_id": "PSA.76.1",
+      "lsv": "TO THE OVERSEER. WITH STRINGED INSTRUMENTS. A PSALM OF ASAPH. A SONG. God [is] known in Judah, || His Name [is] great in"
+    },
+    {
+      "verse_id": "PSA.77.1",
+      "lsv": "TO THE OVERSEER. FOR JEDUTHUN. A PSALM OF ASAPH. My voice [is] to God, and I cry, || My voice [is] to God, || And He has"
+    },
+    {
+      "verse_id": "PSA.79.1",
+      "lsv": "A PSALM OF ASAPH. O God, nations have come into Your inheritance, || They have defiled Your holy temple, || They made Je"
+    },
+    {
+      "verse_id": "PSA.80.1",
+      "lsv": "TO THE OVERSEER. [SET] TO “LILIES OF TESTIMONY.” A PSALM OF ASAPH. Shepherd of Israel, give ear, || Leading Joseph as a "
+    },
+    {
+      "verse_id": "PSA.82.1",
+      "lsv": "A PSALM OF ASAPH. God has stood in the congregation of God, || He judges among the gods."
+    },
+    {
+      "verse_id": "PSA.83.1",
+      "lsv": "A SONG. A PSALM OF ASAPH. O God, let there be no silence to You, || Do not be silent, nor be quiet, O God."
+    },
+    {
+      "verse_id": "PSA.84.1",
+      "lsv": "TO THE OVERSEER. ON THE GITTITH. A PSALM OF THE SONS OF KORAH. How beloved Your dwelling places, YHWH of Hosts!"
+    },
+    {
+      "verse_id": "PSA.85.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF THE SONS OF KORAH. You have accepted, O YHWH, Your land, || You have turned [to] the captivi"
+    },
+    {
+      "verse_id": "PSA.86.1",
+      "lsv": "A PRAYER OF DAVID. Incline, O YHWH, Your ear, || Answer me, for I [am] poor and needy."
+    },
+    {
+      "verse_id": "PSA.87.1",
+      "lsv": "A PSALM OF THE SONS OF KORAH. A SONG. His foundation [is] in holy mountains."
+    },
+    {
+      "verse_id": "PSA.88.1",
+      "lsv": "A SONG. A PSALM OF THE SONS OF KORAH. TO THE OVERSEER. [SET] ON “SICKNESS TO AFFLICT.” AN INSTRUCTION OF HEMAN THE EZRAH"
+    },
+    {
+      "verse_id": "PSA.90.1",
+      "lsv": "A PRAYER OF MOSES, THE MAN OF GOD. Lord, You have been a habitation, || To us—in generation and generation,"
+    },
+    {
+      "verse_id": "PSA.92.1",
+      "lsv": "A PSALM. A SONG FOR THE SABBATH DAY. [It is] good to give thanks to YHWH, || And to sing praises to Your Name, O Most Hi"
+    },
+    {
+      "verse_id": "PSA.98.1",
+      "lsv": "A PSALM. Sing to YHWH a new song, || For He has done wonders, || His right hand and His holy arm have given salvation to"
+    },
+    {
+      "verse_id": "PSA.100.1",
+      "lsv": "A PSALM OF THANKSGIVING. Shout to YHWH, all the earth!"
+    },
+    {
+      "verse_id": "PSA.101.1",
+      "lsv": "A PSALM OF DAVID. I sing kindness and judgment, || To You, O YHWH, I sing praise."
+    },
+    {
+      "verse_id": "PSA.102.1",
+      "lsv": "A PRAYER OF THE AFFLICTED WHEN HE IS FEEBLE, AND POURS OUT HIS COMPLAINT BEFORE YHWH. O YHWH, hear my prayer, indeed, my"
+    },
+    {
+      "verse_id": "PSA.108.1",
+      "lsv": "A SONG. A PSALM OF DAVID. My heart is prepared, O God, || I sing, indeed, I sing praise, also my glory."
+    },
+    {
+      "verse_id": "PSA.109.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. O God of my praise, do not be silent,"
+    },
+    {
+      "verse_id": "PSA.110.1",
+      "lsv": "A PSALM OF DAVID. A declaration of YHWH to my Lord: “Sit at My right hand, || Until I make Your enemies Your footstool.”"
+    },
+    {
+      "verse_id": "PSA.120.1",
+      "lsv": "A SONG OF THE ASCENTS. I have called to YHWH in my distress, || And He answers me."
+    },
+    {
+      "verse_id": "PSA.121.1",
+      "lsv": "A SONG OF THE ASCENTS. I lift up my eyes to the hills, || From where does my help come?"
+    },
+    {
+      "verse_id": "PSA.122.1",
+      "lsv": "A SONG OF THE ASCENTS. BY DAVID. I have rejoiced in those saying to me, “We go to the house of YHWH.”"
+    },
+    {
+      "verse_id": "PSA.123.1",
+      "lsv": "A SONG OF THE ASCENTS. I have lifted up my eyes to You, || O dweller in the heavens."
+    },
+    {
+      "verse_id": "PSA.124.1",
+      "lsv": "A SONG OF THE ASCENTS. BY DAVID. If YHWH had not been for us || (Pray, let Israel say),"
+    },
+    {
+      "verse_id": "PSA.125.1",
+      "lsv": "A SONG OF THE ASCENTS. Those trusting in YHWH [are] as Mount Zion, || It is not moved—it abides for all time."
+    },
+    {
+      "verse_id": "PSA.126.1",
+      "lsv": "A SONG OF THE ASCENTS. In YHWH’s turning back [to] the captivity of Zion, || We have been as dreamers."
+    },
+    {
+      "verse_id": "PSA.127.1",
+      "lsv": "A SONG OF THE ASCENTS. BY SOLOMON. If YHWH does not build the house, || Its builders have labored at it in vain, || If Y"
+    },
+    {
+      "verse_id": "PSA.128.1",
+      "lsv": "A SONG OF THE ASCENTS. O the blessedness of everyone fearing YHWH, || Who is walking in His ways."
+    },
+    {
+      "verse_id": "PSA.129.1",
+      "lsv": "A SONG OF THE ASCENTS. Often they distressed me from my youth, || Pray, let Israel say:"
+    },
+    {
+      "verse_id": "PSA.130.1",
+      "lsv": "A SONG OF THE ASCENTS. I have called You from the depths, YHWH."
+    },
+    {
+      "verse_id": "PSA.131.1",
+      "lsv": "A SONG OF THE ASCENTS. BY DAVID. YHWH, my heart has not been haughty, || Nor have my eyes been high, || Nor have I walke"
+    },
+    {
+      "verse_id": "PSA.132.1",
+      "lsv": "A SONG OF THE ASCENTS. Remember, YHWH, for David, all his afflictions;"
+    },
+    {
+      "verse_id": "PSA.133.1",
+      "lsv": "A SONG OF THE ASCENTS. BY DAVID. Behold, how good and how pleasant || The dwelling of brothers—even together!"
+    },
+    {
+      "verse_id": "PSA.134.1",
+      "lsv": "A SONG OF THE ASCENTS. Behold, bless YHWH, all servants of YHWH, || Who are standing in the house of YHWH by night."
+    },
+    {
+      "verse_id": "PSA.139.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. YHWH, You have searched me, and know."
+    },
+    {
+      "verse_id": "PSA.140.1",
+      "lsv": "TO THE OVERSEER. A PSALM OF DAVID. Deliver me, O YHWH, from an evil man, || Keep me from one of violence."
+    },
+    {
+      "verse_id": "PSA.141.1",
+      "lsv": "A PSALM OF DAVID. O YHWH, I have called You, hurry to me, || Give ear [to] my voice when I call to You."
+    },
+    {
+      "verse_id": "PSA.143.1",
+      "lsv": "A PSALM OF DAVID. O YHWH, hear my prayer, || Give ear to my supplications, || Answer me in Your faithfulness—in Your rig"
+    }
+  ],
+  "chapter_anomalies": [
+    {
+      "ch": 13,
+      "bible_data": 6,
+      "verses_rows": 6,
+      "with_english": 6,
+      "with_tokens": 5
+    },
+    {
+      "ch": 51,
+      "bible_data": 21,
+      "verses_rows": 21,
+      "with_english": 19,
+      "with_tokens": 19
+    },
+    {
+      "ch": 52,
+      "bible_data": 11,
+      "verses_rows": 11,
+      "with_english": 9,
+      "with_tokens": 9
+    },
+    {
+      "ch": 54,
+      "bible_data": 9,
+      "verses_rows": 9,
+      "with_english": 7,
+      "with_tokens": 7
+    },
+    {
+      "ch": 60,
+      "bible_data": 14,
+      "verses_rows": 14,
+      "with_english": 12,
+      "with_tokens": 12
+    }
+  ],
+  "align_offsets_sample": [
+    {
+      "english_verse_id": "PSA.102.1",
+      "source_verse_id": "PSA.102.2",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.10",
+      "source_verse_id": "PSA.102.11",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.11",
+      "source_verse_id": "PSA.102.12",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.12",
+      "source_verse_id": "PSA.102.13",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.13",
+      "source_verse_id": "PSA.102.14",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.14",
+      "source_verse_id": "PSA.102.15",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.15",
+      "source_verse_id": "PSA.102.16",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.16",
+      "source_verse_id": "PSA.102.17",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.17",
+      "source_verse_id": "PSA.102.18",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.18",
+      "source_verse_id": "PSA.102.19",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.19",
+      "source_verse_id": "PSA.102.20",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.2",
+      "source_verse_id": "PSA.102.3",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.20",
+      "source_verse_id": "PSA.102.21",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.21",
+      "source_verse_id": "PSA.102.22",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.22",
+      "source_verse_id": "PSA.102.23",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.23",
+      "source_verse_id": "PSA.102.24",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.24",
+      "source_verse_id": "PSA.102.25",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.25",
+      "source_verse_id": "PSA.102.26",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.26",
+      "source_verse_id": "PSA.102.27",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.27",
+      "source_verse_id": "PSA.102.28",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.28",
+      "source_verse_id": "PSA.102.29",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.3",
+      "source_verse_id": "PSA.102.4",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.4",
+      "source_verse_id": "PSA.102.5",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.5",
+      "source_verse_id": "PSA.102.6",
+      "established_by": "LSV"
+    },
+    {
+      "english_verse_id": "PSA.102.6",
+      "source_verse_id": "PSA.102.7",
+      "established_by": "LSV"
+    }
+  ]
+}

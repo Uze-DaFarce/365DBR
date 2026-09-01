@@ -18,10 +18,11 @@ def inspect(page, label):
     if blocks.count():
         sample = blocks.first.inner_text().replace("\n", " | ")[:600]
         print(f"{label} sample: {sample}")
-        # Focal slot should contain Heading; middle should not repeat the phrase
-        # after display-strip. Count phrase occurrences inside the first matching block.
         inner = blocks.first.inner_text()
         print(f"{label} phrase occurrences in first block: {inner.count(PHRASE)}")
+        assert count == 1, f"{label}: expected exactly one visible heading match, found {count}"
+        assert blocks.count() == 1, f"{label}: expected one verse block containing this heading, found {blocks.count()}"
+        assert inner.count(PHRASE) == 1, f"{label}: expected heading only once in the block, found {inner.count(PHRASE)}"
 
 
 def main():
@@ -39,7 +40,7 @@ def main():
         page.wait_for_timeout(1500)
         inspect(page, "index")
         page.screenshot(
-            path=r"D:\Users\uzeda\Mt. Sinai LLC\monorepo\apps\365DBR\verification\title_index_0123.png"
+            path="D:\\Users\\uzeda\\Mt. Sinai LLC\\monorepo\\apps\\365DBR\\verification\\title_index_0123.png"
         )
 
         page.goto(
@@ -58,7 +59,7 @@ def main():
         page.wait_for_timeout(1000)
         inspect(page, "bible")
         page.screenshot(
-            path=r"D:\Users\uzeda\Mt. Sinai LLC\monorepo\apps\365DBR\verification\title_bible_psa17.png"
+            path="D:\\Users\\uzeda\\Mt. Sinai LLC\\monorepo\\apps\\365DBR\\verification\\title_bible_psa17.png"
         )
 
         mobile = browser.new_page(viewport={"width": 390, "height": 844})
@@ -73,7 +74,7 @@ def main():
         mobile.wait_for_timeout(400)
         print("mobile Heading labels:", mobile.locator("span", has_text="Heading").count())
         mobile.screenshot(
-            path=r"D:\Users\uzeda\Mt. Sinai LLC\monorepo\apps\365DBR\verification\title_index_0123_mobile.png"
+            path="D:\\Users\\uzeda\\Mt. Sinai LLC\\monorepo\\apps\\365DBR\\verification\\title_index_0123_mobile.png"
         )
         mobile.close()
         browser.close()
