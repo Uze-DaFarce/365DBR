@@ -140,7 +140,18 @@ const TRANSLATION_REGISTRY = {
     label: (isHebrew) => `ORIGINAL ${isHebrew ? 'HEBREW' : 'GREEK'}`,
     isHebrewGreek: true
   },
-  // English Parallels (Detected by bibleId)
+  // English Parallels (Detected by bibleId and/or translationCode)
+  lsb: {
+    idPrefix: '8011347e', // DBL 8011347e1aa60e8a → api.bible-style 8011347e1aa60e8a-01
+    altIds: ['8011347e1aa60e8a-01'],
+    translationCode: 'LSB',
+    label: 'LSB - Legacy Standard Bible',
+    attribution: {
+      text: '©',
+      link: '#footer',
+      title: 'View Copyright Information'
+    }
+  },
   kjv: {
     idPrefix: 'de4e12af',
     label: 'KJV - King James Version'
@@ -173,58 +184,14 @@ const TRANSLATION_REGISTRY = {
 /** --- DATA UTILITIES --- **/
 /**
  * English-primary verseMap (production / static JSON).
- * - English (LSV/KJV): keyed by modern English verseId (NOT org/hebrew id).
+ * - English (LSB/LSV/KJV): keyed by modern English verseId (NOT org/hebrew id).
  * - Original: remapped onto those English keys via verseOrgIds.
- * - USFM title paras (style d/s/…): stored on THAT translation's titles[], NEVER appended into verse body.
- *   Heading is shown only if the focal slot's own source (lsv/kjv) had a title para.
+ * - USFM title paras (style d/s/…): stored as entry.titles[], NEVER appended into verse body.
  * Fixes Psalms empty slots (org superscription with no English) and titles glued onto v.1 text.
  */
 const TITLE_PARA_STYLES = new Set(['d', 's', 's1', 's2', 's3', 'ms', 'ms1', 'ms2', 'mr', 'r', 'sp', 'qa']);
-
-/** Plain text from titles[] (string or {text|value}). */
-const titlePlain = (t) => {
-  if (!t) return '';
-  if (typeof t === 'string') return t.trim();
-  return String(t.text || t.value || '').trim();
-};
-
-/** Dedupe heading strings within one translation. */
-const uniqueTitleList = (list) => {
-  const out = [];
-  const seen = new Set();
-  if (!Array.isArray(list)) return out;
-  for (let i = 0; i < list.length; i++) {
-    const s = titlePlain(list[i]);
-    if (!s) continue;
-    const key = s.replace(/\s+/g, ' ').toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(s);
-  }
-  return out;
-};
-
-/** Unique headings for a verse group from one translation slot (lsv/kjv/original). */
-const collectGroupTitles = (group, verseMap, source) => {
-  const merged = [];
-  if (!source) return merged;
-  for (let i = 0; i < group.length; i++) {
-    const data = verseMap[group[i]];
-    const list = data && data[source] && data[source].titles;
-    if (Array.isArray(list)) merged.push(...list);
-  }
-  return uniqueTitleList(merged);
-};
-
-const VerseHeading = ({ text, active }) => {
-  if (!text) return null;
-  return (
-    <p className={`font-serif italic mb-1 leading-snug text-sm md:text-base ${active ? 'text-stone-700' : 'text-stone-400'}`}>
-      <span className="text-[10px] uppercase font-bold tracking-wide text-stone-400 not-italic mr-1.5">Heading</span>
-      {text}
-    </p>
-  );
-};
+const TITLE_PREFIX_RE = /^(?:(?:Psalm|Psalms)\s+\d+|(?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David|In\s+the\s+Shadow\s+of\s+Your\s+Wings|(?:A|The)\s+Song\s+of\s+David|(?:[A-Z]{1,3}\s+)?(?:A|THE)\s+PRAYER\s+OF\s+DAVID|(?:[A-Z]{1,3}\s+)?PSALM\s+\d+)(?:[.:;])?\s*/i;
+const TITLE_PREFIX_RE_SIMPLE = /^((?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David\.|(?:A|THE)\s+PRAYER\s+OF\s+DAVID\.|(?:Psalm|Psalms)\s+\d+\.?|In\s+the\s+Shadow\s+of\s+Your\s+Wings\.?|(?:A|The)\s+Song\s+of\s+David\.?)(?:\s+|$)/i;
 
 const collectTextUnder = (item) => {
   const parts = [];
@@ -233,6 +200,34 @@ const collectTextUnder = (item) => {
   const kids = item.items || [];
   for (let i = 0; i < kids.length; i++) parts.push(collectTextUnder(kids[i]));
   return parts.join('');
+};
+
+const stripTitlePrefix = (text) => {
+  const raw = String(text || '').trim();
+  if (!raw) return { text: '', title: '' };
+
+  let remaining = raw;
+  const titles = [];
+  const titlePattern = /^(?:(?:Psalm|Psalms)\s+\d+|(?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David|In\s+the\s+Shadow\s+of\s+Your\s+Wings|(?:A|The)\s+Song\s+of\s+David|(?:[A-Z]{1,3}\s+)?(?:A|THE)\s+PRAYER\s+OF\s+DAVID|(?:[A-Z]{1,3}\s+)?PSALM\s+\d+)(?:[.:;])?(?=\s|$|[·•▪|/\\-–—:;,.])/i;
+
+  while (remaining) {
+    remaining = remaining.replace(/^[\s·•▪|/\\\-–—:;,.]+/, '');
+    const match = remaining.match(titlePattern);
+    if (!match) break;
+    const title = match[0].replace(/[.;:]+$/, '').trim().replace(/\s+/g, ' ');
+    if (title) titles.push(title);
+    remaining = remaining.slice(match[0].length).replace(/^[\s·•▪|/\\\-–—:;,.]+/, '');
+  }
+
+  if (!titles.length) return { text: raw, title: '' };
+  return { text: remaining || '', title: titles.join(' · ') };
+};
+
+const appendUniqueTitle = (list, title) => {
+  if (!title || !list) return;
+  const cleaned = title.trim().replace(/\s+/g, ' ');
+  if (!cleaned || list.includes(cleaned)) return;
+  list.push(cleaned);
 };
 
 const ensureVerseEntry = (map, vid, versionKey) => {
@@ -253,7 +248,7 @@ const walkEnglishItems = (items, map, versionKey, orgToEnglish, orgToAll, contex
     // Title / superscription para — do not merge into verse body text
     if (item.name === 'para' && TITLE_PARA_STYLES.has(style)) {
       const titleText = collectTextUnder(item).trim();
-      if (titleText) context.pendingTitles.push(titleText);
+      if (titleText) appendUniqueTitle(context.pendingTitles, titleText);
       continue; // do not walk children as verse body
     }
 
@@ -273,18 +268,21 @@ const walkEnglishItems = (items, map, versionKey, orgToEnglish, orgToAll, contex
       context.lastSeenVid = engVid;
       ensureVerseEntry(map, engVid, versionKey);
       if (context.pendingTitles.length > 0) {
-        if (!map[engVid][versionKey].titles) map[engVid][versionKey].titles = [];
-        map[engVid][versionKey].titles.push(...context.pendingTitles);
+        if (!map[engVid].titles) map[engVid].titles = [];
+        context.pendingTitles.forEach((title) => appendUniqueTitle(map[engVid].titles, title));
         context.pendingTitles = [];
       }
     }
 
     if (item.type === 'text' && item.text) {
-      if (context.activeVid && map[context.activeVid] && map[context.activeVid][versionKey]) {
-        map[context.activeVid][versionKey].text.push(item.text);
-      } else if (item.text.trim().length > 0 && context.lastSeenVid &&
-                 map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
-        map[context.lastSeenVid][versionKey].text.push(item.text);
+      const cleanedText = item.text;
+      if (cleanedText) {
+        if (context.activeVid && map[context.activeVid] && map[context.activeVid][versionKey]) {
+          map[context.activeVid][versionKey].text.push(cleanedText);
+        } else if (cleanedText.trim().length > 0 && context.lastSeenVid &&
+                   map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
+          map[context.lastSeenVid][versionKey].text.push(cleanedText);
+        }
       }
     }
 
@@ -313,10 +311,11 @@ const walkOriginalItems = (items, map, orgToEnglish, orgToAll, context) => {
       if (targets) {
         context.targets = targets;
         targets.forEach((eng) => ensureVerseEntry(map, eng, 'original'));
-      } else if (map[orgVid] && (map[orgVid].lsv || map[orgVid].kjv)) {
+      } else if (map[orgVid] && (map[orgVid].lsb || map[orgVid].lsv || map[orgVid].kjv)) {
         // Same BCV string as an English verse, but this org content is superscription-only
         context.targets = null;
         context.superscriptionFor = orgVid;
+        if (!map[orgVid].titles) map[orgVid].titles = [];
       } else {
         // Unmapped org-only material — do not create empty English rows
         context.targets = null;
@@ -325,26 +324,26 @@ const walkOriginalItems = (items, map, orgToEnglish, orgToAll, context) => {
     }
 
     if (item.type === 'text' && item.text) {
+      const { text: cleanedText, title } = stripTitlePrefix(item.text);
+      if (title && context.superscriptionFor && map[context.superscriptionFor]) {
+        if (!map[context.superscriptionFor].titles) map[context.superscriptionFor].titles = [];
+        appendUniqueTitle(map[context.superscriptionFor].titles, title);
+      }
       if (context.targets && context.targets.length) {
         context.targets.forEach((eng) => {
-          if (map[eng] && map[eng].original) map[eng].original.text.push(item.text);
+          if (map[eng] && map[eng].original) map[eng].original.text.push(cleanedText || item.text);
         });
       } else if (context.superscriptionFor && map[context.superscriptionFor]) {
         // Accumulate superscription surface into titles (join later)
         if (!context.superBuf) context.superBuf = {};
         const k = context.superscriptionFor;
         if (!context.superBuf[k]) context.superBuf[k] = [];
-        context.superBuf[k].push(item.text);
+        if (cleanedText) context.superBuf[k].push(cleanedText);
       }
     }
 
     if (item.items && item.items.length > 0) {
       walkOriginalItems(item.items, map, orgToEnglish, orgToAll, context);
-    }
-    if (attrs.strong && context.targets && context.targets.length) {
-      context.targets.forEach((eng) => {
-        if (map[eng] && map[eng].original) map[eng].original.hasStrong = true;
-      });
     }
     context.activeVid = previousActiveVid;
   }
@@ -354,14 +353,6 @@ const processEnglishContent = (contentArray, map, versionKey, orgToEnglish, orgT
   if (!contentArray) return;
   const context = { activeVid: null, lastSeenVid: null, pendingTitles: [] };
   for (const section of contentArray) {
-    const style = (section.attrs || {}).style || '';
-    // Title paras are top-level siblings in api.bible content[]. Walking only
-    // their items would glue the heading onto lastSeenVid (previous verse).
-    if (section.name === 'para' && TITLE_PARA_STYLES.has(style)) {
-      const titleText = collectTextUnder(section).trim();
-      if (titleText) context.pendingTitles.push(titleText);
-      continue;
-    }
     if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context);
   }
 };
@@ -378,13 +369,12 @@ const processOriginalContent = (contentArray, map, orgToEnglish, orgToAll) => {
   for (const section of contentArray) {
     if (section.items) walkOriginalItems(section.items, map, orgToEnglish, orgToAll, context);
   }
-  // Flush Hebrew superscription buffers onto original.titles (never onto lsv/kjv)
+  // Flush Hebrew superscription buffers into titles[]
   Object.keys(context.superBuf).forEach((vid) => {
     const t = context.superBuf[vid].join('').trim();
     if (!t || !map[vid]) return;
-    ensureVerseEntry(map, vid, 'original');
-    if (!map[vid].original.titles) map[vid].original.titles = [];
-    map[vid].original.titles.push(t);
+    if (!map[vid].titles) map[vid].titles = [];
+    appendUniqueTitle(map[vid].titles, t);
   });
 };
 
@@ -463,6 +453,25 @@ const loadDailyBread = async (dateFolder) => {
   return buildFinalData(verseMap, manifest, availableKeys);
 };
 
+const matchParallelTranslation = (parallel) => {
+  if (!parallel) return null;
+  const injected = String(parallel.translationCode || '').toLowerCase();
+  if (injected && TRANSLATION_REGISTRY[injected] && !TRANSLATION_REGISTRY[injected].isHebrewGreek) {
+    return injected;
+  }
+  const bibleId = parallel.bibleId || '';
+  return Object.keys(TRANSLATION_REGISTRY).find((key) => {
+    const config = TRANSLATION_REGISTRY[key];
+    if (!config || config.isHebrewGreek) return false;
+    if (config.translationCode && String(parallel.translationCode || '').toUpperCase() === config.translationCode) {
+      return true;
+    }
+    if (config.idPrefix && bibleId.includes(config.idPrefix)) return true;
+    if (config.altIds && config.altIds.some((id) => bibleId === id)) return true;
+    return false;
+  }) || null;
+};
+
 const processResults = (results, verseMap, availableKeys) => {
   results.forEach((source) => {
     const data = source.data;
@@ -474,13 +483,7 @@ const processResults = (results, verseMap, availableKeys) => {
     // 1. English parallels first (English-primary keys + org maps + titles[])
     if (data.parallels) {
       data.parallels.forEach(parallel => {
-         const matchedKey = Object.keys(TRANSLATION_REGISTRY).find(key => {
-            const config = TRANSLATION_REGISTRY[key];
-            if (!config.idPrefix) return false; // Skip 'original'
-            if (parallel.bibleId.includes(config.idPrefix)) return true;
-            if (config.altIds && config.altIds.some(id => parallel.bibleId === id)) return true;
-            return false;
-         });
+         const matchedKey = matchParallelTranslation(parallel);
 
          if (matchedKey && parallel.content) {
             processEnglishContent(parallel.content, verseMap, matchedKey, orgToEnglish, orgToAll);
@@ -508,10 +511,13 @@ const buildFinalData = (verseMap, manifest, availableKeys) => {
       const verseData = verseMap[vid];
       for (const key in verseData) {
           const entry = verseData[key];
-          if (entry.text && Array.isArray(entry.text)) {
+          if (entry && entry.text && Array.isArray(entry.text)) {
               const config = TRANSLATION_REGISTRY[key];
               const separator = config && config.isHebrewGreek ? '' : ' ';
               entry.text = entry.text.join(separator);
+          }
+          if (Array.isArray(entry?.titles)) {
+              entry.titles = Array.from(new Set(entry.titles.map((t) => String(t).trim()).filter(Boolean))).filter((t) => !t.match(/^A\s+Prayer\s+of\s+David\.?$/i) || t.length > 0);
           }
       }
   }
@@ -520,7 +526,7 @@ const buildFinalData = (verseMap, manifest, availableKeys) => {
   let wordCount = 0;
   Object.values(verseMap).forEach(verseData => {
       // Prioritize English if available
-      const t = verseData.lsv || verseData.kjv || verseData.web || verseData.nlt || verseData.original;
+      const t = verseData.lsb || verseData.lsv || verseData.kjv || verseData.web || verseData.nlt || verseData.original;
       if (t && t.text) {
           // Text is already joined by space above
           wordCount += (t.text.trim() === '' ? 0 : t.text.trim().split(/\s+/).length);
@@ -841,23 +847,15 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const tokens = payload?.original?.tokens || [];
     const withStrong = tokens.some((t) => t.strong);
     const isHeb = (payload?.original?.language || '') === 'hebrew';
-    const src = preferredTranslation || '';
+    const source = preferredTranslation || '';
     const group = (groupedVids && groupedVids.find((g) => g.includes(verseId))) || [verseId];
-    let englishBody = '';
-    if (verseMap && src) {
-        for (let i = 0; i < group.length; i++) {
-            const t = verseMap[group[i]] && verseMap[group[i]][src] && verseMap[group[i]][src].text;
-            if (!t) continue;
-            const s = Array.isArray(t) ? t.join(' ') : String(t);
-            if (s) englishBody += (englishBody ? ' ' : '') + s;
-        }
-    }
-    if (!englishBody && payload?.translations) {
-        const tr = payload.translations;
-        const pref = src.toUpperCase();
-        const raw = (pref && (tr[pref] || tr[pref.toLowerCase()])) || tr.LSV || tr.lsv || tr.KJV || tr.kjv || '';
-        englishBody = typeof raw === 'string' ? raw : String(raw.text || raw.value || '');
-    }
+    const englishBody = group
+      .map((vid) => {
+        const text = verseMap?.[vid]?.[source]?.text;
+        return Array.isArray(text) ? text.join(' ') : (text || '');
+      })
+      .filter(Boolean)
+      .join(' ');
     const humanRef = formatVerseRef(verseId);
 
     return (
@@ -886,11 +884,11 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                         </button>
                     </div>
                     <div className="overflow-y-auto p-3 md:p-4 space-y-3 text-stone-800">
-                        {englishBody ? (
-                            <p className="text-sm md:text-base font-serif text-stone-800 leading-snug">
-                                {englishBody}
-                            </p>
-                        ) : null}
+                      {englishBody && (
+                        <p className="text-sm md:text-base font-serif text-stone-800 leading-snug">
+                          {englishBody}
+                        </p>
+                      )}
                         {status === 'loading' && (
                             <p className="text-sm text-stone-500 font-serif italic">Loading…</p>
                         )}
@@ -1043,8 +1041,6 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
     // on every render (e.g. during scroll/highlight transitions).
     // The content only changes if translations or data change, not when 'isActive' toggles.
     const renderedSlots = useMemo(() => {
-        const groupTitles = collectGroupTitles(group, verseMap, dynamicSlots.bottom && dynamicSlots.bottom.source);
-        const titleText = groupTitles.join(' · ');
         const getSlotContent = (slot) => {
             if (!slot || !slot.source) return { text: '', displayLabel: '' };
 
@@ -1056,9 +1052,10 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                 const data = verseMap[gVid];
                 const slotData = data ? data[slot.source] : null;
                 if (slotData && slotData.text) {
-                    // ⚡ Bolt Optimization: Text is now pre-joined in loadDailyBread
-                    fullText += (fullText ? ' ' : '') + slotData.text;
-
+                const cleanedText = slotData.text;
+                    if (cleanedText) {
+                        fullText += (fullText ? ' ' : '') + cleanedText;
+                    }
                     contributing.push(slotData.displayVid || gVid);
                 }
             });
@@ -1088,13 +1085,12 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                 displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
             }
 
-            return { text: fullText, displayLabel, titleText };
+            return { text: fullText, displayLabel };
         };
 
         const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
 
         return {
-            titleText,
             top: { ...getSlotContent(dynamicSlots.top), label: getLabel(dynamicSlots.top), config: dynamicSlots.top },
             middle: { ...getSlotContent(dynamicSlots.middle), label: getLabel(dynamicSlots.middle), config: dynamicSlots.middle },
             bottom: { ...getSlotContent(dynamicSlots.bottom), label: getLabel(dynamicSlots.bottom), config: dynamicSlots.bottom, attribution: dynamicSlots.bottom.attribution }
@@ -1133,7 +1129,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
 
             {/* SLOT 2: MIDDLE (Secondary) */}
             {(() => {
-                const { text, displayLabel, label } = renderedSlots.middle;
+                const { text, displayLabel, label, titleText } = renderedSlots.middle;
                 return (
                 <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
                     <div className="flex justify-between items-center mb-0.5">
@@ -1151,15 +1147,15 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                         )}
                     </div>
                     </div>
+                    {titleText ? <div className={`text-xs md:text-sm font-serif italic mb-0.5 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{titleText}</div> : null}
                     <div><span className={`text-base md:text-xl font-serif font-bold italic leading-tight tracking-tighter ${isActive ? 'text-stone-900' : 'text-stone-500'}`}>{text}</span></div>
                 </div>
                 );
             })()}
 
-            {/* SLOT 3: BOTTOM (Focal) — heading shown once here, not on compare/original */}
+            {/* SLOT 3: BOTTOM (Focal) */}
             {(() => {
-                const { text, displayLabel, label, attribution } = renderedSlots.bottom;
-                const titleText = renderedSlots.titleText;
+                const { text, displayLabel, label, attribution, titleText } = renderedSlots.bottom;
                 return (
                 <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? `${focalTheme.bg} shadow-xl ${focalTheme.border} ring-1 ${focalTheme.ring}` : 'bg-white/40 border-transparent opacity-80'}`}>
                     <div className="flex justify-between items-center mb-0.5">
@@ -1180,9 +1176,9 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                         {!isPlaying && (
                             <span className="opacity-100">
                                 <CopyButton
-                                    text={titleText ? `${titleText}\n${text}` : text}
+                                    text={text}
                                     reference={displayLabel}
-                                    version={dynamicSlots.bottom.source.toUpperCase() + (dynamicSlots.bottom.source === 'lsv' ? '©' : '')}
+                                    version={dynamicSlots.bottom.source.toUpperCase() + ((dynamicSlots.bottom.source === 'lsv' || dynamicSlots.bottom.source === 'lsb') ? '©' : '')}
                                     tabIndex={isActive ? 0 : -1}
                                     aria-hidden={!isActive}
                                 />
@@ -1191,7 +1187,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                                     tabIndex={isActive ? 0 : -1}
                                     aria-hidden={!isActive}
                                 />
-                                {strongsAvailable && onOpenStrongs && group.some((gVid) => verseMap[gVid] && verseMap[gVid].original && verseMap[gVid].original.hasStrong) && (
+                                {strongsAvailable && onOpenStrongs && (
                                     <StrongsButton
                                         onOpen={() => onOpenStrongs(vid)}
                                         tabIndex={isActive ? 0 : -1}
@@ -1202,7 +1198,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                         )}
                     </div>
                     </div>
-                    <VerseHeading text={titleText} active={isActive} />
+                    {titleText ? <div className={`text-sm md:text-base font-serif italic mb-1 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{titleText}</div> : null}
                     <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-500'}`}>{text}</div>
                 </div>
                 );
@@ -1711,6 +1707,7 @@ const Footer = React.memo(({ isStatic, currentDate, readingLabel, readingTime, n
 
         <div className="hidden md:block">
           <p className="mb-1 text-[9px] text-stone-500">
+              The <strong>(LSB®) Legacy Standard Bible®</strong> is copyright © 2021 by The Lockman Foundation. Used by permission. All rights reserved. Managed in partnership with Three Sixteen Publishing, Inc.
               The <strong>Literal Standard Version (LSV)</strong> is © Covenant Press (CC BY-SA 4.0).
               The <strong>King James Version (KJV)</strong> and <strong>WEB</strong> are public domain.
           </p>
@@ -1726,7 +1723,7 @@ const Footer = React.memo(({ isStatic, currentDate, readingLabel, readingTime, n
         {/* Mobile Simplified Footer */}
         <div className="md:hidden flex flex-col items-center gap-1 text-[8px] text-stone-400">
             <div>
-              LSV © Covenant Press · <a href="https://mt-sin.ai" target="_blank" rel="noopener noreferrer" className="text-stone-400 underline">&copy; Mt. Sinai LLC</a>
+              LSB® © Lockman Foundation · LSV © Covenant Press · <a href="https://mt-sin.ai" target="_blank" rel="noopener noreferrer" className="text-stone-400 underline">&copy; Mt. Sinai LLC</a>
             </div>
             <div className="text-[7px] opacity-75">
               * OH = Orig. Hebrew / OG = Orig. Greek
@@ -2322,11 +2319,12 @@ const App = () => {
 
         // Smart Defaults: 
         // 1. Try to keep current selection if valid.
-        // 2. Fallback to LSV then KJV if available.
+        // 2. Fallback to LSB, then LSV, then KJV if available.
         // 3. Fallback to first available.
         const keys = data.availableTranslations;
         if (keys.length > 0) {
-           let newFocal = keys.includes(focalTranslation) ? focalTranslation : (keys.includes('lsv') ? 'lsv' : keys[0]);
+           const pickDefaultFocal = () => keys.includes('lsb') ? 'lsb' : (keys.includes('lsv') ? 'lsv' : keys[0]);
+           let newFocal = keys.includes(focalTranslation) ? focalTranslation : pickDefaultFocal();
            let newCompare = keys.includes(compareTranslation) ? compareTranslation : (keys.includes('kjv') ? 'kjv' : keys.find(k => k !== newFocal) || keys[0]);
            
            // If we only have one translation, ensure both slots aren't empty (though rendering handles this)

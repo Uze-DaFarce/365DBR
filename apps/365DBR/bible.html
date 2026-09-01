@@ -83,10 +83,26 @@ const formatVerseRef = (vid) => formatVerseRefRaw(vid, typeof BOOK_NAMES !== 'un
 /** --- CONFIGURATION & CONSTANTS --- **/
 const TRANSLATION_REGISTRY = {
   original: { source: 'original', label: (isHebrew) => `ORIGINAL ${isHebrew ? 'HEBREW' : 'GREEK'}`, isHebrewGreek: true },
+  lsb: { idPrefix: '8011347e', altIds: ['8011347e1aa60e8a-01'], translationCode: 'LSB', label: 'LSB - Legacy Standard Bible', attribution: { text: '©', link: '#footer', title: 'View Copyright Information' } },
   kjv: { idPrefix: 'de4e12af', label: 'KJV - King James Version' },
   lsv: { idPrefix: '06125ada', altIds: ['01b29f4b342acc35-01'], label: 'LSV - Literal Standard Version', attribution: { text: '©', link: '#footer', title: 'View Copyright Information' } },
   web: { idPrefix: '9879dbb7', label: 'WEB - World English Bible' },
   nlt: { idPrefix: 'd6e14a62', label: 'NLT - New Living Translation' }
+};
+
+const matchParallelTranslation = (parallel) => {
+  if (!parallel) return null;
+  const injected = String(parallel.translationCode || '').toLowerCase();
+  if (injected && TRANSLATION_REGISTRY[injected] && !TRANSLATION_REGISTRY[injected].isHebrewGreek) return injected;
+  const bibleId = parallel.bibleId || '';
+  return Object.keys(TRANSLATION_REGISTRY).find((key) => {
+    const config = TRANSLATION_REGISTRY[key];
+    if (!config || config.isHebrewGreek) return false;
+    if (config.translationCode && String(parallel.translationCode || '').toUpperCase() === config.translationCode) return true;
+    if (config.idPrefix && bibleId.includes(config.idPrefix)) return true;
+    if (config.altIds && config.altIds.some((id) => bibleId === id)) return true;
+    return false;
+  }) || null;
 };
 
 // Book order, names, and verse counts: bible_common.py → export_bible_meta.py → bible_meta.js
@@ -114,46 +130,11 @@ const FOCAL_THEMES = [
   { bg: 'bg-emerald-100', border: 'border-emerald-500', ring: 'ring-emerald-500/50', text: 'text-emerald-700', linkHover: 'hover:text-emerald-600', linkRing: 'focus-visible:ring-emerald-500' }
 ];
 
-/** --- DATA UTILITIES (English-primary; titles per translation, not merged into body) --- **/
+/** --- DATA UTILITIES (English-primary; titles not merged into body) --- **/
 const TITLE_PARA_STYLES = new Set(['d', 's', 's1', 's2', 's3', 'ms', 'ms1', 'ms2', 'mr', 'r', 'sp', 'qa']);
-function titlePlain(t) {
-  if (!t) return '';
-  if (typeof t === 'string') return t.trim();
-  return String(t.text || t.value || '').trim();
-}
-function uniqueTitleList(list) {
-  const out = [];
-  const seen = new Set();
-  if (!Array.isArray(list)) return out;
-  for (let i = 0; i < list.length; i++) {
-    const s = titlePlain(list[i]);
-    if (!s) continue;
-    const key = s.replace(/\s+/g, ' ').toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(s);
-  }
-  return out;
-}
-function collectGroupTitles(group, verseMap, source) {
-  const merged = [];
-  if (!source) return merged;
-  for (let i = 0; i < group.length; i++) {
-    const data = verseMap[group[i]];
-    const list = data && data[source] && data[source].titles;
-    if (Array.isArray(list)) merged.push(...list);
-  }
-  return uniqueTitleList(merged);
-}
-function VerseHeading({ text, active }) {
-  if (!text) return null;
-  return (
-    <p className={`font-serif italic mb-1 leading-snug text-sm md:text-base ${active ? 'text-stone-700' : 'text-stone-400'}`}>
-      <span className="text-[10px] uppercase font-bold tracking-wide text-stone-400 not-italic mr-1.5">Heading</span>
-      {text}
-    </p>
-  );
-}
+const TITLE_PREFIX_RE = /^(?:(?:Psalm|Psalms)\s+\d+|(?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David|In\s+the\s+Shadow\s+of\s+Your\s+Wings|(?:A|The)\s+Song\s+of\s+David|(?:[A-Z]{1,3}\s+)?(?:A|THE)\s+PRAYER\s+OF\s+DAVID|(?:[A-Z]{1,3}\s+)?PSALM\s+\d+)(?:[.:;])?\s*/i;
+const TITLE_PREFIX_RE_SIMPLE = /^((?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David\.|(?:A|THE)\s+PRAYER\s+OF\s+DAVID\.|(?:Psalm|Psalms)\s+\d+\.?|In\s+the\s+Shadow\s+of\s+Your\s+Wings\.?|(?:A|The)\s+Song\s+of\s+David\.?)(?:\s+|$)/i;
+
 function collectTextUnder(item) {
   const parts = [];
   if (!item || typeof item !== 'object') return '';
@@ -161,6 +142,35 @@ function collectTextUnder(item) {
   (item.items || []).forEach((ch) => parts.push(collectTextUnder(ch)));
   return parts.join('');
 }
+
+function stripTitlePrefix(text) {
+  const raw = String(text || '').trim();
+  if (!raw) return { text: '', title: '' };
+
+  let remaining = raw;
+  const titles = [];
+  const titlePattern = /^(?:(?:Psalm|Psalms)\s+\d+|(?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David|In\s+the\s+Shadow\s+of\s+Your\s+Wings|(?:A|The)\s+Song\s+of\s+David|(?:[A-Z]{1,3}\s+)?(?:A|THE)\s+PRAYER\s+OF\s+DAVID|(?:[A-Z]{1,3}\s+)?PSALM\s+\d+)(?:[.:;])?(?=\s|$|[·•▪|/\\-–—:;,.])/i;
+
+  while (remaining) {
+    remaining = remaining.replace(/^[\s·•▪|/\\\-–—:;,.]+/, '');
+    const match = remaining.match(titlePattern);
+    if (!match) break;
+    const title = match[0].replace(/[.;:]+$/, '').trim().replace(/\s+/g, ' ');
+    if (title) titles.push(title);
+    remaining = remaining.slice(match[0].length).replace(/^[\s·•▪|/\\\-–—:;,.]+/, '');
+  }
+
+  if (!titles.length) return { text: raw, title: '' };
+  return { text: remaining || '', title: titles.join(' · ') };
+}
+
+function appendUniqueTitle(list, title) {
+  if (!title || !list) return;
+  const cleaned = title.trim().replace(/\s+/g, ' ');
+  if (!cleaned || list.includes(cleaned)) return;
+  list.push(cleaned);
+}
+
 function ensureVerseEntry(map, vid, versionKey) {
   if (!map[vid]) map[vid] = {};
   if (versionKey && !map[vid][versionKey]) map[vid][versionKey] = { text: [], displayVid: vid };
@@ -173,7 +183,7 @@ function walkEnglishItems(items, map, versionKey, orgToEnglish, orgToAll, contex
     const style = attrs.style || '';
     if (item.name === 'para' && TITLE_PARA_STYLES.has(style)) {
       const titleText = collectTextUnder(item).trim();
-      if (titleText) context.pendingTitles.push(titleText);
+      if (titleText) appendUniqueTitle(context.pendingTitles, titleText);
       continue;
     }
     const previousActiveVid = context.activeVid;
@@ -190,16 +200,19 @@ function walkEnglishItems(items, map, versionKey, orgToEnglish, orgToAll, contex
       context.lastSeenVid = engVid;
       ensureVerseEntry(map, engVid, versionKey);
       if (context.pendingTitles.length > 0) {
-        if (!map[engVid][versionKey].titles) map[engVid][versionKey].titles = [];
-        map[engVid][versionKey].titles.push(...context.pendingTitles);
+        if (!map[engVid].titles) map[engVid].titles = [];
+        context.pendingTitles.forEach((title) => appendUniqueTitle(map[engVid].titles, title));
         context.pendingTitles = [];
       }
     }
     if (item.type === 'text' && item.text) {
-      if (context.activeVid && map[context.activeVid] && map[context.activeVid][versionKey]) {
-        map[context.activeVid][versionKey].text.push(item.text);
-      } else if (item.text.trim().length > 0 && context.lastSeenVid && map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
-        map[context.lastSeenVid][versionKey].text.push(item.text);
+            const cleanedText = item.text;
+      if (cleanedText) {
+        if (context.activeVid && map[context.activeVid] && map[context.activeVid][versionKey]) {
+          map[context.activeVid][versionKey].text.push(cleanedText);
+        } else if (cleanedText.trim().length > 0 && context.lastSeenVid && map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
+          map[context.lastSeenVid][versionKey].text.push(cleanedText);
+        }
       }
     }
     if (item.items && item.items.length > 0) walkEnglishItems(item.items, map, versionKey, orgToEnglish, orgToAll, context);
@@ -219,43 +232,38 @@ function walkOriginalItems(items, map, orgToEnglish, orgToAll, context) {
       if (targets) {
         context.targets = targets;
         targets.forEach((eng) => ensureVerseEntry(map, eng, 'original'));
-      } else if (map[orgVid] && (map[orgVid].lsv || map[orgVid].kjv)) {
+      } else if (map[orgVid] && (map[orgVid].lsb || map[orgVid].lsv || map[orgVid].kjv)) {
         context.targets = null;
         context.superscriptionFor = orgVid;
+        if (!map[orgVid].titles) map[orgVid].titles = [];
       } else {
         context.targets = null;
         context.superscriptionFor = null;
       }
     }
     if (item.type === 'text' && item.text) {
+      const { text: cleanedText, title } = stripTitlePrefix(item.text);
+      if (title && context.superscriptionFor && map[context.superscriptionFor]) {
+        if (!map[context.superscriptionFor].titles) map[context.superscriptionFor].titles = [];
+        appendUniqueTitle(map[context.superscriptionFor].titles, title);
+      }
       if (context.targets && context.targets.length) {
-        context.targets.forEach((eng) => { if (map[eng] && map[eng].original) map[eng].original.text.push(item.text); });
+        context.targets.forEach((eng) => { if (map[eng] && map[eng].original) map[eng].original.text.push(cleanedText || item.text); });
       } else if (context.superscriptionFor && map[context.superscriptionFor]) {
         if (!context.superBuf) context.superBuf = {};
         const k = context.superscriptionFor;
         if (!context.superBuf[k]) context.superBuf[k] = [];
-        context.superBuf[k].push(item.text);
+        if (cleanedText) context.superBuf[k].push(cleanedText);
       }
     }
     if (item.items && item.items.length > 0) walkOriginalItems(item.items, map, orgToEnglish, orgToAll, context);
-    if (attrs.strong && context.targets && context.targets.length) {
-      context.targets.forEach((eng) => { if (map[eng] && map[eng].original) map[eng].original.hasStrong = true; });
-    }
     context.activeVid = previousActiveVid;
   }
 }
 function processEnglishContent(contentArray, map, versionKey, orgToEnglish, orgToAll) {
   if (!contentArray) return;
   const context = { activeVid: null, lastSeenVid: null, pendingTitles: [] };
-  for (const section of contentArray) {
-    const style = (section.attrs || {}).style || '';
-    if (section.name === 'para' && TITLE_PARA_STYLES.has(style)) {
-      const titleText = collectTextUnder(section).trim();
-      if (titleText) context.pendingTitles.push(titleText);
-      continue;
-    }
-    if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context);
-  }
+  for (const section of contentArray) { if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context); }
 }
 function processOriginalContent(contentArray, map, orgToEnglish, orgToAll) {
   if (!contentArray) return;
@@ -264,9 +272,8 @@ function processOriginalContent(contentArray, map, orgToEnglish, orgToAll) {
   Object.keys(context.superBuf).forEach((vid) => {
     const t = context.superBuf[vid].join('').trim();
     if (!t || !map[vid]) return;
-    ensureVerseEntry(map, vid, 'original');
-    if (!map[vid].original.titles) map[vid].original.titles = [];
-    map[vid].original.titles.push(t);
+    if (!map[vid].titles) map[vid].titles = [];
+    appendUniqueTitle(map[vid].titles, t);
   });
 }
 
@@ -311,13 +318,7 @@ async function loadDailyBread(dateFolder) {
     const orgToAll = {};
     if (data.parallels) {
       data.parallels.forEach(parallel => {
-         const matchedKey = Object.keys(TRANSLATION_REGISTRY).find(key => {
-            const config = TRANSLATION_REGISTRY[key];
-            if (!config.idPrefix) return false;
-            if (parallel.bibleId.includes(config.idPrefix)) return true;
-            if (config.altIds && config.altIds.some(id => parallel.bibleId === id)) return true;
-            return false;
-         });
+         const matchedKey = matchParallelTranslation(parallel);
          if (matchedKey && parallel.content) {
             processEnglishContent(parallel.content, verseMap, matchedKey, orgToEnglish, orgToAll);
             availableKeys.add(matchedKey);
@@ -463,23 +464,15 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const tokens = payload?.original?.tokens || [];
     const withStrong = tokens.some((t) => t.strong);
     const isHeb = (payload?.original?.language || '') === 'hebrew';
-    const src = preferredTranslation || '';
+    const source = preferredTranslation || '';
     const group = (groupedVids && groupedVids.find((g) => g.includes(verseId))) || [verseId];
-    let englishBody = '';
-    if (verseMap && src) {
-        for (let i = 0; i < group.length; i++) {
-            const t = verseMap[group[i]] && verseMap[group[i]][src] && verseMap[group[i]][src].text;
-            if (!t) continue;
-            const s = Array.isArray(t) ? t.join(' ') : String(t);
-            if (s) englishBody += (englishBody ? ' ' : '') + s;
-        }
-    }
-    if (!englishBody && payload?.translations) {
-        const tr = payload.translations;
-        const pref = src.toUpperCase();
-        const raw = (pref && (tr[pref] || tr[pref.toLowerCase()])) || tr.LSV || tr.lsv || tr.KJV || tr.kjv || '';
-        englishBody = typeof raw === 'string' ? raw : String(raw.text || raw.value || '');
-    }
+    const englishBody = group
+        .map((vid) => {
+            const text = verseMap?.[vid]?.[source]?.text;
+            return Array.isArray(text) ? text.join(' ') : (text || '');
+        })
+        .filter(Boolean)
+        .join(' ');
     const humanRef = formatVerseRef(verseId);
 
     return (
@@ -494,7 +487,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                         <button type="button" onClick={onClose} className="shrink-0 px-2.5 py-1 text-[11px] font-semibold text-stone-600 hover:text-stone-900 border border-stone-200 rounded-md bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500" aria-label="Done">Done</button>
                     </div>
                     <div className="overflow-y-auto p-3 md:p-4 space-y-3 text-stone-800">
-                        {englishBody ? <p className="text-sm md:text-base font-serif text-stone-800 leading-snug">{englishBody}</p> : null}
+                        {englishBody && <p className="text-sm md:text-base font-serif text-stone-800 leading-snug">{englishBody}</p>}
                         {status === 'loading' && <p className="text-sm text-stone-500 font-serif italic">Loading…</p>}
                         {status === 'error' && <p className="text-sm text-red-600">Word study is unavailable right now.</p>}
                         {status === 'ready' && (
@@ -626,16 +619,17 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
     };
 
     const renderedSlots = useMemo(() => {
-        const groupTitles = collectGroupTitles(group, verseMap, dynamicSlots.bottom && dynamicSlots.bottom.source);
-        const titleText = groupTitles.join(' · ');
         const getSlotContent = (slot) => {
-            if (!slot || !slot.source) return { text: '', displayLabel: '' };
+            if (!slot || !slot.source) return { text: '', displayLabel: '', titleText: '' };
             let fullText = '', displayLabel = '', contributing = [];
             group.forEach((gVid) => {
                 const data = verseMap[gVid];
                 const slotData = data ? data[slot.source] : null;
                 if (slotData && slotData.text) {
-                    fullText += (fullText ? ' ' : '') + slotData.text;
+                    const cleanedText = slotData.text;
+                    if (cleanedText) {
+                        fullText += (fullText ? ' ' : '') + cleanedText;
+                    }
                     contributing.push(slotData.displayVid || gVid);
                 }
             });
@@ -654,7 +648,6 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
         };
         const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
         return {
-            titleText,
             top: { ...getSlotContent(dynamicSlots.top), label: getLabel(dynamicSlots.top), config: dynamicSlots.top },
             middle: { ...getSlotContent(dynamicSlots.middle), label: getLabel(dynamicSlots.middle), config: dynamicSlots.middle },
             bottom: { ...getSlotContent(dynamicSlots.bottom), label: getLabel(dynamicSlots.bottom), config: dynamicSlots.bottom, attribution: dynamicSlots.bottom.attribution }
@@ -696,6 +689,7 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
                         )}
                     </div>
                 </div>
+                {renderedSlots.middle.titleText ? <div className={`text-xs md:text-sm font-serif italic mb-0.5 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{renderedSlots.middle.titleText}</div> : null}
                 <div><span className={`text-lg md:text-3xl font-serif italic leading-tight tracking-tight ${isActive ? 'text-stone-900' : 'text-stone-500'}`}>{renderedSlots.middle.text}</span></div>
             </div>
             {/* Bottom Slot */}
@@ -709,16 +703,16 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
                         <span>{renderedSlots.bottom.displayLabel}</span>
                         {!isPlaying && (
                             <div className="flex items-center opacity-100">
-                                <CopyButton text={renderedSlots.titleText ? `${renderedSlots.titleText}\n${renderedSlots.bottom.text}` : renderedSlots.bottom.text} reference={renderedSlots.bottom.displayLabel} version={dynamicSlots.bottom.source.toUpperCase() + (dynamicSlots.bottom.source === 'lsv' ? '©' : '')} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                <CopyButton text={renderedSlots.bottom.text} reference={renderedSlots.bottom.displayLabel} version={dynamicSlots.bottom.source.toUpperCase() + (dynamicSlots.bottom.source === 'lsv' ? '©' : '')} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
                                 <BookmarkButton onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
-                                {strongsAvailable && onOpenStrongs && group.some((gVid) => verseMap[gVid] && verseMap[gVid].original && verseMap[gVid].original.hasStrong) && (
+                                {strongsAvailable && onOpenStrongs && (
                                     <StrongsButton onOpen={() => onOpenStrongs(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
                                 )}
                             </div>
                         )}
                     </div>
                 </div>
-                <VerseHeading text={renderedSlots.titleText} active={isActive} />
+                {renderedSlots.bottom.titleText ? <div className={`text-sm md:text-base font-serif italic mb-1 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{renderedSlots.bottom.titleText}</div> : null}
                 <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-500'}`}>{renderedSlots.bottom.text}</div>
             </div>
             </div>
@@ -1089,7 +1083,7 @@ function App() {
 
   // Translation State
   const [availableTranslations, setAvailableTranslations] = useState([]);
-  const [focalTranslation, setFocalTranslation] = useState('lsv');
+  const [focalTranslation, setFocalTranslation] = useState('lsb');
   const [compareTranslation, setCompareTranslation] = useState('kjv');
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isFocalOpen, setIsFocalOpen] = useState(false);
@@ -1567,7 +1561,7 @@ function App() {
 
             // Initial Translation Set
             if (keys.size > 0) {
-               if (!focalTranslation || !keys.has(focalTranslation)) setFocalTranslation(keys.has('lsv') ? 'lsv' : Array.from(keys)[0]);
+               if (!focalTranslation || !keys.has(focalTranslation)) setFocalTranslation(keys.has('lsb') ? 'lsb' : (keys.has('lsv') ? 'lsv' : Array.from(keys)[0]));
                if (!compareTranslation || !keys.has(compareTranslation)) setCompareTranslation(keys.has('kjv') ? 'kjv' : Array.from(keys)[0]);
             }
 
@@ -2035,9 +2029,9 @@ function App() {
         <StrongsPanel
           verseId={strongsVerseId}
           apiBase={queryApiBase}
-          preferredTranslation={focalTranslation}
-          verseMap={verseMap}
-          groupedVids={groupedVids}
+                    preferredTranslation={focalTranslation}
+                    verseMap={verseMap}
+                    groupedVids={groupedVids}
           onClose={closeStrongs}
           onJumpVerse={(vid) => {
             setStrongsVerseId(vid);
@@ -2060,6 +2054,10 @@ function App() {
           targetVid={bookmarkDialogTarget}
       />
 
+      <footer id="footer" className="max-w-7xl mx-auto px-3 py-3 text-[9px] text-stone-500 text-center font-serif leading-snug">
+        The (LSB®) Legacy Standard Bible® is copyright © 2021 by The Lockman Foundation. Used by permission. All rights reserved. Managed in partnership with Three Sixteen Publishing, Inc.
+        {' '}LSV is © Covenant Press (CC BY-SA 4.0). KJV is public domain.
+      </footer>
       <ScrollToTop />
     </div>
   );
