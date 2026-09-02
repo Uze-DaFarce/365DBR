@@ -1087,6 +1087,7 @@ function App() {
   const [compareTranslation, setCompareTranslation] = useState('kjv');
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isFocalOpen, setIsFocalOpen] = useState(false);
+    const readingsRef = useRef([]);
 
   // Playback
   const [playbackStatus, setPlaybackStatus] = useState('stopped');
@@ -1172,6 +1173,7 @@ function App() {
             const res = await fetch(`${basePath}data/readings.json?v=` + new Date().getTime());
             if (!res.ok) throw new Error(`Failed to load readings.json: ${res.status}`);
             const readings = await res.json();
+            readingsRef.current = readings;
             console.log("Loaded readings:", readings.length);
 
             const newIndex = {};
@@ -1517,11 +1519,19 @@ function App() {
         setVerseMap(null);
 
         try {
-            const days = index[selectedBook][selectedChapter];
-            if (!days || days.length === 0) throw new Error("No data found for this chapter.");
+            const indexedDays = index[selectedBook][selectedChapter];
+            const days = new Set(indexedDays || []);
+            const readingDays = readingsRef.current;
+            readingDays.forEach((reading, i) => {
+                if (!days.has(reading.day)) return;
+                if (i > 0) days.add(readingDays[i - 1].day);
+                if (i + 1 < readingDays.length) days.add(readingDays[i + 1].day);
+            });
+            const dayList = Array.from(days);
+            if (!dayList.length) throw new Error("No data found for this chapter.");
 
             // Load all relevant days
-            const dayDataList = await Promise.all(days.map(d => loadDailyBread(d)));
+            const dayDataList = await Promise.all(dayList.map(d => loadDailyBread(d)));
 
             // Merge maps
             const mergedMap = {};
@@ -1529,7 +1539,22 @@ function App() {
 
             dayDataList.forEach(d => {
                 if (d.verseMap) {
-                    Object.assign(mergedMap, d.verseMap);
+                    Object.entries(d.verseMap).forEach(([vid, incoming]) => {
+                        if (!mergedMap[vid]) {
+                            mergedMap[vid] = incoming;
+                            return;
+                        }
+                        const existing = mergedMap[vid];
+                        Object.entries(incoming).forEach(([key, value]) => {
+                            if (key === 'titles' && Array.isArray(value)) {
+                                existing.titles = Array.from(new Set([...(existing.titles || []), ...value]));
+                            } else if (value && typeof value === 'object' && !Array.isArray(value) && key !== 'original') {
+                                existing[key] = { ...(existing[key] || {}), ...value };
+                            } else {
+                                existing[key] = value;
+                            }
+                        });
+                    });
                     d.availableTranslations.forEach(k => keys.add(k));
                 }
             });
