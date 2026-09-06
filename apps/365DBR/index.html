@@ -353,6 +353,12 @@ const processEnglishContent = (contentArray, map, versionKey, orgToEnglish, orgT
   if (!contentArray) return;
   const context = { activeVid: null, lastSeenVid: null, pendingTitles: [] };
   for (const section of contentArray) {
+    const style = (section.attrs || {}).style || '';
+    if (section.name === 'para' && TITLE_PARA_STYLES.has(style)) {
+      const titleText = collectTextUnder(section).trim();
+      if (titleText) appendUniqueTitle(context.pendingTitles, titleText);
+      continue;
+    }
     if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context);
   }
 };
@@ -1047,9 +1053,13 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
             let fullText = '';
             let displayLabel = '';
             const contributing = [];
+            const titles = [];
 
             group.forEach((gVid) => {
                 const data = verseMap[gVid];
+                if (data && Array.isArray(data.titles)) {
+                    data.titles.forEach((t) => appendUniqueTitle(titles, t));
+                }
                 const slotData = data ? data[slot.source] : null;
                 if (slotData && slotData.text) {
                 const cleanedText = slotData.text;
@@ -1085,7 +1095,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                 displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
             }
 
-            return { text: fullText, displayLabel };
+            return { text: fullText, displayLabel, titleText: titles.join(' · ') };
         };
 
         const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;

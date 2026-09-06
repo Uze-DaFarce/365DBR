@@ -22,7 +22,7 @@ def expected_ids(book: str) -> set[str]:
 
 
 def verify(directory: Path) -> list[str]:
-    extracted = extract_directory(directory)
+    extracted, _titles = extract_directory(directory)
     issues: list[str] = []
     inventory: set[str] = set()
     paths = sorted(directory.rglob("*.usx"))
@@ -75,7 +75,8 @@ def main() -> int:
         print("LSB USX verification failed:")
         print("\n".join(f"- {issue}" for issue in issues))
         return 1
-    total = len(extract_directory(args.directory))
+    extracted, _titles = extract_directory(args.directory)
+    total = len(extracted)
     print(f"LSB USX verification passed: {len(BIBLE_DATA)} books, {total} non-empty verses")
     return 0
 
