@@ -630,12 +630,8 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
         const getSlotContent = (slot) => {
             if (!slot || !slot.source) return { text: '', displayLabel: '', titleText: '' };
             let fullText = '', displayLabel = '', contributing = [];
-            const titles = [];
             group.forEach((gVid) => {
                 const data = verseMap[gVid];
-                if (data && Array.isArray(data.titles)) {
-                    data.titles.forEach((t) => appendUniqueTitle(titles, t));
-                }
                 const slotData = data ? data[slot.source] : null;
                 if (slotData && slotData.text) {
                     const cleanedText = slotData.text;
@@ -656,7 +652,7 @@ const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlot
                 const [b, c, v] = group[0].split('.');
                 displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
             }
-            return { text: fullText, displayLabel, titleText: titles.join(' · ') };
+            return { text: fullText, displayLabel, titleText: '' };
         };
         const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
         return {
@@ -1532,14 +1528,15 @@ function App() {
 
         try {
             const indexedDays = index[selectedBook][selectedChapter];
-            const days = new Set(indexedDays || []);
+            const initialDays = new Set(indexedDays || []);
+            const daysToLoad = new Set(initialDays);
             const readingDays = readingsRef.current;
             readingDays.forEach((reading, i) => {
-                if (!days.has(reading.day)) return;
-                if (i > 0) days.add(readingDays[i - 1].day);
-                if (i + 1 < readingDays.length) days.add(readingDays[i + 1].day);
+                if (!initialDays.has(reading.day)) return; // Check the FROZEN initial set
+                if (i > 0) daysToLoad.add(readingDays[i - 1].day);
+                if (i + 1 < readingDays.length) daysToLoad.add(readingDays[i + 1].day);
             });
-            const dayList = Array.from(days);
+            const dayList = Array.from(daysToLoad);
             if (!dayList.length) throw new Error("No data found for this chapter.");
 
             // Load all relevant days
@@ -1791,6 +1788,7 @@ function App() {
       setSelectedBook(nextBook);
       setSelectedChapter(nextChapter.toString());
       setTargetScrollVerse(`${nextBook}.${nextChapter}.1`);
+      setActiveVerseId(`${nextBook}.${nextChapter}.1`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [selectedBook, selectedChapter, availableBooks]);
 

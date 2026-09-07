@@ -182,8 +182,12 @@ def compile_readings(page, readings, base_url, limit=None):
                 document.head.appendChild(script);
             }}""", json_str)
 
+            # Strip the BROWSE link from the static DOM
+            page.evaluate("""() => {
+                document.querySelectorAll('a[href*="bible.html"]').forEach(link => link.remove());
+            }""")
+
             # Get full HTML (with injected script + React scripts)
-            # We do NOT strip scripts anymore, so interactivity works.
             content = page.content()
 
             # Save to data directory
