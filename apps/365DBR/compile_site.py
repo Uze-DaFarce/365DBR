@@ -9,291 +9,223 @@ import argparse
 import sys
 import re
 import requests
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright
 from bible_common import validate_safe_path, validate_safe_relative_path
 
-# Use port 0 to let OS choose a free port
 DATA_DIR = "data"
 PRODUCTION_DATA_URL = "https://mt-sin.ai/365DBR/data"
+BASE_SITE_URL = "https://mt-sin.ai"
+SITEMAP_PATH = "../../sitemap.xml"
 
 def start_server(server_ready_event, port_container):
-    """Starts a simple HTTP server to serve the React app on a random port."""
     try:
-        # Change to the directory containing index.html (current directory)
         class QuietHandler(http.server.SimpleHTTPRequestHandler):
             def log_message(self, format, *args):
-                pass # Suppress logs
-
+                pass
         with socketserver.TCPServer(("", 0), QuietHandler) as httpd:
             port = httpd.server_address[1]
             port_container[0] = port
-            # print(f"Serving at port {port}")
             server_ready_event.set()
             httpd.serve_forever()
     except Exception as e:
         print(f"Server error: {e}")
-        server_ready_event.set() # Unblock main thread even on error
+        server_ready_event.set()
 
 def setup_data_interception(page, base_url):
-    """
-    Intercepts requests to /data/ and serves:
-    1. Local file if it exists (Priority)
-    2. Production file if local is missing (Fallback)
-    """
     def handle_route(route):
-        request = route.request
-        url = request.url
-
-        # Check if it's a data request
-        if "/data/" in url:
-            # Extract relative path after /data/
-            # Example: http://localhost:1234/data/0101/manifest.json -> 0101/manifest.json
+        url = route.request.url
+        split_token = "/data/"
+        
+        if split_token in url:
             try:
-                # Find where /data/ starts
-                split_token = "/data/"
-                if split_token in url:
-                    rel_path = url.split(split_token)[1]
+                rel_path = url.split(split_token)[1]
+                if not validate_safe_relative_path(rel_path):
+                    print(f"  [Blocked] Unsafe path requested: {rel_path}")
+                    route.abort('accessdenied')
+                    return
 
-                    if not validate_safe_relative_path(rel_path):
-                        route.abort('accessdenied')
+                local_path = os.path.join(DATA_DIR, rel_path.replace("/", os.sep))
+                if os.path.exists(local_path) and os.path.isfile(local_path):
+                    print(f"  [Served Local] {rel_path}")
+                    with open(local_path, "rb") as f:
+                        route.fulfill(status=200, body=f.read(), content_type="application/json")
                         return
 
-                    # 1. Check Local File
-                    local_path = os.path.join(DATA_DIR, rel_path.replace("/", os.sep))
-                    if os.path.exists(local_path) and os.path.isfile(local_path):
-                        # print(f"  [Local] Serving {rel_path}")
-                        with open(local_path, "rb") as f:
-                            content = f.read()
-                            route.fulfill(status=200, body=content, content_type="application/json")
+                if rel_path.endswith(".json"):
+                    prod_url = f"{PRODUCTION_DATA_URL}/{rel_path}"
+                    print(f"  [Fallback Prod] {prod_url}")
+                    try:
+                        resp = requests.get(prod_url, timeout=5)
+                        if resp.status_code == 200:
+                            route.fulfill(status=200, body=resp.content, content_type="application/json")
                             return
-
-                    # 2. Check Production (Fallback)
-                    # Only fallback if it's a JSON file (manifest or reading data)
-                    if rel_path.endswith(".json"):
-                        prod_url = f"{PRODUCTION_DATA_URL}/{rel_path}"
-                        print(f"  [Fallback] Fetching {rel_path} from Production...")
-                        try:
-                            resp = requests.get(prod_url)
-                            if resp.status_code == 200:
-                                route.fulfill(status=200, body=resp.content, content_type="application/json")
-                                return
-                            else:
-                                print(f"  [Error] Production fetch failed: {resp.status_code}")
-                        except Exception as e:
-                            print(f"  [Error] Production fetch error: {e}")
+                    except Exception as e:
+                        print(f"  [Fallback Error] {prod_url}: {e}")
 
             except Exception as e:
                 print(f"Interceptor Error: {e}")
 
-        # Continue normally if not handled
         route.continue_()
-
-    # Intercept everything under the base url that looks like data
-    # Note: The React app requests relative paths like "data/...", which resolve to base_url/data/...
     page.route("**/data/**/*.json", handle_route)
 
-def compile_readings(page, readings, base_url, limit=None):
+def compile_readings(browser, readings, base_url, limit=None):
     print("Compiling Daily Readings...")
     total = len(readings)
     if limit:
-        print(f"Limiting to first {limit} days.")
         readings = readings[:limit]
         total = limit
 
+    page = browser.new_page()
+    
+    # 🔴 DIAGNOSTIC LISTENERS 🔴
+    page.on("console", lambda msg: print(f"  [React Console]: {msg.text}"))
+    page.on("pageerror", lambda err: print(f"  [JS CRASH!]: {err}"))
+    
+    setup_data_interception(page, base_url)
+
     for i, day in enumerate(readings):
-        mmdd = day['day'] # e.g. "0225"
+        if i > 0 and i % 60 == 0:
+            page.close()
+            page = browser.new_page()
+            page.on("console", lambda msg: print(f"  [React Console]: {msg.text}"))
+            page.on("pageerror", lambda err: print(f"  [JS CRASH!]: {err}"))
+            setup_data_interception(page, base_url)
 
-        if not validate_safe_path(mmdd):
-             raise ValueError(f"[Security Error] Invalid day ID: {mmdd}")
-
-        # Determine output path: data/0225/index.html
+        mmdd = day['day']
         day_dir = os.path.join(DATA_DIR, mmdd)
-        if not os.path.exists(day_dir):
-            os.makedirs(day_dir)
-
+        os.makedirs(day_dir, exist_ok=True)
         output_file = os.path.join(day_dir, "index.html")
 
         url = f"{base_url}/index.html?startDate={mmdd}&static=true"
-        print(f"[{i+1}/{total}] Processing {mmdd}...", end="\r")
+        print(f"\n[{i+1}/{total}] Processing {mmdd}...")
 
         try:
-            response = page.goto(url, wait_until="networkidle")
-            if not response:
-                raise RuntimeError(f"Failed to load {url}: No response")
+            response = page.goto(url, wait_until="networkidle", timeout=15000)
+            if not response or response.status != 200:
+                raise RuntimeError(f"Status {response.status if response else 'None'}")
 
-            if response.status != 200:
-                raise RuntimeError(f"Failed to load {url}: Status {response.status}")
+            page.wait_for_selector(".verse-block", timeout=6000)
 
-            # Wait for content to load (verse blocks)
-            try:
-                page.wait_for_selector(".verse-block", timeout=5000)
-            except Exception as e:
-                raise RuntimeError(f"Timeout waiting for content on {mmdd}. (Data likely missing in both Local and Production)") from e
-
-            # --- Data Embedding Logic ---
-
-            # Step 1: Get Manifest
             manifest_path = os.path.join(DATA_DIR, mmdd, "manifest.json")
             manifest_content = None
 
-            # Try Local Manifest
             if os.path.exists(manifest_path):
-                 with open(manifest_path, 'r', encoding='utf-8') as f:
-                     manifest_content = json.load(f)
+                with open(manifest_path, 'r', encoding='utf-8') as f:
+                    manifest_content = json.load(f)
             else:
-                # Try Prod Manifest
                 try:
-                    r = requests.get(f"{PRODUCTION_DATA_URL}/{mmdd}/manifest.json")
-                    if r.status_code == 200:
-                        manifest_content = r.json()
-                except:
-                    pass
+                    r = requests.get(f"{PRODUCTION_DATA_URL}/{mmdd}/manifest.json", timeout=5)
+                    if r.status_code == 200: manifest_content = r.json()
+                except: pass
 
             full_data_payload = {}
             if manifest_content:
                 full_data_payload['manifest'] = manifest_content
                 full_data_payload['files'] = {}
                 for fname in manifest_content.get('files', []):
-                    if not validate_safe_path(fname):
-                         raise ValueError(f"[Security Error] Invalid filename in manifest: {fname}")
                     fpath = os.path.join(DATA_DIR, mmdd, fname)
-                    # Try Local File
                     if os.path.exists(fpath):
                         with open(fpath, 'r', encoding='utf-8') as f:
                             full_data_payload['files'][fname] = json.load(f)
                     else:
-                        # Try Prod File
                         try:
-                            r = requests.get(f"{PRODUCTION_DATA_URL}/{mmdd}/{fname}")
-                            if r.status_code == 200:
-                                full_data_payload['files'][fname] = r.json()
-                        except:
-                            pass
+                            r = requests.get(f"{PRODUCTION_DATA_URL}/{mmdd}/{fname}", timeout=5)
+                            if r.status_code == 200: full_data_payload['files'][fname] = r.json()
+                        except: pass
 
-            # Serialize Data
             json_str = json.dumps(full_data_payload, ensure_ascii=False)
 
-            # Inject Script into Head
             page.evaluate(f"""(data) => {{
-                const script = document.createElement('script');
-                script.id = 'preloaded-data';
-                script.type = 'application/json';
+                let script = document.getElementById('preloaded-data');
+                if (!script) {{
+                    script = document.createElement('script');
+                    script.id = 'preloaded-data';
+                    script.type = 'application/json';
+                    document.head.appendChild(script);
+                }}
                 script.textContent = data;
-                document.head.appendChild(script);
             }}""", json_str)
 
-            # Strip the BROWSE link from the static DOM
-            page.evaluate("""() => {
+            canonical_url = f"{BASE_SITE_URL}/365DBR/data/{mmdd}/index.html"
+            page.evaluate(f"""(canonUrl) => {{
                 document.querySelectorAll('a[href*="bible.html"]').forEach(link => link.remove());
-            }""")
+                let link = document.querySelector('link[rel="canonical"]');
+                if (!link) {{
+                    link = document.createElement('link');
+                    link.setAttribute('rel', 'canonical');
+                    document.head.appendChild(link);
+                }}
+                link.setAttribute('href', canonUrl);
+            }}""", canonical_url)
 
-            # Get full HTML (with injected script + React scripts)
-            content = page.content()
-
-            # Save to data directory
             with open(output_file, "w", encoding="utf-8") as f:
-                f.write(content)
+                f.write(page.content())
 
         except Exception as e:
-            raise RuntimeError(f"Error processing {mmdd}: {e}") from e
+            print(f"  [Error]: {e}")
+            continue
 
-    print("\nDaily Readings Compilation Complete.        ")
+    page.close()
+    print("\nDaily Readings Compilation Complete.")
+
+def update_sitemap(all_readings, sitemap_path=SITEMAP_PATH):
+    print(f"Updating {sitemap_path}...")
+    today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    core_urls = [
+        {"loc": f"{BASE_SITE_URL}/", "priority": "1.0", "changefreq": "daily"},
+        {"loc": f"{BASE_SITE_URL}/HeIsRisen/index.html", "priority": "0.9", "changefreq": "monthly"},
+        {"loc": f"{BASE_SITE_URL}/m/index.html", "priority": "0.7", "changefreq": "weekly"},
+    ]
+    xml_lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+
+    for item in core_urls:
+        xml_lines.append(f"  <url>\n    <loc>{item['loc']}</loc>\n    <lastmod>{today}</lastmod>\n    <changefreq>{item['changefreq']}</changefreq>\n    <priority>{item['priority']}</priority>\n  </url>")
+
+    for r in all_readings:
+        xml_lines.append(f"  <url>\n    <loc>{BASE_SITE_URL}/365DBR/data/{r['day']}/index.html</loc>\n    <lastmod>{today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>")
+    
+    xml_lines.append("</urlset>")
+    with open(sitemap_path, "w", encoding="utf-8") as f: f.write("\n".join(xml_lines) + "\n")
 
 def validate_args(args):
-    """
-    Validates command line arguments to prevent injection or misuse.
-    """
-    if args.day:
-        if not re.match(r'^(\d{4}|\d{4}-\d{4})$', args.day):
-             raise ValueError(f"[Input Error] Invalid day format: '{args.day}'. Expected MMDD or MMDD-MMDD.")
-
-    if args.month:
-        if not re.match(r'^(\d{2}|\d{2}-\d{2})$', args.month):
-             raise ValueError(f"[Input Error] Invalid month format: '{args.month}'. Expected MM or MM-MM.")
+    if args.day and not re.match(r'^(\d{4}|\d{4}-\d{4})$', args.day): raise ValueError("Invalid day format.")
+    if args.month and not re.match(r'^(\d{2}|\d{2}-\d{2})$', args.month): raise ValueError("Invalid month format.")
 
 def main():
-    parser = argparse.ArgumentParser(description="Compile the 365DBR site to static HTML.")
-    parser.add_argument("--day", help="Compile specific day (e.g., 0201) or range (0201-0210)")
-    parser.add_argument("--month", help="Compile specific month (e.g., 02) or range (02-03)")
-    parser.add_argument("--all", action="store_true", help="Compile all days")
-    parser.add_argument("--limit", type=int, help="Limit the number of days to process (for testing).")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--day"); parser.add_argument("--month"); parser.add_argument("--all", action="store_true")
+    parser.add_argument("--limit", type=int); parser.add_argument("--sitemap-only", action="store_true")
     args = parser.parse_args()
 
-    try:
-        validate_args(args)
-    except ValueError as e:
-        print(e)
-        return
+    try: validate_args(args)
+    except ValueError as e: return print(e)
 
-    # 3. Start Server
+    with open(os.path.join(DATA_DIR, "readings.json"), "r", encoding="utf-8") as f:
+        all_readings = json.load(f)
+
+    if args.sitemap_only: return update_sitemap(all_readings)
+
     server_ready = threading.Event()
     port_container = [0]
-    server_thread = threading.Thread(target=start_server, args=(server_ready, port_container), daemon=True)
-    server_thread.start()
-
+    threading.Thread(target=start_server, args=(server_ready, port_container), daemon=True).start()
     server_ready.wait()
-    port = port_container[0]
-    if port == 0:
-        print("Failed to start server.")
-        return
+    if port_container[0] == 0: return print("Failed to start server.")
 
-    base_url = f"http://localhost:{port}"
+    base_url = f"http://localhost:{port_container[0]}"
+    targets = all_readings
+    if args.day:
+        if '-' in args.day: targets = [r for r in all_readings if args.day.split('-')[0] <= r['day'] <= args.day.split('-')[1]]
+        else: targets = [r for r in all_readings if r['day'] == args.day]
 
-    # 4. Run Playwright
-    try:
-        with open("data/readings.json", "r") as f:
-            all_readings = json.load(f)
+    with sync_playwright() as p:
+        # 🔴 RUNNING HEADFUL SO YOU CAN SEE THE ERROR 🔴
+        browser = p.chromium.launch(headless=False)
+        compile_readings(browser, targets, base_url, limit=args.limit)
+        browser.close()
 
-        # Filter Readings
-        targets = []
-        if args.day:
-            if '-' in args.day:
-                start, end = args.day.split('-')
-                targets = [r for r in all_readings if r['day'] >= start and r['day'] <= end]
-            else:
-                targets = [r for r in all_readings if r['day'] == args.day]
-        elif args.month:
-            if '-' in args.month:
-                start_m, end_m = args.month.split('-')
-                s_int = int(start_m)
-                e_int = int(end_m)
-                def is_in_month_range(day_str, s, e):
-                    m = int(day_str[:2])
-                    if s <= e: return s <= m <= e
-                    else: return m >= s or m <= e
-                targets = [r for r in all_readings if is_in_month_range(r['day'], s_int, e_int)]
-            else:
-                targets = [r for r in all_readings if r['day'].startswith(args.month)]
-        elif args.all:
-            targets = all_readings
-        elif args.limit:
-            targets = all_readings
-        else:
-            print("Please specify --day, --month, --all, or --limit")
-            sys.exit(0)
-
-        if not targets:
-            print("No readings found matching criteria.")
-            sys.exit(0)
-
-        print(f"Found {len(targets)} days to process.")
-
-        with sync_playwright() as p:
-            browser = p.chromium.launch()
-            page = browser.new_page()
-
-            # Setup Data Interception
-            setup_data_interception(page, base_url)
-
-            compile_readings(page, targets, base_url, limit=args.limit)
-
-            browser.close()
-
-    except Exception as e:
-        print(f"Compilation failed: {e}")
-        sys.exit(1)
-
-    print(f"Compilation finished! Output in '{DATA_DIR}/<day>/index.html'.")
+    update_sitemap(all_readings)
 
 if __name__ == "__main__":
     main()

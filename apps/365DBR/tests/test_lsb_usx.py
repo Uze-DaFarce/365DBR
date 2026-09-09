@@ -2,11 +2,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from inject_lsb import english_verse_ids, verse_ids_for_pack
 from lsb_usx import extract_usx
 
 
-JOB_USX = Path(__file__).parents[1] / "data" / "LSB" / "release" / "USX_1" / "JOB.usx"
-SNG_USX = Path(__file__).parents[1] / "data" / "LSB" / "release" / "USX_1" / "SNG.usx"
+USX_DIR = Path(__file__).parents[1] / "LSB" / "release" / "USX_1"
+JOB_USX = USX_DIR / "JOB.usx"
+SNG_USX = USX_DIR / "SNG.usx"
 
 HEADING_USX = """<?xml version="1.0" encoding="UTF-8"?>
 <usx version="3.0">
@@ -54,6 +56,45 @@ class LsbUsxTests(unittest.TestCase):
         self.assertFalse(any("Troubled Dream" in t for t in titles.get("SNG.2.17", [])))
         self.assertTrue(any("Troubled Dream" in t for t in titles.get("SNG.3.1", [])))
         self.assertIn("On my bed", verses["SNG.3.1"])
+
+    def test_sng_6_13_is_present_in_usx(self):
+        verses, _titles = extract_usx(SNG_USX)
+        self.assertIn("SNG.6.13", verses)
+        self.assertIn("Shulammite", verses["SNG.6.13"])
+        self.assertIn("SNG.7.1", verses)
+        self.assertIn("sandals", verses["SNG.7.1"])
+        self.assertNotIn("Shulammite", verses["SNG.7.1"])
+
+    def test_english_verse_ids_ignore_original_org_numbering(self):
+        data = {
+            "content": [{"items": [{"attrs": {"verseId": "SNG.7.1"}}]}],
+            "parallels": [
+                {
+                    "bibleId": "de4e12af7f28f599-01",
+                    "content": [
+                        {"items": [{"attrs": {"verseId": "SNG.6.13"}}]},
+                        {"items": [{"attrs": {"verseId": "SNG.7.1"}}]},
+                    ],
+                }
+            ],
+        }
+        self.assertEqual(english_verse_ids(data), ["SNG.6.13", "SNG.7.1"])
+
+    def test_pack_keeps_lsb_only_verse_in_range(self):
+        data = {
+            "content": [{"items": [{"attrs": {"verseId": "SNG.7.1"}}]}],
+            "parallels": [
+                {
+                    "bibleId": "de4e12af7f28f599-01",
+                    "content": [{"items": [{"attrs": {"verseId": "SNG.6.12"}}]}],
+                }
+            ],
+        }
+        usx = {"SNG.6.12": "a", "SNG.6.13": "Come back, O Shulammite", "SNG.7.1": "sandals"}
+        path = Path("SNG.6.1-SNG.6.13.json")
+        ids = verse_ids_for_pack(path, data, usx)
+        self.assertIn("SNG.6.12", ids)
+        self.assertIn("SNG.6.13", ids)
 
 
 if __name__ == "__main__":

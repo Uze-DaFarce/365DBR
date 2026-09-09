@@ -2359,6 +2359,16 @@ const App = () => {
     initDay();
     return () => { isMounted = false; };
   }, [currentDate]);
+  
+  const sanitizeForSpeech = (text) => {
+    if (!text) return '';
+    return text
+        .replace(/YHWH/g, 'Yaw-weigh')
+        .replace(/WHO/g, 'Who')
+        .replace(/\bJob\b/g, 'Jobe')
+        .replace(/[\[\]]/g, '')
+        .replace(/¶/g, ''); 
+  };
 
   const playVerse = (vid, previousVid = null) => {
     if (!verseMap) return;
@@ -2401,12 +2411,6 @@ const App = () => {
         return;
     }
 
-    // Improve pronunciation: 
-    const speechText = rawText
-        .replace(/YHWH/g, 'Yaw-weigh')
-        .replace(/WHO/g, 'Who')
-        .replace(/[\[\]]/g, ''); 
-
     // Scroll to the LEADER vid container
     const el = document.getElementById(`verse-${leaderVid}`);
     if (el) {
@@ -2423,6 +2427,9 @@ const App = () => {
     const voices = window.speechSynthesis.getVoices();
     const preferredVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) || voices[0];
     
+    // Sanitize the verse text
+    const speechText = sanitizeForSpeech(rawText);
+
     // 5. Play LSV Verse with corrected pronunciation
     const mainUtterance = new SpeechSynthesisUtterance(speechText);
     mainUtterance.voice = preferredVoice;
@@ -2486,7 +2493,8 @@ const App = () => {
             }
         }
       
-        const intro = new SpeechSynthesisUtterance(introText);
+        // Sanitize the intro text so it pronounces the book correctly
+        const intro = new SpeechSynthesisUtterance(sanitizeForSpeech(introText));
         intro.voice = preferredVoice; 
         intro.rate = 0.9;
         intro.onend = () => {

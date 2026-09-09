@@ -1710,30 +1710,103 @@ function App() {
   }, [playbackStatus, loading, verseMap, groupedVids, targetScrollVerse]);
 
   // Audio Playback
-  const playVerse = (vid) => {
-      // Simplified playback for browser: Just speak the focal text
-      window.speechSynthesis.cancel();
-      setPlaybackVerseId(vid);
+  const playVerse = (vid, previousVid = null) => {
+    if (!verseMap) return;
 
-      const text = verseMap[vid]?.[dynamicSlots.bottom.source]?.text;
-      if (!text) return;
+    // 1. Resolve Group Logic
+    const group = groupedVids.find(g => g.includes(vid)) || [vid];
+    const leaderVid = group[0];
 
-      const u = new SpeechSynthesisUtterance(text.replace(/YHWH/g, 'Yaw-weigh').replace(/[\[\]]/g, ''));
-      u.onend = () => {
-          if (playbackStatusRef.current !== 'playing') return;
-          const idx = sortedVids.indexOf(vid);
-          if (idx < sortedVids.length - 1) playVerse(sortedVids[idx+1]);
-          else setPlaybackStatus('stopped');
-      };
-      window.speechSynthesis.speak(u);
+    // 2. Stop any current speech
+    window.speechSynthesis.cancel();
+    setPlaybackVerseId(leaderVid);
 
-      const el = document.getElementById(`verse-${vid}`);
-      if (el) {
-          const rect = el.getBoundingClientRect();
-          const absoluteTop = window.scrollY + rect.top;
-          const targetY = absoluteTop - 60;
-          window.scrollTo({ top: targetY, behavior: 'smooth' });
-      }
+    // 3. Prepare text from Focal Version
+    const focalSlot = dynamicSlots.bottom;
+    if (!focalSlot) return;
+
+    let groupText = '';
+    group.forEach(gVid => {
+        const slotData = verseMap[gVid] ? verseMap[gVid][focalSlot.source] : null;
+        if (slotData && slotData.text) {
+            const textStr = Array.isArray(slotData.text) ? slotData.text.join(' ') : slotData.text;
+            groupText += textStr.trim() + ' ';
+        }
+    });
+    
+    const rawText = groupText.trim();
+    if (!rawText) {
+        // Skip empty groups
+        const currentGroupIdx = groupedVids.findIndex(g => g[0] === leaderVid);
+        if (currentGroupIdx < groupedVids.length - 1) {
+            playVerse(groupedVids[currentGroupIdx + 1][0], previousVid);
+        } else {
+            setPlaybackStatus('stopped');
+            setPlaybackVerseId(null);
+        }
+        return;
+    }
+
+    // 4. Sanitize Text (SYNTAX FIXED)
+    const speechText = rawText
+        .replace(/YHWH/g, 'Yaw-weigh')
+        .replace(/WHO/g, 'Who')
+        .replace(/[\[\]]/g, '')
+        .replace(/\bJob\b/g, 'Jobe')
+        .replace(/¶/g, '');
+
+    // 5. Scroll to active verse
+    const el = document.getElementById(`verse-${leaderVid}`);
+    if (el) {
+        const rect = el.getBoundingClientRect();
+        const absoluteTop = window.scrollY + rect.top;
+        window.scrollTo({ top: absoluteTop - 60, behavior: 'smooth' });
+    }
+
+    // 6. Voice Selection
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) || voices[0];
+    
+    const mainUtterance = new SpeechSynthesisUtterance(speechText);
+    mainUtterance.voice = preferredVoice;
+    mainUtterance.rate = 0.9;
+
+    // 7. Auto-advance to next group in the chapter
+    mainUtterance.onend = () => {
+        if (playbackStatusRef.current !== 'playing') return; 
+        const currentGroupIdx = groupedVids.findIndex(g => g[0] === leaderVid);
+        if (currentGroupIdx < groupedVids.length - 1) {
+            playVerse(groupedVids[currentGroupIdx + 1][0], leaderVid);
+        } else {
+            setPlaybackStatus('stopped');
+            setPlaybackVerseId(null);
+        }
+    };
+
+    // 8. Handle Intro (Only announce on the very first click, not every verse)
+    if (!previousVid) {
+        const getEnglishVid = (v) => {
+             const d = verseMap[v];
+             const t = d ? d[focalSlot.source] : null;
+             return t?.displayVid || v;
+        };
+
+        const [book, ch, verse] = getEnglishVid(leaderVid).split('.');
+        const bookName = BOOK_NAMES[book] || book;
+        
+        // e.g., "Genesis chapter 1 verse 1"
+        const introText = `${bookName} chapter ${ch} verse ${verse}`;
+      
+        const intro = new SpeechSynthesisUtterance(introText);
+        intro.voice = preferredVoice; 
+        intro.rate = 0.9;
+        intro.onend = () => {
+            window.speechSynthesis.speak(mainUtterance);
+        };
+        window.speechSynthesis.speak(intro);
+    } else {
+        window.speechSynthesis.speak(mainUtterance);
+    }
   };
 
   // True when Next advances to the following book (last chapter of current book).
