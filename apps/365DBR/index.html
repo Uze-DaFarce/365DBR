@@ -189,205 +189,33 @@ const TRANSLATION_REGISTRY = {
  * - USFM title paras (style d/s/…): stored as entry.titles[], NEVER appended into verse body.
  * Fixes Psalms empty slots (org superscription with no English) and titles glued onto v.1 text.
  */
-const TITLE_PARA_STYLES = new Set(['d', 's', 's1', 's2', 's3', 'ms', 'ms1', 'ms2', 'mr', 'r', 'sp', 'qa']);
-const TITLE_PREFIX_RE = /^(?:(?:Psalm|Psalms)\s+\d+|(?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David|In\s+the\s+Shadow\s+of\s+Your\s+Wings|(?:A|The)\s+Song\s+of\s+David|(?:[A-Z]{1,3}\s+)?(?:A|THE)\s+PRAYER\s+OF\s+DAVID|(?:[A-Z]{1,3}\s+)?PSALM\s+\d+)(?:[.:;])?\s*/i;
-const TITLE_PREFIX_RE_SIMPLE = /^((?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David\.|(?:A|THE)\s+PRAYER\s+OF\s+DAVID\.|(?:Psalm|Psalms)\s+\d+\.?|In\s+the\s+Shadow\s+of\s+Your\s+Wings\.?|(?:A|The)\s+Song\s+of\s+David\.?)(?:\s+|$)/i;
-
-const collectTextUnder = (item) => {
-  const parts = [];
-  if (!item || typeof item !== 'object') return '';
-  if (item.type === 'text' && item.text) parts.push(item.text);
-  const kids = item.items || [];
-  for (let i = 0; i < kids.length; i++) parts.push(collectTextUnder(kids[i]));
-  return parts.join('');
+/** --- AST RENDERER & TEXT EXTRACTOR --- **/
+const extractText = (nodes) => {
+  if (!nodes || !Array.isArray(nodes)) return '';
+  return nodes.map(n => n.type === 'text' ? n.text || '' : extractText(n.items)).join('');
 };
 
-const stripTitlePrefix = (text) => {
-  const raw = String(text || '').trim();
-  if (!raw) return { text: '', title: '' };
+const RichTextNode = ({ node }) => {
+  if (!node) return null;
+  if (node.type === 'text') return <>{node.text}</>;
 
-  let remaining = raw;
-  const titles = [];
-  const titlePattern = /^(?:(?:Psalm|Psalms)\s+\d+|(?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David|In\s+the\s+Shadow\s+of\s+Your\s+Wings|(?:A|The)\s+Song\s+of\s+David|(?:[A-Z]{1,3}\s+)?(?:A|THE)\s+PRAYER\s+OF\s+DAVID|(?:[A-Z]{1,3}\s+)?PSALM\s+\d+)(?:[.:;])?(?=\s|$|[·•▪|/\\-–—:;,.])/i;
+  const Tag = node.name === 'para' ? 'div' : 'span';
+  const style = node.attrs?.style || '';
 
-  while (remaining) {
-    remaining = remaining.replace(/^[\s·•▪|/\\\-–—:;,.]+/, '');
-    const match = remaining.match(titlePattern);
-    if (!match) break;
-    const title = match[0].replace(/[.;:]+$/, '').trim().replace(/\s+/g, ' ');
-    if (title) titles.push(title);
-    remaining = remaining.slice(match[0].length).replace(/^[\s·•▪|/\\\-–—:;,.]+/, '');
-  }
+  let cls = '';
+  if (['q', 'q1', 'q2'].includes(style)) cls += ' ml-4 sm:ml-8 block';
+  if (style === 'wj') cls += ' text-red-600';
+  if (style === 'add') cls += ' italic opacity-80';
+  if (style === 'nd') cls += ' font-bold uppercase tracking-wider text-[0.85em]';
+  if (['s', 's1', 'd'].includes(style)) cls += ' font-bold mt-2 mb-1 block text-amber-900 text-sm md:text-lg tracking-wide uppercase';
 
-  if (!titles.length) return { text: raw, title: '' };
-  return { text: remaining || '', title: titles.join(' · ') };
+  return (
+      <Tag className={cls.trim() || undefined}>
+          {node.items?.map((child, i) => <RichTextNode key={i} node={child} />)}
+      </Tag>
+  );
 };
 
-const appendUniqueTitle = (list, title) => {
-  if (!title || !list) return;
-  const cleaned = title.trim().replace(/\s+/g, ' ');
-  if (!cleaned || list.includes(cleaned)) return;
-  list.push(cleaned);
-};
-
-const ensureVerseEntry = (map, vid, versionKey) => {
-  if (!map[vid]) map[vid] = {};
-  if (versionKey && !map[vid][versionKey]) {
-    map[vid][versionKey] = { text: [], displayVid: vid };
-  }
-  return map[vid];
-};
-
-/** Walk English parallel: key by verseId; capture title paras separately; fill org→English maps. */
-const walkEnglishItems = (items, map, versionKey, orgToEnglish, orgToAll, context) => {
-  if (!items) return;
-  for (const item of items) {
-    const attrs = item.attrs || {};
-    const style = attrs.style || '';
-
-    // Title / superscription para — do not merge into verse body text
-    if (item.name === 'para' && TITLE_PARA_STYLES.has(style)) {
-      const titleText = collectTextUnder(item).trim();
-      if (titleText) appendUniqueTitle(context.pendingTitles, titleText);
-      continue; // do not walk children as verse body
-    }
-
-    const previousActiveVid = context.activeVid;
-    if (attrs.verseId) {
-      const engVid = attrs.verseId;
-      const orgs = attrs.verseOrgIds || [];
-      if (orgs.length > 0) {
-        const org = orgs[0];
-        if (org) {
-          if (!orgToEnglish[org]) orgToEnglish[org] = engVid;
-          if (!orgToAll[org]) orgToAll[org] = [];
-          if (!orgToAll[org].includes(engVid)) orgToAll[org].push(engVid);
-        }
-      }
-      context.activeVid = engVid;
-      context.lastSeenVid = engVid;
-      ensureVerseEntry(map, engVid, versionKey);
-      if (context.pendingTitles.length > 0) {
-        if (!map[engVid].titles) map[engVid].titles = [];
-        context.pendingTitles.forEach((title) => appendUniqueTitle(map[engVid].titles, title));
-        context.pendingTitles = [];
-      }
-    }
-
-    if (item.type === 'text' && item.text) {
-      const cleanedText = item.text;
-      if (cleanedText) {
-        if (context.activeVid && map[context.activeVid] && map[context.activeVid][versionKey]) {
-          map[context.activeVid][versionKey].text.push(cleanedText);
-        } else if (cleanedText.trim().length > 0 && context.lastSeenVid &&
-                   map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
-          map[context.lastSeenVid][versionKey].text.push(cleanedText);
-        }
-      }
-    }
-
-    if (item.items && item.items.length > 0) {
-      walkEnglishItems(item.items, map, versionKey, orgToEnglish, orgToAll, context);
-    }
-    context.activeVid = previousActiveVid;
-  }
-};
-
-/** Walk original language: attach under English keys via org maps; bare superscription → titles. */
-const walkOriginalItems = (items, map, orgToEnglish, orgToAll, context) => {
-  if (!items) return;
-  for (const item of items) {
-    const attrs = item.attrs || {};
-    const previousActiveVid = context.activeVid;
-
-    if (attrs.verseId) {
-      const orgVid = attrs.verseId;
-      context.activeVid = orgVid;
-      context.lastSeenVid = orgVid;
-      const targets = (orgToAll[orgVid] && orgToAll[orgVid].length)
-        ? orgToAll[orgVid]
-        : (orgToEnglish[orgVid] ? [orgToEnglish[orgVid]] : null);
-
-      if (targets) {
-        context.targets = targets;
-        targets.forEach((eng) => ensureVerseEntry(map, eng, 'original'));
-      } else if (map[orgVid] && (map[orgVid].lsb || map[orgVid].lsv || map[orgVid].kjv)) {
-        // Same BCV string as an English verse, but this org content is superscription-only
-        context.targets = null;
-        context.superscriptionFor = orgVid;
-        if (!map[orgVid].titles) map[orgVid].titles = [];
-      } else {
-        // Unmapped org-only material — do not create empty English rows
-        context.targets = null;
-        context.superscriptionFor = null;
-      }
-    }
-
-    if (item.type === 'text' && item.text) {
-      const { text: cleanedText, title } = stripTitlePrefix(item.text);
-      if (title && context.superscriptionFor && map[context.superscriptionFor]) {
-        if (!map[context.superscriptionFor].titles) map[context.superscriptionFor].titles = [];
-        appendUniqueTitle(map[context.superscriptionFor].titles, title);
-      }
-      if (context.targets && context.targets.length) {
-        context.targets.forEach((eng) => {
-          if (map[eng] && map[eng].original) map[eng].original.text.push(cleanedText || item.text);
-        });
-      } else if (context.superscriptionFor && map[context.superscriptionFor]) {
-        // Accumulate superscription surface into titles (join later)
-        if (!context.superBuf) context.superBuf = {};
-        const k = context.superscriptionFor;
-        if (!context.superBuf[k]) context.superBuf[k] = [];
-        if (cleanedText) context.superBuf[k].push(cleanedText);
-      }
-    }
-
-    if (item.items && item.items.length > 0) {
-      walkOriginalItems(item.items, map, orgToEnglish, orgToAll, context);
-    }
-    if (attrs.strong && context.targets && context.targets.length) {
-      context.targets.forEach((eng) => {
-        if (map[eng] && map[eng].original) map[eng].original.hasStrong = true;
-      });
-    }
-    context.activeVid = previousActiveVid;
-  }
-};
-
-const processEnglishContent = (contentArray, map, versionKey, orgToEnglish, orgToAll) => {
-  if (!contentArray) return;
-  const context = { activeVid: null, lastSeenVid: null, pendingTitles: [] };
-  for (const section of contentArray) {
-    const style = (section.attrs || {}).style || '';
-    if (section.name === 'para' && TITLE_PARA_STYLES.has(style)) {
-      const titleText = collectTextUnder(section).trim();
-      if (titleText) appendUniqueTitle(context.pendingTitles, titleText);
-      continue;
-    }
-    if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context);
-  }
-};
-
-const processOriginalContent = (contentArray, map, orgToEnglish, orgToAll) => {
-  if (!contentArray) return;
-  const context = {
-    activeVid: null,
-    lastSeenVid: null,
-    targets: null,
-    superscriptionFor: null,
-    superBuf: {},
-  };
-  for (const section of contentArray) {
-    if (section.items) walkOriginalItems(section.items, map, orgToEnglish, orgToAll, context);
-  }
-  // Flush Hebrew superscription buffers into titles[]
-  Object.keys(context.superBuf).forEach((vid) => {
-    const t = context.superBuf[vid].join('').trim();
-    if (!t || !map[vid]) return;
-    if (!map[vid].titles) map[vid].titles = [];
-    appendUniqueTitle(map[vid].titles, t);
-  });
-};
 
 const getBasePath = () => {
     // If we are serving from a subdirectory (e.g. /0225/), we need to go up one level to access data/
@@ -396,156 +224,38 @@ const getBasePath = () => {
     }
     return '';
 };
-
 const loadDailyBread = async (dateFolder) => {
-  // Check for preloaded data (SSR/Static Site Generation)
-  const preloadedScript = document.getElementById('preloaded-data');
-  if (preloadedScript && preloadedScript.textContent) {
-      try {
-          const preloaded = JSON.parse(preloadedScript.textContent);
-          // Check if we already used this data to hydrate the initial load
-          if (preloadedScript.dataset.used !== 'true') {
-             preloadedScript.dataset.used = 'true';
-
-             const manifest = preloaded.manifest;
-             const filesMap = preloaded.files || {};
-
-             const results = [];
-             if (manifest && manifest.files) {
-                 manifest.files.forEach(fileName => {
-                     if (filesMap[fileName]) {
-                         results.push(filesMap[fileName]);
-                     }
-                 });
-             }
-
-             if (results.length > 0) {
-                 const verseMap = {};
-                 const availableKeys = new Set(['original']);
-                 processResults(results, verseMap, availableKeys);
-                 return buildFinalData(verseMap, manifest, availableKeys);
-             }
-          }
-      } catch (e) {
-          console.warn("Failed to parse preloaded data", e);
-      }
-  }
-
   const basePath = getBasePath();
+  let url = `${basePath}data/${dateFolder}/canonical_map.json`;
+  let res = await fetch(url).catch(() => null);
 
-  // Try local first, fallback to mt-sin.ai
-  let manifestRes = await fetch(`${basePath}data/${dateFolder}/manifest.json`).catch(() => null);
-
-  // If local fetch fails or returns 404, fallback to production API
-  let actualBasePath = basePath;
-  if (!manifestRes || !manifestRes.ok) {
-    actualBasePath = "https://mt-sin.ai/365DBR/";
-    manifestRes = await fetch(`${actualBasePath}data/${dateFolder}/manifest.json`);
+  // Fallback to production API if local fetch fails
+  if (!res || !res.ok) {
+    url = `https://mt-sin.ai/365DBR/data/${dateFolder}/canonical_map.json`;
+    res = await fetch(url);
   }
 
-  if (!manifestRes.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
-  const manifest = await manifestRes.json();
+  if (!res.ok) throw new Error(`Canonical data for ${dateFolder} not found.`);
+  
+  const canonicalMap = await res.json();
+  const vids = Object.keys(canonicalMap);
+  if (!vids.length) throw new Error("Empty reading map.");
 
-  const results = await Promise.all(
-    manifest.files.map(async fileName => {
-        const res = await fetch(`${actualBasePath}data/${dateFolder}/${fileName}`);
-        if (!res.ok) throw new Error(`Failed to load ${fileName} (Status: ${res.status})`);
-        const json = await res.json();
-        if (!json || !json.data) {
-             throw new Error(`Invalid data structure in ${fileName}`);
-        }
-        return json;
-    })
-  );
+  // Extract translation keys (e.g., LSB, KJV, LSV) but exclude the primary Hebrew/Greek base
+  const availableKeys = Object.keys(canonicalMap[vids[0]].verses).filter(k => k !== 'HEB');
 
-  const verseMap = {};
-  const availableKeys = new Set(['original']);
-  processResults(results, verseMap, availableKeys);
-  return buildFinalData(verseMap, manifest, availableKeys);
-};
-
-const matchParallelTranslation = (parallel) => {
-  if (!parallel) return null;
-  const injected = String(parallel.translationCode || '').toLowerCase();
-  if (injected && TRANSLATION_REGISTRY[injected] && !TRANSLATION_REGISTRY[injected].isHebrewGreek) {
-    return injected;
-  }
-  const bibleId = parallel.bibleId || '';
-  return Object.keys(TRANSLATION_REGISTRY).find((key) => {
-    const config = TRANSLATION_REGISTRY[key];
-    if (!config || config.isHebrewGreek) return false;
-    if (config.translationCode && String(parallel.translationCode || '').toUpperCase() === config.translationCode) {
-      return true;
-    }
-    if (config.idPrefix && bibleId.includes(config.idPrefix)) return true;
-    if (config.altIds && config.altIds.some((id) => bibleId === id)) return true;
-    return false;
-  }) || null;
-};
-
-const processResults = (results, verseMap, availableKeys) => {
-  results.forEach((source) => {
-    const data = source.data;
-    if (!data) return;
-
-    const orgToEnglish = {};
-    const orgToAll = {};
-
-    // 1. English parallels first (English-primary keys + org maps + titles[])
-    if (data.parallels) {
-      data.parallels.forEach(parallel => {
-         const matchedKey = matchParallelTranslation(parallel);
-
-         if (matchedKey && parallel.content) {
-            processEnglishContent(parallel.content, verseMap, matchedKey, orgToEnglish, orgToAll);
-            availableKeys.add(matchedKey);
-         }
-      });
-    }
-
-    // 2. Original remapped onto English keys (no empty org-only rows)
-    if (data.content) {
-      processOriginalContent(data.content, verseMap, orgToEnglish, orgToAll);
-    }
-  });
-};
-
-const buildFinalData = (verseMap, manifest, availableKeys) => {
-  // Sort keys to ensure consistent order (e.g. KJV, LSV, etc.)
-  const sortedKeys = Array.from(availableKeys).filter(k => k !== 'original');
-
-  // ⚡ Bolt Optimization: Flatten text arrays into single strings to reduce memory and render cost.
-  // WARNING: If this logic changes (e.g., reverting to arrays), ensure `playVerse` is updated to handle the new format.
-  // ⚡ Bolt Optimization: Use for...in loops to avoid allocating intermediate arrays (Object.keys/values)
-  // during critical data loading phase. Reduces GC pressure on mobile devices.
-  for (const vid in verseMap) {
-      const verseData = verseMap[vid];
-      for (const key in verseData) {
-          const entry = verseData[key];
-          if (entry && entry.text && Array.isArray(entry.text)) {
-              const config = TRANSLATION_REGISTRY[key];
-              const separator = config && config.isHebrewGreek ? '' : ' ';
-              entry.text = entry.text.join(separator);
-          }
-          if (Array.isArray(entry?.titles)) {
-              entry.titles = Array.from(new Set(entry.titles.map((t) => String(t).trim()).filter(Boolean))).filter((t) => !t.match(/^A\s+Prayer\s+of\s+David\.?$/i) || t.length > 0);
-          }
-      }
-  }
-
-  // Calculate Reading Time (Standard 200 wpm)
   let wordCount = 0;
-  Object.values(verseMap).forEach(verseData => {
-      // Prioritize English if available
-      const t = verseData.lsb || verseData.lsv || verseData.kjv || verseData.web || verseData.nlt || verseData.original;
-      if (t && t.text) {
-          // Text is already joined by space above
-          wordCount += (t.text.trim() === '' ? 0 : t.text.trim().split(/\s+/).length);
-      }
+  Object.values(canonicalMap).forEach(block => {
+      // Calculate word count from the focal text
+      const text = extractText(block.verses.LSB || block.verses.KJV || block.verses.HEB);
+      wordCount += text.trim().split(/\s+/).length;
   });
-  const readingTime = Math.ceil(wordCount / 200);
 
-  return { verseMap, label: manifest.label, availableTranslations: sortedKeys, readingTime };
+  return { 
+      verseMap: canonicalMap, 
+      availableTranslations: availableKeys, 
+      readingTime: Math.ceil(wordCount / 200) 
+  };
 };
 
 /** --- UTILS --- **/
@@ -639,12 +349,7 @@ const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
     if (!verseMap) return "";
 
     const getEngVid = (vid) => {
-        if (!focalKey) return vid;
-        const d = verseMap[vid];
-        if (d && d[focalKey] && d[focalKey].displayVid) {
-            return d[focalKey].displayVid;
-        }
-        return vid;
+        return verseMap[vid]?.displayVid || vid;
     };
 
     const vids = sortedVids || [];
@@ -715,7 +420,6 @@ const generateSmartLabel = (verseMap, sortedVids, focalKey) => {
 
     return parts.join(', ');
 };
-
 const CopyButton = ({ text, reference, version, ...props }) => {
     const [status, setStatus] = useState('idle');
 
@@ -862,7 +566,13 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const group = (groupedVids && groupedVids.find((g) => g.includes(verseId))) || [verseId];
     const englishBody = group
       .map((vid) => {
-        const text = verseMap?.[vid]?.[source]?.text;
+        const block = verseMap?.[vid];
+        if (!block) return '';
+        if (block.verses) {
+          const dataSrc = !source || source === 'original' ? 'HEB' : String(source).toUpperCase();
+          return extractText(block.verses[dataSrc] || []);
+        }
+        const text = block[source]?.text;
         return Array.isArray(text) ? text.join(' ') : (text || '');
       })
       .filter(Boolean)
@@ -1022,198 +732,165 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
         </div>
     );
 }
-
 const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying, onBookmark, onOpenStrongs, strongsAvailable }) => {
     const vid = group[0];
+    const block = verseMap[vid];
+    if (!block) return null;
+
     const book = vid.substring(0, 3);
     const sectionIndex = getSectionIndex(vid);
     const focalTheme = FOCAL_THEMES[sectionIndex] || FOCAL_THEMES[0];
-
-    // ⚡ Bolt Optimization: Use O(1) Set lookup instead of O(N) array includes + allocation
     const isHebrew = !NT_BOOKS.has(book);
 
     const handleVerseClick = (e) => {
         if (isPlaying) return;
-
-        // Prevent scroll if selecting text
         const selection = window.getSelection();
         if (selection && selection.type === 'Range' && selection.toString().length > 0) return;
-
         const el = document.getElementById(`verse-${vid}`);
         if (el) {
             const rect = el.getBoundingClientRect();
             const absoluteTop = window.scrollY + rect.top;
             const targetY = absoluteTop - 60;
             window.scrollTo({ top: targetY, behavior: 'smooth' });
+            window.dispatchEvent(new CustomEvent('verseclicked', { detail: { vid } }));
         }
     };
 
-    // ⚡ Bolt Optimization: Memoize content generation to prevent expensive string operations
-    // on every render (e.g. during scroll/highlight transitions).
-    // The content only changes if translations or data change, not when 'isActive' toggles.
-    const renderedSlots = useMemo(() => {
-        const getSlotContent = (slot) => {
-            if (!slot || !slot.source) return { text: '', displayLabel: '' };
+    const renderSlot = (slotConfig, isFocal, slotName) => {
+        if (!slotConfig || !slotConfig.source) return null;
+        
+        const dataSrc = slotConfig.source === 'original' ? 'HEB' : slotConfig.source.toUpperCase();
+        
+        const headingNodes = block.headings[dataSrc] || [];
+        const verseNodes = block.verses[dataSrc] || [];
+        if (!headingNodes.length && !verseNodes.length) return null;
 
-            let fullText = '';
-            let displayLabel = '';
-            const contributing = [];
+        const textStr = extractText(verseNodes);
+        
+        // Calculate transparent, localized reference labels
+        const [b, c, v] = vid.split('.');
+        const chapter = parseInt(c);
+        const verse = parseInt(v);
 
-            group.forEach((gVid) => {
-                const data = verseMap[gVid];
-                const slotData = data ? data[slot.source] : null;
-                if (slotData && slotData.text) {
-                const cleanedText = slotData.text;
-                    if (cleanedText) {
-                        fullText += (fullText ? ' ' : '') + cleanedText;
+
+        // 1. Calculate default English baseline
+ 
+        let displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
+
+        // 2. Dynamically override label using actual AST data for 100% transparency
+        if (verseNodes.length > 0 || headingNodes.length > 0) {
+            const renderedVids = new Set();
+            const extractVids = (nodes) => {
+                if (!nodes || !Array.isArray(nodes)) return;
+                nodes.forEach(n => {
+                    if (n?.type === 'text' && n?.attrs?.verseId) {
+                        renderedVids.add(n.attrs.verseId);
                     }
-                    contributing.push(slotData.displayVid || gVid);
-                }
-            });
-            if (contributing.length > 0) {
-                const first = contributing[0];
-                const last = contributing[contributing.length - 1];
+                    if (n?.items) extractVids(n.items);
+                });
+            };
+            
+            // Extract from both headings (e.g., Psalm titles) and verses
+            extractVids(headingNodes); 
+            extractVids(verseNodes);
 
-                const s = parseVid(first);
-                const e = parseVid(last);
-                const bName = BOOK_NAMES[s.book] || s.book;
+            if (renderedVids.size > 0) {
+                const vidsArr = Array.from(renderedVids);
+                // Sort by chapter/verse to ensure chronological labeling
+                vidsArr.sort((x, y) => {
+                    const [, cx, vx] = x.split('.').map(Number);
+                    const [, cy, vy] = y.split('.').map(Number);
+                    return cx !== cy ? cx - cy : vx - vy;
+                });
 
-                if (first === last) {
-                    displayLabel = `${bName} ${s.chapter}:${s.verse}`;
-                } else if (s.book === e.book) {
-                    if (s.chapter === e.chapter) {
-                        displayLabel = `${bName} ${s.chapter}:${s.verse}-${e.verse}`;
-                    } else {
-                        displayLabel = `${bName} ${s.chapter}:${s.verse}-${e.chapter}:${e.verse}`;
-                    }
+                const first = vidsArr[0].split('.');
+                const last = vidsArr[vidsArr.length - 1].split('.');
+                const bName = BOOK_NAMES[first[0]] || first[0];
+                
+                if (vidsArr.length === 1) {
+                    displayLabel = `${bName} ${first[1]}:${first[2]}`;
+                } else if (first[1] === last[1]) {
+                    displayLabel = `${bName} ${first[1]}:${first[2]}-${last[2]}`; // e.g. Psalms 40:1-2
                 } else {
-                    const eName = BOOK_NAMES[e.book] || e.book;
-                    displayLabel = `${bName} ${s.chapter}:${s.verse} - ${eName} ${e.chapter}:${e.verse}`;
+                    displayLabel = `${bName} ${first[1]}:${first[2]} - ${last[1]}:${last[2]}`; // Cross-chapter spans
                 }
-
-            } else if (group.length > 0) {
-                const [b, c, v] = group[0].split('.');
-                displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
             }
+        }
 
-            return { text: fullText, displayLabel };
-        };
+        let bgClass = "";
+        let textClass = "";
+        let colorClass = "";
 
-        const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
+        if (slotName === 'top') {
+            bgClass = isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100';
+            textClass = slotConfig.isHebrewGreek ? (isHebrew ? 'hebrew text-[16px] md:text-2xl text-right' : 'greek text-base md:text-xl text-left') : 'text-lg md:text-3xl font-serif italic';
+            colorClass = isActive ? 'text-white' : 'text-stone-500';
+        } else if (slotName === 'middle') {
+            bgClass = isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80';
+            textClass = 'text-lg md:text-3xl font-serif italic tracking-tighter';
+            colorClass = isActive ? 'text-stone-900 font-bold' : 'text-stone-500';
+        } else if (slotName === 'bottom') {
+            bgClass = isActive ? `${focalTheme.bg} shadow-xl ${focalTheme.border} ring-1 ${focalTheme.ring}` : 'bg-white/40 border-transparent opacity-80';
+            textClass = 'text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight';
+            colorClass = isActive ? 'text-black' : 'text-stone-500';
+        }
 
-        return {
-            top: { ...getSlotContent(dynamicSlots.top), label: getLabel(dynamicSlots.top), config: dynamicSlots.top },
-            middle: { ...getSlotContent(dynamicSlots.middle), label: getLabel(dynamicSlots.middle), config: dynamicSlots.middle },
-            bottom: { ...getSlotContent(dynamicSlots.bottom), label: getLabel(dynamicSlots.bottom), config: dynamicSlots.bottom, attribution: dynamicSlots.bottom.attribution }
-        };
-    }, [group, verseMap, dynamicSlots, isHebrew]);
+        // Securely define the color based on slot position and active state
+        let headingColor = isActive 
+            ? (slotName === 'top' ? 'text-stone-300' : 'text-stone-700') 
+            : 'text-stone-400';
+
+        // Apply specific typography without overwriting the color
+        let headingClass = slotConfig.isHebrewGreek 
+            ? `mb-1 ${colorClass} ${isHebrew ? 'hebrew text-[16px] md:text-2xl text-right' : 'greek text-base md:text-xl text-left'}`
+            : `text-xs md:text-sm font-serif italic mb-0.5 opacity-90 ${colorClass}`;
+
+        return (
+            <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${bgClass}`}>
+                <div className="flex justify-between items-center mb-0.5">
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive && slotName !== 'top' ? focalTheme.text : 'text-stone-400'}`}>
+                        {typeof slotConfig.label === 'function' ? slotConfig.label(isHebrew) : slotConfig.label}
+                        {slotConfig.attribution && (
+                            <a href={slotConfig.attribution.link} className={`inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 ${focalTheme.linkHover} cursor-pointer focus:outline-none focus-visible:ring-2 ${focalTheme.linkRing} rounded-sm`} title={slotConfig.attribution.title}>{slotConfig.attribution.text}</a>
+                        )}
+                    </span>
+                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive && slotName !== 'top' ? focalTheme.text : 'text-stone-400'}`}>
+                        <span>{displayLabel}</span>
+                        {!isPlaying && (
+                            <div className="flex items-center opacity-100">
+                                <CopyButton text={textStr} reference={displayLabel} version={dataSrc + ((slotConfig.source === 'lsv' || slotConfig.source === 'lsb') ? '©' : '')} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                {slotName === 'bottom' && (
+                                    <>
+                                        <BookmarkButton onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                        {strongsAvailable && onOpenStrongs && isHebrew && (
+                                            <StrongsButton onOpen={() => onOpenStrongs(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+                {headingNodes.length > 0 && (
+                    <div className={headingClass} style={{ direction: dataSrc === 'HEB' && isHebrew ? 'rtl' : 'ltr' }}>
+                        {headingNodes.map((n, i) => <RichTextNode key={`h-${i}`} node={n} />)}
+                    </div>
+                )}
+                <div className={`${textClass}`} style={{ direction: dataSrc === 'HEB' && isHebrew ? 'rtl' : 'ltr' }}>
+                    <span className={colorClass}>
+                        {verseNodes.map((n, i) => <RichTextNode key={`v-${i}`} node={n} />)}
+                    </span>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div id={`verse-${vid}`} onClick={handleVerseClick} className={`verse-block group transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'} ${!isPlaying ? 'cursor-pointer' : ''}`}>
-            <div className="flex flex-col gap-1">
-            {/* SLOT 1: TOP (Usually Original) */}
-            {(() => {
-                const { text, displayLabel, label, config } = renderedSlots.top;
-                return (
-                    <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
-                    <div className="flex justify-between items-center mb-0.5">
-                        <span className={`text-[7px] md:text-[10px] uppercase font-black tracking-widest ${isActive ? 'text-amber-500' : 'text-stone-400'}`}>{label}</span>
-                        <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-mono font-bold ${isActive ? 'text-amber-500' : 'text-stone-400'} uppercase`}>
-                             <span>{displayLabel}</span>
-                             {!isPlaying && (
-                                <CopyButton
-                                    text={text}
-                                    reference={displayLabel}
-                                    version={isHebrew ? 'OH' : 'OG'}
-                                    tabIndex={isActive ? 0 : -1}
-                                    aria-hidden={!isActive}
-                                />
-                             )}
-                        </div>
-                    </div>
-                    <div className={`leading-tight tracking-tight break-words ${config.isHebrewGreek ? (isHebrew ? 'hebrew text-[12px] md:text-xl text-right' : 'greek text-base md:text-lg text-left') : 'text-lg md:text-3xl font-serif italic'}`} style={{ direction: config.isHebrewGreek && isHebrew ? 'rtl' : 'ltr' }}>
-                        <span className={isActive ? 'text-white' : 'text-stone-500'}>{text}</span>
-                    </div>
-                    </div>
-                );
-            })()}
-
-            {/* SLOT 2: MIDDLE (Secondary) */}
-            {(() => {
-                const { text, displayLabel, label, titleText } = renderedSlots.middle;
-                return (
-                <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
-                    <div className="flex justify-between items-center mb-0.5">
-                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>{label}</span>
-                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>
-                        <span>{displayLabel}</span>
-                        {!isPlaying && dynamicSlots.middle.source && (
-                            <CopyButton
-                                text={text}
-                                reference={displayLabel}
-                                version={dynamicSlots.middle.source.toUpperCase()}
-                                tabIndex={isActive ? 0 : -1}
-                                aria-hidden={!isActive}
-                            />
-                        )}
-                    </div>
-                    </div>
-                    {titleText ? <div className={`text-xs md:text-sm font-serif italic mb-0.5 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{titleText}</div> : null}
-                    <div><span className={`text-base md:text-xl font-serif font-bold italic leading-tight tracking-tighter ${isActive ? 'text-stone-900' : 'text-stone-500'}`}>{text}</span></div>
-                </div>
-                );
-            })()}
-
-            {/* SLOT 3: BOTTOM (Focal) */}
-            {(() => {
-                const { text, displayLabel, label, attribution, titleText } = renderedSlots.bottom;
-                return (
-                <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? `${focalTheme.bg} shadow-xl ${focalTheme.border} ring-1 ${focalTheme.ring}` : 'bg-white/40 border-transparent opacity-80'}`}>
-                    <div className="flex justify-between items-center mb-0.5">
-                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? focalTheme.text : 'text-stone-400'}`}>
-                        {label}
-                        {attribution && (
-                        <a
-                            href={attribution.link}
-                            className={`inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 ${focalTheme.linkHover} cursor-pointer focus:outline-none focus-visible:ring-2 ${focalTheme.linkRing} rounded-sm`}
-                            title={attribution.title}
-                        >
-                            {attribution.text}
-                        </a>
-                        )}
-                    </span>
-                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? focalTheme.text : 'text-stone-400'}`}>
-                        <span>{displayLabel}</span>
-                        {!isPlaying && (
-                            <span className="opacity-100">
-                                <CopyButton
-                                    text={text}
-                                    reference={displayLabel}
-                                    version={dynamicSlots.bottom.source.toUpperCase() + ((dynamicSlots.bottom.source === 'lsv' || dynamicSlots.bottom.source === 'lsb') ? '©' : '')}
-                                    tabIndex={isActive ? 0 : -1}
-                                    aria-hidden={!isActive}
-                                />
-                                <BookmarkButton
-                                    onBookmark={() => onBookmark(vid)}
-                                    tabIndex={isActive ? 0 : -1}
-                                    aria-hidden={!isActive}
-                                />
-                                {strongsAvailable && onOpenStrongs && group.some((gVid) => verseMap[gVid] && verseMap[gVid].original && verseMap[gVid].original.hasStrong) && (
-                                    <StrongsButton
-                                        onOpen={() => onOpenStrongs(vid)}
-                                        tabIndex={isActive ? 0 : -1}
-                                        aria-hidden={!isActive}
-                                    />
-                                )}
-                            </span>
-                        )}
-                    </div>
-                    </div>
-                    {titleText ? <div className={`text-sm md:text-base font-serif italic mb-1 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{titleText}</div> : null}
-                    <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-500'}`}>{text}</div>
-                </div>
-                );
-            })()}
+            <div className={`flex flex-col gap-1 transition-all duration-500 ${isActive ? 'scale-[1.01]' : 'scale-100'}`}>
+                {renderSlot(dynamicSlots.top, false, 'top')}
+                {renderSlot(dynamicSlots.middle, false, 'middle')}
+                {renderSlot(dynamicSlots.bottom, true, 'bottom')}
             </div>
         </div>
     );
@@ -1883,6 +1560,8 @@ const App = () => {
   const [strongsVerseId, setStrongsVerseId] = useState(null);
   const openStrongs = useCallback((vid) => {
     if (!vid) return;
+    // Current ws packs have Strong's on Hebrew (OT) tokens only; Greek (NT) is surface-only.
+    if (NT_BOOKS.has(String(vid).substring(0, 3))) return;
     setStrongsVerseId(vid);
   }, []);
   const closeStrongs = useCallback(() => setStrongsVerseId(null), []);
@@ -2198,44 +1877,11 @@ const App = () => {
     };
   }, [focalTranslation, compareTranslation]);
 
-  // Grouping Logic to handle versification mismatches (e.g. Psalm Titles)
+  // Grouping Logic is now handled by the backend canonical_map.json
   const groupedVids = useMemo(() => {
-      const groups = [];
-      let i = 0;
-      
-      const hasTranslationContent = (vid) => {
-          if (!verseMap || !verseMap[vid]) return false;
-          const t1 = dynamicSlots.middle.source;
-          const t2 = dynamicSlots.bottom.source;
-          // Check if either slot has content
-          const hasT1 = t1 && verseMap[vid][t1] && verseMap[vid][t1].text.length > 0;
-          const hasT2 = t2 && verseMap[vid][t2] && verseMap[vid][t2].text.length > 0;
-          return hasT1 || hasT2;
-      };
-
-      while (i < sortedVids.length) {
-          const currentVid = sortedVids[i];
-          const group = [currentVid];
-          
-          // Check if we need to merge with next
-          // Condition: Current has NO English, Next HAS English, Same Chapter
-          // This catches the Psalm Title (Verse 1) vs English (Verse 1 in Verse 2 slot) case
-          if (!hasTranslationContent(currentVid) && i + 1 < sortedVids.length) {
-              const nextVid = sortedVids[i+1];
-              // Ensure same book/chapter to avoid merges across boundaries
-              const [b1, c1] = currentVid.split('.');
-              const [b2, c2] = nextVid.split('.');
-              
-              if (b1 === b2 && c1 === c2 && hasTranslationContent(nextVid)) {
-                  group.push(nextVid);
-                  i++; // Skip next one since we consumed it
-              }
-          }
-          groups.push(group);
-          i++;
-      }
-      return groups;
-  }, [sortedVids, dynamicSlots, verseMap]);
+      if (!sortedVids || !sortedVids.length) return [];
+      return sortedVids.map(vid => [vid]);
+  }, [sortedVids]);
 
   useEffect(() => {
     if (playbackStatus === 'playing' || loading || !verseMap || groupedVids.length === 0) return;
@@ -2367,7 +2013,8 @@ const App = () => {
         .replace(/WHO/g, 'Who')
         .replace(/\bJob\b/g, 'Jobe')
         .replace(/[\[\]]/g, '')
-        .replace(/¶/g, ''); 
+        .replace(/¶/g, '')
+        .replace(/['"“”‘’]/g, ''); 
   };
 
   const playVerse = (vid, previousVid = null) => {
@@ -2390,11 +2037,10 @@ const App = () => {
 
     let groupText = '';
     group.forEach(gVid => {
-        const slotData = verseMap[gVid] ? verseMap[gVid][focalSlot.source] : null;
-        if (slotData && slotData.text) {
-            // Robustly handle string (optimized) or array (defensive) text
-            const textStr = Array.isArray(slotData.text) ? slotData.text.join(' ') : slotData.text;
-            groupText += textStr.trim() + ' ';
+        const block = verseMap[gVid];
+        const src = focalSlot.source === 'original' ? 'HEB' : focalSlot.source.toUpperCase();
+        if (block && block.verses && block.verses[src]) {
+            groupText += extractText(block.verses[src]).trim() + ' ';
         }
     });
     
@@ -2463,12 +2109,7 @@ const App = () => {
         // The `getSlotContent` logic handles rendering labels, but here we just need rough "Chapter X Verse Y".
         // We'll use the *English Mapped* verse ID if possible for the intro to match user expectation.
         
-        const getEnglishVid = (v) => {
-             const d = verseMap[v];
-             const t = d ? d[focalSlot.source] : null;
-             return t?.displayVid || v;
-        };
-
+        const getEnglishVid = (v) => verseMap[v]?.displayVid || v;
         const [book, ch, verse] = getEnglishVid(startVid).split('.');
         const [endBook, endCh, endVerse] = getEnglishVid(endVid).split('.');
         

@@ -1,0 +1,7 @@
+# Local-only scripture output from fetch_readings.py / compile_site.py.
+# Safe to run fetches from apps/365DBR — these paths are not committed.
+#
+# Tracked exception: readings.json (365-day plan structure, not full passage text).
+# Day folders (MMDD)
+/*.png
+

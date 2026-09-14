@@ -130,163 +130,32 @@ const FOCAL_THEMES = [
   { bg: 'bg-emerald-100', border: 'border-emerald-500', ring: 'ring-emerald-500/50', text: 'text-emerald-700', linkHover: 'hover:text-emerald-600', linkRing: 'focus-visible:ring-emerald-500' }
 ];
 
-/** --- DATA UTILITIES (English-primary; titles not merged into body) --- **/
-const TITLE_PARA_STYLES = new Set(['d', 's', 's1', 's2', 's3', 'ms', 'ms1', 'ms2', 'mr', 'r', 'sp', 'qa']);
-const TITLE_PREFIX_RE = /^(?:(?:Psalm|Psalms)\s+\d+|(?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David|In\s+the\s+Shadow\s+of\s+Your\s+Wings|(?:A|The)\s+Song\s+of\s+David|(?:[A-Z]{1,3}\s+)?(?:A|THE)\s+PRAYER\s+OF\s+DAVID|(?:[A-Z]{1,3}\s+)?PSALM\s+\d+)(?:[.:;])?\s*/i;
-const TITLE_PREFIX_RE_SIMPLE = /^((?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David\.|(?:A|THE)\s+PRAYER\s+OF\s+DAVID\.|(?:Psalm|Psalms)\s+\d+\.?|In\s+the\s+Shadow\s+of\s+Your\s+Wings\.?|(?:A|The)\s+Song\s+of\s+David\.?)(?:\s+|$)/i;
+/** --- AST RENDERER & TEXT EXTRACTOR --- **/
+const extractText = (nodes) => {
+    if (!nodes || !Array.isArray(nodes)) return '';
+    return nodes.map(n => n.type === 'text' ? n.text || '' : extractText(n.items)).join('');
+};
 
-function collectTextUnder(item) {
-  const parts = [];
-  if (!item || typeof item !== 'object') return '';
-  if (item.type === 'text' && item.text) parts.push(item.text);
-  (item.items || []).forEach((ch) => parts.push(collectTextUnder(ch)));
-  return parts.join('');
-}
+const RichTextNode = ({ node }) => {
+    if (!node) return null;
+    if (node.type === 'text') return <>{node.text}</>;
 
-function stripTitlePrefix(text) {
-  const raw = String(text || '').trim();
-  if (!raw) return { text: '', title: '' };
+    const Tag = node.name === 'para' ? 'div' : 'span';
+    const style = node.attrs?.style || '';
 
-  let remaining = raw;
-  const titles = [];
-  const titlePattern = /^(?:(?:Psalm|Psalms)\s+\d+|(?:A|The)\s+(?:Prayer|Psalm)\s+of\s+David|In\s+the\s+Shadow\s+of\s+Your\s+Wings|(?:A|The)\s+Song\s+of\s+David|(?:[A-Z]{1,3}\s+)?(?:A|THE)\s+PRAYER\s+OF\s+DAVID|(?:[A-Z]{1,3}\s+)?PSALM\s+\d+)(?:[.:;])?(?=\s|$|[·•▪|/\\-–—:;,.])/i;
+    let cls = '';
+    if (['q', 'q1', 'q2'].includes(style)) cls += ' ml-4 sm:ml-8 block';
+    if (style === 'wj') cls += ' text-red-600';
+    if (style === 'add') cls += ' italic opacity-80';
+    if (style === 'nd') cls += ' font-bold uppercase tracking-wider text-[0.85em]';
+    if (['s', 's1', 'd'].includes(style)) cls += ' font-bold mt-2 mb-1 block text-amber-900 text-sm md:text-lg tracking-wide uppercase';
 
-  while (remaining) {
-    remaining = remaining.replace(/^[\s·•▪|/\\\-–—:;,.]+/, '');
-    const match = remaining.match(titlePattern);
-    if (!match) break;
-    const title = match[0].replace(/[.;:]+$/, '').trim().replace(/\s+/g, ' ');
-    if (title) titles.push(title);
-    remaining = remaining.slice(match[0].length).replace(/^[\s·•▪|/\\\-–—:;,.]+/, '');
-  }
-
-  if (!titles.length) return { text: raw, title: '' };
-  return { text: remaining || '', title: titles.join(' · ') };
-}
-
-function appendUniqueTitle(list, title) {
-  if (!title || !list) return;
-  const cleaned = title.trim().replace(/\s+/g, ' ');
-  if (!cleaned || list.includes(cleaned)) return;
-  list.push(cleaned);
-}
-
-function ensureVerseEntry(map, vid, versionKey) {
-  if (!map[vid]) map[vid] = {};
-  if (versionKey && !map[vid][versionKey]) map[vid][versionKey] = { text: [], displayVid: vid };
-  return map[vid];
-}
-function walkEnglishItems(items, map, versionKey, orgToEnglish, orgToAll, context) {
-  if (!items) return;
-  for (const item of items) {
-    const attrs = item.attrs || {};
-    const style = attrs.style || '';
-    if (item.name === 'para' && TITLE_PARA_STYLES.has(style)) {
-      const titleText = collectTextUnder(item).trim();
-      if (titleText) appendUniqueTitle(context.pendingTitles, titleText);
-      continue;
-    }
-    const previousActiveVid = context.activeVid;
-    if (attrs.verseId) {
-      const engVid = attrs.verseId;
-      const orgs = attrs.verseOrgIds || [];
-      if (orgs.length > 0 && orgs[0]) {
-        const org = orgs[0];
-        if (!orgToEnglish[org]) orgToEnglish[org] = engVid;
-        if (!orgToAll[org]) orgToAll[org] = [];
-        if (!orgToAll[org].includes(engVid)) orgToAll[org].push(engVid);
-      }
-      context.activeVid = engVid;
-      context.lastSeenVid = engVid;
-      ensureVerseEntry(map, engVid, versionKey);
-      if (context.pendingTitles.length > 0) {
-        if (!map[engVid].titles) map[engVid].titles = [];
-        context.pendingTitles.forEach((title) => appendUniqueTitle(map[engVid].titles, title));
-        context.pendingTitles = [];
-      }
-    }
-    if (item.type === 'text' && item.text) {
-            const cleanedText = item.text;
-      if (cleanedText) {
-        if (context.activeVid && map[context.activeVid] && map[context.activeVid][versionKey]) {
-          map[context.activeVid][versionKey].text.push(cleanedText);
-        } else if (cleanedText.trim().length > 0 && context.lastSeenVid && map[context.lastSeenVid] && map[context.lastSeenVid][versionKey]) {
-          map[context.lastSeenVid][versionKey].text.push(cleanedText);
-        }
-      }
-    }
-    if (item.items && item.items.length > 0) walkEnglishItems(item.items, map, versionKey, orgToEnglish, orgToAll, context);
-    context.activeVid = previousActiveVid;
-  }
-}
-function walkOriginalItems(items, map, orgToEnglish, orgToAll, context) {
-  if (!items) return;
-  for (const item of items) {
-    const attrs = item.attrs || {};
-    const previousActiveVid = context.activeVid;
-    if (attrs.verseId) {
-      const orgVid = attrs.verseId;
-      context.activeVid = orgVid;
-      context.lastSeenVid = orgVid;
-      const targets = (orgToAll[orgVid] && orgToAll[orgVid].length) ? orgToAll[orgVid] : (orgToEnglish[orgVid] ? [orgToEnglish[orgVid]] : null);
-      if (targets) {
-        context.targets = targets;
-        targets.forEach((eng) => ensureVerseEntry(map, eng, 'original'));
-      } else if (map[orgVid] && (map[orgVid].lsb || map[orgVid].lsv || map[orgVid].kjv)) {
-        context.targets = null;
-        context.superscriptionFor = orgVid;
-        if (!map[orgVid].titles) map[orgVid].titles = [];
-      } else {
-        context.targets = null;
-        context.superscriptionFor = null;
-      }
-    }
-    if (item.type === 'text' && item.text) {
-      const { text: cleanedText, title } = stripTitlePrefix(item.text);
-      if (title && context.superscriptionFor && map[context.superscriptionFor]) {
-        if (!map[context.superscriptionFor].titles) map[context.superscriptionFor].titles = [];
-        appendUniqueTitle(map[context.superscriptionFor].titles, title);
-      }
-      if (context.targets && context.targets.length) {
-        context.targets.forEach((eng) => { if (map[eng] && map[eng].original) map[eng].original.text.push(cleanedText || item.text); });
-      } else if (context.superscriptionFor && map[context.superscriptionFor]) {
-        if (!context.superBuf) context.superBuf = {};
-        const k = context.superscriptionFor;
-        if (!context.superBuf[k]) context.superBuf[k] = [];
-        if (cleanedText) context.superBuf[k].push(cleanedText);
-      }
-    }
-    if (item.items && item.items.length > 0) walkOriginalItems(item.items, map, orgToEnglish, orgToAll, context);
-    if (attrs.strong && context.targets && context.targets.length) {
-      context.targets.forEach((eng) => { if (map[eng] && map[eng].original) map[eng].original.hasStrong = true; });
-    }
-    context.activeVid = previousActiveVid;
-  }
-}
-function processEnglishContent(contentArray, map, versionKey, orgToEnglish, orgToAll) {
-  if (!contentArray) return;
-  const context = { activeVid: null, lastSeenVid: null, pendingTitles: [] };
-  for (const section of contentArray) {
-    const style = (section.attrs || {}).style || '';
-    if (section.name === 'para' && TITLE_PARA_STYLES.has(style)) {
-      const titleText = collectTextUnder(section).trim();
-      if (titleText) appendUniqueTitle(context.pendingTitles, titleText);
-      continue;
-    }
-    if (section.items) walkEnglishItems(section.items, map, versionKey, orgToEnglish, orgToAll, context);
-  }
-}
-function processOriginalContent(contentArray, map, orgToEnglish, orgToAll) {
-  if (!contentArray) return;
-  const context = { activeVid: null, lastSeenVid: null, targets: null, superscriptionFor: null, superBuf: {} };
-  for (const section of contentArray) { if (section.items) walkOriginalItems(section.items, map, orgToEnglish, orgToAll, context); }
-  Object.keys(context.superBuf).forEach((vid) => {
-    const t = context.superBuf[vid].join('').trim();
-    if (!t || !map[vid]) return;
-    if (!map[vid].titles) map[vid].titles = [];
-    appendUniqueTitle(map[vid].titles, t);
-  });
-}
+    return (
+        <Tag className={cls.trim() || undefined}>
+            {node.items?.map((child, i) => <RichTextNode key={i} node={child} />)}
+        </Tag>
+    );
+};
 
 function getBasePath() {
     // If serving from /GEN/1/ -> Go up two levels
@@ -298,62 +167,20 @@ function getBasePath() {
 
 async function loadDailyBread(dateFolder) {
   const basePath = getBasePath();
+  let url = `${basePath}data/${dateFolder}/canonical_map.json`;
+  let res = await fetch(url).catch(() => null);
 
-  // Try local first, fallback to mt-sin.ai
-  let manifestRes = await fetch(`${basePath}data/${dateFolder}/manifest.json`).catch(() => null);
-
-  // If local fetch fails or returns 404, fallback to production API
-  let actualBasePath = basePath;
-  if (!manifestRes || !manifestRes.ok) {
-    actualBasePath = "https://mt-sin.ai/365DBR/";
-    manifestRes = await fetch(`${actualBasePath}data/${dateFolder}/manifest.json`);
+  if (!res || !res.ok) {
+    url = `https://mt-sin.ai/365DBR/data/${dateFolder}/canonical_map.json`;
+    res = await fetch(url);
   }
 
-  if (!manifestRes.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
-  const manifest = await manifestRes.json();
-  const verseMap = {};
-  const availableKeys = new Set(['original']);
+  if (!res.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
+  const canonicalMap = await res.json();
+  const vids = Object.keys(canonicalMap);
+  const availableKeys = vids.length > 0 ? Object.keys(canonicalMap[vids[0]].verses).filter(k => k !== 'HEB') : [];
 
-  const results = await Promise.all(
-    manifest.files.map(async fileName => {
-        const res = await fetch(`${actualBasePath}data/${dateFolder}/${fileName}`);
-        if (!res.ok) throw new Error(`Failed to load ${fileName}`);
-        return await res.json();
-    })
-  );
-
-  results.forEach((source) => {
-    const data = source.data;
-    if (!data) return;
-    const orgToEnglish = {};
-    const orgToAll = {};
-    if (data.parallels) {
-      data.parallels.forEach(parallel => {
-         const matchedKey = matchParallelTranslation(parallel);
-         if (matchedKey && parallel.content) {
-            processEnglishContent(parallel.content, verseMap, matchedKey, orgToEnglish, orgToAll);
-            availableKeys.add(matchedKey);
-         }
-      });
-    }
-    if (data.content) processOriginalContent(data.content, verseMap, orgToEnglish, orgToAll);
-  });
-
-  const sortedKeys = Array.from(availableKeys).filter(k => k !== 'original');
-  // ⚡ Bolt Optimization: Use for...in loops to avoid allocating intermediate arrays (Object.keys/values)
-  // during critical data loading phase. Reduces GC pressure on mobile devices.
-  for (const vid in verseMap) {
-      const verseData = verseMap[vid];
-      for (const key in verseData) {
-          const entry = verseData[key];
-          if (entry.text && Array.isArray(entry.text)) {
-              const config = TRANSLATION_REGISTRY[key];
-              const separator = config && config.isHebrewGreek ? '' : ' ';
-              entry.text = entry.text.join(separator);
-          }
-      }
-  }
-  return { verseMap, label: manifest.label, availableTranslations: sortedKeys };
+  return { verseMap: canonicalMap, availableTranslations: availableKeys, label: "" };
 }
 
 function getSectionIndex(vid) {
@@ -479,7 +306,13 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const group = (groupedVids && groupedVids.find((g) => g.includes(verseId))) || [verseId];
     const englishBody = group
         .map((vid) => {
-            const text = verseMap?.[vid]?.[source]?.text;
+            const block = verseMap?.[vid];
+            if (!block) return '';
+            if (block.verses) {
+                const dataSrc = !source || source === 'original' ? 'HEB' : String(source).toUpperCase();
+                return extractText(block.verses[dataSrc] || []);
+            }
+            const text = block[source]?.text;
             return Array.isArray(text) ? text.join(' ') : (text || '');
         })
         .filter(Boolean)
@@ -590,142 +423,161 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     );
 }
 
-const VerseGroup = React.memo(function VerseGroup({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying, onBookmark, onOpenStrongs, strongsAvailable }) {
+const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying, onBookmark, onOpenStrongs, strongsAvailable }) => {
     const vid = group[0];
+    const block = verseMap[vid];
+    if (!block) return null;
+
     const book = vid.substring(0, 3);
     const sectionIndex = getSectionIndex(vid);
     const focalTheme = FOCAL_THEMES[sectionIndex] || FOCAL_THEMES[0];
     const isHebrew = !NT_BOOKS.has(book);
 
     const handleVerseClick = () => {
-        if (isPlaying) return;
-        const selection = window.getSelection();
-        if (selection && selection.type === 'Range' && selection.toString().length > 0) return;
+        if (isPlaying || window.getSelection()?.toString().length > 0) return;
         const el = document.getElementById(`verse-${vid}`);
         if (el) {
-            const evt = new CustomEvent('verseclicked', { detail: { vid } });
-            window.dispatchEvent(evt);
-
-            const isIframe = window !== window.parent;
-            let targetY;
-
-            if (isIframe) {
-                const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
-                if (focalSlot) {
-                    const rect = focalSlot.getBoundingClientRect();
-                    targetY = window.scrollY + rect.top - 80;
-                } else {
-                    const rect = el.getBoundingClientRect();
-                    targetY = window.scrollY + rect.top - 80;
-                }
-            } else {
-                const rect = el.getBoundingClientRect();
-                const absoluteTop = window.scrollY + rect.top;
-                targetY = absoluteTop - 60;
-            }
-
             window.dispatchEvent(new CustomEvent('scrolllock'));
-              window.scrollTo({ top: targetY, behavior: 'smooth' });
+            window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top - 60, behavior: 'smooth' });
+            window.dispatchEvent(new CustomEvent('verseclicked', { detail: { vid } }));
         }
     };
 
-    const renderedSlots = useMemo(() => {
-        const getSlotContent = (slot) => {
-            if (!slot || !slot.source) return { text: '', displayLabel: '', titleText: '' };
-            let fullText = '', displayLabel = '', contributing = [];
-            group.forEach((gVid) => {
-                const data = verseMap[gVid];
-                const slotData = data ? data[slot.source] : null;
-                if (slotData && slotData.text) {
-                    const cleanedText = slotData.text;
-                    if (cleanedText) {
-                        fullText += (fullText ? ' ' : '') + cleanedText;
-                    }
-                    contributing.push(slotData.displayVid || gVid);
-                }
-            });
-            if (contributing.length > 0) {
-                const s = contributing[0].split('.').map((p,i) => i>0 ? parseInt(p) : p);
-                const e = contributing[contributing.length - 1].split('.').map((p,i) => i>0 ? parseInt(p) : p);
-                const bName = BOOK_NAMES[s[0]] || s[0];
-                if (contributing[0] === contributing[contributing.length-1]) displayLabel = `${bName} ${s[1]}:${s[2]}`;
-                else if (s[0] === e[0]) displayLabel = s[1] === e[1] ? `${bName} ${s[1]}:${s[2]}-${e[2]}` : `${bName} ${s[1]}:${s[2]}-${e[1]}:${e[2]}`;
-                else displayLabel = `${bName} ${s[1]}:${s[2]} - ${BOOK_NAMES[e[0]]||e[0]} ${e[1]}:${e[2]}`;
-            } else if (group.length > 0) {
-                const [b, c, v] = group[0].split('.');
-                displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
-            }
-            return { text: fullText, displayLabel, titleText: '' };
-        };
-        const getLabel = (slot) => typeof slot.label === 'function' ? slot.label(isHebrew) : slot.label;
-        return {
-            top: { ...getSlotContent(dynamicSlots.top), label: getLabel(dynamicSlots.top), config: dynamicSlots.top },
-            middle: { ...getSlotContent(dynamicSlots.middle), label: getLabel(dynamicSlots.middle), config: dynamicSlots.middle },
-            bottom: { ...getSlotContent(dynamicSlots.bottom), label: getLabel(dynamicSlots.bottom), config: dynamicSlots.bottom, attribution: dynamicSlots.bottom.attribution }
-        };
-    }, [group, verseMap, dynamicSlots, isHebrew]);
+    const renderSlot = (slotConfig, isFocal, slotName) => {
+        if (!slotConfig || !slotConfig.source) return null;
+        
+        const dataSrc = slotConfig.source === 'original' ? 'HEB' : slotConfig.source.toUpperCase();
+        
+        const headingNodes = block.headings[dataSrc] || [];
+        const verseNodes = block.verses[dataSrc] || [];
+        if (!headingNodes.length && !verseNodes.length) return null;
 
-    return (
-        <div id={`verse-${vid}`} onClick={handleVerseClick} className={`verse-block group transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'} ${!isPlaying ? 'cursor-pointer' : ''}`}>
-            <div className={`flex flex-col gap-1 transition-all duration-500 ${isActive ? 'scale-[1.01]' : 'scale-100'}`}>
-            {/* Top Slot */}
-            <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100'}`}>
+        const textStr = extractText(verseNodes);
+        
+        // Calculate transparent, localized reference labels
+        const [b, c, v] = vid.split('.');
+        const chapter = parseInt(c);
+        const verse = parseInt(v);
+
+
+        // 1. Calculate default English baseline
+ 
+        let displayLabel = `${BOOK_NAMES[b] || b} ${c}:${v}`;
+
+        // 2. Dynamically override label using actual AST data for 100% transparency
+        if (verseNodes.length > 0 || headingNodes.length > 0) {
+            const renderedVids = new Set();
+            const extractVids = (nodes) => {
+                if (!nodes || !Array.isArray(nodes)) return;
+                nodes.forEach(n => {
+                    if (n?.type === 'text' && n?.attrs?.verseId) {
+                        renderedVids.add(n.attrs.verseId);
+                    }
+                    if (n?.items) extractVids(n.items);
+                });
+            };
+            
+            // Extract from both headings (e.g., Psalm titles) and verses
+            extractVids(headingNodes); 
+            extractVids(verseNodes);
+
+            if (renderedVids.size > 0) {
+                const vidsArr = Array.from(renderedVids);
+                // Sort by chapter/verse to ensure chronological labeling
+                vidsArr.sort((x, y) => {
+                    const [, cx, vx] = x.split('.').map(Number);
+                    const [, cy, vy] = y.split('.').map(Number);
+                    return cx !== cy ? cx - cy : vx - vy;
+                });
+
+                const first = vidsArr[0].split('.');
+                const last = vidsArr[vidsArr.length - 1].split('.');
+                const bName = BOOK_NAMES[first[0]] || first[0];
+                
+                if (vidsArr.length === 1) {
+                    displayLabel = `${bName} ${first[1]}:${first[2]}`;
+                } else if (first[1] === last[1]) {
+                    displayLabel = `${bName} ${first[1]}:${first[2]}-${last[2]}`; // e.g. Psalms 40:1-2
+                } else {
+                    displayLabel = `${bName} ${first[1]}:${first[2]} - ${last[1]}:${last[2]}`; // Cross-chapter spans
+                }
+            }
+        }
+
+        let bgClass = "";
+        let textClass = "";
+        let colorClass = "";
+
+        if (slotName === 'top') {
+            bgClass = isActive ? 'bg-stone-900 border-amber-600 shadow-md' : 'bg-stone-50/50 border-stone-100';
+            textClass = slotConfig.isHebrewGreek ? (isHebrew ? 'hebrew text-[16px] md:text-2xl text-right' : 'greek text-base md:text-xl text-left') : 'text-lg md:text-3xl font-serif italic';
+            colorClass = isActive ? 'text-white' : 'text-stone-500';
+        } else if (slotName === 'middle') {
+            bgClass = isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80';
+            textClass = 'text-lg md:text-3xl font-serif italic tracking-tighter';
+            colorClass = isActive ? 'text-stone-900 font-bold' : 'text-stone-500';
+        } else if (slotName === 'bottom') {
+            bgClass = isActive ? `${focalTheme.bg} shadow-xl ${focalTheme.border} ring-1 ${focalTheme.ring}` : 'bg-white/40 border-transparent opacity-80';
+            textClass = 'text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight';
+            colorClass = isActive ? 'text-black' : 'text-stone-500';
+        }
+
+        // Securely define the color based on slot position and active state
+        let headingColor = isActive 
+            ? (slotName === 'top' ? 'text-stone-300' : 'text-stone-700') 
+            : 'text-stone-400';
+
+        // Apply specific typography without overwriting the color
+        let headingClass = slotConfig.isHebrewGreek 
+            ? `mb-1 ${colorClass} ${isHebrew ? 'hebrew text-[16px] md:text-2xl text-right' : 'greek text-base md:text-xl text-left'}`
+            : `text-xs md:text-sm font-serif italic mb-0.5 opacity-90 ${colorClass}`;
+
+        return (
+            <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${bgClass}`}>
                 <div className="flex justify-between items-center mb-0.5">
-                    <span className={`text-[7px] md:text-[10px] uppercase font-black tracking-widest ${isActive ? 'text-amber-500' : 'text-stone-400'}`}>{renderedSlots.top.label}</span>
-                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-mono font-bold ${isActive ? 'text-amber-500' : 'text-stone-400'} uppercase`}>
-                        <span>{renderedSlots.top.displayLabel}</span>
-                        {!isPlaying && (
-                            <div className="flex items-center">
-                                <CopyButton text={renderedSlots.top.text} reference={renderedSlots.top.displayLabel} version={isHebrew?'OH':'OG'} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
-                                <BookmarkButton onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
-                            </div>
+                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive && slotName !== 'top' ? focalTheme.text : 'text-stone-400'}`}>
+                        {typeof slotConfig.label === 'function' ? slotConfig.label(isHebrew) : slotConfig.label}
+                        {slotConfig.attribution && (
+                            <a href={slotConfig.attribution.link} className={`inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 ${focalTheme.linkHover} cursor-pointer focus:outline-none focus-visible:ring-2 ${focalTheme.linkRing} rounded-sm`} title={slotConfig.attribution.title}>{slotConfig.attribution.text}</a>
                         )}
-                    </div>
-                </div>
-                <div className={`leading-tight tracking-tight break-words ${renderedSlots.top.config.isHebrewGreek ? (isHebrew ? 'hebrew text-[12px] md:text-xl text-right' : 'greek text-base md:text-lg text-left') : 'text-lg md:text-3xl font-serif italic'}`} style={{ direction: renderedSlots.top.config.isHebrewGreek && isHebrew ? 'rtl' : 'ltr' }}>
-                    <span className={isActive ? 'text-white' : 'text-stone-500'}>{renderedSlots.top.text}</span>
-                </div>
-            </div>
-            {/* Middle Slot */}
-            <div className={`px-2 py-1 md:px-3 md:py-15 rounded-lg transition-all duration-300 border-b-2 ${isActive ? 'bg-stone-200 shadow-lg border-stone-800 ring-1 ring-stone-800/50' : 'bg-white/40 border-transparent opacity-80'}`}>
-                <div className="flex justify-between items-center mb-0.5">
-                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>{renderedSlots.middle.label}</span>
-                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>
-                        <span>{renderedSlots.middle.displayLabel}</span>
-                        {!isPlaying && dynamicSlots.middle.source && (
-                            <div className="flex items-center">
-                                <CopyButton text={renderedSlots.middle.text} reference={renderedSlots.middle.displayLabel} version={dynamicSlots.middle.source.toUpperCase()} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
-                                <BookmarkButton onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
-                            </div>
-                        )}
-                    </div>
-                </div>
-                {renderedSlots.middle.titleText ? <div className={`text-xs md:text-sm font-serif italic mb-0.5 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{renderedSlots.middle.titleText}</div> : null}
-                <div><span className={`text-lg md:text-3xl font-serif italic leading-tight tracking-tight ${isActive ? 'text-stone-900' : 'text-stone-500'}`}>{renderedSlots.middle.text}</span></div>
-            </div>
-            {/* Bottom Slot */}
-            <div className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg transition-all duration-300 border-b-2 ${isActive ? `${focalTheme.bg} shadow-xl ${focalTheme.border} ring-1 ${focalTheme.ring}` : 'bg-white/40 border-transparent opacity-80'}`}>
-                <div className="flex justify-between items-center mb-0.5">
-                    <span className={`text-[7px] md:text-[10px] font-black uppercase mb-0.5 block ${isActive ? focalTheme.text : 'text-stone-400'}`}>
-                        {renderedSlots.bottom.label}
-                        {renderedSlots.bottom.attribution && <a href={renderedSlots.bottom.attribution.link} className={`inline-block ml-1 transition-transform duration-200 hover:scale-150 active:scale-150 ${focalTheme.linkHover} cursor-pointer focus:outline-none focus-visible:ring-2 ${focalTheme.linkRing} rounded-sm`} title={renderedSlots.bottom.attribution.title}>{renderedSlots.bottom.attribution.text}</a>}
                     </span>
-                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive ? focalTheme.text : 'text-stone-400'}`}>
-                        <span>{renderedSlots.bottom.displayLabel}</span>
+                    <div className={`flex items-center gap-1 text-[7px] md:text-[10px] font-black uppercase mb-0.5 ${isActive && slotName !== 'top' ? focalTheme.text : 'text-stone-400'}`}>
+                        <span>{displayLabel}</span>
                         {!isPlaying && (
                             <div className="flex items-center opacity-100">
-                                <CopyButton text={renderedSlots.bottom.text} reference={renderedSlots.bottom.displayLabel} version={dynamicSlots.bottom.source.toUpperCase() + (dynamicSlots.bottom.source === 'lsv' ? '©' : '')} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
-                                <BookmarkButton onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
-                                {strongsAvailable && onOpenStrongs && group.some((gVid) => verseMap[gVid] && verseMap[gVid].original && verseMap[gVid].original.hasStrong) && (
-                                    <StrongsButton onOpen={() => onOpenStrongs(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                <CopyButton text={textStr} reference={displayLabel} version={dataSrc + ((slotConfig.source === 'lsv' || slotConfig.source === 'lsb') ? '©' : '')} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                {slotName === 'bottom' && (
+                                    <>
+                                        <BookmarkButton onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                        {strongsAvailable && onOpenStrongs && isHebrew && (
+                                            <StrongsButton onOpen={() => onOpenStrongs(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
+                                        )}
+                                    </>
                                 )}
                             </div>
                         )}
                     </div>
                 </div>
-                {renderedSlots.bottom.titleText ? <div className={`text-sm md:text-base font-serif italic mb-1 ${isActive ? 'text-stone-700' : 'text-stone-400'}`}>{renderedSlots.bottom.titleText}</div> : null}
-                <div className={`text-lg md:text-5xl font-serif font-black leading-[1.1] tracking-tight ${isActive ? 'text-black' : 'text-stone-500'}`}>{renderedSlots.bottom.text}</div>
+                {headingNodes.length > 0 && (
+                    <div className={headingClass} style={{ direction: dataSrc === 'HEB' && isHebrew ? 'rtl' : 'ltr' }}>
+                        {headingNodes.map((n, i) => <RichTextNode key={`h-${i}`} node={n} />)}
+                    </div>
+                )}
+                <div className={`${textClass}`} style={{ direction: dataSrc === 'HEB' && isHebrew ? 'rtl' : 'ltr' }}>
+                    <span className={colorClass}>
+                        {verseNodes.map((n, i) => <RichTextNode key={`v-${i}`} node={n} />)}
+                    </span>
+                </div>
             </div>
+        );
+    };
+
+    return (
+        <div id={`verse-${vid}`} onClick={handleVerseClick} className={`verse-block group transition-all duration-700 scroll-mt-12 md:scroll-mt-14 ${isDimmed ? 'opacity-10 grayscale' : 'opacity-100'} ${!isPlaying ? 'cursor-pointer' : ''}`}>
+            <div className={`flex flex-col gap-1 transition-all duration-500 ${isActive ? 'scale-[1.01]' : 'scale-100'}`}>
+                {renderSlot(dynamicSlots.top, false, 'top')}
+                {renderSlot(dynamicSlots.middle, false, 'middle')}
+                {renderSlot(dynamicSlots.bottom, true, 'bottom')}
             </div>
         </div>
     );
@@ -1093,12 +945,33 @@ function App() {
   const [browseInitialChapter, setBrowseInitialChapter] = useState(null);
 
   // Translation State
+  const initialPrefs = useMemo(() => {
+      try {
+          const saved = localStorage.getItem('biblical_reading_state');
+          if (saved) return JSON.parse(saved);
+      } catch (e) { console.warn(e); }
+      return {};
+  }, []);
+
   const [availableTranslations, setAvailableTranslations] = useState([]);
-  const [focalTranslation, setFocalTranslation] = useState('lsb');
-  const [compareTranslation, setCompareTranslation] = useState('kjv');
+  const [focalTranslation, setFocalTranslation] = useState(initialPrefs.focal || 'lsb');
+  const [compareTranslation, setCompareTranslation] = useState(initialPrefs.compare || 'kjv');
+
+  // Sync preferences so bible.html and index.html share the same configuration
+  useEffect(() => {
+      if (focalTranslation || compareTranslation) {
+          try {
+              const saved = JSON.parse(localStorage.getItem('biblical_reading_state') || '{}');
+              if (focalTranslation) saved.focal = focalTranslation;
+              if (compareTranslation) saved.compare = compareTranslation;
+              localStorage.setItem('biblical_reading_state', JSON.stringify(saved));
+          } catch (e) {}
+      }
+  }, [focalTranslation, compareTranslation]);
+
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isFocalOpen, setIsFocalOpen] = useState(false);
-    const readingsRef = useRef([]);
+  const readingsRef = useRef([]);
 
   // Playback
   const [playbackStatus, setPlaybackStatus] = useState('stopped');
@@ -1128,6 +1001,8 @@ function App() {
   const [strongsVerseId, setStrongsVerseId] = useState(null);
   const openStrongs = useCallback((vid) => {
     if (!vid) return;
+    // Current ws packs have Strong's on Hebrew (OT) tokens only; Greek (NT) is surface-only.
+    if (NT_BOOKS.has(String(vid).substring(0, 3))) return;
     setStrongsVerseId(vid);
   }, []);
   const closeStrongs = useCallback(() => setStrongsVerseId(null), []);
@@ -1552,20 +1427,7 @@ function App() {
             dayDataList.forEach(d => {
                 if (d.verseMap) {
                     Object.entries(d.verseMap).forEach(([vid, incoming]) => {
-                        if (!mergedMap[vid]) {
-                            mergedMap[vid] = incoming;
-                            return;
-                        }
-                        const existing = mergedMap[vid];
-                        Object.entries(incoming).forEach(([key, value]) => {
-                            if (key === 'titles' && Array.isArray(value)) {
-                                existing.titles = Array.from(new Set([...(existing.titles || []), ...value]));
-                            } else if (value && typeof value === 'object' && !Array.isArray(value) && key !== 'original') {
-                                existing[key] = { ...(existing[key] || {}), ...value };
-                            } else {
-                                existing[key] = value;
-                            }
-                        });
+                        mergedMap[vid] = incoming;
                     });
                     d.availableTranslations.forEach(k => keys.add(k));
                 }
@@ -1598,8 +1460,19 @@ function App() {
 
             // Initial Translation Set
             if (keys.size > 0) {
-               if (!focalTranslation || !keys.has(focalTranslation)) setFocalTranslation(keys.has('lsb') ? 'lsb' : (keys.has('lsv') ? 'lsv' : Array.from(keys)[0]));
-               if (!compareTranslation || !keys.has(compareTranslation)) setCompareTranslation(keys.has('kjv') ? 'kjv' : Array.from(keys)[0]);
+               let newFocal = focalTranslation;
+               let newCompare = compareTranslation;
+
+               if (!newFocal || !keys.has(newFocal)) {
+                   newFocal = keys.has('lsb') ? 'lsb' : (keys.has('lsv') ? 'lsv' : Array.from(keys)[0]);
+                   setFocalTranslation(newFocal);
+               }
+               
+               if (!newCompare || !keys.has(newCompare)) {
+                   const availableAlts = Array.from(keys).filter(k => k !== newFocal);
+                   newCompare = keys.has('kjv') ? 'kjv' : (availableAlts.length > 0 ? availableAlts[0] : newFocal);
+                   setCompareTranslation(newCompare);
+               }
             }
 
             setLoading(false);
@@ -1625,17 +1498,8 @@ function App() {
   }, [focalTranslation, compareTranslation]);
 
   const groupedVids = useMemo(() => {
-      if (!sortedVids.length) return [];
-      // Simple grouping for now: Single verses unless special case needed
-      // Reusing logic from index.html if needed, but for lookup simple array is mostly fine.
-      // But let's keep consistency.
-      const groups = [];
-      let i = 0;
-      while (i < sortedVids.length) {
-          groups.push([sortedVids[i]]);
-          i++;
-      }
-      return groups;
+      if (!sortedVids || !sortedVids.length) return [];
+      return sortedVids.map(vid => [vid]);
   }, [sortedVids]);
 
   // Observer for Scroll Tracking
@@ -1727,10 +1591,10 @@ function App() {
 
     let groupText = '';
     group.forEach(gVid => {
-        const slotData = verseMap[gVid] ? verseMap[gVid][focalSlot.source] : null;
-        if (slotData && slotData.text) {
-            const textStr = Array.isArray(slotData.text) ? slotData.text.join(' ') : slotData.text;
-            groupText += textStr.trim() + ' ';
+        const block = verseMap[gVid];
+        const src = focalSlot.source === 'original' ? 'HEB' : focalSlot.source.toUpperCase();
+        if (block && block.verses && block.verses[src]) {
+            groupText += extractText(block.verses[src]).trim() + ' ';
         }
     });
     
@@ -1785,11 +1649,7 @@ function App() {
 
     // 8. Handle Intro (Only announce on the very first click, not every verse)
     if (!previousVid) {
-        const getEnglishVid = (v) => {
-             const d = verseMap[v];
-             const t = d ? d[focalSlot.source] : null;
-             return t?.displayVid || v;
-        };
+        const getEnglishVid = (v) => verseMap[v]?.displayVid || v;
 
         const [book, ch, verse] = getEnglishVid(leaderVid).split('.');
         const bookName = BOOK_NAMES[book] || book;
