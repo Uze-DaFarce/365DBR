@@ -4,7 +4,7 @@
 **Priority**: Truth/Accuracy > Safety > Performance. Bible is Tier-1 truth.  
 **Branch policy**: Owner works on **main** only (`docs/Git-For-You.md`). Agents handle git.
 
-**Copy the “Session start prompt” block into a new agent session.**
+Root `AGENTS.md` auto-loads in new Grok sessions. **Do not paste the block below** unless `grok inspect` shows Project Instructions (0). Prefer a **new small session** on `D:\Users\uzeda\Mt. Sinai LLC\monorepo` (main). Do not resume 500+ message sessions to recover this context.
 
 ---
 
