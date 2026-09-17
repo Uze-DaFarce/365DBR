@@ -60,6 +60,29 @@ def validate_args(args):
         if not re.match(r'^(\d{2}|\d{2}-\d{2})$', args.month):
              raise ValueError(f"[Input Error] Invalid month format: '{args.month}'. Expected MM or MM-MM.")
 
+PASSAGE_JSON_RE = re.compile(
+    r"^[1-3]?[A-Z]{2,3}\.\d+\.\d+(?:-[1-3]?[A-Z]{2,3}\.\d+\.\d+)?\.json$"
+)
+
+
+def remove_orphan_passage_files(day_dir, keep_names):
+    """Delete leftover BOOK.C.V[-BOOK.C.V].json packs. Leave manifest, canonical_map, html."""
+    keep = set(keep_names)
+    removed = []
+    for name in os.listdir(day_dir):
+        if name in keep:
+            continue
+        if not PASSAGE_JSON_RE.match(name):
+            continue
+        path = os.path.join(day_dir, name)
+        if not os.path.isfile(path):
+            continue
+        os.remove(path)
+        removed.append(name)
+    if removed:
+        print(f"  [Cleanup] Removed {len(removed)} orphan passage file(s): {', '.join(sorted(removed))}")
+    return removed
+
 def fetch_passage(api_key, bible_id, passage_range):
     """
     Fetches a passage from api.bible.
@@ -225,7 +248,9 @@ def process_day(day_entry, api_key, output_dir):
     }
     manifest_path = os.path.join(day_dir, "manifest.json")
     atomic_write_json(manifest_path, manifest, ensure_ascii=False)
-    
+
+    remove_orphan_passage_files(day_dir, files_list)
+
     print(f"  Day {day_id} complete.")
 
 def main():

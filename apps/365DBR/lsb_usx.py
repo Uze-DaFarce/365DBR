@@ -7,7 +7,9 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple, Any
 
 VERSE_ID_RE = re.compile(r"^(?P<book>[A-Za-z0-9]{3})\s+(?P<chapter>\d+):(?P<verse>\d+(?:-\d+)?)$")
-TITLE_STYLES = {"d", "qa", "sp"} # Keep only true descriptions
+# Scripture titles / speaker (d, qa, sp). LSB-only section heads (s/s1/s2/s3) are
+# omitted so English columns stay in sync with KJV/LSV; they remain in the USX.
+TITLE_STYLES = {"d", "qa", "sp"}
 
 def _local_name(tag: str) -> str:
     return tag.rsplit("}", 1)[-1]
@@ -20,7 +22,8 @@ def _verse_id(value: str, book: str) -> Optional[str]:
 def _create_text_node(text: str, vid: Optional[str]) -> dict:
     node = {"text": text, "type": "text"}
     if vid:
-        node["attrs"] = {"verseId": vid, "verseOrgIds": [vid]}
+        # LSB is English numbering. Do not invent verseOrgIds (those are original-language ids).
+        node["attrs"] = {"verseId": vid}
     return node
 
 def extract_usx(path: str | Path) -> Tuple[Dict[str, list[dict]], Dict[str, list[dict]]]:
@@ -77,8 +80,14 @@ def extract_usx(path: str | Path) -> Tuple[Dict[str, list[dict]], Dict[str, list
 
         style = node.attrib.get("style", "")
         if name == "para":
-            # Explicitly drop "s" styles to delete headers like "Yahweh, Save Me"
-            if style.startswith("ms") or style.startswith("toc") or style.startswith("mt") or style == "mr" or style == "qa" or style in {"s", "s1", "s2", "s3", "r"}:
+            if (
+                style.startswith("ms")
+                or style.startswith("toc")
+                or style.startswith("mt")
+                or style == "mr"
+                or style == "r"
+                or style in {"s", "s1", "s2", "s3"}
+            ):
                 return [], current_vid 
             
             para_node = {"name": "para", "type": "tag", "attrs": {"style": style}, "items": items}

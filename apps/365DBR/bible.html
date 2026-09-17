@@ -165,17 +165,41 @@ function getBasePath() {
     return '';
 }
 
+const STATIC_CACHE = '365dbr-static';
+async function fetchStaticJson(url) {
+  try {
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (res && res.ok) {
+      if (window.caches) {
+        try {
+          const cache = await caches.open(STATIC_CACHE);
+          await cache.put(url, res.clone());
+        } catch (e) {}
+      }
+      return res;
+    }
+  } catch (e) {}
+  if (window.caches) {
+    try {
+      const cache = await caches.open(STATIC_CACHE);
+      const cached = await cache.match(url);
+      if (cached) return cached;
+    } catch (e) {}
+  }
+  return null;
+}
+
 async function loadDailyBread(dateFolder) {
   const basePath = getBasePath();
   let url = `${basePath}data/${dateFolder}/canonical_map.json`;
-  let res = await fetch(url).catch(() => null);
+  let res = await fetchStaticJson(url);
 
-  if (!res || !res.ok) {
+  if ((!res || !res.ok) && navigator.onLine && window.location.hostname !== 'mt-sin.ai') {
     url = `https://mt-sin.ai/365DBR/data/${dateFolder}/canonical_map.json`;
-    res = await fetch(url);
+    res = await fetchStaticJson(url);
   }
 
-  if (!res.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
+  if (!res || !res.ok) throw new Error(`Manifest for folder ${dateFolder} not found.`);
   const canonicalMap = await res.json();
   const vids = Object.keys(canonicalMap);
   const availableKeys = vids.length > 0 ? Object.keys(canonicalMap[vids[0]].verses).filter(k => k !== 'HEB') : [];
@@ -1054,16 +1078,27 @@ function App() {
   useEffect(() => {
     const initIndex = async () => {
         try {
-            // Cache busting to ensure fresh data
             const basePath = getBasePath();
-            const res = await fetch(`${basePath}data/readings.json?v=` + new Date().getTime());
-            if (!res.ok) throw new Error(`Failed to load readings.json: ${res.status}`);
+            const res = await fetchStaticJson(`${basePath}data/readings.json`);
+            if (!res || !res.ok) throw new Error(`Failed to load readings.json`);
             const readings = await res.json();
             readingsRef.current = readings;
             console.log("Loaded readings:", readings.length);
 
             const newIndex = {};
             const books = new Set();
+
+            const chapterDaysRes = await fetchStaticJson(`${basePath}data/chapter_days.json`);
+            if (chapterDaysRes && chapterDaysRes.ok) {
+                const chapterDays = await chapterDaysRes.json();
+                Object.entries(chapterDays).forEach(([book, chs]) => {
+                    books.add(book);
+                    if (!newIndex[book]) newIndex[book] = {};
+                    Object.entries(chs).forEach(([ch, days]) => {
+                        newIndex[book][ch] = Array.isArray(days) ? days.slice() : [];
+                    });
+                });
+            }
 
             readings.forEach(day => {
                 if (!day.api_format) return;

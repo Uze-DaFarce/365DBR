@@ -77,9 +77,11 @@ BIBLE_DATA = {
   "2PE": [21, 22, 18],
   "1JN": [10, 29, 24, 21, 21],
   "2JN": [13],
-  "3JN": [15],
+  # While some modern translations (like the ESV or NLT) and certain Greek texts have 15 verses in 3 John, many traditional texts (like the Textus Receptus) and standard API base texts merge verses 14 and 15 into a single verse 14.
+  "3JN": [14],
   "JUD": [25],
-  "REV": [20, 29, 22, 11, 14, 17, 17, 13, 21, 11, 19, 18, 18, 20, 8, 21, 18, 24, 21, 15, 27, 21],
+  # Revelation 12 typically ends at verse 17 in older manuscript traditions. The text of "verse 18" ("And the dragon took his stand on the sand of the seashore") is often shifted to the very beginning of the next chapter, becoming Revelation 13:1.
+  "REV": [20, 29, 22, 11, 14, 17, 17, 13, 21, 11, 19, 17, 18, 20, 8, 21, 18, 24, 21, 15, 27, 21],
 }
 
 # Book Lists
@@ -574,7 +576,10 @@ def validate_content_integrity(data, range_str, inject_missing=True):
     # api.bible returns { data: { content: [...] } }
     # validate_api_response already checked structure.
     actual_vids = extract_verse_ids(data['data']['content'])
-    actual = len(actual_vids)
+    parallel_vids = set()
+    for par in data['data'].get('parallels') or []:
+        parallel_vids |= extract_verse_ids(par.get('content') or [])
+    actual = len(parallel_vids) if parallel_vids else len(actual_vids)
 
     # 3. Sentinel Book Verification (New Security Layer)
     expected_books = set(get_books_in_range(range_str))
@@ -588,6 +593,10 @@ def validate_content_integrity(data, range_str, inject_missing=True):
 
     s_book, s_chap, s_verse = parse_reference(start_str)
     e_book, e_chap, e_verse = parse_reference(end_str)
+    org_range = english_range_to_org_range(range_str)
+    org_start_str, org_end_str = (org_range.split("-") + [org_range])[:2]
+    os_book, os_chap, os_verse = parse_reference(org_start_str)
+    oe_book, oe_chap, oe_verse = parse_reference(org_end_str)
 
     for vid in actual_vids:
         # verseId format: BOOK.CHAPTER.VERSE (e.g. JOL.1.1)
@@ -616,7 +625,9 @@ def validate_content_integrity(data, range_str, inject_missing=True):
         if book_code != norm_book_code:
             normalized_vid = vid.replace(book_code, norm_book_code)
 
-        if not is_verse_in_range(normalized_vid, s_book, s_chap, s_verse, e_book, e_chap, e_verse):
+        in_english = is_verse_in_range(normalized_vid, s_book, s_chap, s_verse, e_book, e_chap, e_verse)
+        in_org = is_verse_in_range(normalized_vid, os_book, os_chap, os_verse, oe_book, oe_chap, oe_verse)
+        if not in_english and not in_org:
              raise ValueError(f"[Data Integrity] Corruption Detected! Verse {vid} (normalized: {normalized_vid}) is NOT in range {range_str}.")
 
 
@@ -647,44 +658,121 @@ def validate_content_integrity(data, range_str, inject_missing=True):
         start_vid = start_str
         end_vid = end_str
 
-        # Normalize actual VIDs for lookup
+        # Normalize actual VIDs for lookup (primary org ids + English parallel ids)
         normalized_actual_vids = set()
-        for vid in actual_vids:
+        for vid in actual_vids | parallel_vids:
             b, c, v = vid.split('.')
             if b in REVERSE_HEBREW_BOOK_MAP:
                 b = REVERSE_HEBREW_BOOK_MAP[b]
             normalized_actual_vids.add(f"{b}.{c}.{v}")
 
-        # Check Start
-        # Note: We must handle cases where the start verse itself is a KNOWN_OMISSION (rare but possible)
-        if start_vid not in normalized_actual_vids and start_vid not in KNOWN_OMISSIONS:
-             # Check if it's a Psalm Title issue?
-             # If Psalm 18:43 is requested, but API returns 18:44 due to title...
-             # But we use Hebrew IDs, so it should match.
-             # If it's just missing, it's an error.
+        org_start_vid = f"{os_book}.{os_chap}.{os_verse}"
+        org_end_vid = f"{oe_book}.{oe_chap}.{oe_verse}"
+
+        def _boundary_present(english_vid, org_vid):
+            if english_vid in KNOWN_OMISSIONS:
+                return True
+            return english_vid in normalized_actual_vids or org_vid in normalized_actual_vids
+
+        if not _boundary_present(start_vid, org_start_vid):
              raise ValueError(f"[Data Integrity] Start Verse {start_vid} MISSING in response for {range_str}. Possible range shift or truncation.")
 
-        # Check End
-        if end_vid not in normalized_actual_vids and end_vid not in KNOWN_OMISSIONS:
+        if not _boundary_present(end_vid, org_end_vid):
              raise ValueError(f"[Data Integrity] End Verse {end_vid} MISSING in response for {range_str}. Possible range shift or truncation.")
 
     return True
 
+_VRS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "LSB", "release", "versification.vrs")
+_ENG_TO_ORG = None  # (book, ch, v) -> (book, ch, v)
+
+
+def _load_eng_to_org():
+    global _ENG_TO_ORG
+    if _ENG_TO_ORG is not None:
+        return _ENG_TO_ORG
+    mapping = {}
+    in_maps = False
+    with open(_VRS_PATH, encoding="utf-8") as handle:
+        for raw in handle:
+            line = raw.strip()
+            if line.startswith("# Mappings"):
+                in_maps = True
+                continue
+            if not in_maps or not line or line.startswith("#") or "=" not in line:
+                continue
+            left, right = [part.strip() for part in line.split("=", 1)]
+            lm = re.match(r"^([1-3]?[A-Z]{2,3}) (\d+):(\d+)(?:-(\d+))?$", left)
+            rm = re.match(r"^([1-3]?[A-Z]{2,3}) (\d+):(\d+)(?:-(\d+))?$", right)
+            if not lm or not rm:
+                continue
+            e_book, e_ch, e_v1, e_v2 = lm.group(1), int(lm.group(2)), int(lm.group(3)), lm.group(4)
+            o_book, o_ch, o_v1, o_v2 = rm.group(1), int(rm.group(2)), int(rm.group(3)), rm.group(4)
+            if e_book not in BIBLE_DATA:
+                continue
+            e_v2 = int(e_v2) if e_v2 is not None else e_v1
+            o_v2 = int(o_v2) if o_v2 is not None else o_v1
+            e_vs = list(range(e_v1, e_v2 + 1))
+            o_vs = list(range(o_v1, o_v2 + 1))
+            if len(e_vs) != len(o_vs):
+                continue
+            for ev, ov in zip(e_vs, o_vs):
+                mapping[(e_book, e_ch, ev)] = (o_book, o_ch, ov)
+    _ENG_TO_ORG = mapping
+    return mapping
+
+
+def map_english_verse_to_org(book, chapter, verse):
+    """LSB/KJV English BCV -> WLC org BCV. Identity if unmapped."""
+    return _load_eng_to_org().get((book, chapter, verse), (book, chapter, verse))
+
+
+def english_range_to_org_range(range_str):
+    """
+    Convert an English (KJV/LSB) range to WLC org numbering for use-org-id fetches.
+    GEN.31.1-GEN.31.55 -> GEN.31.1-GEN.32.1
+    Includes Psalm superscription (English v.0 / org v.1) when the range starts at English v.1.
+    """
+    if ";" in range_str:
+        return ";".join(english_range_to_org_range(part) for part in range_str.split(";"))
+
+    if "-" in range_str:
+        start_str, end_str = range_str.split("-")
+    else:
+        start_str = end_str = range_str
+
+    s_book, s_ch, s_v = parse_reference(start_str)
+    e_book, e_ch, e_v = parse_reference(end_str)
+    maps = _load_eng_to_org()
+
+    if s_v == 1 and (s_book, s_ch, 0) in maps:
+        ob, oc, ov = maps[(s_book, s_ch, 0)]
+        if ob == s_book and oc == s_ch:
+            os_book, os_ch, os_v = ob, oc, 1
+        else:
+            os_book, os_ch, os_v = ob, oc, ov
+    else:
+        os_book, os_ch, os_v = map_english_verse_to_org(s_book, s_ch, s_v)
+
+    oe_book, oe_ch, oe_v = map_english_verse_to_org(e_book, e_ch, e_v)
+    org = f"{os_book}.{os_ch}.{os_v}-{oe_book}.{oe_ch}.{oe_v}"
+    if os_book == oe_book and os_ch == oe_ch and os_v == oe_v:
+        org = f"{os_book}.{os_ch}.{os_v}"
+    return org
+
+
 def translate_range_for_bible(range_str, bible_id):
     """
-    Translates book IDs in the range string if required for specific Bibles.
-    e.g. JOE.2.1-JOE.2.10 -> JOL.2.1-JOL.2.10 if bible_id is OT Hebrew
+    For OT WLC: remap book codes if needed, then English BCV -> org BCV.
+    NT / English editions: leave the English range unchanged.
     """
     if bible_id != OT_HEBREW_ID:
         return range_str
 
-    # Check if any mapped book is in the string
     translated = range_str
     for std, heb in OT_HEBREW_BOOK_MAP.items():
         if std in translated:
             translated = translated.replace(std, heb)
-
-    return translated
+    return english_range_to_org_range(translated)
 
 def split_cross_book_range(range_str):
     """

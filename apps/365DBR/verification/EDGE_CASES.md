@@ -6,3 +6,5 @@
 5. Leviticus 6:1|Leviticus 6:1|Leviticus 5:20
 6. Numbers 17:1|Numbers 17:1|Numbers 17:16
 7. Micah 5:1|Micah 5:1|Micah 4:14
+8. BUG ::: DEC 11TH Shows 10:1-11:35 DEC 12TH shows Daniel 11:29-Hosea 2:23 - 11:29-11:35 are repeated in both days??? DAN.11.19-HOS.1.11 is what is in readings.json
+9. BUG ::: REV shows still shows 18 chapters in bible.html, I had to update it to 17 to run fetch_readings.py 1223

@@ -40,9 +40,8 @@ def _is_lsb_parallel(item) -> bool:
     return item.get("bibleId") == LSB_BIBLE_ID
 
 def english_verse_ids(data: dict) -> list[str]:
+    """English BCV only. Original `content` verseIds are org numbering — do not mix them in."""
     ids: set[str] = set()
-    if data.get("content"):
-        ids |= extract_verse_ids(data.get("content"))
     for par in data.get("parallels") or []:
         if _is_lsb_parallel(par):
             continue
@@ -67,20 +66,10 @@ def verse_ids_for_pack(path: Path, data: dict, usx_verses: dict) -> list[str]:
     ids = set(english_verse_ids(data))
     bounds = _filename_range(path.stem)
     if bounds:
-        end_book, end_chapter, end_verse = bounds[3], bounds[4], bounds[5]
-        usx_end = 0
+        s_book, s_chap, s_verse, e_book, e_chap, e_verse = bounds
         for vid in usx_verses:
-            try:
-                book, chapter, verse = str(vid).split(".")[:3]
-                if book == end_book and int(chapter) == end_chapter:
-                    usx_end = max(usx_end, int(verse))
-            except Exception:
-                continue
-        if 0 < usx_end - end_verse <= 2:
-            for number in range(end_verse + 1, usx_end + 1):
-                vid = f"{end_book}.{end_chapter}.{number}"
-                if vid in usx_verses:
-                    ids.add(vid)
+            if is_verse_in_range(vid, s_book, s_chap, s_verse, e_book, e_chap, e_verse):
+                ids.add(vid)
     return sorted(ids, key=_vid_key)
 
 def build_lsb_content(verse_ids: list[str], verses: dict, titles: dict) -> list:

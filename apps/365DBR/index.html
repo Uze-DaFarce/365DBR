@@ -224,18 +224,42 @@ const getBasePath = () => {
     }
     return '';
 };
+const STATIC_CACHE = '365dbr-static';
+const fetchStaticJson = async (url) => {
+  try {
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (res && res.ok) {
+      if (window.caches) {
+        try {
+          const cache = await caches.open(STATIC_CACHE);
+          await cache.put(url, res.clone());
+        } catch (e) {}
+      }
+      return res;
+    }
+  } catch (e) {}
+  if (window.caches) {
+    try {
+      const cache = await caches.open(STATIC_CACHE);
+      const cached = await cache.match(url);
+      if (cached) return cached;
+    } catch (e) {}
+  }
+  return null;
+};
+
 const loadDailyBread = async (dateFolder) => {
   const basePath = getBasePath();
   let url = `${basePath}data/${dateFolder}/canonical_map.json`;
-  let res = await fetch(url).catch(() => null);
+  let res = await fetchStaticJson(url);
 
-  // Fallback to production API if local fetch fails
-  if (!res || !res.ok) {
+  // Same-origin miss while online: try production. Skip when already on mt-sin.ai or offline.
+  if ((!res || !res.ok) && navigator.onLine && window.location.hostname !== 'mt-sin.ai') {
     url = `https://mt-sin.ai/365DBR/data/${dateFolder}/canonical_map.json`;
-    res = await fetch(url);
+    res = await fetchStaticJson(url);
   }
 
-  if (!res.ok) throw new Error(`Canonical data for ${dateFolder} not found.`);
+  if (!res || !res.ok) throw new Error(`Canonical data for ${dateFolder} not found.`);
   
   const canonicalMap = await res.json();
   const vids = Object.keys(canonicalMap);
