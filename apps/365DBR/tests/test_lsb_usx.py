@@ -29,6 +29,25 @@ USX_DIR = Path(__file__).parents[1] / "LSB" / "release" / "USX_1"
 JOB_USX = USX_DIR / "JOB.usx"
 SNG_USX = USX_DIR / "SNG.usx"
 
+SPACE_USX = """<?xml version="1.0" encoding="UTF-8"?>
+<usx version="3.0">
+  <book code="1CO" style="id">1CO</book>
+  <chapter number="2" style="c" sid="1CO 2"/>
+  <para style="q" vid="1CO 2:9">“T<char style="sc">hings</char> which eye has not seen,</para>
+  <para style="q" vid="1CO 2:9">A<char style="sc">nd</char> <char style="it">which</char> <char style="sc">have not entered</char>,</para>
+  <para style="p"><verse number="19" style="v" sid="1CO 3:19"/>“<char style="it">He is</char> <char style="sc">the one</char>”<verse eid="1CO 3:19"/></para>
+  <para style="p"><verse number="40" style="v" sid="1CH 1:40"/>The sons <char style="it">were</char> <note caller="1" style="f"><char style="ft">Lit sons</char></note>Alian.<verse eid="1CH 1:40"/></para>
+  <para style="p"><verse number="24" style="v" sid="1CO 11:24"/>said, <char style="wj">“remember Me.”</char> <verse eid="1CO 11:24"/><verse number="25" style="v" sid="1CO 11:25"/>In the same way<verse eid="1CO 11:25"/></para>
+  <para style="p">
+    <verse number="16" style="v" sid="JHN 3:16"/>
+    <char style="wj">“For God </char>
+    <note caller="1" style="f"><char style="ft">Or thus</char></note>
+    <char style="wj">so loved</char><verse eid="JHN 3:16"/>
+  </para>
+</usx>
+"""
+
+
 HEADING_USX = """<?xml version="1.0" encoding="UTF-8"?>
 <usx version="3.0">
   <book code="GEN" style="id">GEN</book>
@@ -54,6 +73,31 @@ class LsbUsxTests(unittest.TestCase):
 
         self.assertIn("Can you draw out Leviathan", flatten(verses["JOB.41.1"]))
         self.assertIn("Remember the battle", flatten(verses["JOB.41.8"]))
+
+    def test_same_line_spaces_between_markup_stay_word_breaks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "1CO.usx"
+            path.write_text(SPACE_USX, encoding="utf-8")
+            verses, _titles = extract_usx(path)
+
+        line = flatten(verses["1CO.2.9"])
+        self.assertIn("Things which", line)
+        self.assertNotIn("T hings", line)
+        self.assertIn("And which have", line)
+        self.assertNotIn("Andwhich", line)
+        self.assertIn("He is the one", flatten(verses["1CO.3.19"]))
+        self.assertNotIn("isthe", flatten(verses["1CO.3.19"]))
+        alian = flatten(verses["1CH.1.40"])
+        self.assertIn("were Alian", alian)
+        self.assertNotIn("wereAlian", alian)
+        self.assertNotIn("Lit", alian)
+        same = flatten(verses["1CO.11.24"])
+        self.assertIn("Me.” In the same way", same)
+        self.assertNotIn("Me.”In", same)
+        loved = flatten(verses["JHN.3.16"])
+        self.assertIn("For God so loved", loved)
+        self.assertNotIn("God  so", loved)
+        self.assertNotIn("Or thus", loved)
 
     def test_title_paras_do_not_bleed_into_verse_text(self):
         with tempfile.TemporaryDirectory() as tmp:

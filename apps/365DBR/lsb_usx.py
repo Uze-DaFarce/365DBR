@@ -26,6 +26,20 @@ def _create_text_node(text: str, vid: Optional[str]) -> dict:
         node["attrs"] = {"verseId": vid}
     return node
 
+def _visible_text(text: Optional[str]) -> Optional[str]:
+    """Keep scripture text. A same-line space between tags is a word break.
+
+    Pretty-printed USX puts newline indentation between elements. That indent
+    is not a word space. A space that shares the line with the markup is.
+    """
+    if not text:
+        return None
+    if text.strip():
+        return text
+    if "\n" in text or "\r" in text:
+        return None
+    return " "
+
 def extract_usx(path: str | Path) -> Tuple[Dict[str, list[dict]], Dict[str, list[dict]]]:
     root = ET.parse(path).getroot()
     book = next((str(node.attrib.get("code", "")).upper() for node in root.iter() if _local_name(node.tag) == "book"), "")
@@ -62,16 +76,18 @@ def extract_usx(path: str | Path) -> Tuple[Dict[str, list[dict]], Dict[str, list
                     pending_titles.clear()
                     first_verse_seen = True
 
-        if node.text and node.text.strip() and name not in {"verse", "chapter", "book", "usx"}:
-            items.append(_create_text_node(node.text, current_vid))
+        visible = _visible_text(node.text)
+        if visible and name not in {"verse", "chapter", "book", "usx"}:
+            items.append(_create_text_node(visible, current_vid))
 
         for child in list(node):
             child_items, returned_vid = process_node(child, current_vid)
             items.extend(child_items)
             current_vid = active_vid = returned_vid
 
-            if child.tail and child.tail.strip() and name not in {"verse", "chapter", "book", "usx"}:
-                items.append(_create_text_node(child.tail, current_vid))
+            visible = _visible_text(child.tail)
+            if visible and name not in {"verse", "chapter", "book", "usx"}:
+                items.append(_create_text_node(visible, current_vid))
 
         if eid:
             ended = _verse_id(eid, book)
