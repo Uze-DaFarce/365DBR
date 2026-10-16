@@ -1844,7 +1844,7 @@ function App() {
   }, [sortedVids, playbackStatus, navigateChapter, navigateVerse]);
 
   return (
-    <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-12">
+    <div className="min-h-screen bg-[#fdfcfb] text-stone-900 pb-20">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-stone-900 focus:text-white focus:font-bold focus:rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xl transition-all print:hidden">Skip to Content</a>
       <header className="w-full bg-white/95 border-b border-stone-200 py-1 px-2 min-[450px]:px-3 sticky top-0 z-50 backdrop-blur-md shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col min-[450px]:flex-row items-center justify-between gap-1 min-[450px]:gap-3 min-[450px]:h-10">
@@ -2066,9 +2066,11 @@ function App() {
           targetVid={bookmarkDialogTarget}
       />
 
-      <footer id="footer" className="max-w-7xl mx-auto px-3 py-3 text-[9px] text-stone-500 text-center font-serif leading-snug">
+      <footer id="footer" className="fixed bottom-0 left-0 right-0 z-40 w-full bg-[#fdfcfb]/95 backdrop-blur border-t border-stone-200 px-3 py-1.5 text-[9px] text-stone-500 text-center font-serif leading-snug print:static">
+        <div className="max-w-7xl mx-auto">
         The (LSB®) Legacy Standard Bible® is copyright © 2021 by The Lockman Foundation. Used by permission. All rights reserved. Managed in partnership with Three Sixteen Publishing, Inc.
         {' '}LSV is © Covenant Press (CC BY-SA 4.0). KJV is public domain.
+        </div>
       </footer>
       <ScrollToTop />
     </div>

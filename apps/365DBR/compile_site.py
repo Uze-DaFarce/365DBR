@@ -18,6 +18,18 @@ DATA_DIR = "data"
 PRODUCTION_DATA_URL = "https://mt-sin.ai/365DBR/data"
 BASE_SITE_URL = "https://mt-sin.ai"
 SITEMAP_PATH = "../../sitemap.xml"
+_SCRIPT_RE = re.compile(r"<script\b[^>]*>.*?</script>", re.IGNORECASE | re.DOTALL)
+_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+
+
+def strip_static_scripts(html: str) -> str:
+    """Drop every script. A crawler that runs one would replace the saved reading."""
+    stripped = _COMMENT_RE.sub("", _SCRIPT_RE.sub("", html))
+    if re.search(r"<script\b", stripped, re.IGNORECASE):
+        raise ValueError("script tag remained after strip")
+    if "verse-block" not in stripped:
+        raise ValueError("strip removed the reading")
+    return stripped
 
 def start_server(server_ready_event, port_container):
     try:
@@ -108,46 +120,6 @@ def compile_readings(browser, readings, base_url, limit=None):
 
             page.wait_for_selector(".verse-block", timeout=6000)
 
-            manifest_path = os.path.join(DATA_DIR, mmdd, "manifest.json")
-            manifest_content = None
-
-            if os.path.exists(manifest_path):
-                with open(manifest_path, 'r', encoding='utf-8') as f:
-                    manifest_content = json.load(f)
-            else:
-                try:
-                    r = requests.get(f"{PRODUCTION_DATA_URL}/{mmdd}/manifest.json", timeout=5)
-                    if r.status_code == 200: manifest_content = r.json()
-                except: pass
-
-            full_data_payload = {}
-            if manifest_content:
-                full_data_payload['manifest'] = manifest_content
-                full_data_payload['files'] = {}
-                for fname in manifest_content.get('files', []):
-                    fpath = os.path.join(DATA_DIR, mmdd, fname)
-                    if os.path.exists(fpath):
-                        with open(fpath, 'r', encoding='utf-8') as f:
-                            full_data_payload['files'][fname] = json.load(f)
-                    else:
-                        try:
-                            r = requests.get(f"{PRODUCTION_DATA_URL}/{mmdd}/{fname}", timeout=5)
-                            if r.status_code == 200: full_data_payload['files'][fname] = r.json()
-                        except: pass
-
-            json_str = json.dumps(full_data_payload, ensure_ascii=False)
-
-            page.evaluate(f"""(data) => {{
-                let script = document.getElementById('preloaded-data');
-                if (!script) {{
-                    script = document.createElement('script');
-                    script.id = 'preloaded-data';
-                    script.type = 'application/json';
-                    document.head.appendChild(script);
-                }}
-                script.textContent = data;
-            }}""", json_str)
-
             canonical_url = f"{BASE_SITE_URL}/365DBR/data/{mmdd}/index.html"
             page.evaluate(f"""(canonUrl) => {{
                 document.querySelectorAll('a[href*="bible.html"]').forEach(link => link.remove());
@@ -161,7 +133,7 @@ def compile_readings(browser, readings, base_url, limit=None):
             }}""", canonical_url)
 
             with open(output_file, "w", encoding="utf-8") as f:
-                f.write(page.content())
+                f.write(strip_static_scripts(page.content()))
 
         except Exception as e:
             print(f"  [Error]: {e}")

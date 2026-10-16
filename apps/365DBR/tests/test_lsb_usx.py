@@ -2,7 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from inject_lsb import english_verse_ids, verse_ids_for_pack
+from bible_common import extract_verse_ids
+from inject_lsb import build_lsb_content, english_verse_ids, verse_ids_for_pack
 from lsb_usx import extract_usx
 
 
@@ -159,6 +160,41 @@ class LsbUsxTests(unittest.TestCase):
         ids = verse_ids_for_pack(path, data, usx)
         self.assertIn("SNG.6.12", ids)
         self.assertIn("SNG.6.13", ids)
+
+
+class TestBuildLsbContent(unittest.TestCase):
+    def test_shared_paragraph_once_and_inside_the_reading(self):
+        para = {
+            "name": "para",
+            "type": "tag",
+            "attrs": {"style": "p"},
+            "items": [
+                {"type": "text", "text": "yesterday ", "attrs": {"verseId": "MAT.7.21"}},
+                {"type": "text", "text": "today ", "attrs": {"verseId": "MAT.7.22"}},
+                {"type": "text", "text": "still today", "attrs": {"verseId": "MAT.7.23"}},
+                {"type": "text", "text": " tomorrow", "attrs": {"verseId": "MAT.8.16"}},
+            ],
+        }
+        verses = {
+            "MAT.7.21": [para],
+            "MAT.7.22": [para],
+            "MAT.7.23": [para],
+            "MAT.8.16": [para],
+        }
+        title = {
+            "name": "para",
+            "type": "tag",
+            "attrs": {"style": "d"},
+            "items": [{"type": "text", "text": "A heading"}],
+        }
+        content = build_lsb_content(
+            ["MAT.7.22", "MAT.7.23"],
+            verses,
+            {"MAT.7.22": [title]},
+        )
+        self.assertEqual(flatten(content), "A headingtoday still today")
+        self.assertEqual(extract_verse_ids(content), {"MAT.7.22", "MAT.7.23"})
+        self.assertIn("yesterday", flatten([para]))
 
 
 if __name__ == "__main__":

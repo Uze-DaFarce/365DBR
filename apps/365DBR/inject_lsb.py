@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import re
 import sys
@@ -72,13 +73,76 @@ def verse_ids_for_pack(path: Path, data: dict, usx_verses: dict) -> list[str]:
                 ids.add(vid)
     return sorted(ids, key=_vid_key)
 
+def _verse_allowed(vid: str, allowed: set[str]) -> bool:
+    if vid in allowed:
+        return True
+    book_ch, _, span = vid.rpartition(".")
+    if "-" not in span:
+        return False
+    start_s, end_s = span.split("-", 1)
+    try:
+        start, end = int(start_s), int(end_s)
+    except ValueError:
+        return False
+    return any(f"{book_ch}.{n}" in allowed for n in range(start, end + 1))
+
+
+def _prune_node(node, allowed: set[str]):
+    """Copy a USX block, dropping text whose verseId is outside this reading."""
+    if not isinstance(node, dict):
+        return copy.deepcopy(node)
+    if node.get("type") == "text":
+        vid = (node.get("attrs") or {}).get("verseId")
+        if vid and not _verse_allowed(vid, allowed):
+            return None
+        return copy.deepcopy(node)
+    items = node.get("items")
+    if not isinstance(items, list):
+        return copy.deepcopy(node)
+    pruned_items = []
+    for child in items:
+        pruned = _prune_node(child, allowed)
+        if pruned is not None:
+            pruned_items.append(pruned)
+    if node.get("type") == "tag" and not any(_has_visible_text(item) for item in pruned_items):
+        return None
+    cloned = copy.deepcopy({key: value for key, value in node.items() if key != "items"})
+    cloned["items"] = pruned_items
+    return cloned
+
+
+def _has_visible_text(node) -> bool:
+    if not isinstance(node, dict):
+        return False
+    if node.get("type") == "text":
+        return bool((node.get("text") or "").strip())
+    return any(_has_visible_text(child) for child in node.get("items") or [])
+
+
 def build_lsb_content(verse_ids: list[str], verses: dict, titles: dict) -> list:
+    """One copy of each paragraph, limited to the requested verses.
+
+    lsb_usx stores a multi-verse paragraph on every verse in it. Concatenating
+    those lists repeats the paragraph and keeps the verses just outside the reading.
+    """
+    allowed = set(verse_ids)
     content = []
+    seen: set[int] = set()
     for vid in verse_ids:
-        if vid in titles:
-            content.extend(titles[vid])
-        if vid in verses:
-            content.extend(verses[vid])
+        for block in (titles.get(vid) or []):
+            if id(block) in seen:
+                continue
+            seen.add(id(block))
+            pruned = _prune_node(block, allowed)
+            if pruned is not None:
+                content.append(pruned)
+        for block in (verses.get(vid) or []):
+            if id(block) in seen:
+                continue
+            seen.add(id(block))
+            pruned = _prune_node(block, allowed)
+            if pruned is not None:
+                content.append(pruned)
     return content
 
 def build_lsb_parallel(payload: dict, content: list) -> dict:
