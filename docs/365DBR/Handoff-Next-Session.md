@@ -51,6 +51,7 @@ Skip full Blueprint/schema re-read unless design choice requires it.
 - PowerShell: quote days --day "0131"; no && use ;
 
 ## Key commands
+# Monthly api.bible: from apps/365DBR, prove `python fetch_readings.py --day "MMDD"`, then `python fetch_readings.py --all` (every month, all days; Oct 2026 already ran --all). Then inject_lsb.py (no --force), build_canonical_map.py, compile_site.py. Crawler pages are data/MMDD/index.html with no script tags.
 docker compose up -d
 python db/scripts/export_word_study_static.py
 # FTP apps/365DBR/ws/ + index.html + bible.html + strongs_optional.js → https://mt-sin.ai/365DBR/

@@ -1386,18 +1386,19 @@ function App() {
               const tryScroll = () => {
                   const el = document.getElementById(`verse-${resolvedVid}`);
                   if (el) {
-                      const isIframe = window !== window.parent;
-                      let targetY;
-                      if (isIframe) {
-                          const focalSlot = el.querySelector('.flex.flex-col > div:nth-child(3)');
-                          if (focalSlot) {
-                              const rect = focalSlot.getBoundingClientRect();
-                              targetY = window.scrollY + rect.top - 80;
-                          } else {
-                              const rect = el.getBoundingClientRect();
-                              targetY = window.scrollY + rect.top - 80;
-                          }
-                      } else {
+                    const isIframe = window !== window.parent;
+                    let targetY;
+                    if (isIframe) {
+                        const useFullVerse = new URLSearchParams(window.location.search).has('fullverse');
+                        const focalSlot = useFullVerse ? null : el.querySelector('.flex.flex-col > div:nth-child(3)');
+                        if (focalSlot) {
+                            const rect = focalSlot.getBoundingClientRect();
+                            targetY = window.scrollY + rect.top - 80;
+                        } else {
+                            const rect = el.getBoundingClientRect();
+                            targetY = window.scrollY + rect.top - 80;
+                        }
+                    } else {
                           const rect = el.getBoundingClientRect();
                           const absoluteTop = window.scrollY + rect.top;
                           targetY = absoluteTop - 60;
