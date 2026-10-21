@@ -148,6 +148,7 @@ def update_sitemap(all_readings, sitemap_path=SITEMAP_PATH):
     core_urls = [
         {"loc": f"{BASE_SITE_URL}/", "priority": "1.0", "changefreq": "daily"},
         {"loc": f"{BASE_SITE_URL}/HeIsRisen/index.html", "priority": "0.9", "changefreq": "monthly"},
+        {"loc": f"{BASE_SITE_URL}/365DBR/What_We_Know.html", "priority": "0.8", "changefreq": "weekly"},
         {"loc": f"{BASE_SITE_URL}/m/index.html", "priority": "0.7", "changefreq": "weekly"},
     ]
     xml_lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
