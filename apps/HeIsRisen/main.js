@@ -2841,6 +2841,9 @@ class EggZamRoom extends Phaser.Scene {
                 const link = parseScriptureLink(scripture);
                 if (link) {
                     const iframeOverlay = document.createElement('div');
+                    iframeOverlay.setAttribute('role', 'dialog');
+                    iframeOverlay.setAttribute('aria-modal', 'true');
+                    iframeOverlay.setAttribute('aria-label', 'Scripture Reference');
                     iframeOverlay.style.position = 'fixed';
                     iframeOverlay.style.top = '0';
                     iframeOverlay.style.left = '0';
@@ -2857,6 +2860,7 @@ class EggZamRoom extends Phaser.Scene {
 
                     const iframe = document.createElement('iframe');
                     iframe.src = link;
+                    iframe.setAttribute('title', 'Scripture Reference Content');
                     iframe.style.width = '100%';
                     iframe.style.height = '100%';
                     iframe.style.border = '4px solid white';
@@ -2864,6 +2868,7 @@ class EggZamRoom extends Phaser.Scene {
                     iframe.style.backgroundColor = 'white';
 
                     const closeBtn = document.createElement('button');
+                    closeBtn.setAttribute('aria-label', 'Close scripture reference');
                     closeBtn.textContent = '\u2716';
                     closeBtn.style.position = 'absolute';
                     closeBtn.style.top = '10px';
