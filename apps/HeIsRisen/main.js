@@ -21,6 +21,15 @@ class Confirmation extends Phaser.GameObjects.Container {
         this.onYes = onYes;
         this.onNo = onNo;
 
+        this.setScale(0);
+        this.scene.tweens.add({
+            targets: this,
+            scaleX: 1,
+            scaleY: 1,
+            duration: 250,
+            ease: 'Back.out'
+        });
+
         const overlay = this.scene.add.rectangle(0, 0, this.scene.cameras.main.width, this.scene.cameras.main.height, 0x000000, 0.7)
             .setOrigin(0)
             .setInteractive();
