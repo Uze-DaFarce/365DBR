@@ -162,12 +162,18 @@ function initializeGameData(registry, cache, forceNew = false) {
                 } catch (e) {
                     console.warn('Invalid saved game state in localStorage', e);
                 }
-                if (savedState && typeof savedState === 'object' && Array.isArray(savedState.eggData) && Array.isArray(savedState.sections)) {
+                const isValidEggData = savedState && savedState.eggData && Array.isArray(savedState.eggData) && savedState.eggData.every(e => e && typeof e === 'object' && typeof e.eggId === 'number');
+                const isValidSections = savedState && savedState.sections && Array.isArray(savedState.sections) && savedState.sections.every(s => s && typeof s === 'object' && typeof s.name === 'string');
+
+                if (savedState && typeof savedState === 'object' && isValidEggData && isValidSections) {
                     registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
 
-                    registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
-                    registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
+                    const isValidFoundEggs = Array.isArray(savedState.foundEggs) && savedState.foundEggs.every(id => typeof id === 'number');
+                    registry.set('foundEggs', isValidFoundEggs ? savedState.foundEggs : []);
+
+                    const isValidStampedSections = Array.isArray(savedState.stampedSections) && savedState.stampedSections.every(name => typeof name === 'string');
+                    registry.set('stampedSections', isValidStampedSections ? savedState.stampedSections : []);
 
                     let loadedCorrect = (savedState.correctCategorizations !== null && savedState.correctCategorizations !== undefined && String(savedState.correctCategorizations).trim() !== '' && typeof savedState.correctCategorizations !== 'object' && !Array.isArray(savedState.correctCategorizations)) ? Number(savedState.correctCategorizations) : NaN;
                     if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
