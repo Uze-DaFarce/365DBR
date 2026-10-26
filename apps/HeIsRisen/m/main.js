@@ -163,46 +163,56 @@ function initializeGameData(registry, cache, forceNew = false) {
                     console.warn('Invalid saved game state in localStorage', e);
                 }
                 if (savedState && typeof savedState === 'object' && Array.isArray(savedState.eggData) && Array.isArray(savedState.sections)) {
-                    registry.set('eggData', savedState.eggData);
+                    const validEggData = savedState.eggData.every(item => item && typeof item === 'object' && typeof item.eggId === 'number' && typeof item.section === 'string' && typeof item.collected === 'boolean');
+                    const validSections = savedState.sections.every(item => item && typeof item === 'object' && typeof item.name === 'string' && Array.isArray(item.eggs));
+                    const validFoundEggs = Array.isArray(savedState.foundEggs) ? savedState.foundEggs.every(item => item && typeof item === 'object' && typeof item.eggId === 'number') : false;
+                    const validStampedSections = Array.isArray(savedState.stampedSections) ? savedState.stampedSections.every(item => typeof item === 'string') : false;
+
+                    if (!validEggData || !validSections || (!Array.isArray(savedState.foundEggs)) || !validFoundEggs || (!Array.isArray(savedState.stampedSections)) || !validStampedSections) {
+                        console.warn('Corrupted inner array elements found in localStorage, discarding saved state.');
+                        savedState = null;
+                    } else {
+                        registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
 
                     registry.set('foundEggs', Array.isArray(savedState.foundEggs) ? savedState.foundEggs : []);
                     registry.set('stampedSections', Array.isArray(savedState.stampedSections) ? savedState.stampedSections : []);
 
-                    let loadedCorrect = (savedState.correctCategorizations !== null && savedState.correctCategorizations !== undefined && String(savedState.correctCategorizations).trim() !== '' && typeof savedState.correctCategorizations !== 'object' && !Array.isArray(savedState.correctCategorizations)) ? Number(savedState.correctCategorizations) : NaN;
-                    if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
-                    registry.set('correctCategorizations', loadedCorrect);
+                            let loadedCorrect = (savedState.correctCategorizations !== null && savedState.correctCategorizations !== undefined && String(savedState.correctCategorizations).trim() !== '' && typeof savedState.correctCategorizations !== 'object' && !Array.isArray(savedState.correctCategorizations)) ? Number(savedState.correctCategorizations) : NaN;
+                        if (isNaN(loadedCorrect) || !isFinite(loadedCorrect) || loadedCorrect < 0) loadedCorrect = 0;
+                        registry.set('correctCategorizations', loadedCorrect);
 
-                    let loadedScore = (savedState.currentScore !== null && savedState.currentScore !== undefined && String(savedState.currentScore).trim() !== '' && typeof savedState.currentScore !== 'object' && !Array.isArray(savedState.currentScore)) ? Number(savedState.currentScore) : NaN;
-                    if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) loadedScore = 0;
-                    registry.set('currentScore', loadedScore);
+                        let loadedScore = (savedState.currentScore !== null && savedState.currentScore !== undefined && String(savedState.currentScore).trim() !== '' && typeof savedState.currentScore !== 'object' && !Array.isArray(savedState.currentScore)) ? Number(savedState.currentScore) : NaN;
+                        if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) loadedScore = 0;
+                        registry.set('currentScore', loadedScore);
 
-                    // Always ensure highScore is loaded/initialized correctly
-                    try {
-                        let highScoreVal = null;
-                        try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
-                        let loadedScore = (highScoreVal !== null && highScoreVal !== undefined && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object' && !Array.isArray(highScoreVal)) ? Number(highScoreVal) : NaN;
-                        if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
-                            loadedScore = 0;
+                        // Always ensure highScore is loaded/initialized correctly
+                        try {
+                            let highScoreVal = null;
+                            try { highScoreVal = localStorage.getItem('highScore'); } catch (e) { console.warn('localStorage error', e); }
+                            let loadedScore = (highScoreVal !== null && highScoreVal !== undefined && String(highScoreVal).trim() !== '' && typeof highScoreVal !== 'object' && !Array.isArray(highScoreVal)) ? Number(highScoreVal) : NaN;
+                            if (isNaN(loadedScore) || !isFinite(loadedScore) || loadedScore < 0) {
+                                loadedScore = 0;
+                            }
+                            registry.set('highScore', loadedScore);
+                        } catch (e) {
+                            registry.set('highScore', 0);
                         }
-                        registry.set('highScore', loadedScore);
-                    } catch (e) {
-                        registry.set('highScore', 0);
-                    }
 
-                    // We also need to restore symbols from cache just in case the scene needs them
-                    const symbolsData = cache.json.get('symbols');
-                    if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
-                        const validSymbols = symbolsData.symbols.filter(s => {
-                            return s && typeof s === 'object' &&
-                                   typeof s.filename === 'string' &&
-                                   !s.filename.includes('..') &&
-                                   /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
-                        });
-                        symbolsData.symbols = validSymbols;
-                        registry.set('symbols', symbolsData);
+                        // We also need to restore symbols from cache just in case the scene needs them
+                        const symbolsData = cache.json.get('symbols');
+                        if (symbolsData && symbolsData.symbols && Array.isArray(symbolsData.symbols)) {
+                            const validSymbols = symbolsData.symbols.filter(s => {
+                                return s && typeof s === 'object' &&
+                                       typeof s.filename === 'string' &&
+                                       !s.filename.includes('..') &&
+                                       /^[a-zA-Z0-9_\-\/]+\.(png|jpg|jpeg)$/i.test(s.filename);
+                            });
+                            symbolsData.symbols = validSymbols;
+                            registry.set('symbols', symbolsData);
+                        }
+                        return; // Successfully loaded from save
                     }
-                    return; // Successfully loaded from save
                 }
             }
         } catch (e) {
