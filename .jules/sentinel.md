@@ -129,3 +129,6 @@ Dynamically loaded external JSON files accessed via `cache.json.get('key')` (lik
 ## 2024-04-06 - Fixing Video Missing Texture Flash in Lens
 **Learning:** In Phaser, video objects have a width of 0 until their metadata fully loads. When rendering a video into a dynamic target like a magnifying lens `renderStamp`, this results in Phaser temporarily flashing the fallback "missing texture" (black box with neon green stripes).
 **Action:** Always check `video.width > 0` before setting the video's key as a dynamic texture source. While it evaluates to 0, fall back to the safe, pre-loaded thumbnail asset (e.g., `${sectionName}-thumb`) to maintain visual continuity.
+## 2024-04-14 - Deep Validation for localStorage Arrays
+**Learning:** Checking `Array.isArray()` is insufficient for validating JSON arrays loaded from `localStorage` containing game state. Attackers or corruption can inject invalid inner elements (e.g., `[{id: 'NaN'}]`) that pass `isArray()` but crash the application later when properties are accessed.
+**Action:** Always implement deep validation using `.every()` to ensure inner array elements are objects and possess the correct expected primitive types (e.g., `typeof item.eggId === 'number'`) before applying them to the application state. If deep validation fails, reject the entire array and fallback gracefully.
