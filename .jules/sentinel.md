@@ -129,3 +129,7 @@ Dynamically loaded external JSON files accessed via `cache.json.get('key')` (lik
 ## 2024-04-06 - Fixing Video Missing Texture Flash in Lens
 **Learning:** In Phaser, video objects have a width of 0 until their metadata fully loads. When rendering a video into a dynamic target like a magnifying lens `renderStamp`, this results in Phaser temporarily flashing the fallback "missing texture" (black box with neon green stripes).
 **Action:** Always check `video.width > 0` before setting the video's key as a dynamic texture source. While it evaluates to 0, fall back to the safe, pre-loaded thumbnail asset (e.g., `${sectionName}-thumb`) to maintain visual continuity.
+
+## 2026-05-14 - Fix localStorage deep array corruption vulnerability
+**Finding:** The \`initializeGameData\` loader accepted deeply corrupted arrays for \`eggData\`, \`sections\`, \`foundEggs\`, and \`stampedSections\` simply because they passed the root \`Array.isArray()\` check. This would allow an injected array of primitives or objects with missing/NaN IDs to crash or corrupt the downstream game systems.
+**Action:** Implemented deep validation using \`.every()\` to ensure each element is a correctly structured object with precise primitive types (e.g. \`typeof e.eggId === 'number' && !isNaN(e.eggId)\`) and safely intercepting any issues by throwing exceptions within the try-catch block, forcing a safe rollback to the default new game state. Built a permanent test \`apps/HeIsRisen/tests/test_state_corruption.js\` to guarantee it works.

@@ -159,8 +159,25 @@ function initializeGameData(registry, cache, forceNew = false) {
                 let savedState = null;
                 try {
                     savedState = JSON.parse(savedStateStr);
+
+                    if (savedState && typeof savedState === 'object' && Array.isArray(savedState.eggData) && Array.isArray(savedState.sections)) {
+                        const isValidEggData = savedState.eggData.every(e => e && typeof e === 'object' && typeof e.eggId === 'number' && !isNaN(e.eggId) && typeof e.section === 'string');
+                        const isValidSections = savedState.sections.every(s => s && typeof s === 'object' && typeof s.name === 'string');
+                        if (!isValidEggData || !isValidSections) throw new Error("Corrupted arrays in save state");
+
+                        if (Array.isArray(savedState.foundEggs)) {
+                            const allValid = savedState.foundEggs.every(e => e && typeof e === 'object' && typeof e.eggId === 'number' && !isNaN(e.eggId));
+                            if (!allValid) throw new Error("Corrupted foundEggs");
+                        }
+
+                        if (Array.isArray(savedState.stampedSections)) {
+                            const allValid = savedState.stampedSections.every(s => typeof s === 'string');
+                            if (!allValid) throw new Error("Corrupted stampedSections");
+                        }
+                    }
                 } catch (e) {
                     console.warn('Invalid saved game state in localStorage', e);
+                    savedState = null; // Invalidate the state so the if block below fails
                 }
                 if (savedState && typeof savedState === 'object' && Array.isArray(savedState.eggData) && Array.isArray(savedState.sections)) {
                     registry.set('eggData', savedState.eggData);
