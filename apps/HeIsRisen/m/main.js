@@ -59,8 +59,19 @@ class Confirmation extends Phaser.GameObjects.Container {
         yesBtnContainer.setInteractive();
         addButtonInteraction(this.scene, yesBtnContainer, 'menu-click');
         yesBtnContainer.on('pointerdown', () => {
-            if (this.onYes) this.onYes();
-            this.destroy();
+            if (this.isDismissing) return;
+            this.isDismissing = true;
+            this.scene.tweens.add({
+                targets: popupCont,
+                scaleX: 0,
+                scaleY: 0,
+                duration: 200,
+                ease: 'Back.in',
+                onComplete: () => {
+                    if (this.onYes) this.onYes();
+                    this.destroy();
+                }
+            });
         });
         popupCont.add(yesBtnContainer);
 
@@ -81,8 +92,19 @@ class Confirmation extends Phaser.GameObjects.Container {
         noBtnContainer.setInteractive();
         addButtonInteraction(this.scene, noBtnContainer, 'menu-click');
         noBtnContainer.on('pointerdown', () => {
-            if (this.onNo) this.onNo();
-            this.destroy();
+            if (this.isDismissing) return;
+            this.isDismissing = true;
+            this.scene.tweens.add({
+                targets: popupCont,
+                scaleX: 0,
+                scaleY: 0,
+                duration: 200,
+                ease: 'Back.in',
+                onComplete: () => {
+                    if (this.onNo) this.onNo();
+                    this.destroy();
+                }
+            });
         });
         popupCont.add(noBtnContainer);
 
@@ -96,14 +118,36 @@ class Confirmation extends Phaser.GameObjects.Container {
 
         this.escListener = (e) => {
             if (e.code === 'Escape') {
-                if (this.onNo) this.onNo();
-                this.destroy();
+                if (this.isDismissing) return;
+                this.isDismissing = true;
+                this.scene.tweens.add({
+                    targets: popupCont,
+                    scaleX: 0,
+                    scaleY: 0,
+                    duration: 200,
+                    ease: 'Back.in',
+                    onComplete: () => {
+                        if (this.onNo) this.onNo();
+                        this.destroy();
+                    }
+                });
             }
         };
         this.enterListener = (e) => {
             if (e.code === 'Enter') {
-                if (this.onYes) this.onYes();
-                this.destroy();
+                if (this.isDismissing) return;
+                this.isDismissing = true;
+                this.scene.tweens.add({
+                    targets: popupCont,
+                    scaleX: 0,
+                    scaleY: 0,
+                    duration: 200,
+                    ease: 'Back.in',
+                    onComplete: () => {
+                        if (this.onYes) this.onYes();
+                        this.destroy();
+                    }
+                });
             }
         };
         window.addEventListener('keydown', this.escListener);
