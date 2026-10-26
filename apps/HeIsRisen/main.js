@@ -161,7 +161,35 @@ function initializeGameData(registry, cache, forceNew = false) {
                 } catch (e) {
                     console.warn('Invalid saved game state in localStorage', e);
                 }
+                let isValidState = false;
                 if (savedState && typeof savedState === 'object' && Array.isArray(savedState.eggData) && Array.isArray(savedState.sections)) {
+                    // Deep validate eggData array elements
+                    const validEggData = savedState.eggData.every(egg =>
+                        egg !== null && typeof egg === 'object' &&
+                        typeof egg.eggId === 'number' && !isNaN(egg.eggId) &&
+                        typeof egg.section === 'string' &&
+                        typeof egg.x === 'number' && !isNaN(egg.x) &&
+                        typeof egg.y === 'number' && !isNaN(egg.y) &&
+                        typeof egg.collected === 'boolean' &&
+                        (egg.symbol === null || (typeof egg.symbol === 'object' && typeof egg.symbol.filename === 'string'))
+                    );
+
+                    // Deep validate sections array elements
+                    const validSections = savedState.sections.every(sec =>
+                        sec !== null && typeof sec === 'object' &&
+                        typeof sec.name === 'string' &&
+                        Array.isArray(sec.eggs) &&
+                        sec.eggs.every(id => typeof id === 'number' && !isNaN(id))
+                    );
+
+                    if (validEggData && validSections) {
+                        isValidState = true;
+                    } else {
+                        console.warn('Security: Corrupted deep data detected in localStorage save arrays. Rejecting save state.');
+                    }
+                }
+
+                if (isValidState) {
                     registry.set('eggData', savedState.eggData);
                     registry.set('sections', savedState.sections);
 
