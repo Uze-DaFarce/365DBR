@@ -34,4 +34,8 @@ apps/365DBR/ws/verse/
 apps/365DBR/ws/strong/
 
 .cache/
+apps/365DBR/gen_drip.py
+apps/365DBR/40_Day_Drip*
 
+# Raw DBL USX bundles
+apps/365DBR/RAW/
