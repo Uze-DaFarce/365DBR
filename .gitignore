@@ -39,3 +39,4 @@ apps/365DBR/40_Day_Drip*
 
 # Raw DBL USX bundles
 apps/365DBR/RAW/
+.env*

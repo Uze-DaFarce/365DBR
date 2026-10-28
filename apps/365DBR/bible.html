@@ -84,9 +84,10 @@ const formatVerseRef = (vid) => formatVerseRefRaw(vid, typeof BOOK_NAMES !== 'un
 const TRANSLATION_REGISTRY = {
   original: { source: 'original', label: (isHebrew) => `ORIGINAL ${isHebrew ? 'HEBREW' : 'GREEK'}`, isHebrewGreek: true },
   lsb: { idPrefix: '8011347e', altIds: ['8011347e1aa60e8a-01'], translationCode: 'LSB', label: 'LSB - Legacy Standard Bible', attribution: { text: '©', link: '#footer', title: 'View Copyright Information' } },
-  kjv: { idPrefix: 'de4e12af', label: 'KJV - King James Version' },
-  lsv: { idPrefix: '06125ada', altIds: ['01b29f4b342acc35-01'], label: 'LSV - Literal Standard Version', attribution: { text: '©', link: '#footer', title: 'View Copyright Information' } },
-  web: { idPrefix: '9879dbb7', label: 'WEB - World English Bible' },
+  kjv: { idPrefix: 'de4e12af', translationCode: 'KJV', label: 'KJV - King James Version' },
+  lsv: { idPrefix: '06125ada', altIds: ['01b29f4b342acc35-01'], translationCode: 'LSV', label: 'LSV - Literal Standard Version', attribution: { text: '©', link: '#footer', title: 'View Copyright Information' } },
+  web: { idPrefix: '9879dbb7', translationCode: 'WEB', label: 'WEB - World English Bible' },
+        ylt: { idPrefix: 'ylt', translationCode: 'YLT', label: "YLT - Young's Literal Translation" },
   nlt: { idPrefix: 'd6e14a62', label: 'NLT - New Living Translation' }
 };
 
@@ -311,7 +312,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
 
     const loadStrong = useCallback(async (token) => {
         if (!token?.strong || !apiBase) return;
-        setSelected({ strong: token.strong, surface: token.surface, order: token.order });
+        setSelected({ ...token });
         setStrongLoading(true);
         setStrongHits(null);
         try {
@@ -1819,13 +1820,15 @@ function App() {
         return;
       }
       const prevFocal = focalTranslation;
-      setFocalTranslation(newFocal);
-      if (prevFocal && prevFocal !== newFocal && availableTranslations.includes(prevFocal)) {
-        setCompareTranslation(prevFocal);
-      } else if (newFocal === compareTranslation) {
-        const alt = availableTranslations.find((k) => k !== newFocal);
-        if (alt) setCompareTranslation(alt);
-      }
+            setFocalTranslation(newFocal);
+            if (newFocal === compareTranslation) {
+              if (prevFocal && prevFocal !== newFocal && availableTranslations.includes(prevFocal)) {
+                setCompareTranslation(prevFocal);
+              } else {
+                const alt = availableTranslations.find((k) => k !== newFocal);
+                if (alt) setCompareTranslation(alt);
+              }
+            }
       setIsFocalOpen(false);
   }, [focalTranslation, compareTranslation, availableTranslations]);
 

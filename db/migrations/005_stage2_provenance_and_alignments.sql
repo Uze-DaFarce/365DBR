@@ -1,0 +1,2 @@
+DELETE FROM verse_alignments WHERE english_verse_id='REV.12.18';
+INSERT INTO verse_alignments (english_verse_id,source_verse_id,source_system,established_by,note) VALUES ('LUK.17.37','LUK.17.37','api.bible-org','LSV','Stage 2 canonical alignment repair'),('ACT.15.41','ACT.15.41','api.bible-org','LSV','Stage 2 canonical alignment repair'),('ACT.24.27','ACT.24.27','api.bible-org','LSV','Stage 2 canonical alignment repair') ON CONFLICT DO NOTHING;

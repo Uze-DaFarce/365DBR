@@ -1,0 +1,1 @@
+-- Stage 1 verified state: 31,102 canonical spine across 5 translations (155,510 rows) + 439,531 original_tokens
