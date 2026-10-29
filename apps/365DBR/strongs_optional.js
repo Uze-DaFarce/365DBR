@@ -180,9 +180,32 @@
   function normalizeStrongKey(strong) {
     if (!strong) return "";
     var s = String(strong).trim().toUpperCase();
-    var m = s.match(/^([HG])0*(\d+)$/);
+    var m = s.match(/^([HG])0*(\d+)([A-Z]*)$/);
     if (!m) return s;
-    return m[1] + String(parseInt(m[2], 10));
+    return m[1] + String(parseInt(m[2], 10)) + (m[3] || "");
+  }
+
+  /**
+   * Static files keep the stored key (G0746.json, H0430.json) and sometimes
+   * the unpadded key (H430.json). Try the token key first, then both forms.
+   */
+  function strongStaticKeys(strong) {
+    var raw = String(strong || "").trim().toUpperCase();
+    var keys = [];
+    function add(k) {
+      if (k && keys.indexOf(k) === -1) keys.push(k);
+    }
+    add(raw);
+    var m = raw.match(/^([HG])0*(\d+)([A-Z]*)$/);
+    if (m) {
+      var digits = String(parseInt(m[2], 10));
+      var suffix = m[3] || "";
+      add(m[1] + digits + suffix);
+      var padded = digits;
+      while (padded.length < 4) padded = "0" + padded;
+      add(m[1] + padded + suffix);
+    }
+    return keys;
   }
 
   // In-memory book shard cache for static mode
@@ -252,19 +275,22 @@
 
     if (isStaticBase(base)) {
       var root = staticRoot(base);
-      return fetchJson(root + "strong/" + encodeURIComponent(key) + ".json").then(
-        function (r) {
-          if (!r.res.ok || !r.body || r.body.ok === false) {
-            // No Strong's file (e.g. Greek surface-only) — empty hits, not hard fail
-            return {
-              ok: true,
-              query: key,
-              total_verses: 0,
-              returned: 0,
-              hits: [],
-              source: "static-ws",
-            };
-          }
+      var keys = strongStaticKeys(strong);
+      function tryKey(i) {
+        if (i >= keys.length) {
+          return Promise.resolve({
+            ok: true,
+            query: key,
+            total_verses: 0,
+            returned: 0,
+            hits: [],
+            source: "static-ws",
+          });
+        }
+        return fetchJson(
+          root + "strong/" + encodeURIComponent(keys[i]) + ".json"
+        ).then(function (r) {
+          if (!r.res.ok || !r.body || r.body.ok === false) return tryKey(i + 1);
           var body = r.body;
           if (body.hits && body.hits.length > limit) {
             body = Object.assign({}, body, {
@@ -273,8 +299,9 @@
             });
           }
           return body;
-        }
-      );
+        });
+      }
+      return tryKey(0);
     }
 
     var num = encodeURIComponent(String(strong).trim());

@@ -530,6 +530,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
     const [hoverKey, setHoverKey] = useState(null);
     const [selected, setSelected] = useState(null); // { strong, surface, order }
     const [strongHits, setStrongHits] = useState(null);
+    const [hitTexts, setHitTexts] = useState({});
     const [strongLoading, setStrongLoading] = useState(false);
     const panelRef = useRef(null);
 
@@ -610,6 +611,61 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
       .filter(Boolean)
       .join(' ');
     const humanRef = formatVerseRef(verseId);
+    const focalCode = String(source || '').toUpperCase();
+
+    // Hit sentences follow the Focal slot only. Static packs store the LSB
+    // verse on focal_text and the KJV verse on compare_text; those fields are
+    // used only when that translation is the one in the Focal slot.
+    const storedFocalSentence = (hit) => {
+        if (!hit || !focalCode || focalCode === 'ORIGINAL' || focalCode === 'HEB') return '';
+        const block = verseMap?.[hit.verse_id];
+        if (block?.verses) {
+            const fromReader = extractText(block.verses[focalCode] || []);
+            if (fromReader) return fromReader;
+        } else if (block) {
+            const raw = block[source]?.text || block[focalCode]?.text || block[focalCode.toLowerCase()]?.text;
+            const fromReader = Array.isArray(raw) ? raw.join(' ') : (raw || '');
+            if (fromReader) return fromReader;
+        }
+        if (focalCode === 'LSB' && hit.focal_text) return hit.focal_text;
+        if (focalCode === 'KJV' && hit.compare_text) return hit.compare_text;
+        if (focalCode === 'LSV' && (hit.lsv || hit.snippet)) return hit.lsv || hit.snippet;
+        const tr = hit.translations;
+        if (tr) return tr[focalCode] || tr[focalCode.toLowerCase()] || '';
+        return '';
+    };
+
+    useEffect(() => {
+        const hits = strongHits?.hits;
+        if (!hits || !hits.length) {
+            setHitTexts({});
+            return;
+        }
+        let cancelled = false;
+        const next = {};
+        const missing = [];
+        hits.forEach((h) => {
+            const inline = storedFocalSentence(h);
+            if (inline) next[h.verse_id] = inline;
+            else if (h.verse_id) missing.push(h.verse_id);
+        });
+        setHitTexts(next);
+        if (!missing.length || !apiBase || !focalCode) return undefined;
+        (async () => {
+            const extra = {};
+            await Promise.all(missing.map(async (vid) => {
+                try {
+                    const row = await fetchVerseDetail(vid, apiBase);
+                    const tr = row?.translations || {};
+                    extra[vid] = tr[focalCode] || tr[focalCode.toLowerCase()] || '';
+                } catch (_) {
+                    extra[vid] = '';
+                }
+            }));
+            if (!cancelled) setHitTexts((prev) => ({ ...prev, ...extra }));
+        })();
+        return () => { cancelled = true; };
+    }, [strongHits, source, apiBase, verseMap, focalCode]);
 
     return (
         <div
@@ -671,7 +727,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                                                 const isHover = hoverKey === key;
                                                 const isSel = selected && selected.order === t.order && selected.strong === t.strong;
                                                 const tip = hasS
-                                                    ? `${t.surface} · Strong’s ${t.strong} — click for other uses`
+                                                    ? `${t.surface} · Strong’s ${t.strong}${t.transliteration ? ` · ${t.transliteration}` : ''} — click for other uses`
                                                     : t.surface;
                                                 const Tag = hasS ? 'button' : 'span';
                                                 return (
@@ -728,6 +784,9 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                                             <span className="text-xs font-semibold text-amber-800" dir="ltr">
                                                 Strong’s {selected.strong}
                                             </span>
+                                            {selected.transliteration && (
+                                                <span className="text-xs text-stone-500" dir="ltr">{selected.transliteration}</span>
+                                            )}
                                             {strongHits?.total_verses != null && (
                                                 <span className="text-xs text-stone-400">
                                                     {strongHits.total_verses.toLocaleString()} place{strongHits.total_verses === 1 ? '' : 's'} in Scripture
@@ -747,8 +806,8 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                                                         >
                                                             {formatVerseRef(h.verse_id)}
                                                         </button>
-                                                        {(h.snippet || h.lsv || h.english) && (
-                                                            <span className="block text-stone-600 pl-0.5 line-clamp-2 font-serif">{h.snippet || h.lsv || h.english}</span>
+                                                        {hitTexts[h.verse_id] && (
+                                                            <span className="block text-stone-600 pl-0.5 line-clamp-2 font-serif">{hitTexts[h.verse_id]}</span>
                                                         )}
                                                     </li>
                                                 ))}
@@ -894,7 +953,7 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                                 {slotName === 'bottom' && (
                                     <>
                                         <BookmarkButton onBookmark={() => onBookmark(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
-                                        {strongsAvailable && onOpenStrongs && isHebrew && (
+                                        {strongsAvailable && onOpenStrongs && (
                                             <StrongsButton onOpen={() => onOpenStrongs(vid)} tabIndex={isActive?0:-1} aria-hidden={!isActive} />
                                         )}
                                     </>
@@ -1318,8 +1377,8 @@ const Header = React.memo(({
 
              {/* Slot 2 Selector (Middle) */}
              {availableTranslations.length > 2 ? (
-              <div className="relative hidden min-[450px]:block">
-                <button onClick={() => { setIsCompareOpen(!isCompareOpen); setIsFocalOpen(false); }} aria-haspopup="true" aria-expanded={isCompareOpen} aria-label="Select Comparison Translation" className="flex items-center gap-1 text-[9px] min-[450px]:text-[10px] font-bold uppercase text-stone-500 hover:text-stone-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Translation for Middle Slot">
+              <div className="relative">
+                <button onClick={() => { setIsCompareOpen(!isCompareOpen); setIsFocalOpen(false); }} aria-haspopup="true" aria-expanded={isCompareOpen} aria-label="Select Comparison Translation" className="flex items-center gap-1 text-[10px] min-[450px]:text-xs font-black uppercase text-stone-600 hover:text-stone-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 rounded" title="Select Translation for Middle Slot">
                   {compareTranslation ? compareTranslation.toUpperCase() : '-'}
                   <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${isCompareOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                 </button>
@@ -1343,7 +1402,7 @@ const Header = React.memo(({
               </div>
              ) : (
                 availableTranslations.length > 1 && (
-                  <span className="hidden min-[450px]:inline text-[9px] min-[450px]:text-[10px] font-bold uppercase text-stone-400 cursor-default" title="Middle Slot (Fixed)">
+                  <span className="text-[10px] min-[450px]:text-xs font-black uppercase text-stone-600 cursor-default" title="Middle Slot (Fixed)">
                     {compareTranslation ? compareTranslation.toUpperCase() : '-'}
                   </span>
                 )
@@ -1592,8 +1651,6 @@ const App = () => {
   const [strongsVerseId, setStrongsVerseId] = useState(null);
   const openStrongs = useCallback((vid) => {
     if (!vid) return;
-    // Current ws packs have Strong's on Hebrew (OT) tokens only; Greek (NT) is surface-only.
-    if (NT_BOOKS.has(String(vid).substring(0, 3))) return;
     setStrongsVerseId(vid);
   }, []);
   const closeStrongs = useCallback(() => setStrongsVerseId(null), []);

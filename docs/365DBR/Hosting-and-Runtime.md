@@ -42,7 +42,9 @@ Public site: `https://mt-sin.ai/365DBR/`
 
 No cloud database. No localhost probe on production (CSP-safe).
 
-**Publish path**: generate on the PC (Docker Postgres + Python) → FTP static files to GoDaddy.
+**Publish path**: generate on the PC (Docker Postgres + Python) → static files in `apps/365DBR/` → GoDaddy `/public_html/365DBR/`.
+
+After a full upload is already on the server, later publishes use `scripts/publish_365dbr.ps1`. Run `-Init` once so the script records what is already online. Later runs zip only changed public files (`index.html`, `bible.html`, `bible_meta.js`, `strongs_optional.js`, `sitemap.xml`, `What_We_Know.html`, `data/`, `ws/`). Upload that one zip into `/public_html/365DBR/` and extract it there. The script does not upload `RAW/`, `LSB/`, Python, or tests.
 
 ---
 

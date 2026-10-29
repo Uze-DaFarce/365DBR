@@ -105,8 +105,9 @@ def main():
             trans = {t["code"]: t for t in cur.fetchall()}
             check("LSV translation present", "LSV" in trans)
             check("LSV is_primary = true", trans["LSV"]["is_primary"] is True)
-            check("LSV source_bible_id correct", trans["LSV"]["source_bible_id"] == "01b29f4b342acc35-01")
+            check("LSV source_bible_id correct", trans["LSV"]["source_bible_id"] == "ebible:englsv")
             check("KJV translation present", "KJV" in trans)
+            check("KJV source_bible_id correct", trans["KJV"]["source_bible_id"] == "ebible:eng-kjv2006")
             print("[verify] Translations seeded correctly (LSV primary).")
 
             # 4. Core tables exist

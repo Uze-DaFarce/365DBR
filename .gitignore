@@ -40,3 +40,12 @@ apps/365DBR/40_Day_Drip*
 # Raw DBL USX bundles
 apps/365DBR/RAW/
 .env*
+
+# 365DBR delta publish: local state, zips, and FTP credentials
+scripts/.publish-365dbr/
+scripts/publish_365dbr.ftp.json
+scripts/publish_365dbr.ps1
+scripts/publish_365dbr.ftp.example.json
+patch_export.py
+
+apps/365DBR/finish_all.py

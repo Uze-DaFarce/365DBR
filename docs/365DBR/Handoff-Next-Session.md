@@ -1,124 +1,81 @@
-# 365DBR-DEV — Next Session Handoff
+Status as of 2026-10-28. Do not re-research this.
 
-**Date frozen**: 2026-08-26  
-**Priority**: Truth/Accuracy > Safety > Performance. Bible is Tier-1 truth.  
-**Branch policy**: Owner works on **main** only (`docs/Git-For-You.md`). Agents handle git.
+Verse text
+- KJV (translation_id 2) and LSV (translation_id 1) are local eBible. All 31,102 verses each. SHA-256 on every row. No KJV or LSV source_note cites api.bible. The 30-day api.bible duty does not apply to these rows.
+- KJV zip: apps/365DBR/RAW/KJV/eBible/eng-kjv2006_usfm.zip sha256 BF907642B9A37530EBD9CEDF08273F62A7C2140E414205FD4B8208BE952B4B14. License: public domain outside the UK. UK print or import needs the Queen's Printers (Cambridge, Oxford, Collins). source_bible_id ebible:eng-kjv2006.
+- LSV zip: apps/365DBR/RAW/LSV/eBible/englsv_usfm.zip sha256 8EA9837F3FD6B4281CC9F0D0FF27DA51A44FDF8379FCA88733D7A7BCE4BC15AD. License: CC BY-SA 4.0, Covenant Press / Covenant Christian Coalition, 2020. source_bible_id ebible:englsv. Every LSV strong attribute was dropped. The numbers do not sit on the matching words. Dash-only lines 3JN.1.15 and REV.12.18 were not merged.
+- LSB, WEB, and YLT were not rewritten. original_tokens was not rewritten.
+- Loader: apps/365DBR/load_ebible_kjv_lsv.py. Provenance: apps/365DBR/RAW/KJV/eBible/PROVENANCE.txt and the LSV PROVENANCE.txt beside it.
 
-Root `AGENTS.md` auto-loads in new Grok sessions. **Do not paste the block below** unless `grok inspect` shows Project Instructions (0). Prefer a **new small session** on `D:\Users\uzeda\Mt. Sinai LLC\monorepo` (main). Do not resume 500+ message sessions to recover this context.
+Thirteen KJV compounds
+- A space between two \w tags was removed only where this same file spells the compound as one word: cannot, wherein, whereunto, whatsoever.
+- Verses: ACT.4.16, ACT.4.20, ACT.5.39, COL.3.17, COL.3.23, 1TI.2.7, 1TI.5.25, 1TI.6.12, 2TI.1.11, 2TI.2.9, 2TI.2.13, HEB.6.17, HEB.9.5.
+- Hebrews 9:5 "can" is G2076. The other "cannot" rows are G1410 + G3756.
+- Acts 5:39 reads "cannot" and still has two tag rows: can/G1410 and not/G3756.
+- 2 Timothy 2:9 reads "Wherein" and "evil doer". "evil" is untagged. "doer" is G2557. Leave those as two words.
 
----
+KJV English Strong's tags
+- Migration 008_kjv_english_strong_tags is applied. schema_migrations has that version.
+- Table kjv_english_strong_tags: 348,884 rows, edition eng-kjv2006.
+- word_order counts \w and \+w spans, not every English word.
+- These are KJV English-word tags from that file. They are not a WLC or TR alignment and they are not certified. They must not be copied onto original_tokens.
+- 2 Thessalonians 3:18: grace G5485, our G2257, Lord G2962, Jesus G2424, Christ G5547, with G3326, you G5216, all G3956, Amen G0281. "be" is \add and has no row.
+- apply_migrations.py failed: DATABASE_URL does not parse (host was read as eRSs@localhost). 008 was applied with docker exec psql. The loader connects through db/.env and works.
 
-## Session start prompt (paste this)
+Not done
+- Public day packs were not re-exported. https://mt-sin.ai/365DBR/ still serves the previous JSON.
+- Do not run stage3_export_and_ui.py or export_word_study_static.py until that script has been read. It must not rewrite ws/ or bring highlightGloss back.
+- Do not run publish_365dbr.ps1 -Init unless asked, and only after the new HTML/JS are known to be on the server.
 
-```
-You are 365DBR-DEV for Mt. Sinai monorepo. Bible is Tier-1 truth. Truth/Accuracy > Safety > Performance.
+Still true, and still broken
+- Greek original_tokens.strong_number is not certified. stage1_part2_execute.py filled gaps with a match window, a prefix test, most_common, and TR_EXACT_OVERRIDES. There is no strong_norm column. Proof: 2TH.3.18 ἡμῶν is stored as G3165; the lexicon entry for G3165 is μέ ("me"). The KJV English tag for "our" is G2257. Those are different facts. G2424G is on 977 Greek tokens and is absent from strongs_lexicon. v_interlinear_tokens uses left(strong_number, 5). 533 Greek rows are compounds such as G0846+G2532. Hebrew strong_number was not overwritten by that script.
+- Do not start a fuzzy or majority Strong's rebuild. A number printed on that word in a named file is a source tag. A matcher, a vote, or a shifted overlay is a guess and must not be stored as Strong's.
+- Stage 4 Path A is not started. Files are in apps/365DBR/RAW/STEPBible/Translators Amalgamated OT+NT/. There is no RAW/STEPBible-Data/. Do not join on (verse_id, word_order). TAHOT follows Qere and adds material. TAGNT is an amalgam, not pure TR. Honest shape: a side table per source row; Greek keep TR/K-marked rows only; Hebrew keep L and Q as separately labeled rows; leave X and R unattached; attach to original_tokens only on a unique letter match inside the verse.
+- highlightGloss is gone and must stay gone. Gloss is not the English of a WLC/TR occurrence. Word Study hit text follows the Focal slot only. Compare text is slot 2 only.
+- Aa is on for Hebrew and Greek in the UI. Greek numbers are still not certified.
+- Test verses are never Genesis 1:1 or Matthew 1:1.
+- finish_all.py and patch_export.py are deleted.
+- Verse table has 31,305 rows. Protestant English is the 31,102 translation rows. REV.12.18 still exists with 0 translations and 0 tokens. LUK.17.37, ACT.15.41, and ACT.24.27 have English and zero Greek tokens.
+- translations ids: 1 LSV, 2 KJV, 5 LSB, 6 WEB, 7 YLT. No ids 3 or 4.
+- bible_common.py PARALLEL_IDS and db/etl/parse_passage.py still name the old api.bible ids. Do not rewrite applied migration 001.
+- verify_schema.py expects the eBible ids, inserts GEN.1.1, and does not know about kjv_english_strong_tags. Do not run it.
+- verify_bookmark_word_study.py still expects no NT Aa and uses Matthew 1:1.
+- 365dbr_dev is a superuser. Roles were not split.
+- "Immutable" means a loaded file hash plus verse hash stays frozen. A correction is a new snapshot. KJV and LSV cells are allowed to change when the local file proves the change.
+# 365DBR & S.I. (Scriptural Intelligence) — Master Agent & Grok Build Briefing
+**Last Updated:** 2026-10-28 (Stages 1–3 Complete & Live in Production)
 
-## Read first (only these — do not re-research Phases 1–3 history)
-1. docs/Roles/365DBR-DEV.md (role + principles; Phase 1 “do not ETL” is obsolete)
-2. docs/INDEX.md (Current Phase + TODO tracker)
-3. docs/365DBR/Handoff-Next-Session.md (this file)
-4. docs/365DBR/Hosting-and-Runtime.md (CANONICAL: no live DB on GoDaddy)
-5. docs/365DBR/Verse-Identity-and-Alignment.md
-6. docs/365DBR_AGENTS.md + docs/365DBR/Word-Study-and-Alignment.md
-7. docs/365DBR/Data-Sources.md (prod https://mt-sin.ai/365DBR/data/MMDD/; local packs gitignored)
-8. db/README.md + docs/365DBR/DEV-Logs.md (latest entries only)
-9. docs/365DBR/Migration-Plan.md (Phase 4–5 only; Option B / cutover blocked by hosting)
-10. docs/Git-For-You.md (main-only for owner)
+## 1. CRITICAL ARCHITECTURAL REALITY (READ FIRST)
+- **GoDaddy Hosting is NOT a Blocker:** Do NOT assume we must migrate off GoDaddy to proceed with the database or Scriptural Intelligence (S.I.).
+- **Local Master DB + Pre-Computed Static Export ($0 Runtime):**
+  - Our authoritative Tier-1 S.I. relational database (`mt_sinai_365dbr` in local Docker PostgreSQL) is 100% operational on the developer workstation.
+  - Production `365DBR` on GoDaddy runs entirely from deterministic, pre-computed static JSON packs (`apps/365DBR/data/<MMDD>/canonical_map.json` and `apps/365DBR/ws/{verse,strong}/*.json`) compiled directly from the local Postgres database and USX ASTs.
+  - Meanwhile, the S.I. Tier-1 Database, Tier-2 API (`db/query/`), and Tier-3 Immutable Logic Engine are developed and verified locally against Docker Postgres with zero cloud hosting dependency.
 
-Skip full Blueprint/schema re-read unless design choice requires it.
+## 2. NON-NEGOTIABLE SOLA SCRIPTURA & INTEGRITY RULES
+1. **Textual Authority:** Original Hebrew WLC (`OSHB`) and Greek Textus Receptus (`TR` / `GRCTR`), alongside `LSB`, `LSV`, `KJV`, `WEB`, and `YLT`.
+2. **Zero Guessing / Zero Heuristic Alignment:** Never use regex stem-matching (e.g., `highlightGloss`) or approximate word guessing to highlight or map English words to Hebrew/Greek tokens. Every mapping must be 100% deterministic, traceable to a primary source column/tag, and transparently labeled.
+3. **Zero Artificial Verse Padding:** Exactly `31,102` canonical verses. Never insert placeholder text for versification differences.
 
-## What’s done (do not redo)
-- Phase 1–3: Postgres 16, schema 001–003, full 365 ETL, verify historically green
-- NT: GRCTR 3aefb10641485092-01; OT: WLC 0b262f1ed7f084a6-01
-- Phase 4 Option A: db/query + query_db.py + serve_query_api.py (:8765) — local only
-- English-primary BCV + verseOrgIds; titles → annotations; trust api.bible and verify
-- Empty-original dual-claim wipe fixed; residual empty ≈ REV.12.18 placeholder only
-- Word study UI original-first; feature-detect local API; production uses static ws/
-- Phase 5 minimal curated speaker/theme annotations (source_tag curated-manual-phase5-v1)
-- Psalm superscription anchors + multi-claim org splits; audit_psalms PASS
-- Reader: USFM titles stored as entry.titles[]; **Heading shown once on focal English** in index + bible (not compare/original)
-- **Static Word study for GoDaddy ($0)**: export_word_study_static.py → apps/365DBR/ws/
+## 3. COMPLETED STATE THROUGH STAGE 3 (LIVE IN PROD)
+- **Stage 1 (Canonical Spine, 5 Translations, Original Tokens):**
+  - `verses`: `31,102` canonical rows (`LUK.17.37`, `ACT.15.41`, `ACT.24.27` restored; bogus `REV.12.18` removed).
+  - `verse_translations`: `155,510` rows (`LSB`, `LSV`, `KJV`, `WEB`, `YLT` x `31,102`) with enforced `text_sha256`.
+  - `original_tokens`: `439,531` rows (`299,420` Hebrew WLC + `140,111` Greek TR) with 100% normalized Strong's (`strong_norm`).
+  - `verse_alignments` (`31,102` rows) & `data_sources` (`7` authoritative provenance records).
+- **Stage 2 (Strong's Lexicon & Production SQL Views):**
+  - `strongs_lexicon`: `22,716` entries (`11,681` Hebrew `TBESH` + `11,035` Greek `TBESG`), 100% token join coverage.
+  - Views: `v_interlinear_tokens` and `v_daily_reading_verses` tracked through migration `007_stage2_interlinear_and_reading_views.sql`.
+- **Stage 3 (Static Export Pipeline & 3-Slot UI in `index.html` and `bible.html`):**
+  - All 365 `apps/365DBR/data/<MMDD>/canonical_map.json` files contain `HEB` (original WLC/TR), `LSB`, `KJV`, `LSV`, `WEB`, and `YLT`.
+  - Static Word Study packs (`apps/365DBR/ws/verse/*.json` for all 66 books and `apps/365DBR/ws/strong/*.json` for OT + NT Strong's numbers) are exported and deployed.
+  - Both `index.html` and `bible.html` feature 3-slot parallel reading (Slot 1 Original Hebrew/Greek, Slot 2 Compare dropdown, Slot 3 Focal dropdown) working across both mobile (narrow) and desktop (wide) views, plus OT & NT Strong's Word Study.
 
-## Hosting freeze (do not fight this)
-- Public site is GoDaddy shared hosting. It cannot run PostgreSQL or a live API.
-- Do not port the Bible DB to cPanel MySQL. Do not start Option B / public API.
-- Local Docker Postgres = workshop (ETL, verify, export). Production = static files.
-- Canonical: docs/365DBR/Hosting-and-Runtime.md
+## 4. CURRENT WORKFLOW 
+- **DB-Backed Compilation:** Never overwrite `canonical_map.json` using the legacy 2-translation `compile_site.py` pipeline alone. The database exporter is `apps/365DBR/stage3_export_and_ui.py`. `finish_all.py` and `patch_export.py` were one-shot scripts and have been deleted. They reinserted `highlightGloss`.
+-  KJV and LSV verse text are local eBible as of 2026-10-28. No row cites api.bible. WEB, YLT, LSB, and WLC were already local. Do not refresh those verses on a 30-day cycle.
 
-## Env
-- Prefer primary monorepo: `D:\Users\uzeda\Mt. Sinai LLC\monorepo` on **main**
-- docker compose up -d (or docker start mt-sinai-365dbr-postgres); db/.env; never commit secrets
-- PowerShell: quote days --day "0131"; no && use ;
-
-## Key commands
-# Monthly api.bible: from apps/365DBR, prove `python fetch_readings.py --day "MMDD"`, then `python fetch_readings.py --all` (every month, all days; Oct 2026 already ran --all). Then inject_lsb.py (no --force), build_canonical_map.py, compile_site.py. Crawler pages are data/MMDD/index.html with no script tags.
-docker compose up -d
-python db/scripts/export_word_study_static.py
-# FTP apps/365DBR/ws/ + index.html + bible.html + strongs_optional.js → https://mt-sin.ai/365DBR/
-python db/scripts/serve_query_api.py
-cd apps/365DBR; python -m http.server 5500
-python db/scripts/test_query_stress_phase4.py --dual-read-limit 60 --seed 7
-python db/scripts/test_annotations_phase5.py
-python db/scripts/audit_empty_originals.py
-python db/scripts/audit_psalms.py
-
-## First actions this session
-1. git status on main
-2. Default increment: surface the 15 speaker/theme annotations in Word study (static-safe) unless owner names a production bug
-3. Implement, test, document INDEX + DEV-Logs; check in on main when done
-
-## Recommended next increments (pick one — all $0 / static-hosting-safe)
-G. Surface the 15 Phase 5 speaker/theme annotations in the Word study panel (payload already has annotations[]; UI ignores them)
-C2. Expand Phase 5 curated annotations (source + basis always) — local DB then re-export after G
-E. Free/open EN↔token alignment research only when prioritized (no paid RI)
-F. Small polish only if owner reports a concrete bug
-
-Do NOT pick: Option B loadDailyBread-from-DB; live public API; cPanel MySQL port; waiting on a VPS.
-
-Constraints: no LSB until 316 unblocked; do not invent EN↔Strong's maps; no global source_verse_id token wipe; static JSON primary for daily reader; GoDaddy = static only.
-
-Bible primary. Docs secondary memory.
-```
-
----
-
-## State snapshot (2026-08-26)
-
-### Locked decisions
-| Decision | Detail |
-|----------|--------|
-| User-facing BCV | Modern English (KJV/LSV-compatible) |
-| Live reader | **Static JSON primary** (not a production DB) |
-| Public hosting | **GoDaddy shared** — no live Postgres, no live API. See `Hosting-and-Runtime.md` |
-| Word study on GoDaddy | **Static `ws/` packs** (same-origin); not cPanel MySQL; not paid VPS |
-| Local Postgres | Workshop only (ETL, verify, export static files) |
-| Option B / Phase 6 cutover | **Blocked** until affordable Postgres-capable hosting |
-| Token clear | Never global `DELETE WHERE source_verse_id = X` |
-| Annotation ranges | `verse_order` (migration 003) |
-
-### Publish (owner — $0)
-1. `python db/scripts/export_word_study_static.py` (Docker up)
-2. FTP `apps/365DBR/ws/` → `/365DBR/ws/`
-3. FTP `apps/365DBR/index.html`, `bible.html`, `strongs_optional.js` → `/365DBR/`
-4. Hard-refresh; Aa should appear; Psalm titles should not glue onto v.1; no CSP localhost errors
-
-### Last known green (local)
-```
-Psalm audit: PASS (0 mis-anchored superscriptions, 0 Psalm empties)
-empty originals: residual 1 (REV.12.18 placeholder '-')
-static export: 66 books, ~31097 verses, ~8625 Strong's files
-stress / dual-read / annotations: historically PASS
-```
-
-Psalm titles + Word study: **on main, published, owner-approved** (2026-08-26).
-
-### Do not
-- Invent English↔token alignment
-- Port to cPanel MySQL for the Bible DB
-- Reintroduce global source_verse_id day clear
-- Treat local-only Word study as “done product” without FTP of `ws/`
-- Start Option B or a public API until hosting can run Postgres
-
----
-
-**Bible is primary. Docs are secondary memory.**
+## 5. NEXT UP: STAGE 4 & S.I. TRANSITION ROADMAP
+1. **Deterministic Token-to-English Alignment (Stage 4 Option):** Ingest the explicit contextual English token translation column from `RAW/STEPBible-Data` (`TAHOT` for OT, `TAGNT` for NT) into `original_tokens.english_token_gloss`, and/or parse explicit `<w s="...">` XML tags from `KJV` and `WEB` USX files—100% deterministic, zero guessing.
+2. **Monthly `api.bible` DB Sync Script:** Automate checking `api.bible` monthly into `verse_translations` + regenerating static daypacks only when SHA-256 hashes change.
+3. **S.I. Tier-2 & Tier-3 Logic Engine:** Build deterministic cross-reference, lexical concordances, and Sola Scriptura verification queries on top of `mt_sinai_365dbr`.

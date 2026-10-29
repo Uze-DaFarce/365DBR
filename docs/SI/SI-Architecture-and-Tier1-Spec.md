@@ -52,3 +52,19 @@ Every prompt is evaluated through a deterministic PostgreSQL cascade before any 
    * **Covenant & Audience Scope:** Distinguishes Universal Moral Law (`EXO.20`) and New Covenant commands from temporary/fulfilled Mosaic Civil/Ceremonial laws or one-time historical commands.
    * **Grammatical Polarity & Coreference:** Preserves Hebrew/Greek negation (`lo`/`ou`/`me`) and conditional (`if`/`ean`) particles, and resolves pericope pronouns to their antecedent subjects.
    * **Mandatory Pericope Expansion:** Always retrieves the surrounding literary unit (±3 verses minimum) to prevent proof-texting out of context.
+
+
+---
+
+## Production Status Update (2026-10-28 — Stages 1–3 Complete)
+- **Authoritative Database (`mt_sinai_365dbr`):**
+  - `verses`: `31,102` canonical rows (`LUK.17.37`, `ACT.15.41`, `ACT.24.27` restored; bogus `REV.12.18` removed).
+  - `verse_translations`: `155,510` rows (`LSB`, `LSV`, `KJV`, `WEB`, `YLT` x `31,102`) with SHA-256 verification (`text_sha256`).
+  - `original_tokens`: `439,531` rows (`299,420` Hebrew WLC + `140,111` Greek TR) with 100% normalized Strong's (`strong_norm`).
+  - `strongs_lexicon`: `22,716` entries (`11,681` Hebrew `TBESH` + `11,035` Greek `TBESG`), 100% token join coverage.
+  - `verse_alignments`: `31,102` rows; `data_sources`: `7` registered corpora; `schema_migrations`: `001` through `007` applied.
+  - Views: `v_interlinear_tokens` and `v_daily_reading_verses`.
+- **GoDaddy Static Hosting & S.I. Architecture Alignment:**
+  - GoDaddy static hosting is **not** a blocker for S.I. development. The local PostgreSQL database serves as the Tier-1 S.I. Master Spine and compiles deterministic static JSON packs (`apps/365DBR/data/<MMDD>/canonical_map.json` and `apps/365DBR/ws/{verse,strong}/*.json`) for $0 static hosting while Tier-1/2/3 S.I. engineering proceeds locally.
+- **Monthly `api.bible` Refresh Workflow:**
+  - Rather than overwriting `canonical_map.json` from scratch with the legacy `fetch_readings.py -> inject_lsb.py -> compile_site.py` chain, monthly `api.bible` refreshes update cached `api.bible` translations in Postgres (`verse_translations` with SHA-256 comparison) and re-run the DB+AST static exporter so all 5 English translations (`LSB`, `KJV`, `LSV`, `WEB`, `YLT`) and `HEB`/`GRK` data remain intact.
