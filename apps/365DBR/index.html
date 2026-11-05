@@ -200,15 +200,86 @@ const TRANSLATION_REGISTRY = {
 /** --- AST RENDERER & TEXT EXTRACTOR --- **/
 const extractText = (nodes) => {
   if (!nodes || !Array.isArray(nodes)) return '';
-  return nodes.map(n => n.type === 'text' ? n.text || '' : extractText(n.items)).join('');
+  let out = '';
+  for (const n of nodes) {
+    if (!n) continue;
+    if (n.name === 'br') {
+      if (out && !/\s$/.test(out)) out += ' ';
+      continue;
+    }
+    const piece = n.type === 'text' ? (n.text || '') : extractText(n.items);
+    if (!piece) continue;
+    if (n.name === 'para' && out && !/\s$/.test(out) && !/^\s/.test(piece)) out += ' ';
+    out += piece;
+  }
+  return out;
 };
 
-const RichTextNode = ({ node }) => {
+function normStrong(value) {
+  const raw = String(value || '').trim().toUpperCase();
+  const m = raw.match(/^([HG])0*(\d+)(.*)$/);
+  if (!m) return raw;
+  return m[1] + String(parseInt(m[2], 10)) + m[3];
+}
+
+function originalLetters(text) {
+  let out = '';
+  for (const ch of String(text || '').normalize('NFD')) {
+    const c = ch.codePointAt(0);
+    if (c >= 0x0300 && c <= 0x036F) continue;
+    if (c >= 0x0591 && c <= 0x05C7) continue;
+    if (c >= 0x05D0 && c <= 0x05EA) out += ch;
+    else if (c === 0x03C2) out += '\u03C3';
+    else if ((c >= 0x0370 && c <= 0x03FF) || (c >= 0x1F00 && c <= 0x1FFF)) out += ch.toLowerCase();
+  }
+  return out;
+}
+
+function isAttachedMark(ch) {
+  const c = ch.codePointAt(0);
+  return (c >= 0x0591 && c <= 0x05C7) || (c >= 0x0300 && c <= 0x036F);
+}
+
+function HighlightedText({ text, letters }) {
+  if (!text) return null;
+  if (!letters) return <>{text}</>;
+  const parts = [];
+  let buf = '';
+  const flushWord = () => {
+    if (!buf) return;
+    if (originalLetters(buf) === letters) {
+      parts.push(<span key={parts.length} className="rounded-sm bg-amber-300 text-stone-900">{buf}</span>);
+    } else {
+      parts.push(buf);
+    }
+    buf = '';
+  };
+  for (const ch of text) {
+    if (originalLetters(ch) || (buf && isAttachedMark(ch))) buf += ch;
+    else {
+      flushWord();
+      parts.push(ch);
+    }
+  }
+  flushWord();
+  return <>{parts}</>;
+}
+
+const RichTextNode = ({ node, markStrong, markLetters, inWord }) => {
   if (!node) return null;
-  if (node.type === 'text') return <>{node.text}</>;
+  if (node.type === 'text') {
+    if (inWord || !markLetters) return <>{node.text}</>;
+    return <HighlightedText text={node.text} letters={markLetters} />;
+  }
 
   const Tag = node.name === 'para' ? 'div' : 'span';
   const style = node.attrs?.style || '';
+  const nodeStrong = normStrong(node.attrs?.strong);
+  let marked = false;
+  if (style === 'w') {
+    if (markStrong && nodeStrong && nodeStrong === markStrong) marked = true;
+    else if (!nodeStrong && markLetters && originalLetters(extractText(node.items)) === markLetters) marked = true;
+  }
 
   let cls = '';
   if (['q', 'q1', 'q2'].includes(style)) cls += ' ml-4 sm:ml-8 block';
@@ -216,10 +287,13 @@ const RichTextNode = ({ node }) => {
   if (style === 'add') cls += ' italic opacity-80';
   if (style === 'nd') cls += ' font-bold uppercase tracking-wider text-[0.85em]';
   if (['s', 's1', 'd'].includes(style)) cls += ' font-bold mt-2 mb-1 block text-amber-900 text-sm md:text-lg tracking-wide uppercase';
+  if (marked) cls += ' rounded-sm bg-amber-300 text-stone-900';
 
   return (
       <Tag className={cls.trim() || undefined}>
-          {node.items?.map((child, i) => <RichTextNode key={i} node={child} />)}
+          {node.items?.map((child, i) => (
+            <RichTextNode key={i} node={child} markStrong={markStrong} markLetters={markLetters} inWord={inWord || style === 'w'} />
+          ))}
       </Tag>
   );
 };
@@ -523,7 +597,7 @@ const StrongsButton = React.memo(({ onOpen, ...props }) => (
  * Results strip only after a word is chosen — not a debug/API dump.
  * Static JSON remains primary for the reader.
  */
-function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTranslation, verseMap, groupedVids }) {
+function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, preferredTranslation, verseMap, groupedVids }) {
     const [status, setStatus] = useState('loading'); // loading | ready | error
     const [error, setError] = useState(null);
     const [payload, setPayload] = useState(null);
@@ -536,6 +610,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
 
     useEffect(() => {
         let cancelled = false;
+        onMarkWord?.(null);
         setStatus('loading');
         setError(null);
         setPayload(null);
@@ -557,7 +632,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
             }
         })();
         return () => { cancelled = true; };
-    }, [verseId, apiBase]);
+    }, [verseId, apiBase, onMarkWord]);
 
     useEffect(() => {
         const onKey = (e) => {
@@ -565,6 +640,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                 if (selected) {
                     setSelected(null);
                     setStrongHits(null);
+                    onMarkWord?.(null);
                 } else {
                     onClose();
                 }
@@ -572,15 +648,24 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
         };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
-    }, [onClose, selected]);
+    }, [onClose, onMarkWord, selected]);
 
     useEffect(() => {
         try { panelRef.current?.focus(); } catch (_) { /* ignore */ }
     }, [verseId]);
 
     const loadStrong = useCallback(async (token) => {
-        if (!token?.strong || !apiBase) return;
+        if (!token?.strong) {
+            if (!token?.step_english) return;
+            setSelected({ ...token });
+            onMarkWord?.(token);
+            setStrongLoading(false);
+            setStrongHits(null);
+            return;
+        }
+        if (!apiBase) return;
         setSelected({ ...token });
+        onMarkWord?.(token);
         setStrongLoading(true);
         setStrongHits(null);
         try {
@@ -590,7 +675,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
         } finally {
             setStrongLoading(false);
         }
-    }, [apiBase]);
+    }, [apiBase, onMarkWord]);
 
     const tokens = payload?.original?.tokens || [];
     const withStrong = tokens.some((t) => t.strong);
@@ -723,20 +808,23 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                                         >
                                             {tokens.map((t, i) => {
                                                 const hasS = !!t.strong;
+                                                const openable = hasS || !!t.step_english;
                                                 const key = `${t.order}-${t.strong || ''}-${i}`;
                                                 const isHover = hoverKey === key;
                                                 const isSel = selected && selected.order === t.order && selected.strong === t.strong;
                                                 const tip = hasS
                                                     ? `${t.surface} · Strong’s ${t.strong}${t.transliteration ? ` · ${t.transliteration}` : ''} — click for other uses`
-                                                    : t.surface;
-                                                const Tag = hasS ? 'button' : 'span';
+                                                    : t.step_english
+                                                      ? `${t.surface} · STEPBible contextual English`
+                                                      : t.surface;
+                                                const Tag = openable ? 'button' : 'span';
                                                 return (
                                                     <React.Fragment key={key}>
                                                         {i > 0 && !isHeb && ' '}
                                                         <Tag
-                                                            type={hasS ? 'button' : undefined}
+                                                            type={openable ? 'button' : undefined}
                                                             onClick={(e) => {
-                                                                if (!hasS) return;
+                                                                if (!openable) return;
                                                                 e.stopPropagation();
                                                                 loadStrong(t);
                                                             }}
@@ -747,15 +835,15 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                                                             title={tip}
                                                             aria-label={tip}
                                                             className={`inline rounded-sm px-0.5 transition-colors duration-100 align-baseline ${
-                                                                hasS
+                                                                openable
                                                                     ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500'
                                                                     : 'cursor-default'
                                                             } ${
                                                                 isSel
                                                                     ? 'bg-amber-300 text-stone-900 ring-1 ring-amber-500'
-                                                                    : isHover && hasS
+                                                                    : isHover && openable
                                                                       ? 'bg-amber-200 text-stone-900'
-                                                                      : hasS
+                                                                      : openable
                                                                         ? 'hover:bg-amber-100'
                                                                         : ''
                                                             }`}
@@ -777,22 +865,32 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
                                 {/* Results only after a word is clicked */}
                                 {selected && (
                                     <div className="border-t border-stone-100 pt-3 mt-1">
-                                        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mb-2">
-                                            <span className={`text-base ${isHeb ? 'hebrew' : 'greek'}`} dir={isHeb ? 'rtl' : 'ltr'}>
-                                                {selected.surface}
-                                            </span>
-                                            <span className="text-xs font-semibold text-amber-800" dir="ltr">
-                                                Strong’s {selected.strong}
-                                            </span>
+                                        <p className="mb-2 text-sm leading-snug text-stone-800" dir="ltr">
+                                            <span className={`text-base ${isHeb ? 'hebrew' : 'greek'}`} dir={isHeb ? 'rtl' : 'ltr'} style={{ unicodeBidi: 'isolate' }}>{selected.surface}</span>
                                             {selected.transliteration && (
-                                                <span className="text-xs text-stone-500" dir="ltr">{selected.transliteration}</span>
+                                                <span className="text-xs text-stone-500"> {selected.transliteration}</span>
                                             )}
-                                            {strongHits?.total_verses != null && (
-                                                <span className="text-xs text-stone-400">
-                                                    {strongHits.total_verses.toLocaleString()} place{strongHits.total_verses === 1 ? '' : 's'} in Scripture
+                                            {selected.step_english && (
+                                                <span>
+                                                    <span className="mx-1.5 text-stone-300">|</span>
+                                                    {selected.step_english}
+                                                    <span className="ml-1 text-[10px] font-normal text-stone-400">(STEPBible contextual English)</span>
                                                 </span>
                                             )}
-                                        </div>
+                                            {selected.strong && (
+                                                <span>
+                                                    <span className="mx-1.5 text-stone-300">|</span>
+                                                    {selected.strong}
+                                                    <span className="ml-1 text-[10px] font-normal text-stone-400">(Strong’s)</span>
+                                                </span>
+                                            )}
+                                            {strongHits?.total_verses != null && (
+                                                <span>
+                                                    <span className="mx-1.5 text-stone-300">|</span>
+                                                    <span className="text-stone-500">{strongHits.total_verses.toLocaleString()} place{strongHits.total_verses === 1 ? '' : 's'} in Scripture</span>
+                                                </span>
+                                            )}
+                                        </p>
                                         {strongLoading && <p className="text-sm text-stone-500">Finding other uses…</p>}
                                         {strongHits?.error && <p className="text-sm text-red-600">Could not search right now.</p>}
                                         {strongHits?.hits && (
@@ -823,7 +921,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, preferredTransla
         </div>
     );
 }
-const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying, onBookmark, onOpenStrongs, strongsAvailable }) => {
+const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimmed, isPlaying, onBookmark, onOpenStrongs, strongsAvailable, markStrong, markLetters }) => {
     const vid = group[0];
     const block = verseMap[vid];
     if (!block) return null;
@@ -964,13 +1062,13 @@ const VerseGroup = React.memo(({ group, verseMap, dynamicSlots, isActive, isDimm
                 </div>
                 {headingNodes.length > 0 && (
                     <div className={headingClass} style={{ direction: dataSrc === 'HEB' && isHebrew ? 'rtl' : 'ltr' }}>
-                        {headingNodes.map((n, i) => <RichTextNode key={`h-${i}`} node={n} />)}
+                        {headingNodes.map((n, i) => <RichTextNode key={`h-${i}`} node={n} markStrong={slotName === 'top' ? markStrong : null} markLetters={slotName === 'top' ? markLetters : null} />)}
                     </div>
                 )}
                 <div className={`${textClass}`} style={{ direction: dataSrc === 'HEB' && isHebrew ? 'rtl' : 'ltr' }}>
-                    <span className={colorClass}>
-                        {verseNodes.map((n, i) => <RichTextNode key={`v-${i}`} node={n} />)}
-                    </span>
+                    <div className={colorClass}>
+                        {verseNodes.map((n, i) => <RichTextNode key={`v-${i}`} node={n} markStrong={slotName === 'top' ? markStrong : null} markLetters={slotName === 'top' ? markLetters : null} />)}
+                    </div>
                 </div>
             </div>
         );
@@ -1649,11 +1747,26 @@ const App = () => {
   // Optional Strong's (feature-detect local query API). Null base ⇒ UI hidden.
   const [queryApiBase, setQueryApiBase] = useState(null);
   const [strongsVerseId, setStrongsVerseId] = useState(null);
+  const [studiedMark, setStudiedMark] = useState(null);
+  const strongsAnchorVid = useRef(null);
+  const strongsJumpVid = useRef(null);
+  const onMarkWord = useCallback((token) => {
+    if (!token) { setStudiedMark(null); return; }
+    const strong = token.strong ? normStrong(token.strong) : '';
+    setStudiedMark({ strong, letters: originalLetters(token.surface || '') });
+  }, []);
   const openStrongs = useCallback((vid) => {
     if (!vid) return;
+    strongsAnchorVid.current = activeVerseIdRef.current;
+    strongsJumpVid.current = null;
     setStrongsVerseId(vid);
   }, []);
-  const closeStrongs = useCallback(() => setStrongsVerseId(null), []);
+  const closeStrongs = useCallback(() => {
+    strongsAnchorVid.current = null;
+    strongsJumpVid.current = null;
+    setStrongsVerseId(null);
+    setStudiedMark(null);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -1666,8 +1779,22 @@ const App = () => {
 
   // Close Strong's panel during audio playback (do not fight playVerse UX)
   useEffect(() => {
-    if (playbackStatus === 'playing') setStrongsVerseId(null);
+    if (playbackStatus === 'playing') {
+      setStrongsVerseId(null);
+      setStudiedMark(null);
+    }
   }, [playbackStatus]);
+
+  // Follow the reading when the reader moves. A hit click sets strongsJumpVid
+  // so the page moves and this study stays.
+  useEffect(() => {
+    if (!strongsVerseId || !activeVerseId) return;
+    if (activeVerseId === strongsJumpVid.current) return;
+    if (activeVerseId === strongsAnchorVid.current) return;
+    strongsAnchorVid.current = activeVerseId;
+    strongsJumpVid.current = null;
+    if (activeVerseId !== strongsVerseId) setStrongsVerseId(activeVerseId);
+  }, [activeVerseId, strongsVerseId]);
 
   // Load bookmarks on mount
   useEffect(() => {
@@ -2401,6 +2528,8 @@ const App = () => {
                     onBookmark={setBookmarkDialogTarget}
                     onOpenStrongs={openStrongs}
                     strongsAvailable={!!queryApiBase}
+                    markStrong={isActive && studiedMark?.strong ? studiedMark.strong : null}
+                    markLetters={isActive && studiedMark?.letters ? studiedMark.letters : null}
                 />
             );
         })}
@@ -2415,14 +2544,17 @@ const App = () => {
           verseMap={verseMap}
           groupedVids={groupedVids}
           onClose={closeStrongs}
+          onMarkWord={onMarkWord}
           onJumpVerse={(vid) => {
-            setStrongsVerseId(vid);
             const el = document.getElementById(`verse-${vid}`);
-            if (el) {
-              const rect = el.getBoundingClientRect();
-              window.scrollTo({ top: window.scrollY + rect.top - 60, behavior: 'smooth' });
-              setActiveVerseId(vid);
-            }
+            if (!el) return;
+            strongsJumpVid.current = vid;
+            isNavigatingRef.current = true;
+            if (navigationTimeoutRef.current) clearTimeout(navigationTimeoutRef.current);
+            navigationTimeoutRef.current = setTimeout(() => { isNavigatingRef.current = false; }, 800);
+            const rect = el.getBoundingClientRect();
+            window.scrollTo({ top: window.scrollY + rect.top - 60, behavior: 'smooth' });
+            setActiveVerseId(vid);
           }}
         />
       )}

@@ -192,7 +192,7 @@ def verify_local_content(readings_path):
     )
     if errors == 0:
         if checked_files == 0:
-            print("⚠️ No content files found to verify (fetch days first with fetch_readings.py).")
+            print("⚠️ No content files found to verify.")
         else:
             print(f"✅ Local content verification passed ({checked_files} files checked).")
         return True

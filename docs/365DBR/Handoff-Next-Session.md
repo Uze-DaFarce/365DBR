@@ -1,4 +1,19 @@
-Status as of 2026-10-28. Do not re-research this.
+Check-in and production, 2026-11-04. The owner is committing. Do not FTP unless asked.
+
+`apps/365DBR/ws/manifest.json`, `ws/verse/`, and `ws/strong/` are gitignored. A commit does not contain the new STEPBible English. That English is only in the local `ws/` folder and the local database.
+
+Production is GoDaddy `/public_html/365DBR/`. The public site never has a database. Security requires the cache to be written on this machine, then moved. Speed is a side effect.
+
+- `index.html` and `bible.html` can go up first. `step_english` is optional, so these pages still work with the word-study pack already online. The new English appears after `ws/` is replaced.
+- Replace the whole `ws/` folder for the new English: 409,219 tokens with `step_english`. Either order is safe. Put `ws/` beside the HTML files (`https://mt-sin.ai/365DBR/ws/manifest.json`).
+- `strongs_optional.js` was not changed. Day packs in `data/` were not changed. Leave both unless a diff says otherwise.
+- Do not upload `RAW/`, Python, `db/`, or Docker.
+
+UI in those two HTML files: the selected word is one line with pipes; a flattened poetry line keeps a space between lines; changing the verse updates word study; a hit click moves the page and leaves the study on the same word; slot 1 marks that original word in amber. The pages were not clicked in a browser.
+
+Data already in the local database and in local `ws/`: a whole verse of letters links in order even when the verse numbers differ. One cross-number link, STEPBible PSA.18.50 onto the tokens at 2SA.22.51. A samekh or pe after the sof pasuq is a section mark and is ignored. 1 Chronicles 12:8–10 carry their STEPBible English. No original word was moved.
+
+Status as of 2026-10-28. Do not re-research this. The block above is the newer status.
 
 Verse text
 - KJV (translation_id 2) and LSV (translation_id 1) are local eBible. All 31,102 verses each. SHA-256 on every row. No KJV or LSV source_note cites api.bible. The 30-day api.bible duty does not apply to these rows.
@@ -24,13 +39,20 @@ KJV English Strong's tags
 
 Not done
 - Public day packs were not re-exported. https://mt-sin.ai/365DBR/ still serves the previous JSON.
-- Do not run stage3_export_and_ui.py or export_word_study_static.py until that script has been read. It must not rewrite ws/ or bring highlightGloss back.
+- stage1_ingest_lsb_web_ylt.py, stage1_part2_execute.py, and stage3_export_and_ui.py were deleted on 2026-11-04 at the owner's request. Do not restore them. fetch_readings.py and fetch_omissions_cache.py are in apps/365DBR/reference/retired-api-bible/ and must not be run. They call api.bible and can overwrite day JSON.
 - Do not run publish_365dbr.ps1 -Init unless asked, and only after the new HTML/JS are known to be on the server.
 
 Still true, and still broken
-- Greek original_tokens.strong_number is not certified. stage1_part2_execute.py filled gaps with a match window, a prefix test, most_common, and TR_EXACT_OVERRIDES. There is no strong_norm column. Proof: 2TH.3.18 ἡμῶν is stored as G3165; the lexicon entry for G3165 is μέ ("me"). The KJV English tag for "our" is G2257. Those are different facts. G2424G is on 977 Greek tokens and is absent from strongs_lexicon. v_interlinear_tokens uses left(strong_number, 5). 533 Greek rows are compounds such as G0846+G2532. Hebrew strong_number was not overwritten by that script.
+- Greek original_tokens.strong_number is not certified. The deleted stage1_part2_execute.py had filled gaps with a match window, a prefix test, most_common, and TR_EXACT_OVERRIDES. There is no strong_norm column. Proof: 2TH.3.18 ἡμῶν is stored as G3165; the lexicon entry for G3165 is μέ ("me"). The KJV English tag for "our" is G2257. The STEPBible English on that token is "of us". Those are different facts. G2424G is on 977 Greek tokens and is absent from strongs_lexicon. v_interlinear_tokens uses left(strong_number, 5). 533 Greek rows are compounds such as G0846+G2532. Hebrew strong_number was not overwritten by that script. The suffix restore did not write any Strong's number.
 - Do not start a fuzzy or majority Strong's rebuild. A number printed on that word in a named file is a source tag. A matcher, a vote, or a shifted overlay is a guess and must not be stored as Strong's.
-- Stage 4 Path A is not started. Files are in apps/365DBR/RAW/STEPBible/Translators Amalgamated OT+NT/. There is no RAW/STEPBible-Data/. Do not join on (verse_id, word_order). TAHOT follows Qere and adds material. TAGNT is an amalgam, not pure TR. Honest shape: a side table per source row; Greek keep TR/K-marked rows only; Hebrew keep L and Q as separately labeled rows; leave X and R unattached; attach to original_tokens only on a unique letter match inside the verse.
+- Stage 4 Path A is loaded (2026-11-04). Table stepbible_token_rows: 305,648 TAHOT + 141,746 TAGNT = 447,394 word rows. Migration 009. Loader apps/365DBR/load_stepbible_tokens.py. Audit apps/365DBR/audit_token_sources.py.
+- Referees on disk: Hebrew is apps/365DBR/RAW/OSHB/wlc (WLC 4.20, the file TAHOT names as its base). Greek is apps/365DBR/RAW/GRCTR USX running text. Footnotes stay out of the verse body. Style d is a colophon. HEB_WLC is the same Leningrad text in another file, not a second manuscript. There is no Aleppo file here. Do not treat a different edition's disagreement as corruption.
+- Link check, 2026-11-04: all 348,088 original_token_id values match the token's letters and verse. 0 failures. 319 tokens carry two STEPBible rows, and those rows agree on the letters. 1,182 links are out of sequence. A later לך can point at the only earlier לך token. Letter identity is checked. Same-occurrence is not, for those 1,182. Do not show them as alignments until they are classified.
+- OSHB vs original_tokens on the same verse id: 16,923 of 23,012 verses are consonant-exact. 6,072 OSHB words are absent from that token verse. 5,162 of those are still in stepbible_token_rows, unlinked. Song of Solomon 8:14 is the pattern: OSHB and TAHOT both have לְ/ךָ, and original_tokens does not. The unlinked row was kept. 1 Chronicles 12 shows a verse-number offset (OSHB 12:10 is the token text of 12:9), so a raw "replaced word" count is not letter corruption. 1,833 TAHOT L rows differ from OSHB by a trailing section-mark samekh.
+- GRCTR verse body vs Greek tokens: 7,474 of 7,856 verses exact. 2 Thessalonians 3:18 colophon is Πρὸς Θεσσαλονικεῖς δευτέρα ἐγράφη ἀπὸ Ἀθηνῶν, and the six unlinked TAGNT K rows are that colophon. TAGNT also preserves real edition variants (for example ἑλλησι / ἔθνεσιν) and movable nu. Keep both labeled.
+- Suffix restore 2026-11-04 (`restore_oshb_suffixes.py`, reader `oshb_wlc.py`). 5,260 OSHB suffix pronouns inserted into 4,236 verses. New rows have strong_number NULL, lemma NULL, morph from the OSHB `<w>`, and extra.source `oshb-wlc-4.20`. Hebrew tokens 299,420 to 304,680. Greek stayed 140,111. Song 8:14 consonants match OSHB, including לְ/ךָ with no Strong's number. 1 Chronicles 12 was not changed. The 1,144 neighbor-verse offsets (1,004 at verse-1, 140 at verse+1) were not touched. Letter link after the insert: 352,337 linked, 9,321 no letter match, 57,970 ambiguous. Shared-token English agrees on 139 and disagrees on 169. Disagreeing tokens were left unlabeled.
+- Local `ws/` export 2026-11-04 (`db/scripts/export_word_study_static.py`). 66 books, 444,791 tokens, 351,824 with `step_english`. The key is omitted unless every linked STEPBible row on that token has the same English. Label: STEPBible contextual English. highlightGloss was not written. Not uploaded. `get_connection()` reads `db/.env` first because the container env password is rejected. Do not FTP unless asked.
+- Text match 2026-11-04 (`load_stepbible_tokens.py --link-only`). Verse numbers are an index. A whole verse whose letters match in order is linked even when `heb_ref` is set and even when the token verse number differs. One such cross-number link: STEPBible PSA.18.50 (מגדיל, "making great") to tokens at 2SA.22.51. Tokens at PSA.18.50 read מגדל and stayed unlinked to that gloss. ס or פ after sof pasuq is a section mark and is ignored. 1CH.12.8–10 now carry their STEPBible English, including Ezer, the/ chief, Obadiah, the/ second, Eliab, the/ third. Single-word rows that still have `heb_ref` and do not sit in a full-verse match stay unlinked. No original_tokens row was moved. Greek colophon words at 2TH.3.18 stay unlinked. Do not treat a cross-number full-verse link as corruption. Local `ws/` was exported again after that link: 409,219 tokens with `step_english`. Not uploaded.
 - highlightGloss is gone and must stay gone. Gloss is not the English of a WLC/TR occurrence. Word Study hit text follows the Focal slot only. Compare text is slot 2 only.
 - Aa is on for Hebrew and Greek in the UI. Greek numbers are still not certified.
 - Test verses are never Genesis 1:1 or Matthew 1:1.
@@ -76,6 +98,6 @@ Still true, and still broken
 -  KJV and LSV verse text are local eBible as of 2026-10-28. No row cites api.bible. WEB, YLT, LSB, and WLC were already local. Do not refresh those verses on a 30-day cycle.
 
 ## 5. NEXT UP: STAGE 4 & S.I. TRANSITION ROADMAP
-1. **Deterministic Token-to-English Alignment (Stage 4 Option):** Ingest the explicit contextual English token translation column from `RAW/STEPBible-Data` (`TAHOT` for OT, `TAGNT` for NT) into `original_tokens.english_token_gloss`, and/or parse explicit `<w s="...">` XML tags from `KJV` and `WEB` USX files—100% deterministic, zero guessing.
+1. **Deterministic Token-to-English Alignment (Stage 4 Path A):** Loaded 2026-11-04 into `stepbible_token_rows` from `apps/365DBR/RAW/STEPBible/Translators Amalgamated OT+NT/`. See the status block at the top of this file. Do not write those values onto `original_tokens`. KJV English `<w>` tags already sit in `kjv_english_strong_tags` and are not a WLC/TR alignment.
 2. **Monthly `api.bible` DB Sync Script:** Automate checking `api.bible` monthly into `verse_translations` + regenerating static daypacks only when SHA-256 hashes change.
 3. **S.I. Tier-2 & Tier-3 Logic Engine:** Build deterministic cross-reference, lexical concordances, and Sola Scriptura verification queries on top of `mt_sinai_365dbr`.

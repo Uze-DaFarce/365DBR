@@ -1,3 +1,5 @@
+# RETIRED 2026-11-04. Do not run. This calls api.bible and overwrites day JSON.
+# See reference/retired-api-bible/README.md.
 import json
 import os
 import argparse

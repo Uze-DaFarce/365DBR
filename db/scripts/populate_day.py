@@ -86,7 +86,7 @@ def resolve_source(day: str, source: str) -> str:
         if not local_manifest.exists():
             raise FileNotFoundError(
                 f"Local manifest missing: {local_manifest}. "
-                f"Run fetch_readings.py --day {day} first, or use --source prod."
+                f"Use --source prod. Do not run apps/365DBR/reference/retired-api-bible/."
             )
         return "local"
     if source == "prod":

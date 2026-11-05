@@ -11,8 +11,8 @@ If this session is a Grok worktree, prefer the D: tree for real edits unless the
 ## 365DBR (non-negotiable)
 
 - Bible (66 books, read contextually) is Tier-1 truth. Truth/Accuracy > Safety > Performance.
-- Public site is **static files on GoDaddy** (`https://mt-sin.ai/365DBR/`). No live Postgres, no public API, no cPanel MySQL, no Option B. Canonical: `docs/365DBR/Hosting-and-Runtime.md`.
-- LSB is default focal English when present in the day pack; LSV fallback. Do not add LSB to `fetch_readings.py`.
+- Public site is **static files on GoDaddy** (`https://mt-sin.ai/365DBR/`). It never has a database. Security requires a local cache, then those files move to production. Speed is a side effect. No live Postgres, no public API, no cPanel MySQL, no Option B. Canonical: `docs/365DBR/Hosting-and-Runtime.md`.
+- LSB is default focal English when present in the day pack; LSV fallback. Do not add LSB to the retired api.bible fetcher, and do not run `apps/365DBR/reference/retired-api-bible/`.
 - Show real verses; never hide them. Titles live in `titles[]`, not verse bodies.
 - Word study `Aa` is on for Hebrew and Greek tokens. Do not invent EN↔Strong's maps. Do not global-wipe tokens. Greek `strong_number` values are not certified until each one is an exact unique match to its source row.
 - Before changing `verseMap` / `loadDailyBread` / `playVerse`, read `docs/365DBR_AGENTS.md` (audio).

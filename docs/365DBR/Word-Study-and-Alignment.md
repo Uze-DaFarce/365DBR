@@ -13,13 +13,11 @@ Under our Sola Scriptura integrity standard, **we never guess or use regex heuri
 There are exactly **two honest, 100% deterministic sources** in our local `RAW/` repositories that require zero guessing:
 
 ### Path A: STEPBible Contextual Token Translation (`TAHOT` & `TAGNT`)
-- **Source Files:** `RAW/STEPBible-Data/Translators Amalgamated OT+NT/` (`TAHOT` for Hebrew WLC; `TAGNT` for Greek TR).
-- **Why It Is Deterministic:** Scholars manually aligned every single Hebrew and Greek token row 1-to-1 with its exact contextual English translation column in that specific verse.
-- **Implementation Plan:**
-  1. Add `english_token_gloss TEXT` to `original_tokens` (Migration `008`).
-  2. Parse the exact contextual English column from `TAHOT` / `TAGNT` matched by `(verse_id, word_order)`.
-  3. Expose `english_token_gloss` in `v_interlinear_tokens` and `ws/verse/{BOOK}.json`.
-  4. **UI Labeling:** Explicitly label it as *"STEPBible Contextual Token Translation"* (distinct from the general Strong's lexicon headword gloss and distinct from LSB/KJV/LSV/WEB/YLT prose).
+- **Source files:** `apps/365DBR/RAW/STEPBible/Translators Amalgamated OT+NT/` (four `TAHOT` files, two `TAGNT` files). There is no `RAW/STEPBible-Data/` directory.
+- **Loaded 2026-11-04** into `stepbible_token_rows` by `apps/365DBR/load_stepbible_tokens.py` (migration `009`). The contextual English is the `english` column. `dstrong` is the tag printed on that STEPBible row.
+- **Link rule:** `original_token_id` is set only when the letters match one `original_tokens` row in that verse. A 2026-11-04 audit rechecked all 348,088 links: the letters match. 1,182 of them are out of sequence, so same-occurrence is not yet proved for those. Do not export them. Rows with a parenthetical alternate verse stay unlinked. Do not join on `(verse_id, word_order)`. Do not copy these values onto `original_tokens`.
+- TAHOT follows Qere and adds material. TAGNT is an amalgam, not pure TR. Hebrew candidates are text types that start with `L` or `Q`. Greek candidates are text types that contain uppercase `K`.
+- **UI, when a later session exports it:** label the English *"STEPBible Contextual Token Translation"*, distinct from the Strong's lexicon headword and from LSB/KJV/LSV/WEB/YLT prose.
 
 ### Path B: Explicit USX `<w s="Hxxxx|Gxxxx">` Tags (`KJV` and `WEB` Only)
 - **Source Files:** `RAW/KJV` and `RAW/WEB` USX XML files wrap English words directly in `<w s="G0976">The book</w>` tags.

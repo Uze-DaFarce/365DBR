@@ -88,6 +88,24 @@ def export_verses(conn, out_dir: Path) -> dict:
 
     total_verses = 0
     total_tokens = 0
+    step_labeled = 0
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT original_token_id, min(english) AS english
+            FROM stepbible_token_rows
+            WHERE original_token_id IS NOT NULL
+              AND english IS NOT NULL
+            GROUP BY original_token_id
+            HAVING min(english) IS NOT DISTINCT FROM max(english)
+            """
+        )
+        agreed_english = {
+            row["original_token_id"]: row["english"]
+            for row in cur.fetchall()
+            if row["english"]
+        }
 
     with conn.cursor() as cur:
         for book, vrows in sorted(by_book.items()):
@@ -95,7 +113,7 @@ def export_verses(conn, out_dir: Path) -> dict:
             # tokens
             cur.execute(
                 """
-                SELECT verse_id, word_order, language, surface_text, strong_number,
+                SELECT id, verse_id, word_order, language, surface_text, strong_number,
                        lemma, morph, source_verse_id
                 FROM original_tokens
                 WHERE verse_id = ANY(%s)
@@ -159,6 +177,23 @@ def export_verses(conn, out_dir: Path) -> dict:
                 vid = v["id"]
                 tokens = toks_by.get(vid, [])
                 total_tokens += len(tokens)
+                token_rows = []
+                for t in tokens:
+                    row = {
+                        "order": t["word_order"],
+                        "surface": t["surface_text"] or "",
+                        "strong": t["strong_number"],
+                        "lemma": t["lemma"],
+                        "morph": t["morph"],
+                        "language": t["language"],
+                        "source_verse_id": t.get("source_verse_id"),
+                    }
+                    english = agreed_english.get(t["id"])
+                    if english:
+                        row["step_english"] = english
+                        row["step_english_label"] = "STEPBible contextual English"
+                        step_labeled += 1
+                    token_rows.append(row)
                 src_ids = sorted(
                     {
                         t.get("source_verse_id")
@@ -189,18 +224,7 @@ def export_verses(conn, out_dir: Path) -> dict:
                         "text": _join_original(tokens, lang),
                         "language": lang,
                         "source_verse_ids": src_ids,
-                        "tokens": [
-                            {
-                                "order": t["word_order"],
-                                "surface": t["surface_text"] or "",
-                                "strong": t["strong_number"],
-                                "lemma": t["lemma"],
-                                "morph": t["morph"],
-                                "language": t["language"],
-                                "source_verse_id": t.get("source_verse_id"),
-                            }
-                            for t in tokens
-                        ],
+                        "tokens": token_rows,
                     },
                     "titles": [
                         {
@@ -223,6 +247,7 @@ def export_verses(conn, out_dir: Path) -> dict:
         "books": len(by_book),
         "verses": total_verses,
         "tokens": total_tokens,
+        "step_english": step_labeled,
     }
 
 
@@ -333,7 +358,12 @@ def main() -> int:
         "mode": "static-ws",
         "version": "1",
         "service": "365DBR-word-study-static",
-        "note": "Same-origin static Word study for shared hosting (no live DB).",
+        "note": (
+            "Same-origin static Word study for shared hosting (no live DB). "
+            "step_english is present only when every linked STEPBible row on that "
+            "token has the same English. It is STEPBible contextual English, not a Strong's gloss."
+        ),
+        "step_english_tokens": vstats.get("step_english", 0),
         "verse_books": vstats["books"],
         "verses": vstats["verses"],
         "tokens": vstats["tokens"],

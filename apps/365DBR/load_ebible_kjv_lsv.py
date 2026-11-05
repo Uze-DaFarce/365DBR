@@ -17,6 +17,7 @@ KJV \\w tags go in kjv_english_strong_tags, edition eng-kjv2006. They are not
 written to original_tokens. LSV strong attributes are dropped and not stored.
 """
 import argparse
+import hashlib
 import os
 import re
 import sys
@@ -27,8 +28,72 @@ import psycopg2
 from psycopg2.extras import execute_values
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[1]
 sys.path.insert(0, str(SCRIPT_DIR))
-import stage1_ingest_lsb_web_ylt as ingest
+import bible_common
+
+
+def load_dotenv_files():
+    for env_path in (REPO_ROOT / "db" / ".env", REPO_ROOT / ".env", SCRIPT_DIR / ".env"):
+        if env_path.is_file():
+            for raw_line in env_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+                line = raw_line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                key, value = key.strip(), value.strip().strip('"').strip("'")
+                if key not in os.environ:
+                    os.environ[key] = value
+
+
+def load_canonical_spine():
+    raw = bible_common.BIBLE_DATA
+    spine_by_usfm = {}
+    expected_verse_ids = set()
+    for idx, (usfm, chapters) in enumerate(raw.items(), start=1):
+        code = usfm.upper().strip()
+        spine_by_usfm[code] = {
+            "book_num": idx,
+            "usfm": code,
+            "chapters": list(chapters),
+        }
+        for ch_idx, max_v in enumerate(chapters, start=1):
+            for v_idx in range(1, max_v + 1):
+                expected_verse_ids.add(f"{code}.{ch_idx}.{v_idx}")
+    if len(spine_by_usfm) != 66:
+        raise RuntimeError(f"Expected 66 books in BIBLE_DATA; found {len(spine_by_usfm)}")
+    return spine_by_usfm, expected_verse_ids
+
+
+def clean_whitespace(text: str) -> str:
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def compute_sha256(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def remap_versification(usfm, chapter, verse, spine_by_usfm):
+    ch_limits = spine_by_usfm[usfm]["chapters"]
+    if usfm == "3JN" and chapter == 1 and verse == 15 and ch_limits[0] == 14:
+        return (1, 14)
+    if usfm == "REV" and chapter == 12 and verse == 18 and ch_limits[11] == 17:
+        return (12, 17)
+    if usfm == "MAL" and chapter == 3 and verse >= 19:
+        return (4, verse - 18)
+    if usfm == "JOL" and chapter == 4:
+        return (3, verse)
+    if usfm == "MIC" and chapter == 4 and verse == 14:
+        return (5, 1)
+    if usfm == "EXO" and chapter == 7 and verse >= 26:
+        return (8, verse - 25)
+    if usfm == "LEV" and chapter == 5 and verse >= 20:
+        return (6, verse - 19)
+    if usfm == "JOB" and chapter == 40 and verse >= 25:
+        return (41, verse - 24)
+    if usfm == "ROM" and chapter == 14 and verse in (24, 25, 26):
+        return (16, verse + 1)
+    return (chapter, verse)
 
 KJV_DIR = SCRIPT_DIR / "RAW" / "KJV" / "eBible" / "usfm"
 LSV_DIR = SCRIPT_DIR / "RAW" / "LSV" / "eBible" / "usfm"
@@ -169,7 +234,7 @@ def clean_verse(raw: str) -> str:
     txt = re.sub(r"([(\[\u201c\u2018\"])\s+", r"\1", txt)
     txt = re.sub(r"\s+([\u2019'])", r"\1", txt)
     txt = re.sub(r"([\u2019'])\s+(s\b)", r"\1\2", txt)
-    return ingest.clean_whitespace(txt)
+    return clean_whitespace(txt)
 
 
 def words(text: str):
@@ -214,7 +279,7 @@ def parse_dir(folder: Path, spine, collect_tags: bool = False):
                 if vt:
                     dropped.append(f"{book}.{ch}.{verse_no}")
                 return
-            rc, rv = ingest.remap_versification(book, ch, verse_no, spine)
+            rc, rv = remap_versification(book, ch, verse_no, spine)
             acc[(rc, rv)].append(vt)
             if tags:
                 tag_acc[(rc, rv)].extend(tags)
@@ -242,7 +307,7 @@ def parse_dir(folder: Path, spine, collect_tags: bool = False):
             elif ch > 0 and v > 0:
                 take(line, v)
         for (c, vv), chunks in acc.items():
-            txt = ingest.clean_whitespace(" ".join(chunks))
+            txt = clean_whitespace(" ".join(chunks))
             if txt:
                 out[f"{book}.{c}.{vv}"] = txt
         for (c, vv), spans in tag_acc.items():
@@ -274,7 +339,7 @@ def has_adjacent(rows, left, right):
 
 
 def connect():
-    ingest.load_dotenv_files()
+    load_dotenv_files()
     return psycopg2.connect(
         host=os.getenv("POSTGRES_HOST") or "localhost",
         port=int(os.getenv("POSTGRES_PORT") or 5432),
@@ -289,7 +354,7 @@ def main():
     parser.add_argument("--execute", action="store_true")
     args = parser.parse_args()
 
-    spine, expected = ingest.load_canonical_spine()
+    spine, expected = load_canonical_spine()
     kjv, kjv_dash, kjv_tags, kjv_joins, kjv_joined = parse_dir(KJV_DIR, spine, collect_tags=True)
     lsv, lsv_dash, lsv_tags, lsv_joins, lsv_joined = parse_dir(LSV_DIR, spine, collect_tags=False)
     if set(kjv) != expected or set(lsv) != expected:
@@ -346,7 +411,7 @@ def main():
             sys.exit(f"Missing KJV row {vid}")
         if words(new) != words(old):
             diffs.append(vid)
-        kjv_rows.append((vid, 2, new, ingest.compute_sha256(new)))
+        kjv_rows.append((vid, 2, new, compute_sha256(new)))
     if diffs:
         sys.exit("KJV word diffs: " + ", ".join(diffs))
     if len(kjv_rows) != 31102:
@@ -360,7 +425,7 @@ def main():
             sys.exit(f"Missing LSV row {vid}")
         if words(new) != words(old):
             sys.exit(f"LSV word diff at {vid}")
-        lsv_rows.append((vid, 1, new, ingest.compute_sha256(new)))
+        lsv_rows.append((vid, 1, new, compute_sha256(new)))
 
     spots = {
         (2, "2TH.3.18"): "The grace of our Lord Jesus Christ be with you all. Amen.",
