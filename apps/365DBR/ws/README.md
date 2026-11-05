@@ -24,6 +24,10 @@ FTP the entire `ws/` folder next to `index.html` / `bible.html`:
 
 `https://mt-sin.ai/365DBR/ws/manifest.json`
 
+These JSON files are gitignored. Committing the repo does not publish them.
+
+`index.html` and `bible.html` can go up before `ws/`. They still work with the pack already online. The STEPBible English from the 2026-11-04 export (409,219 tokens, `manifest.json` field `step_english_tokens`) shows after this folder is replaced. Day packs in `data/` are a separate upload and were not part of that export.
+
 CSP `connect-src 'self'` allows same-origin fetches. No localhost probe on production.
 
 ## Local

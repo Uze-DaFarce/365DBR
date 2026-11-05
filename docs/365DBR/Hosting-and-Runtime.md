@@ -9,11 +9,11 @@ This file is the single source of truth for **where 365DBR actually runs**. Othe
 
 ## Locked decision
 
-**Production 365DBR cannot transition to a live relational database while it is on GoDaddy shared hosting.**
+**The public site never has a database.** Security is the reason. The database stays on this machine. Work here writes a cache of static files, and those files are what move to production. Faster pages are a side effect of that cache.
 
-The owner can currently afford **GoDaddy shared hosting only** (FTP + static files + CSP on `mt-sin.ai`). That plan cannot run PostgreSQL, a persistent Python process, or a public query API. There is no supported way to host this Bible database on that shared host.
+The public host is GoDaddy shared hosting (FTP + static files + CSP on `mt-sin.ai`). That plan also cannot run PostgreSQL, a persistent Python process, or a public query API. A future host that could run a database still serves the exported cache. The Bible database stays off the public site.
 
-Until the owner finds work and can afford hosting that actually runs PostgreSQL (or a cheap VPS that does), **the public app stays static files**. Local Docker Postgres remains the **authoring, verification, and export** tool — not the public runtime.
+Local Docker Postgres remains the **authoring, verification, and export** tool.
 
 ---
 
@@ -24,8 +24,8 @@ Until the owner finds work and can afford hosting that actually runs PostgreSQL 
 | PostgreSQL on shared hosting | Not available. Shared FTP/cPanel does not run our Docker/Postgres 16 stack. |
 | cPanel MySQL / MariaDB | **Rejected.** This schema needs PostgreSQL (trigram, tsvector, JSONB, `verse_order` ranges, Hebrew/Greek tokens). Do not port the Bible DB to MySQL to fit the host. |
 | Live query API (`serve_query_api.py`) on the host | Needs a long-running process + HTTPS + CSP `connect-src`. Shared hosting does not provide that. Production CSP already blocks `127.0.0.1`. |
-| Paid VPS / managed Postgres (~$5–12/mo) | Correct *future* runtime. **Blocked by budget** until paid work. Do not wait on it to ship reader improvements. |
-| Option B (`loadDailyBread` from DB) | Requires a live DB or API on the public host. **Blocked by this freeze.** Also still requires AGENTS audio verification if/when hosting exists. |
+| Paid VPS / managed Postgres (~$5–12/mo) | Still serves the exported cache. A live Bible database on the public site stays closed. Do not wait on a new host to ship reader improvements. |
+| Option B (`loadDailyBread` from DB) | Would read a database from the public page. Closed. The page reads the exported day pack. |
 
 ---
 
@@ -67,7 +67,7 @@ Local Postgres is how we keep the text honest and then **freeze results into fil
 - Static UI polish (titles, Word study, accessibility) that ships as HTML/JS/JSON
 - Expanding curated annotations **locally**, then exporting anything the static packs can carry
 - Free/open English↔token alignment **research** (no paid reverse-interlinear budget)
-- The long-term S.I. vision (relational DB + Deep Thought) — that waits on **affordable hosting that can run Postgres**, not on more shared-host tricks
+- The long-term S.I. vision stays on this machine. What the public site receives is still a cache of files.
 
 ---
 
