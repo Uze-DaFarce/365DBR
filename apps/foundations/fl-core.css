@@ -1,6 +1,6 @@
 /* ==========================================================================
    Foundations Library (FL) — fl-core.css
-   Shared Palette, Unified Topbar, 450px 365DBR Scripture Reader & Print Base
+   Shared Palette, 2-Line Unified Topbar, Docked 365DBR Reader & Print Base
    ========================================================================== */
 :root {
   --bg: #fdfbf7;
@@ -16,11 +16,13 @@
 
   /* Overridable Unified Topbar Variables (Defaulted to Book 1 "God" Branding) */
   --fl-topbar-bg: var(--accent);
+  --fl-topbar-row2-bg: rgba(0, 0, 0, 0.18);
   --fl-topbar-text: #fdfbf7;
   --fl-topbar-link: #f5efe6;
   --fl-topbar-highlight: #ffd166;
   --fl-topbar-border: var(--gold);
   --fl-topbar-font: 'Cinzel', 'Georgia', serif;
+  --fl-topbar-height: 76px;
 
   /* Mapped Aliases for Book 2 Compatibility */
   --fl-bg: var(--bg);
@@ -35,39 +37,67 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--fl-topbar-height, 76px) + 14px);
+}
 
 body {
   margin: 0;
   padding: 0;
   background-color: var(--bg);
   color: var(--text);
+}
+
+/* Content Wrappers Receive the 450px Reader Push (Header Stays Full Width) */
+.container,
+.fl-layout,
+.hub-container {
   transition: padding-right 0.3s ease;
 }
 
-/* Unified Floating Topbar Across All Foundations Library Pages */
+/* Unified 2-Line Floating Topbar Across All Foundations Library Pages */
 .fl-topbar {
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 1001;
+  width: 100%;
   background: var(--fl-topbar-bg);
   color: var(--fl-topbar-text);
-  padding: 10px 24px;
+  border-bottom: 3px solid var(--fl-topbar-border);
+  font-family: var(--fl-topbar-font);
+  font-size: 13px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Line 1: Platform Brand & Right-Aligned Actions */
+.fl-topbar-row1 {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  border-bottom: 3px solid var(--fl-topbar-border);
-  font-family: var(--fl-topbar-font);
-  font-size: 14px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  gap: 8px 14px;
+  padding: 7px 20px;
+}
+
+/* Line 2: Bookshelf Bar (Active Book Full Title + Short Sibling Links) */
+.fl-topbar-row2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 5px 20px 6px;
+  background: var(--fl-topbar-row2-bg);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 12.5px;
 }
 
 .fl-brand-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -82,25 +112,6 @@ body {
 .fl-topbar-sep {
   color: rgba(255, 255, 255, 0.35);
   user-select: none;
-}
-
-.fl-active-book {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid var(--fl-topbar-border);
-  color: #fff;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 4px;
-  text-decoration: none;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-.fl-active-book:hover {
-  background: rgba(255, 255, 255, 0.24);
-  color: #fff;
 }
 
 .fl-nav-link {
@@ -125,37 +136,59 @@ body {
   text-decoration: underline;
 }
 
-.fl-cobrand-banner {
-  display: none;
+.fl-active-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.16);
-  padding: 4px 10px;
+  border: 1px solid var(--fl-topbar-border);
+  color: #fff;
+  font-weight: 700;
+  padding: 2px 9px;
   border-radius: 4px;
-  font-size: 12.5px;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.fl-active-book:hover {
+  background: rgba(255, 255, 255, 0.25);
   color: #fff;
 }
 
+.fl-cobrand-banner {
+  display: none;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  color: #fff;
+}
+
+/* Always Align Action Buttons to the Right, Even When Line-Wrapping */
 .fl-top-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: flex-end;
+  gap: 6px;
   flex-wrap: wrap;
+  margin-left: auto;
 }
 
-/* Shared Buttons */
+/* Shared Buttons (-1px Reduced Size in Topbar) */
 .fl-btn {
   cursor: pointer;
   font-family: var(--fl-topbar-font);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  padding: 6px 12px;
-  border-radius: 5px;
+  padding: 4px 10px;
+  border-radius: 4px;
   border: 1px solid transparent;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 .fl-btn-primary { background: var(--accent); color: #fff; }
 .fl-btn-primary:hover { opacity: 0.92; }
@@ -199,32 +232,32 @@ body {
 }
 .fl-support-text strong { color: var(--text); }
 
-/* Shared 450px Slide-Out 365DBR Scripture Reader (100% Free / Non-Commercial) */
+/* Shared 450px Slide-Out 365DBR Scripture Reader (Docked Below .fl-topbar) */
 #bible-drawer {
   position: fixed;
-  top: 0;
+  top: var(--fl-topbar-height, 76px);
   right: -500px;
   width: 450px;
   max-width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  height: calc(100vh - var(--fl-topbar-height, 76px));
+  height: calc(100dvh - var(--fl-topbar-height, 76px));
   background: var(--card);
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.14);
+  box-shadow: -4px 4px 24px rgba(0, 0, 0, 0.14);
   border-left: 1px solid var(--border);
-  z-index: 9999;
+  z-index: 999;
   display: flex;
   flex-direction: column;
-  transition: right 0.3s ease;
+  transition: right 0.3s ease, top 0.15s ease, height 0.15s ease;
 }
 #bible-drawer.open { right: 0; }
 
 .drawer-header {
-  padding: 12px 16px;
+  padding: 9px 14px;
   background: var(--accent);
   border-bottom: 2px solid var(--gold);
   color: #fff;
   font-family: var(--fl-topbar-font);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 600;
   display: flex;
   justify-content: space-between;
@@ -241,7 +274,7 @@ body {
 }
 .drawer-actions a {
   color: #ffd166;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
   text-decoration: none;
 }
@@ -252,9 +285,9 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
   border-radius: 4px;
-  padding: 3px 10px;
+  padding: 2px 9px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 .drawer-close:hover { background: rgba(0, 0, 0, 0.32); }
 
@@ -265,44 +298,74 @@ body {
   background: var(--bg);
 }
 
-/* Desktop Push vs. Tablet/Mobile Overlay */
+/* Desktop Push Applies ONLY to Content Container (Never Crushes Topbar) */
 @media (min-width: 901px) {
-  body.drawer-open { padding-right: 450px; }
+  body.drawer-open .container,
+  body.drawer-open .fl-layout,
+  body.drawer-open .hub-container {
+    padding-right: 466px;
+  }
 }
 @media (max-width: 900px) {
-  body.drawer-open { padding-right: 0; }
   #bible-drawer { width: 100vw; right: -105vw; }
 }
 
-/* Mobile View (<= 450px): Keep Topbar Compact & Pin Quick Actions to Bottom */
+/* Mobile View (<= 450px): Pin Action Buttons to Bottom Bar */
 @media (max-width: 450px) {
-  body { padding-bottom: 64px; }
+  body { padding-bottom: 60px; }
   .fl-top-actions {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 1002;
     justify-content: space-around;
-    padding: 8px 12px;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    padding: 7px 10px;
+    padding-bottom: calc(7px + env(safe-area-inset-bottom, 0px));
     background: var(--bg);
     border-top: 2px solid var(--border);
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
   }
 }
 
-/* Print QR & Footer Helpers */
-.print-qr, .fl-print-footer { display: none; }
+/* Hide Long Book Subtitles Below 1400px */
+@media (max-width: 1400px) {
+  .book-card-sub,
+  .fl-book-sub {
+    display: none;
+  }
+}
+
+/* Print / Web Toggle & 4-QR Footer Helpers */
+.print-only,
+.print-qr,
+.fl-print-footer {
+  display: none;
+}
 
 @media print {
+  .book-refs a { 
+    text-decoration: none !important; 
+    border: none !important; 
+    background: transparent !important; 
+    color: #000 !important;
+ }
   .no-print,
+  .web-only,
   .fl-topbar,
   .fl-top-actions,
   .fl-support-footer,
   #bible-drawer,
   .drawer-close {
     display: none !important;
+  }
+  span.print-only {
+    display: inline !important;
+  }
+  div.print-only,
+  p.print-only,
+  aside.print-only {
+    display: block !important;
   }
   body {
     background: #fff !important;
@@ -311,25 +374,58 @@ body {
     margin: 0 !important;
   }
   .print-qr {
-    display: flex !important;
-    justify-content: space-around;
-    align-items: center;
-    margin-top: 18px;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 22px;
     padding-top: 12px;
-    border-top: 1px solid #ccc;
+    border-top: 1.5pt solid #000;
     page-break-inside: avoid;
-    font-family: sans-serif;
-    font-size: 9pt;
-    color: #222;
-  }
-  .print-qr-item { display: flex; align-items: center; gap: 10px; }
-  .print-qr img { width: 72px; height: 72px; }
-  .fl-print-footer {
-    display: block !important;
-    margin-top: 24pt;
-    padding-top: 10pt;
-    border-top: 1pt solid #000;
-    font-size: 9.5pt;
+    break-inside: avoid;
+    font-family: Georgia, serif;
+    font-size: 8pt;
+    line-height: 1.25;
     color: #000 !important;
+  }
+  .print-qr-item {
+    display: grid !important;
+    grid-template-columns: 54px 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 4px 8px;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 8px;
+  }
+  .print-qr-title {
+    grid-column: 1 / -1; /* ~colspan=2 across top */
+    font-weight: 700;
+    font-size: 8.5pt;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .print-qr-item img {
+    width: 54px;
+    height: 54px;
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .print-qr-desc {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 7.8pt;
+  }
+  .print-qr-url {
+    grid-column: 1 / -1; /* ~colspan=2 across bottom */
+    font-family: monospace;
+    font-size: 7.5pt;
+    font-weight: 700;
+    border-top: 1px solid #eee;
+    padding-top: 3px;
+    text-align: center;
+    white-space: nowrap;
   }
 }

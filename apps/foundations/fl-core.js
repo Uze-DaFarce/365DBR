@@ -1,8 +1,47 @@
 /* ==========================================================================
-   Foundations Library (FL) — fl-core.js
-   Unified 365DBR Scripture Reader, Co-Branding, LocalStorage & Lab Calculator
+   Foundations Library (FL) — fl-core.js (100% CSP 'script-src self' Compliant)
+   2-Line Topbar Height Sync, 365DBR Reader, LocalStorage, Print & Coffee
    ========================================================================== */
 const FLApp = (() => {
+  // Set your Stripe Payment Link or Ko-fi URL here once created; all pages update automatically!
+  const COFFEE_TIP_URL = "#support-coffee";
+
+  function syncTopbarHeight() {
+    const topbar = document.querySelector(".fl-topbar");
+    if (!topbar) return;
+    const update = () => {
+      const h = Math.round(topbar.getBoundingClientRect().height);
+      if (h > 0) {
+        document.documentElement.style.setProperty("--fl-topbar-height", `${h}px`);
+      }
+    };
+    update();
+    window.addEventListener("resize", update);
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(update).observe(topbar);
+    }
+  }
+
+  function runCaseRouterIf404() {
+    if (!document.body || !document.body.hasAttribute("data-fl-case-router")) return;
+    const path = window.location.pathname || "";
+    const lower = path.toLowerCase().replace(/_/g, "-");
+    const search = window.location.search || "";
+    const hash = window.location.hash || "";
+
+    if (lower.indexOf("god") !== -1 || lower.indexOf("what-we-know") !== -1) {
+      window.location.replace("/foundations/what-does-the-bible-say-about-god.html" + search + hash);
+      return;
+    }
+    if (lower.indexOf("education") !== -1) {
+      window.location.replace("/foundations/what-does-the-bible-say-about-education.html" + search + hash);
+      return;
+    }
+    if (path !== lower) {
+      window.location.replace(lower + search + hash);
+    }
+  }
+
   function normalizeScriptureUrl(rawHref) {
     if (!rawHref) return "";
     try {
@@ -31,18 +70,57 @@ const FLApp = (() => {
     document.body.classList.remove("drawer-open");
   }
 
-  function initScriptureReader() {
+  function initDelegatedActions() {
     const drawer = document.getElementById("bible-drawer");
     const frame = document.getElementById("bible-frame");
     const title = document.getElementById("drawer-title");
     const extLink = document.getElementById("drawer-ext");
     const closeBtn = document.getElementById("drawer-close-btn");
 
-    if (!drawer || !frame) return;
+    if (COFFEE_TIP_URL && COFFEE_TIP_URL !== "#support-coffee") {
+      document.querySelectorAll(".fl-btn-coffee").forEach((btn) => {
+        btn.setAttribute("href", COFFEE_TIP_URL);
+        btn.setAttribute("target", "_blank");
+        btn.setAttribute("rel", "noopener");
+      });
+    }
 
     document.addEventListener("click", (e) => {
+      // 1. Print Full Page
+      const printPageBtn = e.target.closest('[data-fl-action="print-page"]');
+      if (printPageBtn) {
+        e.preventDefault();
+        window.print();
+        return;
+      }
+
+      // 2. Print All 8 Labs Only (Book 2)
+      const printAllLabsBtn = e.target.closest('[data-fl-action="print-all-labs"]');
+      if (printAllLabsBtn) {
+        e.preventDefault();
+        printAllLabs();
+        return;
+      }
+
+      // 3. Print Single Lab
+      const printLabBtn = e.target.closest("[data-fl-print-lab]");
+      if (printLabBtn) {
+        e.preventDefault();
+        printLab(printLabBtn.getAttribute("data-fl-print-lab"));
+        return;
+      }
+
+      // 4. Clear Single Lab
+      const clearLabBtn = e.target.closest("[data-fl-clear-lab]");
+      if (clearLabBtn) {
+        e.preventDefault();
+        clearLab(clearLabBtn.getAttribute("data-fl-clear-lab"));
+        return;
+      }
+
+      // 5. Scripture Reference Links -> Open Docked 450px 365DBR Scripture Reader
       const link = e.target.closest(".refs a, a.fl-scripture-link");
-      if (!link) return;
+      if (!link || !drawer || !frame) return;
 
       const rawHref = link.getAttribute("href") || "";
       if (!rawHref.includes("365DBR") && !rawHref.includes("bible.html")) return;
@@ -54,9 +132,6 @@ const FLApp = (() => {
       if (title) title.textContent = `${refLabel} — 365DBR Scripture Reader`;
       if (extLink) extLink.setAttribute("href", targetUrl);
 
-      if (frame.hasAttribute("srcdoc")) {
-        frame.removeAttribute("srcdoc");
-      }
       if (frame.getAttribute("src") !== targetUrl) {
         frame.setAttribute("src", targetUrl);
       }
@@ -71,7 +146,7 @@ const FLApp = (() => {
     }
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && drawer.classList.contains("open")) {
+      if (e.key === "Escape" && drawer && drawer.classList.contains("open")) {
         closeReader();
       }
     });
@@ -149,9 +224,9 @@ const FLApp = (() => {
       box.style.display = "inline-block";
       const label = city ? `${church} (${city})` : church;
       box.textContent = `Provided in partnership with: ${label}`;
+      syncTopbarHeight();
     }
 
-    // Pass ?church= co-branding through to internal Foundations Library links
     document.querySelectorAll('a[href^="/foundations/"]').forEach((a) => {
       try {
         const url = new URL(a.getAttribute("href"), window.location.origin);
@@ -177,6 +252,14 @@ const FLApp = (() => {
     }, 500);
   }
 
+  function printAllLabs() {
+    document.body.classList.add("fl-print-all-labs");
+    window.print();
+    setTimeout(() => {
+      document.body.classList.remove("fl-print-all-labs");
+    }, 500);
+  }
+
   function clearLab(labId) {
     const target = document.getElementById(labId);
     if (!target) return;
@@ -191,11 +274,13 @@ const FLApp = (() => {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    initScriptureReader();
+    runCaseRouterIf404();
+    syncTopbarHeight();
+    initDelegatedActions();
     initStorageInputs();
     updateLab2Calculator();
     initCoBranding();
   });
 
-  return { printLab, clearLab, closeReader };
+  return { printLab, printAllLabs, clearLab, closeReader };
 })();

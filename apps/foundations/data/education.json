@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2.0",
-  "generated_at": "2026-11-13T00:08:00.817666Z",
+  "generated_at": "2026-11-13T04:33:25.388276Z",
   "app": {
     "name": "Foundations Library",
     "abbr": "FL",
@@ -126,7 +126,7 @@
           "sections": [
             {
               "id": "ch-1-sec-1",
-              "heading": "1\\. The Imperative Command: Stop Listening to Ungodly Instruction (Proverbs 19:27)",
+              "heading": "1. The Imperative Command: Stop Listening to Ungodly Instruction (Proverbs 19:27)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -164,7 +164,7 @@
             },
             {
               "id": "ch-1-sec-2",
-              "heading": "2\\. What Is the True Foundation of Knowledge? (Proverbs 1:7; 9:10; Psalm 14:1)",
+              "heading": "2. What Is the True Foundation of Knowledge? (Proverbs 1:7; 9:10; Psalm 14:1)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -194,7 +194,7 @@
             },
             {
               "id": "ch-1-sec-3",
-              "heading": "3\\. The Trajectory of Compromise: Walking, Standing, Sitting (Psalm 1:1–2; 2 Peter 3:3–6; Genesis 1:27; 2:24)",
+              "heading": "3. The Trajectory of Compromise: Walking, Standing, Sitting (Psalm 1:1–2; 2 Peter 3:3–6; Genesis 1:27; 2:24)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -344,7 +344,7 @@
             },
             {
               "type": "paragraph",
-              "text": "Then **Ken Ham** and consumer researcher **Britt Beemer** (of America’s Research Group) conducted an extensive national study for Answers in Genesis, published in the landmark book *Already Gone*. They surveyed a thousand young adults (ages 20 to 29\\) who had grown up regularly attending evangelical, conservative churches across America, but who had walked away from the church as adults."
+              "text": "Then **Ken Ham** and consumer researcher **Britt Beemer** (of America’s Research Group) conducted an extensive national study for Answers in Genesis, published in the landmark book *Already Gone*. They surveyed a thousand young adults (ages 20 to 29) who had grown up regularly attending evangelical, conservative churches across America, but who had walked away from the church as adults."
             },
             {
               "type": "paragraph",
@@ -374,7 +374,7 @@
           "sections": [
             {
               "id": "ch-2-sec-1",
-              "heading": "1\\. Do the Math: 12,000 Hours vs. Time with God",
+              "heading": "1. Do the Math: 12,000 Hours vs. Time with God",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -408,7 +408,7 @@
             },
             {
               "id": "ch-2-sec-2",
-              "heading": "2\\. By Design, Not by Accident: The Historical Blueprint",
+              "heading": "2. By Design, Not by Accident: The Historical Blueprint",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -430,7 +430,7 @@
             },
             {
               "id": "ch-2-sec-3",
-              "heading": "3\\. The \"Separation of Church and State\" Lie",
+              "heading": "3. The \"Separation of Church and State\" Lie",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -458,7 +458,7 @@
                 },
                 {
                   "type": "paragraph",
-                  "text": "Notice the bait-and-switch that occurred: the courts did not remove *religion* from the schools in 1962 and 1963\\. They simply evicted Christianity and handed an exclusive, taxpayer-funded monopoly to a different religion—**Secular Humanism**, which teaches that matter created itself, morality is invented by man, and God is irrelevant to truth."
+                  "text": "Notice the bait-and-switch that occurred: the courts did not remove *religion* from the schools in 1962 and 1963. They simply evicted Christianity and handed an exclusive, taxpayer-funded monopoly to a different religion—**Secular Humanism**, which teaches that matter created itself, morality is invented by man, and God is irrelevant to truth."
                 },
                 {
                   "type": "paragraph",
@@ -535,15 +535,15 @@
               },
               {
                 "type": "ul_item",
-                "text": "**1\\. The Integrated 365DBR Scripture Reader:** Our free web platform ([`https://mt-sin.ai/365DBR/`](https://mt-sin.ai/365DBR/)), offering daily readings with side-by-side literal translations and instant access to Hebrew and Greek interlinear text."
+                "text": "**The Integrated 365DBR Scripture Reader:** Our free web platform ([`https://mt-sin.ai/365DBR/`](https://mt-sin.ai/365DBR/)), offering daily readings with side-by-side literal translations and instant access to Hebrew and Greek interlinear text."
               },
               {
                 "type": "ul_item",
-                "text": "**2\\. The Official Legacy Standard Bible (LSB) Daily Reading Plan:** Guides families through the entire Bible in a year using an exceptionally literal word-for-word translation ([`https://lsbible.org/daily-reading-plan/`](https://lsbible.org/daily-reading-plan/))."
+                "text": "**The Official Legacy Standard Bible (LSB) Daily Reading Plan:** Guides families through the entire Bible in a year using an exceptionally literal word-for-word translation ([`https://lsbible.org/daily-reading-plan/`](https://lsbible.org/daily-reading-plan/))."
               },
               {
                 "type": "ul_item",
-                "text": "**3\\. The One Year Bible Audio Edition:** A convenient daily listening option for the car or family breakfast ([`https://www.youtube.com/@ChristChurch_OneYearBible`](https://www.youtube.com/@ChristChurch_OneYearBible))."
+                "text": "**The One Year Bible Audio Edition:** A convenient daily listening option for the car or family breakfast ([`https://www.youtube.com/@ChristChurch_OneYearBible`](https://www.youtube.com/@ChristChurch_OneYearBible))."
               },
               {
                 "type": "ul_item",
@@ -596,7 +596,7 @@
           "sections": [
             {
               "id": "ch-3-sec-1",
-              "heading": "1\\. God’s Chain of Custody: *Shanan* (שָׁנַן) and *Paideia* (παιδεία) (Deuteronomy 6:6–9; Ephesians 6:4; Proverbs 22:6)",
+              "heading": "1. God’s Chain of Custody: *Shanan* (שָׁנַן) and *Paideia* (παιδεία) (Deuteronomy 6:6–9; Ephesians 6:4; Proverbs 22:6)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -634,7 +634,7 @@
             },
             {
               "id": "ch-3-sec-2",
-              "heading": "2\\. Demolishing the Myth of \"Neutrality\" (Matthew 12:30; Colossians 2:3, 8\\)",
+              "heading": "2. Demolishing the Myth of \"Neutrality\" (Matthew 12:30; Colossians 2:3, 8)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -680,7 +680,7 @@
             },
             {
               "id": "ch-3-sec-3",
-              "heading": "3\\. The Unavoidable Law of Discipleship: *Katartizō* (καταρτίζω) and *Theopneustos* (θεόπνευστος) (Luke 6:40; 2 Timothy 3:15–17)",
+              "heading": "3. The Unavoidable Law of Discipleship: *Katartizō* (καταρτίζω) and *Theopneustos* (θεόπνευστος) (Luke 6:40; 2 Timothy 3:15–17)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -812,7 +812,7 @@
           "sections": [
             {
               "id": "ch-4-sec-1",
-              "heading": "1\\. The \"Salt and Light\" Misapplication (Matthew 5:13–16)",
+              "heading": "1. The \"Salt and Light\" Misapplication (Matthew 5:13–16)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -830,7 +830,7 @@
             },
             {
               "id": "ch-4-sec-2",
-              "heading": "2\\. Pearls Before Swine & The Millstone Warning (Matthew 7:6; Luke 17:1–2; Psalm 127:3)",
+              "heading": "2. Pearls Before Swine & The Millstone Warning (Matthew 7:6; Luke 17:1–2; Psalm 127:3)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -848,7 +848,7 @@
             },
             {
               "id": "ch-4-sec-3",
-              "heading": "3\\. The Truth About Joseph and Daniel: Captivity vs. Enrollment (Genesis 37:2, 28; 39:9; 50:20; Daniel 1:1–8)",
+              "heading": "3. The Truth About Joseph and Daniel: Captivity vs. Enrollment (Genesis 37:2, 28; 39:9; 50:20; Daniel 1:1–8)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -954,7 +954,7 @@
           },
           {
             "type": "paragraph",
-            "text": "For this reason, here at Part II, the entire structure of this guide shifts. In Student-to-Parent Labs #5, #6, and #7, the traditional flow is reversed: **the student takes the lead to brief and teach their parents**. Students will demonstrate how they dissect secular textbook claims, spot worldview traps, apply the 3 E's and 7 Checks of Critical Thinking, and practice short-answer test responses without compromise—preparing the entire household for the joint Family & Student Commissioning Covenant in Chapter 8\\."
+            "text": "For this reason, here at Part II, the entire structure of this guide shifts. In Student-to-Parent Labs #5, #6, and #7, the traditional flow is reversed: **the student takes the lead to brief and teach their parents**. Students will demonstrate how they dissect secular textbook claims, spot worldview traps, apply the 3 E's and 7 Checks of Critical Thinking, and practice short-answer test responses without compromise—preparing the entire household for the joint Family & Student Commissioning Covenant in Chapter 8."
           }
         ]
       },
@@ -981,7 +981,7 @@
           "sections": [
             {
               "id": "ch-5-sec-1",
-              "heading": "1\\. Front #1: Daniel and the Secular Classroom (Daniel 1:3–20; Psalm 119:99–100)",
+              "heading": "1. Front #1: Daniel and the Secular Classroom (Daniel 1:3–20; Psalm 119:99–100)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1019,7 +1019,7 @@
             },
             {
               "id": "ch-5-sec-2",
-              "heading": "2\\. Front #2: Joseph Inside the Walls — When School Feels Like a Prison (Genesis 39:1–23; 50:20; Proverbs 4:14–15; 22:3; Colossians 3:23)",
+              "heading": "2. Front #2: Joseph Inside the Walls — When School Feels Like a Prison (Genesis 39:1–23; 50:20; Proverbs 4:14–15; 22:3; Colossians 3:23)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1045,7 +1045,7 @@
             },
             {
               "id": "ch-5-sec-3",
-              "heading": "3\\. Patricia Engler's \"Prepare to Thrive\" Principle (Prepare to Thrive; Genesis 1–11)",
+              "heading": "3. Patricia Engler's \"Prepare to Thrive\" Principle (Prepare to Thrive; Genesis 1–11)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1135,7 +1135,7 @@
           "sections": [
             {
               "id": "ch-6-sec-1",
-              "heading": "1\\. Tool #1: The 3 E's of Spiritual Defense (Examine, Expose, Escape) (1 Thessalonians 5:21; Acts 17:11; Ephesians 5:11; 2 Corinthians 10:5; 1 Corinthians 10:13; 2 Timothy 2:22)",
+              "heading": "1. Tool #1: The 3 E's of Spiritual Defense (Examine, Expose, Escape) (1 Thessalonians 5:21; Acts 17:11; Ephesians 5:11; 2 Corinthians 10:5; 1 Corinthians 10:13; 2 Timothy 2:22)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1157,7 +1157,7 @@
             },
             {
               "id": "ch-6-sec-2",
-              "heading": "2\\. The Workman's Standard (2 Timothy 2:15 — LSB)",
+              "heading": "2. The Workman's Standard (2 Timothy 2:15 — LSB)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1167,7 +1167,7 @@
             },
             {
               "id": "ch-6-sec-3",
-              "heading": "3\\. Tool #2: Patricia Engler's 7 Checks of Critical Thinking (Genesis 1:21; Titus 1:2; Matthew 7:16–20; Psalm 119:99–100)",
+              "heading": "3. Tool #2: Patricia Engler's 7 Checks of Critical Thinking (Genesis 1:21; Titus 1:2; Matthew 7:16–20; Psalm 119:99–100)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1217,7 +1217,7 @@
             },
             {
               "id": "ch-6-sec-4",
-              "heading": "4\\. The Two-Column Note-Taking Habit",
+              "heading": "4. The Two-Column Note-Taking Habit",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1307,7 +1307,7 @@
           "sections": [
             {
               "id": "ch-7-sec-1",
-              "heading": "1\\. The Biblical Posture: Respectful Boldness, Not Fleshly Quarreling (1 Peter 3:15–16; 2 Timothy 2:24–26)",
+              "heading": "1. The Biblical Posture: Respectful Boldness, Not Fleshly Quarreling (1 Peter 3:15–16; 2 Timothy 2:24–26)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1329,7 +1329,7 @@
             },
             {
               "id": "ch-7-sec-2",
-              "heading": "2\\. How to Answer Secular Test Questions Without Lying (Daniel 1:17–20; 1 Peter 3:16)",
+              "heading": "2. How to Answer Secular Test Questions Without Lying (Daniel 1:17–20; 1 Peter 3:16)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1367,7 +1367,7 @@
             },
             {
               "id": "ch-7-sec-3",
-              "heading": "3\\. Deconstructing Four Real-World Classroom Scenarios (Genesis 1:21; 6–8; 2 Peter 3:5–6; Ephesians 5:3, 11; Acts 5:29)",
+              "heading": "3. Deconstructing Four Real-World Classroom Scenarios (Genesis 1:21; 6–8; 2 Peter 3:5–6; Ephesians 5:3, 11; Acts 5:29)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1521,7 +1521,7 @@
           "sections": [
             {
               "id": "ch-8-sec-1",
-              "heading": "1\\. Daily Scripture Immersion Tools (Personal & Family) (Psalm 1:2; Joshua 1:8; Acts 17:11; Deuteronomy 6:6–9)",
+              "heading": "1. Daily Scripture Immersion Tools (Personal & Family) (Psalm 1:2; Joshua 1:8; Acts 17:11; Deuteronomy 6:6–9)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1547,7 +1547,7 @@
             },
             {
               "id": "ch-8-sec-2",
-              "heading": "2\\. The Answers in Genesis (AiG) Core Arsenal & Frontline PhD Scientists (Genesis 1–11; 6–8)",
+              "heading": "2. The Answers in Genesis (AiG) Core Arsenal & Frontline PhD Scientists (Genesis 1–11; 6–8)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1657,7 +1657,7 @@
             },
             {
               "id": "ch-8-sec-3",
-              "heading": "3\\. Breaking Classroom Isolation, Campus Evangelism & Time-Tested Pillars of Truth (Daniel 1:3–4; 1 Kings 19:18; Romans 1:16)",
+              "heading": "3. Breaking Classroom Isolation, Campus Evangelism & Time-Tested Pillars of Truth (Daniel 1:3–4; 1 Kings 19:18; Romans 1:16)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1665,7 +1665,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**1\\. Turning Point USA (High School, College, TPUSA Faith & Turning Point Education):**"
+                  "text": "**Turning Point USA (High School, College, TPUSA Faith & Turning Point Education):**"
                 },
                 {
                   "type": "ul_item",
@@ -1681,7 +1681,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**2\\. Living Waters & Ray Comfort (Biblical Evangelism & Campus Apologetics):**"
+                  "text": "**Living Waters & Ray Comfort (Biblical Evangelism & Campus Apologetics):**"
                 },
                 {
                   "type": "ul_item",
@@ -1697,7 +1697,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**3\\. Uncompromising *Sola Scriptura* Preachers, Historians & Literary Pillars:**"
+                  "text": "**Uncompromising *Sola Scriptura* Preachers, Historians & Literary Pillars:**"
                 },
                 {
                   "type": "ul_item",
@@ -1731,7 +1731,7 @@
             },
             {
               "id": "ch-8-sec-4",
-              "heading": "4\\. Practical Pathways: Biblical Education Pioneers, Homeschooling & Church Equipping (Proverbs 19:27; Deuteronomy 6:6–9; Luke 6:40)",
+              "heading": "4. Practical Pathways: Biblical Education Pioneers, Homeschooling & Church Equipping (Proverbs 19:27; Deuteronomy 6:6–9; Luke 6:40)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1739,7 +1739,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**1\\. The Voices of the Christian Educational Exodus (Books & Documentaries for Parents):**"
+                  "text": "**The Voices of the Christian Educational Exodus (Books & Documentaries for Parents):**"
                 },
                 {
                   "type": "ul_item",
@@ -1763,7 +1763,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**2\\. Step-by-Step Transition into Full-Time Biblical Homeschooling:**"
+                  "text": "**Step-by-Step Transition into Full-Time Biblical Homeschooling:**"
                 },
                 {
                   "type": "ul_item",
@@ -1795,7 +1795,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**3\\. Daily Dinner-Table Counter-Programming & Reforming the Local Church:**"
+                  "text": "**Daily Dinner-Table Counter-Programming & Reforming the Local Church:**"
                 },
                 {
                   "type": "ul_item",
@@ -1809,7 +1809,7 @@
             },
             {
               "id": "ch-8-sec-5",
-              "heading": "5\\. Direct Plug-In Directory: Websites, YouTube, Streaming & X (x.com)",
+              "heading": "5. Direct Plug-In Directory: Websites, YouTube, Streaming & X (x.com)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -2006,7 +2006,7 @@
             "lab_number": 8,
             "id": "lab-8",
             "direction": "Joint Family & Student Commissioning",
-            "title": "6\\. Family & Student Commissioning Lab #8: Our Household Covenant & Action Plan (Joshua 24:14–15; Deuteronomy 6:6–9; 2 Timothy 2:15; 1 Peter 3:15–16)",
+            "title": "Family & Student Commissioning Lab #8: Our Household Covenant & Action Plan (Joshua 24:14–15; Deuteronomy 6:6–9; 2 Timothy 2:15; 1 Peter 3:15–16)",
             "blocks": [
               {
                 "type": "paragraph",
@@ -2042,7 +2042,7 @@
               },
               {
                 "type": "ol_item",
-                "text": "**1\\. Our Daily Scripture Habit (Personal & Family Partnership):**"
+                "text": "**Our Daily Scripture Habit (Personal & Family Partnership):**"
               },
               {
                 "type": "ul_item",
@@ -2066,7 +2066,7 @@
               },
               {
                 "type": "ol_item",
-                "text": "**2\\. Our Educational Direction & Apologetics Equipping:**"
+                "text": "**Our Educational Direction & Apologetics Equipping:**"
               },
               {
                 "type": "ul_item",
@@ -2080,7 +2080,7 @@
               },
               {
                 "type": "ol_item",
-                "text": "**3\\. Our Classroom & Cultural Battle Posture:**"
+                "text": "**Our Classroom & Cultural Battle Posture:**"
               },
               {
                 "type": "ul_item",

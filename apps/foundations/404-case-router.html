@@ -4,33 +4,15 @@
   <meta charset="UTF-8" />
   <title>Routing | Foundations Library (Mt. Sinai LLC)</title>
   <meta name="robots" content="noindex, follow" />
-  <script>
-    (function() {
-      var path = window.location.pathname || "";
-      var lower = path.toLowerCase().replace(/_/g, "-");
-      var search = window.location.search || "";
-      var hash = window.location.hash || "";
-
-      if (lower.indexOf("god") !== -1 || lower.indexOf("what-we-know") !== -1) {
-        window.location.replace("/foundations/what-does-the-bible-say-about-god.html" + search + hash);
-        return;
-      }
-      if (lower.indexOf("education") !== -1) {
-        window.location.replace("/foundations/what-does-the-bible-say-about-education.html" + search + hash);
-        return;
-      }
-      if (path !== lower) {
-        window.location.replace(lower + search + hash);
-      }
-    })();
-  </script>
+  <link rel="stylesheet" href="/foundations/fl-core.css" />
 </head>
-<body style="font-family: Georgia, serif; padding: 40px; color: #1f1b18; background: #f7f4ef;">
+<body data-fl-case-router="true" style="font-family: Georgia, serif; padding: 40px;">
   <h2>Mt. Sinai LLC — Foundations Library</h2>
   <p>Select a resource below:</p>
   <ul>
-    <li><a href="/foundations/what-does-the-bible-say-about-god.html">What Does the Bible Say About God?: What We Know About God (Foundational Facts, Biblically Backed)</a></li>
-    <li><a href="/foundations/what-does-the-bible-say-about-education.html">What Does the Bible Say About Education?: Foundational Truths for Parents &amp; Students</a></li>
+    <li><a href="/foundations/what-does-the-bible-say-about-god.html">1: What Does the Bible Say About God? (What We Know About God — Foundational Facts, Biblically Backed)</a></li>
+    <li><a href="/foundations/what-does-the-bible-say-about-education.html">2: What Does the Bible Say About Education? (Foundational Truths for Parents &amp; Students)</a></li>
   </ul>
+  <script src="/foundations/fl-core.js"></script>
 </body>
 </html>

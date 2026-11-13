@@ -163,20 +163,24 @@
 <body>
 
   <header class="fl-topbar no-print">
-    <div class="fl-brand-group">
-      <a href="/foundations/" class="fl-active-book" aria-current="page">🏛️ Foundations Library Hub</a>
-      <span class="fl-topbar-sep">|</span>
-      <a href="/foundations/what-does-the-bible-say-about-god.html" class="fl-nav-link">Book 1: What We Know About God</a>
-      <span class="fl-topbar-sep">|</span>
-      <a href="/foundations/what-does-the-bible-say-about-education.html" class="fl-nav-link">Book 2: Biblical Education</a>
-      <span class="fl-topbar-sep">|</span>
-      <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link">📖 365DBR Daily</a>
-      <span class="fl-topbar-sep">|</span>
-      <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link">Multi-Translation Bible</a>
-      <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
+    <div class="fl-topbar-row1">
+      <div class="fl-brand-group">
+        <a href="/foundations/" class="fl-active-book" aria-current="page">🏛️ Foundations Library Hub</a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link">🕮 365DBR Daily</a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link">✝️ Multi-Translation Bible</a>
+        <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
+      </div>
+      <div class="fl-top-actions">
+        <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing">☕ Buy Your Brother a Coffee</a>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page">🖨️ Print</button>
+      </div>
     </div>
-    <div class="fl-top-actions">
-      <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing">☕ Buy Your Brother a Coffee</a>
+    <div class="fl-topbar-row2">
+      <a href="/foundations/what-does-the-bible-say-about-god.html" class="fl-nav-link">📖 1: What About God? ↗</a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/what-does-the-bible-say-about-education.html" class="fl-nav-link">📖 2: Biblical Education ↗</a>
     </div>
   </header>
 
@@ -205,7 +209,7 @@
             <li><strong>Instant Interlinear Verification:</strong> Every foundational fact is backed by direct, clickable Scripture citations.</li>
           </ul>
           <div class="book-refs refs">
-            <strong>Key Anchors (Click to Preview):</strong>
+            <strong class="web-only">Key Anchors (Click to Preview):</strong><strong class="print-only">Key Scripture Anchors:</strong>
             <a href="/365DBR/bible.html?book=GEN&chapter=1&verse=1&fullverse=1">Gen 1:1</a>
             <a href="/365DBR/bible.html?book=JHN&chapter=1&verse=1&fullverse=1">John 1:1–3</a>
             <a href="/365DBR/bible.html?book=2TI&chapter=3&verse=16&fullverse=1">2 Tim 3:16–17</a>
@@ -233,7 +237,7 @@
             <li><strong>Babylon Survival Toolkit:</strong> Daniel &amp; Joseph blueprint, the 3 E's, 7 Checks of Critical Thinking, and answering exams without lying.</li>
           </ul>
           <div class="book-refs refs">
-            <strong>Key Anchors (Click to Preview):</strong>
+            <strong class="web-only">Key Anchors (Click to Preview):</strong><strong class="print-only">Key Scripture Anchors:</strong>
             <a href="/365DBR/bible.html?book=PRO&chapter=19&verse=27&fullverse=1">Prov 19:27</a>
             <a href="/365DBR/bible.html?book=PRO&chapter=1&verse=7&fullverse=1">Prov 1:7</a>
             <a href="/365DBR/bible.html?book=DEU&chapter=6&verse=6&fullverse=1">Deut 6:6–9</a>
@@ -279,11 +283,36 @@
     </div>
     <iframe
       id="bible-frame"
-      srcdoc="<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>365DBR Scripture Reader</title></head><body style='margin:0;padding:24px;background:#fdfbf7;color:#5c4028;font-family:Georgia,serif;font-size:15px;'>Select any Scripture reference badge to compare Hebrew/Greek interlinear and literal English translations side-by-side.</body></html>"
+      src="about:blank"
       title="365DBR Multi-Translation Bible">
     </iframe>
   </aside>
-
+    <div class="print-qr">
+    <div class="print-qr-item">
+        <div class="print-qr-title">Book 1 Online</div>
+        <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2Fgod.html" alt="Book Online QR"/>
+        <div class="print-qr-desc">Tap any verse online for live Hebrew/Greek interlinear</div>
+        <div class="print-qr-url">mt-sin.ai/foundations/god.html</div>
+    </div>
+    <div class="print-qr-item">
+        <div class="print-qr-title">Book 2 Online</div>
+        <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2Feducation.html" alt="Book Online QR"/>
+        <div class="print-qr-desc">Interactive labs, calculator &amp; directory:</div>
+        <div class="print-qr-url">mt-sin.ai/foundations/education.html</div>
+    </div>
+    <div class="print-qr-item">
+        <div class="print-qr-title">365 Daily Bible Plan</div>
+        <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2F" alt="365DBR Daily QR"/>
+        <div class="print-qr-desc">OT, NT, Psalms &amp; Proverbs (~15 min/day)</div>
+        <div class="print-qr-url">mt-sin.ai/365DBR/</div>
+    </div>
+    <div class="print-qr-item">
+        <div class="print-qr-title">Bible &amp; Interlinear Lookup</div>
+        <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2Fbible.html" alt="Multi-Translation Lookup QR"/>
+        <div class="print-qr-desc">Hebrew/Greek + LSB &amp; KJV side-by-side</div>
+        <div class="print-qr-url">mt-sin.ai/365DBR/bible.html</div>
+    </div>
+    </div>
   <script src="/foundations/fl-core.js"></script>
 </body>
 </html>

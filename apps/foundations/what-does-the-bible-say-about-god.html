@@ -19,21 +19,24 @@
 </head>
 <body>
   <header class="fl-topbar no-print">
-    <div class="fl-brand-group">
-      <a href="/foundations/" class="fl-brand-title">🏛️ Foundations Library</a>
-      <span class="fl-topbar-sep">›</span>
-      <a href="#" class="fl-active-book" aria-current="page" title="Currently Reading: What We Know About God">📖 1: What About God?</a>
+    <div class="fl-topbar-row1">
+      <div class="fl-brand-group">
+        <a href="/foundations/" class="fl-brand-title">🏛️ Foundations Library</a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link">🕮 365DBR Daily</a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link">✝️ Multi-Translation Bible</a>
+        <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
+      </div>
+      <div class="fl-top-actions">
+        <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing">☕ Buy Your Brother a Coffee</a>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page">🖨️ Print</button>
+      </div>
+    </div>
+    <div class="fl-topbar-row2">
+      <a href="#" class="fl-active-book" aria-current="page">📖 Book 1: What We Know About God<span class="fl-book-sub"> — Foundational Facts, Biblically Backed</span></a>
       <span class="fl-topbar-sep">|</span>
       <a href="/foundations/what-does-the-bible-say-about-education.html" class="fl-nav-link">2: Biblical Education ↗</a>
-      <span class="fl-topbar-sep">|</span>
-      <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link">📖 365DBR Daily</a>
-      <span class="fl-topbar-sep">|</span>
-      <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link">Multi-Translation Bible</a>
-      <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
-    </div>
-    <div class="fl-top-actions">
-      <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing">☕ Buy Your Brother a Coffee</a>
-      <button type="button" class="fl-btn fl-btn-light" onclick="window.print()">🖨️ Print Facts</button>
     </div>
   </header>
 
@@ -123,69 +126,11 @@
   <div id="pt-40" class="point"><span class="cross">†</span>One day soon, He will return to abolish the curse completely. He will deliver all of creation from the bondage of entropy and corruption, raise believers with incorruptible, glorified bodies, and restore the unbroken fellowship of Eden forever in the New Heaven and New Earth. <span class="refs">(<a href="/365DBR/bible.html?book=ROM&chapter=8&verse=21&fullverse=1">Rom 8:21</a>; <a href="/365DBR/bible.html?book=1CO&chapter=15&verse=42&fullverse=1">1 Cor 15:42–44</a>, <a href="/365DBR/bible.html?book=1CO&chapter=15&verse=51&fullverse=1">51–57</a>; <a href="/365DBR/bible.html?book=REV&chapter=21&verse=1&fullverse=1">Rev 21:1–5</a>; <a href="/365DBR/bible.html?book=REV&chapter=22&verse=3&fullverse=1">22:3</a>; <a href="/365DBR/bible.html?book=PHP&chapter=3&verse=20&fullverse=1">Phil 3:20–21</a>)</span></div>
 </div>
 
-<!-- Live 365DBR Reader Side-Drawer -->
-<aside id="bible-drawer" aria-hidden="true">
-  <div class="drawer-header">
-    <span id="drawer-title">365DBR Scripture Reader (LSB / KJV / Interlinear)</span>
-    <div class="drawer-actions">
-      <a id="drawer-ext" href="/365DBR/bible.html" target="_blank" rel="noopener">Open Full Tab ↗</a>
-      <button class="drawer-close" id="drawer-close-btn" type="button">✕ Close</button>
-    </div>
-  </div>
-  <iframe
-    id="bible-frame"
-    srcdoc="<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>365DBR</title></head><body style='margin:0;background:#fdfbf7;'><style>.print-qr{display:none}@media print{.print-qr{display:flex!important;justify-content:space-around;align-items:center;margin-top:18px;padding-top:12px;border-top:1px solid #ccc;page-break-inside:avoid;font-family:sans-serif;font-size:9pt;color:#222}.print-qr-item{display:flex;align-items:center;gap:10px}.print-qr img{width:72px;height:72px}}.point:target{background:rgba(212,175,55,0.18);border-left:3px solid #b8860b;padding-left:10px;border-radius:4px;transition:background 0.4s ease}</style><div class="print-qr"><div class="print-qr-item"><img src="https://quickchart.io/qr?format=svg&margin=1&size=140&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2FWhat_We_Know.html" alt="What We Know QR"/><div><strong>Interactive Edition (Tri-View Drawer)</strong><br/>Tap any verse reference online to compare<br/>Hebrew/Greek &amp; literal English side-by-side:<br/>mt-sin.ai/365DBR/What_We_Know.html</div></div><div class="print-qr-item"><img src="https://quickchart.io/qr?format=svg&margin=1&size=140&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2F" alt="365DBR QR"/><div><strong>365 Daily Bible Reading (Tri-View)</strong><br/>OT, NT, Psalms &amp; Proverbs daily (~15 min)<br/>in Hebrew/Greek + 2 literal translations:<br/>mt-sin.ai/365DBR/</div></div></div></body></html>"
-    title="365DBR Multi-Translation Bible">
-  </iframe>
-</aside>
-
-<script>
-  (function() {
-    const drawer = document.getElementById('bible-drawer');
-    const frame = document.getElementById('bible-frame');
-    const title = document.getElementById('drawer-title');
-    const extLink = document.getElementById('drawer-ext');
-    const closeBtn = document.getElementById('drawer-close-btn');
-
-    document.querySelectorAll('.refs a').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const url = this.getAttribute('href');
-        const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-        const baseIframeUrl = url;
-        const iframeUrl = baseIframeUrl + (baseIframeUrl.includes('?') ? '&' : '?') + 'fullverse=1';
-
-        title.textContent = this.textContent + ' — 365DBR Reader';
-        extLink.setAttribute('href', url);
-
-        // Remove the initial srcdoc placeholder so it doesn't override src
-        if (frame.hasAttribute('srcdoc')) {
-          frame.removeAttribute('srcdoc');
-        }
-        // Load the URL with &fullverse=1 into the iframe
-        if (frame.getAttribute('src') !== iframeUrl) {
-          frame.setAttribute('src', iframeUrl);
-        }
-        drawer.classList.add('open');
-        drawer.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('drawer-open');
-      });
-    });
-
-    closeBtn.addEventListener('click', function() {
-      drawer.classList.remove('open');
-      drawer.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('drawer-open');
-    });
-  })();
-</script>
-
-<style>.print-qr{display:none}@media print{.print-qr{display:flex!important;justify-content:space-around;align-items:center;margin-top:18px;padding-top:12px;border-top:1px solid #ccc;page-break-inside:avoid;font-family:sans-serif;font-size:9pt;color:#222}.print-qr-item{display:flex;align-items:center;gap:10px}.print-qr img{width:72px;height:72px}}.point:target{background:rgba(212,175,55,0.18);border-left:3px solid #b8860b;padding-left:10px;border-radius:4px;transition:background 0.4s ease}</style><div class="print-qr"><div class="print-qr-item"><img src="https://quickchart.io/qr?format=svg&margin=1&size=140&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2FWhat_We_Know.html" alt="What We Know QR"/><div><strong>Interactive Edition</strong><br/>Tap any verse reference online to compare<br/>Hebrew/Greek &amp; literal English side-by-side:<br/>mt-sin.ai/365DBR/What_We_Know.html</div></div><div class="print-qr-item"><img src="https://quickchart.io/qr?format=svg&margin=1&size=140&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2F" alt="365DBR QR"/><div><strong>365 Daily Bible Reading (Tri-View)</strong><br/>OT, NT, Psalms &amp; Proverbs daily (~15 min)<br/>in Hebrew/Greek + KJV + LSB&reg;/LSV:<br/>mt-sin.ai/365DBR/</div></div></div>
 <aside id="support-coffee" class="fl-support-footer no-print" aria-label="Voluntary Ministry Support">
     <p class="fl-support-text">
       <strong>☕ Support Independent Sola Scriptura Writing:</strong> All Scripture tools (<em>365DBR</em> &amp; the <em>Legacy Standard Bible</em>) are provided 100% free of charge and strictly non-commercial. Voluntary gifts solely support <strong>Rowley &amp; Patty Shaw's</strong> independent writing and server hosting.
     </p>
-    <a href="#support-coffee" class="fl-btn fl-btn-coffee" data-coffee-link="pending">☕ Buy Your Brother a Coffee</a>
+    <a href="#support-coffee" class="fl-btn fl-btn-coffee">☕ Buy Your Brother a Coffee</a>
   </aside>
 </div>
 
@@ -200,21 +145,37 @@
   </div>
   <iframe
     id="bible-frame"
-    srcdoc="<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>365DBR Scripture Reader</title></head><body style='margin:0;padding:24px;background:#fdfbf7;color:#5c4028;font-family:Georgia,serif;font-size:15px;'>Select any Scripture reference badge to compare Hebrew/Greek interlinear and literal English translations side-by-side.</body></html>"
+    src="about:blank"
     title="365DBR Multi-Translation Bible">
   </iframe>
 </aside>
 
-<div class="print-qr">
-  <div class="print-qr-item">
-    <img src="https://quickchart.io/qr?format=svg&margin=1&size=140&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2Fwhat-does-the-bible-say-about-god.html" alt="What We Know About God QR"/>
-    <div><strong>Interactive Edition (Scripture Reader)</strong><br/>Tap any verse reference online to compare<br/>Hebrew/Greek &amp; literal English side-by-side:<br/>mt-sin.ai/foundations/god.html</div>
-  </div>
-  <div class="print-qr-item">
-    <img src="https://quickchart.io/qr?format=svg&margin=1&size=140&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2F" alt="365DBR QR"/>
-    <div><strong>365 Daily Bible Reading (Tri-View)</strong><br/>OT, NT, Psalms &amp; Proverbs daily (~15 min)<br/>in Hebrew/Greek + KJV + LSB&reg;/LSV:<br/>mt-sin.ai/365DBR/</div>
-  </div>
-</div>
+    <div class="print-qr">
+    <div class="print-qr-item">
+        <div class="print-qr-title">Foundations Library</div>
+        <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2F" alt="Foundations Library QR"/>
+        <div class="print-qr-desc">Free Sola Scriptura books &amp; family equipping guides</div>
+        <div class="print-qr-url">mt-sin.ai/foundations/</div>
+    </div>
+    <div class="print-qr-item">
+        <div class="print-qr-title">Book 1 Online</div>
+        <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2Fgod.html" alt="Book Online QR"/>
+        <div class="print-qr-desc">Tap any verse online for live Hebrew/Greek interlinear</div>
+        <div class="print-qr-url">mt-sin.ai/foundations/god.html</div>
+    </div>
+    <div class="print-qr-item">
+        <div class="print-qr-title">365 Daily Bible Plan</div>
+        <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2F" alt="365DBR Daily QR"/>
+        <div class="print-qr-desc">OT, NT, Psalms &amp; Proverbs (~15 min/day)</div>
+        <div class="print-qr-url">mt-sin.ai/365DBR/</div>
+    </div>
+    <div class="print-qr-item">
+        <div class="print-qr-title">Bible &amp; Interlinear Lookup</div>
+        <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2Fbible.html" alt="Multi-Translation Lookup QR"/>
+        <div class="print-qr-desc">Hebrew/Greek + LSB &amp; KJV side-by-side</div>
+        <div class="print-qr-url">mt-sin.ai/365DBR/bible.html</div>
+    </div>
+    </div>
 
 <script src="/foundations/fl-core.js"></script>
 </body>

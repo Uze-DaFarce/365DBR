@@ -134,16 +134,37 @@ def linkify_scripture_references(html_text: str) -> str:
 # 3. SURGICAL MANUSCRIPT CLEANUP RULES
 # ==============================================================================
 def clean_manuscript_text(raw_text: str) -> str:
-    text = raw_text.replace("\r\n", "\n").replace("\u00a0", " ")
-    for esc, char in [(r"\#", "#"), (r"\!", "!"), (r"\~", "~"), (r"\_", "_"), (r"\[", "["), (r"\]", "]"), (r"\&", "&")]:
-        text = text.replace(esc, char)
-    text = text.replace("directed primary from Parent to Child", "directed primarily from Parent to Child")
-    text = re.sub(r"\(Genesis 39:9\)\.Notice", "(Genesis 39:9). Notice", text)
-    text = re.sub(r"^(\s*\d+\.\s+)\*\*\d+\.\s+", r"\1**", text, flags=re.MULTILINE)
-    text = re.sub(r"^(\s*[\-\*]\s+)\*\*(\d+\.)\s+", r"\1**", text, flags=re.MULTILINE)
-    text = re.sub(r"^\s*1\.\s+\*\*Step 4:\s*Family Prayer\*\*", "**Step 4: Family Prayer**", text, flags=re.MULTILINE)
-    text = re.sub(r"^\s*<!--\s*end list\s*-->\s*$", "", text, flags=re.MULTILINE)
-    return text
+  text = raw_text.replace("\r\n", "\n").replace("\u00a0", " ")
+  for esc, char in [
+      (r"\#", "#"),
+      (r"\!", "!"),
+      (r"\~", "~"),
+      (r"\_", "_"),
+      (r"\[", "["),
+      (r"\]", "]"),
+      (r"\&", "&"),
+      (r"\.", "."),
+      (r"\)", ")"),
+      (r"\(", "("),
+  ]:
+    text = text.replace(esc, char)
+  text = text.replace(
+      "directed primary from Parent to Child",
+      "directed primarily from Parent to Child",
+  )
+  text = re.sub(r"\(Genesis 39:9\)\.Notice", "(Genesis 39:9). Notice", text)
+  text = re.sub(r"^(\s*\d+\.\s+)\*\*\d+\.\s+", r"\1**", text, flags=re.MULTILINE)
+  text = re.sub(
+      r"^(\s*[\-\*]\s+)\*\*(\d+\.)\s+", r"\1**", text, flags=re.MULTILINE
+  )
+  text = re.sub(
+      r"^\s*1\.\s+\*\*Step 4:\s*Family Prayer\*\*",
+      "**Step 4: Family Prayer**",
+      text,
+      flags=re.MULTILINE,
+  )
+  text = re.sub(r"^\s*<!--\s*end list\s*-->\s*$", "", text, flags=re.MULTILINE)
+  return text
 
 def strip_md_wrappers(line: str) -> str:
     s = re.sub(r"^#+\s*", "", line.strip())
@@ -369,13 +390,79 @@ def parse_manuscript_to_json(cleaned_md: str) -> dict:
 # 5. INLINE MARKDOWN FORMATTER & WIDGET RENDERERS
 # ==============================================================================
 def format_inline_md(text: str) -> str:
-    s = html.escape(text, quote=False)
-    s = re.sub(r"&lt;(https?://[^&>\s]+)&gt;", r'<a href="\1" target="_blank" rel="noopener" class="fl-ext-link">\1</a>', s)
-    s = re.sub(r"\[([^\]]+)\]\((https?://[^\)]+)\)", r'<a href="\2" target="_blank" rel="noopener" class="fl-ext-link">\1</a>', s)
-    s = re.sub(r"\*\*\*(.+?)\*\*\*", r"<strong><em>\1</em></strong>", s)
-    s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
-    s = re.sub(r"\*(.+?)\*", r"<em>\1</em>", s)
-    return linkify_scripture_references(s)
+  s = html.escape(text, quote=False)
+  # Strip markdown backticks around URLs or @handles so they never print raw `backticks`
+  s = re.sub(r"`(https?://[^`\s]+)`", r"\1", s)
+  s = re.sub(r"`(@[A-Za-z0-9_]+)`", r"\1", s)
+  s = re.sub(
+      r"&lt;(https?://[^&>\s]+)&gt;",
+      r'<a href="\1" target="_blank" rel="noopener" class="fl-ext-link">\1</a>',
+      s,
+  )
+  s = re.sub(
+      r"\[([^\]]+)\]\((https?://[^\)]+)\)",
+      r'<a href="\2" target="_blank" rel="noopener" class="fl-ext-link">\1</a>',
+      s,
+  )
+  s = re.sub(r"\*\*\*(.+?)\*\*\*", r"<strong><em>\1</em></strong>", s)
+  s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
+  s = re.sub(r"\*(.+?)\*", r"<em>\1</em>", s)
+
+  # Swap web-only phrasing for natural print-table phrasing when printed
+  web_to_print_swaps = [
+      (
+          "in your print Bible or by using the interactive verse links",
+          (
+              'in your Bible<span class="web-only"> (or click the interactive'
+              " verse links)</span>"
+          ),
+      ),
+      (
+          "in your print Bible or the online text",
+          'in your Bible<span class="web-only"> or the online text</span>',
+      ),
+      (
+          "in your print Bible or the integrated 365DBR Scripture reader",
+          (
+              'in your Bible<span class="web-only"> or the integrated 365DBR'
+              " Scripture reader</span>"
+          ),
+      ),
+      (
+          (
+              "in your printed Bibles or by using <strong>the integrated 365DBR"
+              " Scripture reader</strong>"
+          ),
+          (
+              'in your Bible<span class="web-only"> or by using <strong>the'
+              " integrated 365DBR Scripture reader</strong></span>"
+          ),
+      ),
+      (
+          "Open your Bibles using the interactive verse links and read",
+          (
+              'Open your Bible<span class="web-only"> (or use the interactive'
+              " verse links)</span> and read"
+          ),
+      ),
+      (
+          "Gather around the table with a notebook, pen, and the integrated"
+          " 365DBR Scripture reader.",
+          (
+              "Gather around the table with your Bible, a notebook, and a"
+              ' pen<span class="web-only"> (or use the integrated 365DBR'
+              " Scripture reader)</span>."
+          ),
+      ),
+      (
+          " — Print or Discuss at the Table",
+          '<span class="web-only"> — Print or Discuss at the Table</span>',
+      ),
+  ]
+  for old_str, new_str in web_to_print_swaps:
+    s = s.replace(old_str, new_str)
+
+  return linkify_scripture_references(s)
 
 def render_k12_static_svg_chart() -> str:
     return """
@@ -459,6 +546,12 @@ def render_lab2_interactive_calculator() -> str:
           </div>
         </div>
         <p id="fl-calc-summary-verdict" class="fl-calc-verdict"></p>
+      </div>
+      <div class="fl-calc-print-worksheet print-only">
+        <strong>Paper Worksheet 12-Year (K–12) Worldview Audit Formula:</strong><br/>
+        &bull; <strong>12-Yr Secular Stream:</strong> (Line 1 School Hrs × 432 wks) + (Line 2 Media Hrs × 624 wks) = <strong>_____________ Secular Hours</strong><br/>
+        &bull; <strong>12-Yr Word of God Stream:</strong> (Line 3 Personal Hrs + Line 4 Family/Church Hrs) × 624 wks = <strong>_____________ Biblical Hours</strong><br/>
+        &bull; <strong>Our Household Ratio:</strong> Secular Hours &divide; Biblical Hours = <strong>________ to 1</strong>
       </div>
     </div>
     """
@@ -580,10 +673,22 @@ def build_education_html(doc_data: dict) -> str:
 
             sec_html_list = []
             for sec in ch["sections"]:
-                sec_html_list.append(f"""
+              extra_print_card = ""
+              if sec["id"] == "ch-8-sec-5":
+                extra_print_card = """
+                    <div class="fl-ch8-print-card print-only">
+                      <img src="https://quickchart.io/qr?format=svg&margin=1&size=140&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2Feducation.html%23ch-8-sec-5" alt="Chapter 8 Resource Directory QR" />
+                      <div>
+                        <strong>Scan to Open the Live Clickable Ministry &amp; Scientist Directory on Your Phone</strong><br/>
+                        To keep this printed page uncluttered by 45+ raw web URLs and social handles, scan this QR code with your phone camera (or visit <strong>mt-sin.ai/foundations/education.html#ch-8-sec-5</strong>) for direct one-tap links to Answers in Genesis, PhD Scientist profiles, Turning Point USA, Living Waters, Grace to You, Hillsdale College, HSLDA, Master Books, and Apologia.
+                      </div>
+                    </div>
+                    """
+              sec_html_list.append(f"""
                 <div id="{sec['id']}" class="fl-chapter-subsection">
                   <h3>{format_inline_md(sec['heading'])}</h3>
                   {render_blocks_html(sec['blocks'])}
+                  {extra_print_card}
                 </div>
                 """)
 
@@ -602,8 +707,8 @@ def build_education_html(doc_data: dict) -> str:
                     {render_blocks_html(lab['blocks'])}
                   </div>
                   <div class="fl-lab-actions no-print">
-                    <button type="button" class="fl-btn fl-btn-primary" onclick="FLApp.printLab('{lid}')">🖨️ Print / Save Completed Lab #{lab['lab_number']}</button>
-                    <button type="button" class="fl-btn fl-btn-outline" onclick="FLApp.clearLab('{lid}')">Clear Lab #{lab['lab_number']} Inputs</button>
+                    <button type="button" class="fl-btn fl-btn-primary" data-fl-print-lab="{lid}">🖨️ Print / Save Completed Lab #{lab['lab_number']}</button>
+                    <button type="button" class="fl-btn fl-btn-outline" data-fl-clear-lab="{lid}">Clear Lab #{lab['lab_number']} Inputs</button>
                   </div>
                 </section>
                 """
@@ -710,21 +815,25 @@ def build_education_html(doc_data: dict) -> str:
 <body>
 
   <header class="fl-topbar no-print">
-    <div class="fl-brand-group">
-      <a href="/foundations/" class="fl-brand-title">🏛️ Foundations Library</a>
-      <span class="fl-topbar-sep">›</span>
-      <a href="/foundations/{GOD_CANONICAL_SLUG}" class="fl-nav-link">1: What About God ↗</a>
-      <span class="fl-topbar-sep">|</span>
-      <a href="#" class="fl-active-book" aria-current="page" title="Currently Reading: What Does the Bible Say About Education?">📖 2: What About Education?</a>
-      <span class="fl-topbar-sep">|</span>
-      <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link">📖 365DBR Daily</a>
-      <span class="fl-topbar-sep">|</span>
-      <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link">Multi-Translation Bible</a>
-      <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
+    <div class="fl-topbar-row1">
+      <div class="fl-brand-group">
+        <a href="/foundations/" class="fl-brand-title">🏛️ Foundations Library</a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link">🕮 365DBR Daily</a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link">✝️ Multi-Translation Bible</a>
+        <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
+      </div>
+      <div class="fl-top-actions">
+        <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing">☕ Buy Your Brother a Coffee</a>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-all-labs" title="Print only the 8 Family &amp; Student Lab Worksheets">🖨️ Print All 8 Labs</button>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page" title="Print full book and worksheets">🖨️ Print</button>
+      </div>
     </div>
-    <div class="fl-top-actions">
-      <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing">☕ Buy Your Brother a Coffee</a>
-      <button type="button" class="fl-btn fl-btn-light" onclick="window.print()">🖨️ Print Full Book / Worksheets</button>
+    <div class="fl-topbar-row2">
+      <a href="/foundations/{GOD_CANONICAL_SLUG}" class="fl-nav-link">1: What About God? ↗</a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="#" class="fl-active-book" aria-current="page">📖 Book 2: What Does the Bible Say About Education? — Foundational Truths for Parents and Students Survival Guide</a>
     </div>
   </header>
 
@@ -756,11 +865,32 @@ def build_education_html(doc_data: dict) -> str:
         <a href="#support-coffee" class="fl-btn fl-btn-coffee" data-coffee-link="pending">☕ Buy Your Brother a Coffee</a>
       </aside>
 
-      <footer class="fl-print-footer">
-        <p><strong>Foundations Library (Mt. Sinai LLC):</strong> {EDU_CANONICAL_URL} (Short Link: https://mt-sin.ai/foundations/education.html) &bull; <strong>365DBR Scripture Engine:</strong> https://mt-sin.ai/365DBR/</p>
-      </footer>
-    </main>
-  </div>
+      <div class="print-qr">
+        <div class="print-qr-item">
+            <div class="print-qr-title">Foundations Library</div>
+            <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2F" alt="Foundations Library QR"/>
+            <div class="print-qr-desc">Free Sola Scriptura books &amp; family equipping guides</div>
+            <div class="print-qr-url">mt-sin.ai/foundations/</div>
+        </div>
+        <div class="print-qr-item">
+            <div class="print-qr-title">Book 1 Online</div>
+            <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2Fgod.html" alt="Book Online QR"/>
+            <div class="print-qr-desc">Tap any verse online for live Hebrew/Greek interlinear</div>
+            <div class="print-qr-url">mt-sin.ai/foundations/god.html</div>
+        </div>
+        <div class="print-qr-item">
+            <div class="print-qr-title">365 Daily Bible Plan</div>
+            <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2F" alt="365DBR Daily QR"/>
+            <div class="print-qr-desc">OT, NT, Psalms &amp; Proverbs (~15 min/day)</div>
+            <div class="print-qr-url">mt-sin.ai/365DBR/</div>
+        </div>
+        <div class="print-qr-item">
+            <div class="print-qr-title">Bible &amp; Interlinear Lookup</div>
+            <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2Fbible.html" alt="Multi-Translation Lookup QR"/>
+            <div class="print-qr-desc">Hebrew/Greek + LSB &amp; KJV side-by-side</div>
+            <div class="print-qr-url">mt-sin.ai/365DBR/bible.html</div>
+        </div>
+    </div>
 
   <!-- Live 365DBR Scripture Reader (100% Free & Non-Commercial) -->
   <aside id="bible-drawer" aria-hidden="true">
@@ -773,7 +903,7 @@ def build_education_html(doc_data: dict) -> str:
     </div>
     <iframe
       id="bible-frame"
-      srcdoc="<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>365DBR Scripture Reader</title></head><body style='margin:0;padding:24px;background:#fdfbf7;color:#5c4028;font-family:Georgia,serif;font-size:15px;'>Select any Scripture reference link to compare Hebrew/Greek interlinear and literal English translations side-by-side.</body></html>"
+      src="about:blank"
       title="365DBR Multi-Translation Bible">
     </iframe>
   </aside>
@@ -827,44 +957,39 @@ def sync_book1_god_html():
     GOD_CANONICAL_PATH.write_text(content, encoding="utf-8")
 
 # ==============================================================================
-# 8. REDIRECT STUBS, GODADDY .HTACCESS & CASE-INSENSITIVE ROUTER
+# 8. REDIRECT STUBS, GODADDY .HTACCESS & CASE-INSENSITIVE ROUTER (CSP-SAFE)
 # ==============================================================================
 def make_redirect_stub(target_path: str, title_label: str) -> str:
-    canonical_full = f"https://mt-sin.ai{target_path}"
-    return f"""<!DOCTYPE html>
+  canonical_full = f"https://mt-sin.ai{target_path}"
+  return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Redirecting to {title_label} | Foundations Library (Mt. Sinai LLC)</title>
   <link rel="canonical" href="{canonical_full}" />
   <meta name="robots" content="noindex, follow" />
-  <script>
-    (function() {{
-      var targetBase = "{target_path}";
-      var search = window.location.search || "";
-      var hash = window.location.hash || "";
-      window.location.replace(targetBase + search + hash);
-    }})();
-  </script>
   <meta http-equiv="refresh" content="0; url={target_path}" />
 </head>
-<body style="font-family: Georgia, serif; padding: 40px; color: #1f1b18; background: #f7f4ef;">
+<body style="font-family: Georgia, serif; padding: 40px; color: #1f1b18; background: #fdfbf7;">
   <p>Redirecting to <strong>{title_label}</strong> in the Mt. Sinai LLC Foundations Library...</p>
-  <p><a id="fallback-link" href="{target_path}">Click here if you are not redirected automatically.</a></p>
-  <script>
-    document.getElementById("fallback-link").href = "{target_path}" + (window.location.search || "") + (window.location.hash || "");
-  </script>
+  <p><a href="{target_path}">Click here if you are not redirected automatically.</a></p>
 </body>
 </html>
 """
 
+
 HTACCESS_CONTENT = """# ==============================================================================
 # Foundations Library (apps/foundations/.htaccess) — Mt. Sinai LLC
-# GoDaddy / Apache Case-Insensitive & Short-Slug Funnel Router
+# GoDaddy / Apache Case-Insensitive Router & CSP Header Override
 # ==============================================================================
 Options -MultiViews +FollowSymLinks
 RewriteEngine On
 RewriteBase /foundations/
+
+# 0. Override Root CSP so 365DBR Iframe ('self') & Print QR Codes Load Cleanly
+<IfModule mod_headers.c>
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self';"
+</IfModule>
 
 # 1. Enable Apache mod_speling if available on GoDaddy server (auto-fixes mixed case)
 <IfModule mod_speling.c>
@@ -872,7 +997,7 @@ RewriteBase /foundations/
   CheckCaseOnly On
 </IfModule>
 
-# 2. Case-Insensitive [NC] 301 Redirects for Book 1 (What Does the Bible Say About God? / What We Know About God)
+# 2. Case-Insensitive [NC] 301 Redirects for Book 1 (What Does the Bible Say About God?)
 RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-god\\.html$
 RewriteRule ^(what-does-the-bible-say-about-god|what-we-know-about-god|what-we-know|what_we_know|what_do_we_know|god)(\\.html)?$ /foundations/what-does-the-bible-say-about-god.html [R=301,L,NC,QSA]
 
@@ -890,34 +1015,16 @@ CASE_ROUTER_HTML = """<!DOCTYPE html>
   <meta charset="UTF-8" />
   <title>Routing | Foundations Library (Mt. Sinai LLC)</title>
   <meta name="robots" content="noindex, follow" />
-  <script>
-    (function() {
-      var path = window.location.pathname || "";
-      var lower = path.toLowerCase().replace(/_/g, "-");
-      var search = window.location.search || "";
-      var hash = window.location.hash || "";
-
-      if (lower.indexOf("god") !== -1 || lower.indexOf("what-we-know") !== -1) {
-        window.location.replace("/foundations/what-does-the-bible-say-about-god.html" + search + hash);
-        return;
-      }
-      if (lower.indexOf("education") !== -1) {
-        window.location.replace("/foundations/what-does-the-bible-say-about-education.html" + search + hash);
-        return;
-      }
-      if (path !== lower) {
-        window.location.replace(lower + search + hash);
-      }
-    })();
-  </script>
+  <link rel="stylesheet" href="/foundations/fl-core.css" />
 </head>
-<body style="font-family: Georgia, serif; padding: 40px; color: #1f1b18; background: #f7f4ef;">
+<body data-fl-case-router="true" style="font-family: Georgia, serif; padding: 40px;">
   <h2>Mt. Sinai LLC — Foundations Library</h2>
   <p>Select a resource below:</p>
   <ul>
-    <li><a href="/foundations/what-does-the-bible-say-about-god.html">What Does the Bible Say About God?: What We Know About God (Foundational Facts, Biblically Backed)</a></li>
-    <li><a href="/foundations/what-does-the-bible-say-about-education.html">What Does the Bible Say About Education?: Foundational Truths for Parents &amp; Students</a></li>
+    <li><a href="/foundations/what-does-the-bible-say-about-god.html">1: What Does the Bible Say About God? (What We Know About God — Foundational Facts, Biblically Backed)</a></li>
+    <li><a href="/foundations/what-does-the-bible-say-about-education.html">2: What Does the Bible Say About Education? (Foundational Truths for Parents &amp; Students)</a></li>
   </ul>
+  <script src="/foundations/fl-core.js"></script>
 </body>
 </html>
 """

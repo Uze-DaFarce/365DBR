@@ -1,10 +1,15 @@
 # ==============================================================================
 # Foundations Library (apps/foundations/.htaccess) — Mt. Sinai LLC
-# GoDaddy / Apache Case-Insensitive & Short-Slug Funnel Router
+# GoDaddy / Apache Case-Insensitive Router & CSP Header Override
 # ==============================================================================
 Options -MultiViews +FollowSymLinks
 RewriteEngine On
 RewriteBase /foundations/
+
+# 0. Override Root CSP so 365DBR Iframe ('self') & Print QR Codes Load Cleanly
+<IfModule mod_headers.c>
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self';"
+</IfModule>
 
 # 1. Enable Apache mod_speling if available on GoDaddy server (auto-fixes mixed case)
 <IfModule mod_speling.c>
@@ -12,7 +17,7 @@ RewriteBase /foundations/
   CheckCaseOnly On
 </IfModule>
 
-# 2. Case-Insensitive [NC] 301 Redirects for Book 1 (What Does the Bible Say About God? / What We Know About God)
+# 2. Case-Insensitive [NC] 301 Redirects for Book 1 (What Does the Bible Say About God?)
 RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-god\.html$
 RewriteRule ^(what-does-the-bible-say-about-god|what-we-know-about-god|what-we-know|what_we_know|what_do_we_know|god)(\.html)?$ /foundations/what-does-the-bible-say-about-god.html [R=301,L,NC,QSA]
 
