@@ -1,4 +1,4 @@
-"""Verify focal-only bookmark, per-translation copy, and OT-only Word Study."""
+"""Verify focal-only bookmark, per-translation copy, and Aa on Hebrew and Greek."""
 import json
 from playwright.sync_api import sync_playwright
 
@@ -73,48 +73,48 @@ def run():
         if ot["aa"] != 1:
             raise SystemExit(f"FAIL: 2KI.1.1 expected Aa (OT Strong's), got {ot['aa']}")
 
-        # --- NT bible: Matthew 1:1 should have copy x3, bookmark x1, no Aa ---
-        page.goto(f"{BASE}/bible.html?book=MAT&chapter=1&verse=1", wait_until="domcontentloaded")
-        wait_verses(page, "MAT")
+        # --- NT bible: 2 Thessalonians 3:18 has copy x3, bookmark x1, Aa x1 ---
+        page.goto(f"{BASE}/bible.html?book=2TH&chapter=3&verse=18", wait_until="domcontentloaded")
+        wait_verses(page, "2TH")
         page.wait_for_selector(BM, timeout=20000)
-        page.wait_for_timeout(2500)  # allow Word Study probe to finish
-        nt = counts_in(page, "MAT.1.1")
-        print("bible MAT.1.1", nt)
-        page.screenshot(path=f"{OUT}/gate_bible_mat1.png")
+        wait_aa_or_timeout(page, 8000)
+        nt = counts_in(page, "2TH.3.18")
+        print("bible 2TH.3.18", nt)
+        page.screenshot(path=f"{OUT}/gate_bible_2th318.png")
         if nt["copy"] != 3:
-            raise SystemExit(f"FAIL: MAT.1.1 expected 3 copy buttons, got {nt['copy']}")
+            raise SystemExit(f"FAIL: 2TH.3.18 expected 3 copy buttons, got {nt['copy']}")
         if nt["bookmark"] != 1:
-            raise SystemExit(f"FAIL: MAT.1.1 expected 1 bookmark (focal only), got {nt['bookmark']}")
-        if nt["aa"] != 0:
-            raise SystemExit(f"FAIL: MAT.1.1 expected no Aa (no NT Strong's), got {nt['aa']}")
+            raise SystemExit(f"FAIL: 2TH.3.18 expected 1 bookmark (focal only), got {nt['bookmark']}")
+        if nt["aa"] != 1:
+            raise SystemExit(f"FAIL: 2TH.3.18 expected Aa (Greek word study), got {nt['aa']}")
 
-        # --- Daily bread 0913: Job (OT) has Aa, 1 Cor (NT) does not ---
+        # --- Daily bread 0913: first Job verse and first 1 Cor verse both have Aa ---
         page.goto(f"{BASE}/index.html?startDate=0913", wait_until="domcontentloaded")
         wait_verses(page, "JOB")
         page.wait_for_selector(BM, timeout=20000)
         wait_aa_or_timeout(page, 8000)
         page.wait_for_timeout(1500)
-        job = counts_in(page, "JOB.41.1")
-        print("index JOB.41.1", job)
+        job = counts_in(page, "JOB.41.12")
+        print("index JOB.41.12", job)
         page.screenshot(path=f"{OUT}/gate_index_job41.png")
         if job["copy"] != 3:
-            raise SystemExit(f"FAIL: JOB.41.1 expected 3 copy buttons, got {job['copy']}")
+            raise SystemExit(f"FAIL: JOB.41.12 expected 3 copy buttons, got {job['copy']}")
         if job["bookmark"] != 1:
-            raise SystemExit(f"FAIL: JOB.41.1 expected 1 bookmark, got {job['bookmark']}")
+            raise SystemExit(f"FAIL: JOB.41.12 expected 1 bookmark, got {job['bookmark']}")
         if job["aa"] != 1:
-            raise SystemExit(f"FAIL: JOB.41.1 expected Aa, got {job['aa']}")
+            raise SystemExit(f"FAIL: JOB.41.12 expected Aa, got {job['aa']}")
 
-        page.locator('[id="verse-1CO.15.20"]').scroll_into_view_if_needed()
+        page.locator('[id="verse-1CO.15.22"]').scroll_into_view_if_needed()
         page.wait_for_timeout(400)
-        co = counts_in(page, "1CO.15.20")
-        print("index 1CO.15.20", co)
+        co = counts_in(page, "1CO.15.22")
+        print("index 1CO.15.22", co)
         page.screenshot(path=f"{OUT}/gate_index_1co15.png")
         if co["copy"] != 3:
-            raise SystemExit(f"FAIL: 1CO.15.20 expected 3 copy buttons, got {co['copy']}")
+            raise SystemExit(f"FAIL: 1CO.15.22 expected 3 copy buttons, got {co['copy']}")
         if co["bookmark"] != 1:
-            raise SystemExit(f"FAIL: 1CO.15.20 expected 1 bookmark, got {co['bookmark']}")
-        if co["aa"] != 0:
-            raise SystemExit(f"FAIL: 1CO.15.20 expected no Aa, got {co['aa']}")
+            raise SystemExit(f"FAIL: 1CO.15.22 expected 1 bookmark, got {co['bookmark']}")
+        if co["aa"] != 1:
+            raise SystemExit(f"FAIL: 1CO.15.22 expected Aa (Greek word study), got {co['aa']}")
 
         browser.close()
 

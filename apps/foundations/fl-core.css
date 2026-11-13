@@ -1,0 +1,335 @@
+/* ==========================================================================
+   Foundations Library (FL) — fl-core.css
+   Shared Palette, Unified Topbar, 450px 365DBR Scripture Reader & Print Base
+   ========================================================================== */
+:root {
+  --bg: #fdfbf7;
+  --card: #ffffff;
+  --text: #1e242b;
+  --muted: #68737d;
+  --accent: #5c4028;
+  --accent-bg: #f5efe6;
+  --border: #e6dfd3;
+  --gold: #b8860b;
+  --crimson: #8b2626;
+  --lab-bg: #fcfaf5;
+
+  /* Overridable Unified Topbar Variables (Defaulted to Book 1 "God" Branding) */
+  --fl-topbar-bg: var(--accent);
+  --fl-topbar-text: #fdfbf7;
+  --fl-topbar-link: #f5efe6;
+  --fl-topbar-highlight: #ffd166;
+  --fl-topbar-border: var(--gold);
+  --fl-topbar-font: 'Cinzel', 'Georgia', serif;
+
+  /* Mapped Aliases for Book 2 Compatibility */
+  --fl-bg: var(--bg);
+  --fl-surface: var(--card);
+  --fl-ink: var(--text);
+  --fl-muted: var(--muted);
+  --fl-accent: var(--accent);
+  --fl-gold: var(--gold);
+  --fl-crimson: var(--crimson);
+  --fl-border: var(--border);
+  --fl-lab-bg: var(--lab-bg);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: padding-right 0.3s ease;
+}
+
+/* Unified Floating Topbar Across All Foundations Library Pages */
+.fl-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--fl-topbar-bg);
+  color: var(--fl-topbar-text);
+  padding: 10px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 3px solid var(--fl-topbar-border);
+  font-family: var(--fl-topbar-font);
+  font-size: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.fl-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fl-brand-title {
+  font-weight: 700;
+  color: var(--fl-topbar-text);
+  text-decoration: none;
+  letter-spacing: 0.03em;
+}
+.fl-brand-title:hover { text-decoration: underline; }
+
+.fl-topbar-sep {
+  color: rgba(255, 255, 255, 0.35);
+  user-select: none;
+}
+
+.fl-active-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--fl-topbar-border);
+  color: #fff;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.fl-active-book:hover {
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+
+.fl-nav-link {
+  color: var(--fl-topbar-link);
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.fl-nav-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.fl-dbr-link {
+  color: var(--fl-topbar-highlight);
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.fl-dbr-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.fl-cobrand-banner {
+  display: none;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12.5px;
+  color: #fff;
+}
+
+.fl-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Shared Buttons */
+.fl-btn {
+  cursor: pointer;
+  font-family: var(--fl-topbar-font);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 6px 12px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.fl-btn-primary { background: var(--accent); color: #fff; }
+.fl-btn-primary:hover { opacity: 0.92; }
+.fl-btn-light { background: var(--bg); color: var(--accent); border-color: var(--border); }
+.fl-btn-light:hover { background: var(--accent-bg); }
+.fl-btn-coffee {
+  background: #fff8eb;
+  color: #5c4028;
+  border: 1px solid var(--gold);
+}
+.fl-btn-coffee:hover {
+  background: var(--gold);
+  color: #fff;
+}
+.fl-btn-outline { background: transparent; border-color: var(--muted); color: var(--muted); }
+.fl-btn-outline:hover { border-color: var(--text); color: var(--text); }
+
+/* Voluntary Support / LSB Separation Footer Box (Strictly Outside #bible-drawer) */
+.fl-support-footer {
+  max-width: 880px;
+  margin: 36px auto 16px;
+  padding: 16px 20px;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.fl-support-text {
+  flex: 1 1 420px;
+  margin: 0;
+  color: var(--muted);
+}
+.fl-support-text strong { color: var(--text); }
+
+/* Shared 450px Slide-Out 365DBR Scripture Reader (100% Free / Non-Commercial) */
+#bible-drawer {
+  position: fixed;
+  top: 0;
+  right: -500px;
+  width: 450px;
+  max-width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--card);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.14);
+  border-left: 1px solid var(--border);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s ease;
+}
+#bible-drawer.open { right: 0; }
+
+.drawer-header {
+  padding: 12px 16px;
+  background: var(--accent);
+  border-bottom: 2px solid var(--gold);
+  color: #fff;
+  font-family: var(--fl-topbar-font);
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.drawer-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.drawer-actions a {
+  color: #ffd166;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.drawer-actions a:hover { text-decoration: underline; }
+
+.drawer-close {
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.drawer-close:hover { background: rgba(0, 0, 0, 0.32); }
+
+#bible-frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: var(--bg);
+}
+
+/* Desktop Push vs. Tablet/Mobile Overlay */
+@media (min-width: 901px) {
+  body.drawer-open { padding-right: 450px; }
+}
+@media (max-width: 900px) {
+  body.drawer-open { padding-right: 0; }
+  #bible-drawer { width: 100vw; right: -105vw; }
+}
+
+/* Mobile View (<= 450px): Keep Topbar Compact & Pin Quick Actions to Bottom */
+@media (max-width: 450px) {
+  body { padding-bottom: 64px; }
+  .fl-top-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    justify-content: space-around;
+    padding: 8px 12px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg);
+    border-top: 2px solid var(--border);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Print QR & Footer Helpers */
+.print-qr, .fl-print-footer { display: none; }
+
+@media print {
+  .no-print,
+  .fl-topbar,
+  .fl-top-actions,
+  .fl-support-footer,
+  #bible-drawer,
+  .drawer-close {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .print-qr {
+    display: flex !important;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid #ccc;
+    page-break-inside: avoid;
+    font-family: sans-serif;
+    font-size: 9pt;
+    color: #222;
+  }
+  .print-qr-item { display: flex; align-items: center; gap: 10px; }
+  .print-qr img { width: 72px; height: 72px; }
+  .fl-print-footer {
+    display: block !important;
+    margin-top: 24pt;
+    padding-top: 10pt;
+    border-top: 1pt solid #000;
+    font-size: 9.5pt;
+    color: #000 !important;
+  }
+}

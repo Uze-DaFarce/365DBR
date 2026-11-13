@@ -323,6 +323,100 @@
     });
   }
 
+  function greekLetters(text) {
+    var s = String(text || "").normalize("NFD");
+    var out = "";
+    for (var i = 0; i < s.length; i++) {
+      var ch = s.charAt(i);
+      if (/\p{M}/u.test(ch)) continue;
+      if (ch === "ς") ch = "σ";
+      var code = ch.charCodeAt(0);
+      var greek =
+        (code >= 0x0370 && code <= 0x03ff) || (code >= 0x1f00 && code <= 0x1fff);
+      if (greek && /\p{L}/u.test(ch)) out += ch.toLowerCase();
+    }
+    return out;
+  }
+
+  function hebrewLetters(text) {
+    var raw = String(text || "");
+    var sof = raw.indexOf("\u05c3");
+    if (sof >= 0) {
+      raw =
+        raw.slice(0, sof) +
+        raw.slice(sof + 1).replace(/\u05e1/g, "").replace(/\u05e4/g, "");
+    }
+    var s = raw.normalize("NFKD");
+    var out = "";
+    for (var i = 0; i < s.length; i++) {
+      var code = s.charCodeAt(i);
+      if (code >= 0x05d0 && code <= 0x05ea) out += s.charAt(i);
+    }
+    return out;
+  }
+
+  /** ASCII file name. Greek and Hebrew letters do not survive FTP to GoDaddy. */
+  function wordFileName(key) {
+    var bytes = new TextEncoder().encode(key);
+    var hex = "";
+    for (var i = 0; i < bytes.length; i++) {
+      var h = bytes[i].toString(16);
+      hex += h.length < 2 ? "0" + h : h;
+    }
+    return hex + ".json";
+  }
+
+  /** Letters of the written word. Lemma when it has letters, else the surface. */
+  function wordKey(token) {
+    if (!token) return "";
+    var hebrew = token.language === "hebrew";
+    var letters = hebrew ? hebrewLetters : greekLetters;
+    var fromLemma = letters(token.lemma);
+    if (fromLemma) return fromLemma;
+    return letters(token.surface);
+  }
+
+  function fetchWordHits(tokenOrKey, base, limit) {
+    var key = typeof tokenOrKey === "string" ? tokenOrKey : wordKey(tokenOrKey);
+    if (!key) {
+      return Promise.resolve({
+        ok: true,
+        query: "",
+        total_verses: 0,
+        returned: 0,
+        hits: [],
+        source: "static-ws",
+      });
+    }
+    limit = Math.max(1, Math.min(limit == null ? 12 : limit, 50));
+    var root = isStaticBase(base) ? staticRoot(base) : resolveStaticWsBase();
+    if (!root) {
+      return Promise.reject(new Error("word study pack is not available"));
+    }
+    return fetchJson(root + "word/" + wordFileName(key)).then(
+      function (r) {
+        if (!r.res.ok || !r.body || r.body.ok === false) {
+          return {
+            ok: true,
+            query: key,
+            total_verses: 0,
+            returned: 0,
+            hits: [],
+            source: "static-ws",
+          };
+        }
+        var body = r.body;
+        if (body.hits && body.hits.length > limit) {
+          body = Object.assign({}, body, {
+            hits: body.hits.slice(0, limit),
+            returned: Math.min(limit, body.hits.length),
+          });
+        }
+        return body;
+      }
+    );
+  }
+
   /**
    * User-facing BCV: "2KI.10.17" → "2 Kings 10:17".
    */
@@ -347,6 +441,8 @@
     probeQueryApi: probeQueryApi,
     fetchVerseDetail: fetchVerseDetail,
     fetchStrongHits: fetchStrongHits,
+    fetchWordHits: fetchWordHits,
+    wordKey: wordKey,
     formatVerseRef: formatVerseRef,
     normalizeStrongKey: normalizeStrongKey,
   };

@@ -1,0 +1,129 @@
+/* ==========================================================================
+   Foundations Library (FL) — fl-god.css
+   Book 1: What Does the Bible Say About God? (40 Foundational Facts)
+   ========================================================================== */
+body {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-weight: 400;
+  font-size: 16.5px;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 24px 32px 64px;
+}
+
+.page-hero {
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 14px;
+  margin-bottom: 22px;
+}
+
+h1 {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 2.1rem;
+  margin: 0 0 4px 0;
+  color: #1e1e1e;
+  line-height: 1.15;
+}
+
+.subtitle {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--accent);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+h2 {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: var(--accent);
+  border-left: 4px solid var(--accent);
+  padding-left: 10px;
+  margin-top: 26px;
+  margin-bottom: 14px;
+}
+
+.point {
+  position: relative;
+  padding-left: 22px;
+  margin-bottom: 11px;
+}
+
+.point:target {
+  background: rgba(212, 175, 55, 0.18);
+  border-left: 3px solid var(--gold);
+  padding-left: 10px;
+  border-radius: 4px;
+  scroll-margin-top: 90px;
+  transition: background 0.4s ease;
+}
+
+.cross {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent);
+  font-weight: bold;
+  font-size: 1.05em;
+  user-select: none;
+}
+
+.refs {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin-left: 4px;
+  white-space: normal;
+}
+
+.refs a {
+  color: var(--muted);
+  text-decoration: none;
+  background: var(--accent-bg);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  margin: 0 1px;
+  display: inline-block;
+  line-height: 1.35;
+  transition: all 0.15s ease;
+}
+
+.refs a:hover {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .container { padding: 20px 16px 48px; }
+}
+
+@media (max-width: 450px) {
+  .container { padding: 16px 16px 84px; }
+  .point:target { scroll-margin-top: 75px; scroll-margin-bottom: 70px; }
+}
+
+@media print {
+  .container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .point { font-size: 12pt !important; }
+  .refs, .refs a {
+    font-size: 9pt !important;
+    color: #444 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+}

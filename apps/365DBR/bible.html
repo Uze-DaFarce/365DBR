@@ -59,7 +59,7 @@
     <!-- Single source of truth: generated from bible_common.py via export_bible_meta.py -->
     <script src="bible_meta.js"></script>
     <!-- Optional Strong's helpers (window.__DBR_STRONGs__); classic script for esm.sh/run -->
-    <script src="strongs_optional.js"></script>
+    <script src="strongs_optional.js?v=20261109"></script>
     <script type="text/tsx">
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -69,12 +69,14 @@ const {
   probeQueryApi,
   fetchVerseDetail,
   fetchStrongHits,
+  fetchWordHits,
   resolveQueryApiBase,
   formatVerseRef: formatVerseRefRaw,
 } = window.__DBR_STRONGs__ || {
   probeQueryApi: async () => null,
   fetchVerseDetail: async () => { throw new Error('strongs_optional.js not loaded'); },
   fetchStrongHits: async () => { throw new Error('strongs_optional.js not loaded'); },
+  fetchWordHits: async () => { throw new Error('strongs_optional.js not loaded'); },
   resolveQueryApiBase: () => 'http://127.0.0.1:8765',
   formatVerseRef: (vid) => vid,
 };
@@ -346,7 +348,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
     const [payload, setPayload] = useState(null);
     const [hoverKey, setHoverKey] = useState(null);
     const [selected, setSelected] = useState(null);
-    const [strongHits, setStrongHits] = useState(null);
+    const [placeLists, setPlaceLists] = useState([]);
     const [hitTexts, setHitTexts] = useState({});
     const [strongLoading, setStrongLoading] = useState(false);
     const panelRef = useRef(null);
@@ -358,7 +360,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
         setError(null);
         setPayload(null);
         setSelected(null);
-        setStrongHits(null);
+        setPlaceLists([]);
         setHoverKey(null);
         (async () => {
             try {
@@ -374,7 +376,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
     useEffect(() => {
         const onKey = (e) => {
             if (e.key === 'Escape') {
-                if (selected) { setSelected(null); setStrongHits(null); onMarkWord?.(null); }
+                if (selected) { setSelected(null); setPlaceLists([]); onMarkWord?.(null); }
                 else onClose();
             }
         };
@@ -387,23 +389,22 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
     }, [verseId]);
 
     const loadStrong = useCallback(async (token) => {
-        if (!token?.strong) {
-            if (!token?.step_english) return;
-            setSelected({ ...token });
-            onMarkWord?.(token);
-            setStrongLoading(false);
-            setStrongHits(null);
-            return;
-        }
-        if (!apiBase) return;
+        if (!token) return;
         setSelected({ ...token });
         onMarkWord?.(token);
+        const key = (window.__DBR_STRONGs__ && window.__DBR_STRONGs__.wordKey(token)) || '';
+        if (!key || !apiBase) {
+            setStrongLoading(false);
+            setPlaceLists([]);
+            return;
+        }
         setStrongLoading(true);
-        setStrongHits(null);
+        setPlaceLists([]);
         try {
-            setStrongHits(await fetchStrongHits(token.strong, apiBase, 12));
+            const hits = await fetchWordHits(token, apiBase, 12);
+            setPlaceLists([{ id: key, label: 'word', ...hits }]);
         } catch (e) {
-            setStrongHits({ error: e.message || String(e) });
+            setPlaceLists([{ id: key, label: 'word', error: e.message || String(e) }]);
         } finally {
             setStrongLoading(false);
         }
@@ -453,8 +454,8 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
     };
 
     useEffect(() => {
-        const hits = strongHits?.hits;
-        if (!hits || !hits.length) {
+        const hits = (placeLists || []).flatMap((list) => list.hits || []);
+        if (!hits.length) {
             setHitTexts({});
             return;
         }
@@ -482,7 +483,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
             if (!cancelled) setHitTexts((prev) => ({ ...prev, ...extra }));
         })();
         return () => { cancelled = true; };
-    }, [strongHits, source, apiBase, verseMap, focalCode]);
+    }, [placeLists, source, apiBase, verseMap, focalCode]);
 
     return (
         <div ref={panelRef} role="dialog" aria-modal="false" aria-label={`Word study for ${humanRef}`} tabIndex={-1} className="fixed bottom-0 inset-x-0 z-[60] print:hidden outline-none">
@@ -506,7 +507,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
                                 ) : (
                                     <div>
                                         {withStrong && (
-                                            <p className="text-[11px] text-stone-400 mb-2">Hover a word to highlight · click a word to find other uses</p>
+                                            <p className="text-[11px] text-stone-400 mb-2">Hover a word to highlight · click a word to read the notes on it</p>
                                         )}
                                         <p
                                             className={`text-lg md:text-2xl leading-relaxed ${isHeb ? 'hebrew' : 'greek'}`}
@@ -514,12 +515,11 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
                                             style={{ textAlign: isHeb ? 'right' : 'left', unicodeBidi: 'isolate' }}
                                         >
                                             {tokens.map((t, i) => {
-                                                const hasS = !!t.strong;
-                                                const openable = hasS || !!t.step_english;
+                                                const openable = !!(t.surface && String(t.surface).trim());
                                                 const key = `${t.order}-${t.strong || ''}-${i}`;
                                                 const isHover = hoverKey === key;
                                                 const isSel = selected && selected.order === t.order && selected.strong === t.strong;
-                                                const tip = hasS ? `${t.surface} · Strong’s ${t.strong}${t.transliteration ? ` · ${t.transliteration}` : ''} — click for other uses` : t.step_english ? `${t.surface} · STEPBible contextual English` : t.surface;
+                                                const tip = `${t.surface} · notes on this word`;
                                                 const Tag = openable ? 'button' : 'span';
                                                 return (
                                                     <React.Fragment key={key}>
@@ -567,34 +567,78 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
                                                     <span className="ml-1 text-[10px] font-normal text-stone-400">(STEPBible contextual English)</span>
                                                 </span>
                                             )}
-                                            {selected.strong && (
+                                            {selected.lemma && (
                                                 <span>
                                                     <span className="mx-1.5 text-stone-300">|</span>
-                                                    {selected.strong}
-                                                    <span className="ml-1 text-[10px] font-normal text-stone-400">(Strong’s)</span>
+                                                    <span className={isHeb ? 'hebrew' : 'greek'} dir={isHeb ? 'rtl' : 'ltr'} style={{ unicodeBidi: 'isolate' }}>{selected.lemma}</span>
+                                                    <span className="ml-1 text-[10px] font-normal text-stone-400">(lemma)</span>
                                                 </span>
                                             )}
-                                            {strongHits?.total_verses != null && (
+                                            {selected.lexicon_gloss && (
                                                 <span>
                                                     <span className="mx-1.5 text-stone-300">|</span>
-                                                    <span className="text-stone-500">{strongHits.total_verses.toLocaleString()} place{strongHits.total_verses === 1 ? '' : 's'} in Scripture</span>
+                                                    {selected.lexicon_gloss}
+                                                    <span className="ml-1 text-[10px] font-normal text-stone-400">(TBESG lexicon gloss)</span>
+                                                </span>
+                                            )}
+                                            {(selected.step_notes || []).length > 0 && (
+                                                <span className="text-[11px] font-normal text-stone-500" title={(selected.step_notes || []).map((note) => note.file).filter(Boolean).join(' · ')}>
+                                                    <span className="mx-1.5 text-stone-300">|</span>
+                                                    {(selected.step_notes || []).map((note, noteIndex) => (
+                                                        <span key={`${note.source}-${noteIndex}`}>
+                                                            {noteIndex > 0 && ' · '}
+                                                            {note.source}
+                                                            {note.dstrong ? ` · dStrong ${note.dstrong}` : ''}
+                                                            {note.sstrong ? ` · sStrong ${note.sstrong}` : ''}
+                                                            {note.alt ? ` · Alt ${note.alt}` : ''}
+                                                        </span>
+                                                    ))}
+                                                    {selected.strong ? ` · stored ${selected.strong}` : ''}
+                                                </span>
+                                            )}
+                                            {selected.strong && !(selected.step_notes && selected.step_notes.length) && (
+                                                <span className="text-[11px] font-normal text-stone-500">
+                                                    <span className="mx-1.5 text-stone-300">|</span>
+                                                    Stored {selected.strong} · no STEPBible row is linked to this word
+                                                </span>
+                                            )}
+                                            {!selected.strong && !(selected.step_notes && selected.step_notes.length) && (
+                                                <span className="text-[11px] font-normal text-stone-500">
+                                                    <span className="mx-1.5 text-stone-300">|</span>
+                                                    No number is stored on this word, and no STEPBible row is linked
                                                 </span>
                                             )}
                                         </p>
-                                        {strongLoading && <p className="text-sm text-stone-500">Finding other uses…</p>}
-                                        {strongHits?.error && <p className="text-sm text-red-600">Could not search right now.</p>}
-                                        {strongHits?.hits && (
-                                            <ul className="space-y-2 max-h-36 overflow-y-auto">
-                                                {strongHits.hits.map((h) => (
-                                                    <li key={`${h.verse_id}-${h.surface}`} className="text-sm leading-snug">
-                                                        <button type="button" className="font-serif font-bold text-amber-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded text-left" onClick={() => onJumpVerse?.(h.verse_id)}>
-                                                            {formatVerseRef(h.verse_id)}
-                                                        </button>
-                                                        {hitTexts[h.verse_id] && <span className="block text-stone-600 pl-0.5 line-clamp-2 font-serif">{hitTexts[h.verse_id]}</span>}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
+                                        {strongLoading && <p className="text-sm text-stone-500">Finding places…</p>}
+                                        {placeLists.map((list) => {
+                                            const hits = list.hits || [];
+                                            const show = !list.error && Number(list.total_verses) > 0 && hits.length > 0;
+                                            if (!list.error && !show) return null;
+                                            return (
+                                                <div key={`${list.label}-${list.id}`}>
+                                                    {list.error && <p className="text-sm text-red-600">Could not search {list.id} right now.</p>}
+                                                    {show && (
+                                                        <>
+                                                            <p className="text-[11px] leading-snug text-stone-500">
+                                                                {list.total_verses.toLocaleString()} place{list.total_verses === 1 ? '' : 's'} this word appears:
+                                                            </p>
+                                                            <ul className="space-y-2 max-h-36 overflow-y-auto">
+                                                                {hits.map((h) => (
+                                                                    <li key={`${list.id}-${h.verse_id}-${h.surface}`} className="text-sm leading-snug">
+                                                                        <button type="button" className="font-serif font-bold text-amber-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded text-left" onClick={() => onJumpVerse?.(h.verse_id)}>
+                                                                            {h.surface && <span className={h.language === 'hebrew' ? 'hebrew' : 'greek'} dir={h.language === 'hebrew' ? 'rtl' : 'ltr'}>{h.surface}</span>}
+                                                                            {h.surface ? ' · ' : ''}
+                                                                            {formatVerseRef(h.verse_id)}
+                                                                        </button>
+                                                                        {hitTexts[h.verse_id] && <span className="block text-stone-600 pl-0.5 line-clamp-2 font-serif">{hitTexts[h.verse_id]}</span>}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </>

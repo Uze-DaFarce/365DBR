@@ -324,7 +324,9 @@ def link_rows(conn):
     when the verse numbers differ. An alternate number on the row (heb_ref)
     does not block that match. A row that does not sit in a full-verse match
     still needs one token in its own verse, and an alternate number still
-    keeps that single-word guess unlinked.
+    keeps that single-word guess unlinked. A single word is also left unlinked
+    when this verse has a different number of those letters than the token
+    verse. That link would pick one copy and leave the other.
     """
     with conn.cursor() as cur:
         cur.execute("SELECT language, count(*) FROM original_tokens GROUP BY language")
@@ -418,9 +420,17 @@ def link_rows(conn):
         if len(hits) == 1 and link_sequence(rows, hits[0]):
             cross_verses += 1
 
-    no_match = ambiguous = empty_letters = 0
+    no_match = ambiguous = empty_letters = count_mismatch = 0
     for (verse_id, source), rows in groups.items():
         language = "hebrew" if source == "TAHOT" else "greek"
+        home_counts = Counter(
+            norm for _row_id, norm, heb_ref in rows if norm and not heb_ref
+        )
+        token_counts = Counter(
+            norm
+            for _token_id, norm, token_language in token_seq.get(verse_id, [])
+            if token_language == language and norm
+        )
         for row_id, norm, heb_ref in rows:
             if row_id in linked_ids:
                 continue
@@ -436,6 +446,9 @@ def link_rows(conn):
                 if token_id not in used_tokens
             ]
             if len(hits) == 1:
+                if home_counts[norm] != token_counts[norm]:
+                    count_mismatch += 1
+                    continue
                 updates.append((row_id, hits[0]))
                 row_letters[row_id] = norm
                 linked_ids.add(row_id)
@@ -500,7 +513,8 @@ def link_rows(conn):
     conn.commit()
     print(
         f"Link candidates {len(candidates)}: linked {linked}, "
-        f"no letter match {no_match}, ambiguous {ambiguous}, empty letters {empty_letters}",
+        f"no letter match {no_match}, ambiguous {ambiguous}, "
+        f"letter-count mismatch {count_mismatch}, empty letters {empty_letters}",
         flush=True,
     )
     print(

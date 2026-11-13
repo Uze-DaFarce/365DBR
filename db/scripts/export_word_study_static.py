@@ -6,6 +6,7 @@ Writes under apps/365DBR/ws/:
   manifest.json          — feature-detect target (same-origin, CSP-safe)
   verse/{BOOK}.json      — map of verse_id → load_verse-compatible payload
   strong/{H430|G26}.json — search_strong-compatible hit lists (capped)
+  word/{utf8-hex}.json   — verses of the same written word (capped; ASCII name)
 
 Usage (monorepo root; Docker Postgres up; db/.env set):
   python db/scripts/export_word_study_static.py
@@ -30,10 +31,29 @@ sys.path.insert(0, str(ROOT / "db"))
 sys.path.insert(0, str(ROOT / "apps" / "365DBR"))
 
 from etl.parse_passage import language_for_book  # noqa: E402
+from load_stepbible_tokens import grk_letters, heb_letters  # noqa: E402
 from query import get_connection  # noqa: E402
 from query.day_load import _join_original  # noqa: E402
 
 OUT_DEFAULT = ROOT / "apps" / "365DBR" / "ws"
+
+
+def _word_filename(key: str) -> str:
+    """ASCII name. GoDaddy FTP replaces Greek and Hebrew letters with ?."""
+    return key.encode("utf-8").hex() + ".json"
+
+
+def _word_key(language: str | None, lemma: str | None, surface: str | None) -> str | None:
+    """Letters of the written word. Lemma when it has letters, else the surface.
+
+    Greek drops accents. Hebrew keeps consonants. A Strong's number is not a key.
+    """
+    letters = heb_letters if (language or "").lower() == "hebrew" else grk_letters
+    for text in (lemma, surface):
+        key = letters(text or "")
+        if key:
+            return key
+    return None
 
 
 def _norm_strong_key(strong: str | None) -> str | None:
@@ -89,6 +109,7 @@ def export_verses(conn, out_dir: Path) -> dict:
     total_verses = 0
     total_tokens = 0
     step_labeled = 0
+    step_note_tokens = 0
 
     with conn.cursor() as cur:
         cur.execute(
@@ -105,6 +126,40 @@ def export_verses(conn, out_dir: Path) -> dict:
             row["original_token_id"]: row["english"]
             for row in cur.fetchall()
             if row["english"]
+        }
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT original_token_id, source, source_file, dstrong, root_strong, alt_strongs
+            FROM stepbible_token_rows
+            WHERE original_token_id IS NOT NULL
+            ORDER BY original_token_id, word_index
+            """
+        )
+        notes_by: dict[int, list] = defaultdict(list)
+        for row in cur.fetchall():
+            note = {"source": row["source"], "file": row["source_file"]}
+            if row["dstrong"]:
+                note["dstrong"] = row["dstrong"]
+            if row["root_strong"]:
+                note["sstrong"] = row["root_strong"]
+            if row["alt_strongs"]:
+                note["alt"] = row["alt_strongs"]
+            notes_by[row["original_token_id"]].append(note)
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT extended_strong, gloss
+            FROM strongs_lexicon
+            WHERE gloss IS NOT NULL AND gloss <> ''
+            """
+        )
+        gloss_by = {
+            row["extended_strong"]: row["gloss"]
+            for row in cur.fetchall()
+            if row["extended_strong"] and row["gloss"]
         }
 
     with conn.cursor() as cur:
@@ -193,6 +248,14 @@ def export_verses(conn, out_dir: Path) -> dict:
                         row["step_english"] = english
                         row["step_english_label"] = "STEPBible contextual English"
                         step_labeled += 1
+                    notes = notes_by.get(t["id"])
+                    if notes:
+                        row["step_notes"] = notes
+                        step_note_tokens += 1
+                    gloss = gloss_by.get(t["strong_number"])
+                    if gloss:
+                        row["lexicon_gloss"] = gloss
+                        row["lexicon_gloss_label"] = "TBESG lexicon gloss"
                     token_rows.append(row)
                 src_ids = sorted(
                     {
@@ -248,6 +311,7 @@ def export_verses(conn, out_dir: Path) -> dict:
         "verses": total_verses,
         "tokens": total_tokens,
         "step_english": step_labeled,
+        "step_notes": step_note_tokens,
     }
 
 
@@ -322,6 +386,71 @@ def export_strongs(conn, out_dir: Path, *, hit_limit: int) -> dict:
     return {"strong_numbers": len(buckets), "hit_limit": lim}
 
 
+def export_words(conn, out_dir: Path, *, hit_limit: int) -> dict:
+    """One JSON per written word. The key is the word's letters, not a Strong's number."""
+    word_dir = out_dir / "word"
+    if word_dir.exists():
+        for p in word_dir.glob("*.json"):
+            p.unlink()
+    else:
+        word_dir.mkdir(parents=True, exist_ok=True)
+
+    lim = max(1, min(int(hit_limit), 100))
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT ot.verse_id, ot.surface_text, ot.lemma, ot.language,
+                   v.verse_order, vt.text AS lsv_text
+            FROM original_tokens ot
+            JOIN verses v ON v.id = ot.verse_id
+            LEFT JOIN translations t ON t.code = 'LSV'
+            LEFT JOIN verse_translations vt
+              ON vt.verse_id = ot.verse_id AND vt.translation_id = t.id
+            ORDER BY v.verse_order, ot.word_order
+            """
+        )
+        rows = cur.fetchall()
+
+    buckets: dict[str, list] = defaultdict(list)
+    seen: dict[str, set] = defaultdict(set)
+    totals: dict[str, set] = defaultdict(set)
+    for r in rows:
+        key = _word_key(r["language"], r["lemma"], r["surface_text"])
+        if not key:
+            continue
+        vid = r["verse_id"]
+        totals[key].add(vid)
+        if vid in seen[key]:
+            continue
+        seen[key].add(vid)
+        if len(buckets[key]) >= lim:
+            continue
+        buckets[key].append(
+            {
+                "verse_id": vid,
+                "surface": r["surface_text"],
+                "language": r["language"],
+                "snippet": (r["lsv_text"] or "")[:160] if r["lsv_text"] else None,
+                "snippet_translation": "LSV",
+                "lsv": (r["lsv_text"] or "")[:160] if r["lsv_text"] else None,
+            }
+        )
+
+    for key, hits in buckets.items():
+        payload = {
+            "ok": True,
+            "query": key,
+            "total_verses": len(totals[key]),
+            "returned": len(hits),
+            "hits": hits,
+            "source": "static-ws",
+        }
+        _atomic_write_json(word_dir / _word_filename(key), payload)
+
+    print(f"  word/*.json  words={len(buckets)} (hit_cap={lim})")
+    return {"words": len(buckets), "hit_limit": lim}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Export static Word study JSON for GoDaddy ($0 publish)"
@@ -350,6 +479,8 @@ def main() -> int:
         vstats = export_verses(conn, out)
         print("[export_ws] strongs…")
         sstats = export_strongs(conn, out, hit_limit=args.strong_limit)
+        print("[export_ws] words…")
+        wstats = export_words(conn, out, hit_limit=args.strong_limit)
     finally:
         conn.close()
 
@@ -361,18 +492,26 @@ def main() -> int:
         "note": (
             "Same-origin static Word study for shared hosting (no live DB). "
             "step_english is present only when every linked STEPBible row on that "
-            "token has the same English. It is STEPBible contextual English, not a Strong's gloss."
+            "token has the same English. It is STEPBible contextual English, not a Strong's gloss. "
+            "step_notes copies dStrong, sStrong, and Alt Strongs from each linked STEPBible row, "
+            "with that file's name. lexicon_gloss is the TBESG gloss for the stored number when "
+            "that number is an exact lexicon key. Those notes are not the word. The word is the token surface. "
+            "Place lists are verses of that written word: Greek lemma letters without accents, "
+            "Hebrew lemma consonants, or the surface letters when the lemma has none."
         ),
         "step_english_tokens": vstats.get("step_english", 0),
+        "step_note_tokens": vstats.get("step_notes", 0),
         "verse_books": vstats["books"],
         "verses": vstats["verses"],
         "tokens": vstats["tokens"],
         "strong_numbers": sstats["strong_numbers"],
         "strong_hit_limit": sstats["hit_limit"],
+        "words": wstats["words"],
         "paths": {
             "manifest": "manifest.json",
             "verse_book": "verse/{BOOK}.json",
             "strong": "strong/{H430|G26}.json",
+            "word": "word/{utf8-hex}.json",
         },
     }
     _atomic_write_json(out / "manifest.json", manifest)

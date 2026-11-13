@@ -1,0 +1,219 @@
+/* ==========================================================================
+   Foundations Library (FL) — fl-education.css
+   Book 2: What Does the Bible Say About Education?
+   ========================================================================== */
+body {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.78;
+  text-align: left;
+}
+
+.fl-layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 32px;
+  padding: 28px 20px 64px;
+}
+
+.fl-sidebar {
+  position: sticky;
+  top: 76px;
+  align-self: start;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.fl-sidebar h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.fl-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.fl-toc-list li { margin-bottom: 6px; }
+.fl-toc-part { margin-top: 12px; font-weight: 700; color: var(--crimson); }
+.fl-toc-lab { padding-left: 10px; font-size: 12.5px; }
+.fl-toc-list a { color: var(--text); text-decoration: none; }
+.fl-toc-list a:hover { color: var(--accent); text-decoration: underline; }
+
+.fl-main {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 42px 48px;
+  max-width: 880px;
+  text-align: left;
+}
+
+h1, h2, h3, h4 {
+  text-align: left;
+  color: var(--accent);
+  line-height: 1.32;
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+}
+
+.fl-hero-header {
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+}
+.fl-hero-header h1 { margin-top: 0; font-size: 30px; color: var(--text); }
+.fl-hero-subtitle { font-size: 19px; color: var(--muted); font-weight: 400; margin: 8px 0 12px; }
+.fl-hero-meta { font-size: 14px; color: var(--muted); }
+
+.fl-scripture-link {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: rgba(92, 64, 40, 0.45);
+  text-underline-offset: 3px;
+}
+.fl-scripture-link:hover {
+  color: var(--crimson);
+  text-decoration-color: var(--crimson);
+}
+
+.fl-part-banner {
+  background: var(--accent-bg);
+  border-left: 5px solid var(--accent);
+  padding: 20px 24px;
+  border-radius: 4px;
+  margin: 36px 0 24px;
+}
+.fl-part-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.fl-baton-callout {
+  background: #fff8eb;
+  border: 2px solid #d97706;
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin: 20px 0 28px;
+}
+
+.fl-chart-card, .fl-calculator-card {
+  background: #faf8f5;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 26px 0;
+}
+.fl-svg-chart { width: 100%; height: auto; display: block; }
+.fl-calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+.fl-calc-field label { display: block; font-size: 13.5px; font-weight: 700; margin-bottom: 6px; }
+.fl-calc-input {
+  width: 100%;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 15px;
+  border: 1px solid #b5ab99;
+  border-radius: 4px;
+}
+.fl-calc-print-line { display: none; }
+.fl-bar-row { margin-bottom: 12px; }
+.fl-bar-label { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 4px; }
+.fl-bar-track { height: 22px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.fl-bar-fill { height: 100%; transition: width 0.25s ease; }
+.fl-bar-secular { background: var(--crimson); }
+.fl-bar-biblical { background: var(--accent); }
+.fl-calc-verdict { font-size: 14.5px; font-weight: 700; margin-top: 10px; color: var(--text); }
+
+.fl-lab-card {
+  background: var(--lab-bg);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 24px 28px;
+  margin: 34px 0;
+}
+.fl-lab-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.fl-lab-response-block { margin: 16px 0; }
+.fl-response-label { display: block; font-weight: 700; margin-bottom: 6px; color: var(--accent); }
+.fl-textarea, .fl-sig-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 15px;
+  padding: 10px 12px;
+  border: 1px solid #b8ae9c;
+  border-radius: 4px;
+  background: #fff;
+}
+.fl-print-blank-line { display: none; }
+
+@media (max-width: 960px) {
+  .fl-layout { grid-template-columns: 1fr; }
+  .fl-sidebar { position: static; max-height: none; }
+  .fl-main { padding: 24px 20px; }
+  .fl-calc-grid { grid-template-columns: 1fr; }
+}
+
+@page { size: letter; margin: 1.0in; }
+@media print {
+  body {
+    font-size: 11.5pt;
+    line-height: 1.55;
+    text-align: left !important;
+  }
+  .fl-sidebar, .fl-lab-actions { display: none !important; }
+  .fl-layout { display: block !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+  .fl-main { border: none !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+  h1, h2, h3, h4 { text-align: left !important; color: #000 !important; page-break-after: avoid; }
+  .fl-page-break-before { page-break-before: always; break-before: page; }
+  body.fl-print-single-lab .fl-intro-card,
+  body.fl-print-single-lab .fl-part-section,
+  body.fl-print-single-lab .fl-chapter-article > :not(.fl-lab-target-active) {
+    display: none !important;
+  }
+  body.fl-print-single-lab .fl-chapter-article {
+    page-break-before: auto !important;
+    break-before: auto !important;
+  }
+  .fl-persist-input.fl-is-empty { display: none !important; }
+  .fl-persist-input.fl-is-empty + .fl-print-blank-line,
+  .fl-persist-input.fl-is-empty + .fl-calc-print-line {
+    display: block !important;
+    color: #000;
+    margin-top: 6pt;
+    line-height: 2.0;
+  }
+  .fl-persist-input:not(.fl-is-empty) {
+    border: 1px solid #444 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .fl-scripture-link, .fl-ext-link { color: #000 !important; text-decoration: underline; }
+}

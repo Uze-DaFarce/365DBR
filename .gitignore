@@ -32,6 +32,7 @@ apps/365DBR/LSB/
 apps/365DBR/ws/manifest.json
 apps/365DBR/ws/verse/
 apps/365DBR/ws/strong/
+apps/365DBR/ws/word/
 
 .cache/
 apps/365DBR/gen_drip.py

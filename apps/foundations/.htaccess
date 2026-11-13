@@ -1,0 +1,24 @@
+# ==============================================================================
+# Foundations Library (apps/foundations/.htaccess) — Mt. Sinai LLC
+# GoDaddy / Apache Case-Insensitive & Short-Slug Funnel Router
+# ==============================================================================
+Options -MultiViews +FollowSymLinks
+RewriteEngine On
+RewriteBase /foundations/
+
+# 1. Enable Apache mod_speling if available on GoDaddy server (auto-fixes mixed case)
+<IfModule mod_speling.c>
+  CheckSpelling On
+  CheckCaseOnly On
+</IfModule>
+
+# 2. Case-Insensitive [NC] 301 Redirects for Book 1 (What Does the Bible Say About God? / What We Know About God)
+RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-god\.html$
+RewriteRule ^(what-does-the-bible-say-about-god|what-we-know-about-god|what-we-know|what_we_know|what_do_we_know|god)(\.html)?$ /foundations/what-does-the-bible-say-about-god.html [R=301,L,NC,QSA]
+
+# 3. Case-Insensitive [NC] 301 Redirects for Book 2 (What Does the Bible Say About Education?)
+RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-education\.html$
+RewriteRule ^(what-does-the-bible-say-about-education|biblical-education|education)(\.html)?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
+
+# 4. Fallback Case-Normalizer for any other future Foundations Library guide
+ErrorDocument 404 /foundations/404-case-router.html

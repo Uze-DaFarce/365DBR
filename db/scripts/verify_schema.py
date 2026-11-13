@@ -8,29 +8,27 @@ Performs the checks required by docs/Roles/365DBR-DEV.md and Database-Schema.md:
 - Book metadata (name, testament, num_chapters, order) matches bible_common.py exactly
 - Translations seeded correctly (LSV primary, KJV)
 - Basic table existence and constraints
-- Sample verse insert + query for Hebrew (GEN.1.1) and Greek (e.g. JHN.1.1 or ACT.1.1)
+- Read-only lookup of SNG.8.14 and 2TH.3.18 (no inserts, no deletes)
+- kjv_english_strong_tags present, with the eng-kjv2006 tags on 2TH.3.18
 - Reports Hebrew vs Greek handling awareness
 - All checks are explicit and fail hard on mismatch
 
-Run after migrations + seed_books.
+Read-only. Does not certify Greek original_tokens.strong_number.
 
-This script uses production-data *patterns* (BCV structure, known books, Hebrew/Greek distinction)
-but does not yet pull real production content (Phase 2).
+Run after migrations + seed_books.
 
 Usage:
   python db/scripts/verify_schema.py
 """
 
-import os
 import sys
 from pathlib import Path
 
-import psycopg
-from psycopg.rows import dict_row
-
 ROOT = Path(__file__).resolve().parents[2]
 BIBLE_COMMON_DIR = ROOT / "apps" / "365DBR"
+DB_DIR = ROOT / "db"
 sys.path.insert(0, str(BIBLE_COMMON_DIR))
+sys.path.insert(0, str(DB_DIR))
 
 try:
     import bible_common
@@ -39,23 +37,10 @@ except ImportError as e:
     sys.exit(1)
 
 try:
-    from dotenv import load_dotenv
-    load_dotenv(ROOT / "db" / ".env")
-except ImportError:
-    pass
-
-
-def get_connection():
-    dsn = os.getenv("DATABASE_URL")
-    if not dsn:
-        user = os.getenv("POSTGRES_USER", "365dbr_dev")
-        pw = os.getenv("POSTGRES_PASSWORD", "dev_password_change_me")
-        host = os.getenv("POSTGRES_HOST", "localhost")
-        port = os.getenv("POSTGRES_PORT", "5432")
-        db = os.getenv("POSTGRES_DB", "mt_sinai_365dbr")
-        dsn = f"postgresql://{user}:{pw}@{host}:{port}/{db}"
-    print(f"[verify] Connecting to Postgres...")
-    return psycopg.connect(dsn, row_factory=dict_row)
+    from query.connection import get_connection
+except ImportError as e:
+    print(f"[ERROR] Could not import query.connection: {e}")
+    sys.exit(1)
 
 
 def check(msg: str, condition: bool):
@@ -67,11 +52,12 @@ def check(msg: str, condition: bool):
 
 def main():
     print("=" * 70)
-    print("365DBR Phase 1 — Schema Bootstrap Verification")
+    print("365DBR Phase 1 — Schema Bootstrap Verification (read-only)")
     print("Priorities: Truth/Accuracy > Safety/Security > Performance")
     print("Reference: docs/Roles/365DBR-DEV.md + docs/365DBR/Database-Schema.md")
     print("=" * 70)
 
+    print("[verify] Connecting to Postgres...")
     conn = get_connection()
     try:
         with conn.cursor() as cur:
@@ -112,51 +98,64 @@ def main():
 
             # 4. Core tables exist
             for table in ["verses", "original_tokens", "verse_translations", "annotations",
-                          "daily_readings", "daily_passages", "data_sources", "schema_migrations"]:
+                          "daily_readings", "daily_passages", "data_sources", "schema_migrations",
+                          "kjv_english_strong_tags"]:
                 cur.execute("SELECT to_regclass(%s) IS NOT NULL AS exists;", (table,))
                 exists = cur.fetchone()["exists"]
                 check(f"Table {table} exists", exists)
 
-            # 5. Sample verse insert + roundtrip (Hebrew example)
-            print("\n[verify] Testing sample verse insert (Hebrew pattern)...")
-            try:
-                cur.execute("""
-                    INSERT INTO verses (id, book_code, chapter, verse, verse_order)
-                    VALUES ('GEN.1.1', 'GEN', 1, 1, 1)
-                    ON CONFLICT (id) DO NOTHING;
-                """)
-                cur.execute("SELECT * FROM verses WHERE id = 'GEN.1.1';")
-                v = cur.fetchone()
-                check("GEN.1.1 verse row created", v is not None)
-                check("GEN.1.1 book_code=GEN", v["book_code"] == "GEN")
-                check("GEN.1.1 chapter/verse correct", v["chapter"] == 1 and v["verse"] == 1)
-                print("  Hebrew sample (GEN.1.1) inserted and retrievable.")
-            finally:
-                cur.execute("DELETE FROM verses WHERE id = 'GEN.1.1';")
-                conn.commit()
+            # 5. Existing verses only. Never insert or delete.
+            print("\n[verify] Reading existing sample verses...")
+            for verse_id, book, chapter, verse in (
+                ("SNG.8.14", "SNG", 8, 14),
+                ("2TH.3.18", "2TH", 3, 18),
+            ):
+                cur.execute(
+                    "SELECT book_code, chapter, verse FROM verses WHERE id = %s;",
+                    (verse_id,),
+                )
+                row = cur.fetchone()
+                check(f"{verse_id} exists", row is not None)
+                check(f"{verse_id} book_code={book}", row["book_code"] == book)
+                check(
+                    f"{verse_id} chapter/verse correct",
+                    row["chapter"] == chapter and row["verse"] == verse,
+                )
 
-            # 6. Sample Greek NT verse
-            print("\n[verify] Testing sample verse insert (Greek NT pattern)...")
-            try:
-                cur.execute("""
-                    INSERT INTO verses (id, book_code, chapter, verse, verse_order)
-                    VALUES ('JHN.1.1', 'JHN', 1, 1, 1000001)
-                    ON CONFLICT (id) DO NOTHING;
-                """)
-                cur.execute("SELECT * FROM verses WHERE id = 'JHN.1.1';")
-                v = cur.fetchone()
-                check("JHN.1.1 verse row created", v is not None)
-                print("  Greek sample (JHN.1.1) inserted and retrievable.")
-            finally:
-                cur.execute("DELETE FROM verses WHERE id = 'JHN.1.1';")
-                conn.commit()
+            # 6. KJV English tags. These are not original-token Strong's numbers.
+            print("\n[verify] Reading kjv_english_strong_tags for 2TH.3.18...")
+            cur.execute(
+                """
+                SELECT lower(surface) AS surface, strong_number
+                FROM kjv_english_strong_tags
+                WHERE verse_id = '2TH.3.18'
+                ORDER BY word_order;
+                """
+            )
+            tags = [(r["surface"], r["strong_number"]) for r in cur.fetchall()]
+            expected_tags = [
+                ("grace", "G5485"),
+                ("our", "G2257"),
+                ("lord", "G2962"),
+                ("jesus", "G2424"),
+                ("christ", "G5547"),
+                ("with", "G3326"),
+                ("you", "G5216"),
+                ("all", "G3956"),
+                ("amen", "G0281"),
+            ]
+            if tags != expected_tags:
+                print(f"  got: {tags}")
+            check(
+                "2TH.3.18 KJV English tags match eng-kjv2006",
+                tags == expected_tags,
+            )
 
-            # 7. Hebrew vs Greek awareness note (from schema doc)
-            print("\n[verify] Hebrew vs Greek handling (per Database-Schema.md):")
-            print("  - original_tokens.language will be 'hebrew' | 'greek'")
-            print("  - strong_number populated for Hebrew from current prod data")
-            print("  - Greek currently uses surface_text (strongs often NULL until better sources)")
-            print("  - Client already distinguishes via NT_BOOKS / isHebrew")
+            # 7. Hebrew vs Greek awareness. Greek numbers stay uncertified.
+            print("\n[verify] Hebrew vs Greek handling:")
+            print("  - original_tokens.language is 'hebrew' | 'greek'")
+            print("  - Greek original_tokens.strong_number is stored and is not certified")
+            print("  - kjv_english_strong_tags are KJV English tags, not a WLC/TR alignment")
             check("Hebrew/Greek distinction documented in schema", True)
 
             # Final summary query (single fetchone — do not call fetchone twice)
@@ -168,11 +167,11 @@ def main():
             print(f"  Books in DB          : {final_books}")
             print(f"  Expected             : 66")
             print(f"  Translations         : LSV (primary), KJV")
-            print(f"  Sample inserts       : Hebrew + Greek OK (rolled back)")
+            print("  Sample verses        : SNG.8.14, 2TH.3.18 (read-only)")
+            print("  KJV English tags     : 2TH.3.18 checked")
             print("  All structural checks: PASSED")
             print("=" * 70)
-            print("\nPhase 1 schema bootstrap looks correct.")
-            print("Next (later): populate with real prod data via Phase 2 ETL.\n")
+            print("\nSchema checks passed. Read-only. No rows were written.\n")
 
     except AssertionError as e:
         print(f"\n[FAIL] {e}")
