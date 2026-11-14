@@ -4,7 +4,7 @@
    ========================================================================== */
 body {
   font-family: 'Merriweather', Georgia, serif;
-  font-size: 17px;
+  font-size: clamp(1.06rem, 2.5vw, 1.16rem);
   line-height: 1.78;
   text-align: left;
 }
@@ -18,11 +18,24 @@ body {
   padding: 28px 20px 64px;
 }
 
+/* Wide Desktop (>= 1201px and taller than 500px): Collapsible Side-by-Side TOC */
+@media (min-width: 1201px) and (min-height: 501px) {
+  body.toc-collapsed .fl-layout {
+    grid-template-columns: 1fr;
+  }
+  body.toc-collapsed .fl-sidebar {
+    display: none;
+  }
+  body.toc-collapsed .fl-main {
+    margin: 0 auto;
+  }
+}
+
 .fl-sidebar {
   position: sticky;
-  top: 76px;
+  top: calc(var(--fl-topbar-height, 76px) + 12px);
   align-self: start;
-  max-height: calc(100vh - 96px);
+  max-height: calc(100vh - var(--fl-topbar-height, 76px) - 24px);
   overflow-y: auto;
   background: var(--card);
   border: 1px solid var(--border);
@@ -50,8 +63,34 @@ body {
 .fl-toc-list li { margin-bottom: 6px; }
 .fl-toc-part { margin-top: 12px; font-weight: 700; color: var(--crimson); }
 .fl-toc-lab { padding-left: 10px; font-size: 12.5px; }
-.fl-toc-list a { color: var(--text); text-decoration: none; }
+.fl-toc-list a { color: var(--text); text-decoration: none; display: block; padding: 2px 0; }
 .fl-toc-list a:hover { color: var(--accent); text-decoration: underline; }
+
+/* Compact / Tablet / Mobile / Landscape Phone (<= 1200px OR max-height: 500px):
+   Off-Canvas Slide-Out Left TOC Drawer */
+@media (max-width: 1200px), (max-height: 500px) {
+  .fl-layout {
+    grid-template-columns: 1fr;
+    padding: 18px 14px 64px;
+  }
+  .fl-sidebar {
+    position: fixed;
+    top: var(--fl-topbar-height, 64px);
+    left: -340px;
+    width: 300px;
+    max-width: 86vw;
+    height: calc(100vh - var(--fl-topbar-height, 64px));
+    height: calc(100dvh - var(--fl-topbar-height, 64px));
+    max-height: none;
+    z-index: 1000;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 4px 4px 24px rgba(0, 0, 0, 0.18);
+    transition: left 0.25s ease;
+  }
+  body.toc-open .fl-sidebar {
+    left: 0;
+  }
+}
 
 .fl-main {
   background: var(--card);
@@ -59,6 +98,8 @@ body {
   border-radius: 8px;
   padding: 42px 48px;
   max-width: 880px;
+  width: 100%;
+  margin: 0 auto;
   text-align: left;
 }
 
@@ -75,9 +116,33 @@ h1, h2, h3, h4 {
   padding-bottom: 24px;
   margin-bottom: 28px;
 }
-.fl-hero-header h1 { margin-top: 0; font-size: 30px; color: var(--text); }
-.fl-hero-subtitle { font-size: 19px; color: var(--muted); font-weight: 400; margin: 8px 0 12px; }
+.fl-hero-header h1 { margin-top: 0; font-size: clamp(1.45rem, 3.8vw, 1.88rem); color: var(--text); }
+.fl-hero-subtitle { font-size: clamp(1.02rem, 2.5vw, 1.18rem); color: var(--muted); font-weight: 400; margin: 8px 0 12px; }
 .fl-hero-meta { font-size: 14px; color: var(--muted); }
+
+/* Chapter 8 & Book-Wide Category Lead vs Sub-Point Visual Hierarchy (Zero Extra Indent) */
+.fl-list {
+  padding-left: 1.35rem;
+}
+.fl-list li {
+  margin-bottom: 0.65rem;
+}
+.fl-list li.fl-list-lead {
+  list-style: none;
+  margin-left: -1.35rem;
+  margin-top: 1.35rem;
+  margin-bottom: 0.45rem;
+  padding: 5px 10px 5px 12px;
+  background: var(--accent-bg);
+  border-left: 4px solid var(--crimson);
+  border-radius: 0 4px 4px 0;
+  color: var(--crimson);
+  font-size: 1.03em;
+  line-height: 1.4;
+}
+.fl-list li.fl-list-lead:first-child {
+  margin-top: 0.35rem;
+}
 
 .fl-scripture-link {
   color: var(--accent);
@@ -174,14 +239,30 @@ h1, h2, h3, h4 {
 }
 .fl-print-blank-line { display: none; }
 
-@media (max-width: 960px) {
-  .fl-layout { grid-template-columns: 1fr; }
-  .fl-sidebar { position: static; max-height: none; }
-  .fl-main { padding: 24px 20px; }
+@media (max-width: 1100px), (max-height: 500px) {
+  body {
+    font-size: clamp(1.06rem, 2.5vw, 1.16rem);
+    line-height: 1.75;
+  }
+  .fl-layout {
+    padding: 12px 10px 68px;
+  }
+  .fl-main {
+    padding: 20px 15px;
+    border-radius: 6px;
+  }
+  h2 { font-size: 1.32rem; }
+  h3 { font-size: 1.14rem; }
+  .fl-part-banner,
+  .fl-baton-callout,
+  .fl-lab-card,
+  .fl-chart-card,
+  .fl-calculator-card {
+    padding: 16px 14px;
+  }
   .fl-calc-grid { grid-template-columns: 1fr; }
 }
 
-@page { size: letter; margin: 1.0in; }
 @page { size: letter; margin: 1.0in; }
 @media print {
   body {
@@ -199,6 +280,14 @@ h1, h2, h3, h4 {
   .fl-main { border: none !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
   h1, h2, h3, h4 { text-align: left !important; color: #000 !important; page-break-after: avoid; break-after: avoid; }
   .fl-page-break-before { page-break-before: always; break-before: page; }
+
+  .fl-list li.fl-list-lead {
+    background: transparent !important;
+    color: #000 !important;
+    border-left: 2pt solid #000 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
 
   /* Keep Cards, Charts, Calculators & Signature Blocks From Splitting Mid-Page */
   .fl-chart-card,

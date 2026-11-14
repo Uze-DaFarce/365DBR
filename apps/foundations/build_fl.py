@@ -16,6 +16,7 @@ Outputs & Maintains:
 5. apps/foundations/.htaccess & apps/foundations/404-case-router.html (GoDaddy Case-Insensitive Routing)
 """
 
+import argparse
 import json
 import re
 import html
@@ -93,42 +94,115 @@ def build_365dbr_url(book_code: str, ch_verse_str: str) -> str:
     return f"/365DBR/bible.html?book={book_code}&chapter={ch}&verse=1&fullverse=1"
 
 
-def linkify_scripture_references(html_text: str) -> str:
-  tokens = re.split(
-      r"(<a\b[^>]*>.*?</a>)", html_text, flags=re.IGNORECASE | re.DOTALL
-  )
-  out = []
-  for tok in tokens:
-    if tok.lower().startswith("<a "):
-      out.append(tok)
-      continue
+def _format_ref_group(book_name: str, book_code: str, ref_group: str, include_book: bool) -> str:
+    s = ref_group.strip()
+    if ":" not in s:
+        url = build_365dbr_url(book_code, s)
+        label = f"{book_name} {s}" if include_book else s
+        return (
+            f'<a href="{url}" class="fl-scripture-link" '
+            f'title="Open {book_name} {s} in 365DBR Scripture Reader">{label}</a>'
+        )
 
-    def _replace_match(m: re.Match) -> str:
-      book_name = m.group("book")
-      ref = m.group("ref")
-      tail = m.group("tail") or ""
-      book_code = BIBLE_BOOKS[book_name]
-      main_url = build_365dbr_url(book_code, ref)
-      linked = (
-          f'<a href="{main_url}" class="fl-scripture-link" '
-          f'title="Open {book_name} {ref} in 365DBR Scripture Reader">{book_name} {ref}</a>'
-      )
-
-      if tail:
-        parts = re.split(r"(\s*;\s*)", tail)
-        for p in parts:
-          if re.match(r"^\s*;\s*$", p):
-            linked += p
-          elif p.strip():
-            sub_url = build_365dbr_url(book_code, p.strip())
-            linked += (
-                f'<a href="{sub_url}" class="fl-scripture-link" '
-                f'title="Open {book_name} {p.strip()} in 365DBR Scripture Reader">{p}</a>'
+    ch_part, v_part = s.split(":", 1)
+    ch = re.sub(r"\D", "", ch_part) or "1"
+    v_tokens = re.split(r"(\s*,\s*)", v_part)
+    out_parts = []
+    first_seg = True
+    for tok in v_tokens:
+        if re.match(r"^\s*,\s*$", tok):
+            out_parts.append(tok)
+        elif tok.strip():
+            seg = tok.strip()
+            url = build_365dbr_url(book_code, f"{ch}:{seg}")
+            if first_seg:
+                label = f"{book_name} {ch_part.strip()}:{seg}" if include_book else f"{ch_part.strip()}:{seg}"
+                title_ref = f"{book_name} {ch_part.strip()}:{seg}"
+                first_seg = False
+            else:
+                label = seg
+                title_ref = f"{book_name} {ch_part.strip()}:{seg}"
+            out_parts.append(
+                f'<a href="{url}" class="fl-scripture-link" '
+                f'title="Open {title_ref} in 365DBR Scripture Reader">{label}</a>'
             )
-      return linked
+    return "".join(out_parts)
 
-    out.append(CITATION_REGEX.sub(_replace_match, tok))
-  return "".join(out)
+
+def linkify_scripture_references(html_text: str) -> str:
+    tokens = re.split(
+        r"(<a\b[^>]*>.*?</a>)", html_text, flags=re.IGNORECASE | re.DOTALL
+    )
+    out = []
+    for tok in tokens:
+        if tok.lower().startswith("<a "):
+            out.append(tok)
+            continue
+
+        def _replace_match(m: re.Match) -> str:
+            book_name = m.group("book")
+            ref = m.group("ref")
+            tail = m.group("tail") or ""
+            book_code = BIBLE_BOOKS[book_name]
+            linked = _format_ref_group(book_name, book_code, ref, include_book=True)
+
+            if tail:
+                parts = re.split(r"(\s*;\s*)", tail)
+                for p in parts:
+                    if re.match(r"^\s*;\s*$", p):
+                        linked += p
+                    elif p.strip():
+                        linked += _format_ref_group(book_name, book_code, p.strip(), include_book=False)
+            return linked
+
+        out.append(CITATION_REGEX.sub(_replace_match, tok))
+    return "".join(out)
+
+
+def write_if_changed(path: Path, new_content: str, dry_run: bool = False) -> bool:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        try:
+            old_content = path.read_text(encoding="utf-8")
+            if old_content == new_content:
+                print(f" [UNCHANGED] {path}")
+                return False
+        except Exception:
+            pass
+    if dry_run:
+        print(f" [DRY-RUN: WOULD UPDATE] {path}")
+        return True
+    path.write_text(new_content, encoding="utf-8")
+    print(f" [UPDATED]   {path}")
+    return True
+
+
+def write_json_if_changed(path: Path, doc_data: dict, dry_run: bool = False) -> bool:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    new_ts = doc_data.get("generated_at", "")
+    ordered = {k: v for k, v in doc_data.items() if k != "generated_at"}
+    if path.exists():
+        try:
+            existing_raw = path.read_text(encoding="utf-8")
+            existing_json = json.loads(existing_raw)
+            existing_cmp = {k: v for k, v in existing_json.items() if k != "generated_at"}
+            if existing_cmp == ordered and "generated_at" in existing_json:
+                ordered["generated_at"] = existing_json["generated_at"]
+                candidate_str = json.dumps(ordered, indent=2, ensure_ascii=False)
+                if existing_raw == candidate_str:
+                    print(f" [UNCHANGED] {path}")
+                    return False
+                if not dry_run:
+                    path.write_text(candidate_str, encoding="utf-8")
+                    print(f" [UPDATED KEY ORDER] {path}")
+                else:
+                    print(f" [DRY-RUN: WOULD REORDER KEYS] {path}")
+                return True
+        except Exception:
+            pass
+    ordered["generated_at"] = new_ts
+    new_str = json.dumps(ordered, indent=2, ensure_ascii=False)
+    return write_if_changed(path, new_str, dry_run=dry_run)
 
 # ==============================================================================
 # 3. SURGICAL MANUSCRIPT CLEANUP RULES
@@ -179,7 +253,6 @@ def parse_manuscript_to_json(cleaned_md: str) -> dict:
 
     doc_data = {
         "schema_version": "1.2.0",
-        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "app": {
             "name": "Foundations Library",
             "abbr": "FL",
@@ -217,7 +290,8 @@ def parse_manuscript_to_json(cleaned_md: str) -> dict:
             "title": "About This Resource & Attribution",
             "blocks": []
         },
-        "parts": []
+        "parts": [],
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     }
 
     current_part = None
@@ -495,7 +569,7 @@ def render_k12_static_svg_chart() -> str:
         <text x="425" y="229" font-family="Merriweather, serif" font-size="13" font-weight="bold" fill="#1e3a5f">3,500–5,000+ hrs (+ Christ-Centered Ed)</text>
 
         <text x="410" y="288" text-anchor="middle" font-family="Merriweather, serif" font-size="11.5" font-style="italic" fill="#4a4036">
-          "Everyone, after he has been fully trained (katartizō — καταρτίζω), will be like his teacher." — Luke 6:40
+          "Everyone, after he has been fully trained (katērtismenos — κατηρτισμένος), will be like his teacher." — Luke 6:40
         </text>
       </svg>
     </figure>
@@ -573,13 +647,17 @@ def render_blocks_html(blocks: list) -> str:
     for b in blocks:
         btype = b["type"]
         if btype == "ul_item":
-            if in_ol:
-                html_out.append("</ol>")
-                in_ol = False
-            if not in_ul:
-                html_out.append('<ul class="fl-list">')
-                in_ul = True
-            html_out.append(f"<li>{format_inline_md(b['text'])}</li>")
+          if in_ol:
+            html_out.append("</ol>")
+            in_ol = False
+          if not in_ul:
+            html_out.append('<ul class="fl-list">')
+            in_ul = True
+          rendered_item = format_inline_md(b["text"]).strip()
+          if re.match(r"^<strong>.+?:</strong>$", rendered_item):
+            html_out.append(f'<li class="fl-list-lead">{rendered_item}</li>')
+          else:
+            html_out.append(f"<li>{rendered_item}</li>")
         elif btype == "ol_item":
             if in_ul:
                 html_out.append("</ul>")
@@ -756,7 +834,7 @@ def build_education_html(doc_data: dict) -> str:
                 "url": EDU_CANONICAL_URL,
                 "sameAs": "https://mt-sin.ai/foundations/education.html",
                 "educationalUse": ["Discipleship", "Worldview Training", "Homeschooling", "Student Apologetics"],
-                "about": ["Biblical Education", "Sola Scriptura", "Creation Apologetics", "Deuteronomy 6", "Proverbs 19:27"]
+                "about": ["Biblical Education", "Sola Scriptura", "Creation Apologetics", "Deuteronomy 6", "Proverbs 19:27–29"]
             },
             {
                 "@type": "FAQPage",
@@ -767,7 +845,7 @@ def build_education_html(doc_data: dict) -> str:
                         "name": "Does the Bible speak about secular public education even though the words 'public school' are not in an English concordance?",
                         "acceptedAnswer": {
                             "@type": "Answer",
-                            "text": "Yes. God's Word addresses actions and mechanisms rather than 21st-century English buzzwords. Proverbs 19:27 issues a direct imperative command to cease listening (chadal) to formal instruction (musar) that causes one to stray from the words of knowledge, and Proverbs 1:7 establishes that the fear of Yahweh is the beginning (reshith) of knowledge."
+                            "text": "Yes. God's Word addresses actions and mechanisms rather than 21st-century English buzzwords. Proverbs 19:27–29 issues a direct imperative command to cease listening (chadal) to formal instruction (musar) that causes one to stray from the words of knowledge—warning that judgments are prepared for scoffers (letsim)—and Proverbs 1:7 establishes that the fear of Yahweh is the beginning (reshith) of knowledge."
                         }
                     },
                     {
@@ -817,23 +895,25 @@ def build_education_html(doc_data: dict) -> str:
   <header class="fl-topbar no-print">
     <div class="fl-topbar-row1">
       <div class="fl-brand-group">
-        <a href="/foundations/" class="fl-brand-title">🏛️ Foundations Library</a>
+        <a href="/foundations/" class="fl-brand-title"><span class="fl-lbl-full">🏛️ Foundations Library</span><span class="fl-lbl-short">🏛️ FL</span></a>
         <span class="fl-topbar-sep">|</span>
-        <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link">🕮 365DBR Daily</a>
+        <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link"><span class="fl-lbl-full">🕮 365DBR Daily</span><span class="fl-lbl-short">🕮 365DBR</span></a>
         <span class="fl-topbar-sep">|</span>
-        <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link">✝️ Multi-Translation Bible</a>
+        <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link"><span class="fl-lbl-full">✝️ Multi-Translation Bible</span><span class="fl-lbl-short">✝️ Bible</span></a>
         <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
       </div>
       <div class="fl-top-actions">
-        <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing">☕ Buy Your Brother a Coffee</a>
-        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-all-labs" title="Print only the 8 Family &amp; Student Lab Worksheets">🖨️ Print All 8 Labs</button>
-        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page" title="Print full book and worksheets">🖨️ Print</button>
+        <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing"><span class="fl-lbl-full">☕ Buy Your Brother a Coffee</span><span class="fl-lbl-short">☕ Coffee</span></a>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-all-labs" title="Print only the 8 Family &amp; Student Lab Worksheets"><span class="fl-lbl-full">🖨️ Print All 8 Labs</span><span class="fl-lbl-short">🖨️ 8 Labs</span></button>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page" title="Print full book and worksheets"><span class="fl-lbl-full">🖨️ Print</span><span class="fl-lbl-short">🖨️ Print</span></button>
       </div>
     </div>
     <div class="fl-topbar-row2">
-      <a href="/foundations/{GOD_CANONICAL_SLUG}" class="fl-nav-link">1: What About God? ↗</a>
+      <button type="button" class="fl-btn fl-toc-toggle" data-fl-action="toggle-toc" aria-expanded="true" title="Toggle Table of Contents"><span class="fl-lbl-full">☰ Contents</span><span class="fl-lbl-short">☰ TOC</span></button>
       <span class="fl-topbar-sep">|</span>
-      <a href="#" class="fl-active-book" aria-current="page">📖 Book 2: What Does the Bible Say About Education? — Foundational Truths for Parents and Students Survival Guide</a>
+      <a href="/foundations/{GOD_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">1: What About God? ↗</span><span class="fl-lbl-short">1: God ↗</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="#" class="fl-active-book" aria-current="page"><span class="fl-lbl-full">📖 Book 2: What Does the Bible Say About Education?<span class="fl-book-sub"> — Foundational Truths, Biblically Backed</span></span><span class="fl-lbl-short">📖 #2: Education</span></a>
     </div>
   </header>
 
@@ -893,9 +973,9 @@ def build_education_html(doc_data: dict) -> str:
     </div>
 
   <!-- Live 365DBR Scripture Reader (100% Free & Non-Commercial) -->
-  <aside id="bible-drawer" aria-hidden="true">
+  <aside id="bible-drawer" aria-hidden="true" inert>
     <div class="drawer-header">
-      <span id="drawer-title">365DBR Scripture Reader (LSB / KJV / Interlinear)</span>
+      <span id="drawer-title">Scripture Reader</span>
       <div class="drawer-actions">
         <a id="drawer-ext" href="/365DBR/bible.html" target="_blank" rel="noopener">Open Full Tab ↗</a>
         <button class="drawer-close" id="drawer-close-btn" type="button">✕ Close</button>
@@ -916,7 +996,7 @@ def build_education_html(doc_data: dict) -> str:
 # ==============================================================================
 # 7. SURGICAL METADATA & CANONICAL SYNC FOR BOOK 1 (WHAT WE KNOW ABOUT GOD)
 # ==============================================================================
-def sync_book1_god_html():
+def sync_book1_god_html(dry_run: bool = False):
     """Updates canonical URLs and <title> inside what-does-the-bible-say-about-god.html."""
     if not GOD_CANONICAL_PATH.exists():
         print(f" [!] Skipping Book 1 sync: {GOD_CANONICAL_PATH} not found yet.")
@@ -954,7 +1034,7 @@ def sync_book1_god_html():
 
     # 5. Ensure relative bible.html links point to /365DBR/bible.html
     content = re.sub(r'href="(?:\./|/365DBR/)?bible\.html', 'href="/365DBR/bible.html', content)
-    GOD_CANONICAL_PATH.write_text(content, encoding="utf-8")
+    write_if_changed(GOD_CANONICAL_PATH, content, dry_run=dry_run)
 
 # ==============================================================================
 # 8. REDIRECT STUBS, GODADDY .HTACCESS & CASE-INSENSITIVE ROUTER (CSP-SAFE)
@@ -1032,54 +1112,108 @@ CASE_ROUTER_HTML = """<!DOCTYPE html>
 # ==============================================================================
 # 9. MAIN EXECUTION PIPELINE
 # ==============================================================================
+
+MTSINAI_HTACCESS_PATH = BASE_DIR.parent / "mtsinai" / ".htaccess"
+MONOREPO_HTACCESS_PATH = BASE_DIR.parent.parent / ".htaccess"
+
+FL_ROOT_REWRITE_BLOCK = r"""
+<IfModule mod_rewrite.c>
+  # ?? Foundations Library Ultra-Short Print & QR Redirects (/fl/*)
+  RewriteEngine On
+  RewriteRule ^fl/?$ /foundations/ [R=301,L,NC,QSA]
+  RewriteRule ^fl/god(\.html)?/?$ /foundations/what-does-the-bible-say-about-god.html [R=301,L,NC,QSA]
+  RewriteRule ^fl/edu(\.html)?/?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
+</IfModule>
+"""
+
+def sync_root_htaccess(dry_run: bool = False):
+    if not MTSINAI_HTACCESS_PATH.exists():
+        print(f" [!] Skipping root .htaccess sync: {MTSINAI_HTACCESS_PATH} not found.")
+        return
+    root_content = MTSINAI_HTACCESS_PATH.read_text(encoding="utf-8")
+    if "RewriteRule ^fl/god" not in root_content:
+        root_content = root_content.rstrip() + "\n" + FL_ROOT_REWRITE_BLOCK
+    write_if_changed(MTSINAI_HTACCESS_PATH, root_content, dry_run=dry_run)
+    write_if_changed(MONOREPO_HTACCESS_PATH, root_content, dry_run=dry_run)
+
+
 def main():
-    if not RAW_MD_PATH.exists():
-        raise FileNotFoundError(f"Source manuscript not found at: {RAW_MD_PATH}")
+    parser = argparse.ArgumentParser(
+        description="Foundations Library (FL) Compiler — Idempotent Builder"
+    )
+    parser.add_argument(
+        "--target",
+        choices=["all", "bks", "stubs", "htaccess"],
+        default=None,
+        help="Build scope: all, bks (all books), stubs (redirect stubs), or htaccess (routing)."
+    )
+    parser.add_argument(
+        "--bk-1",
+        action="store_true",
+        help="Compile/sync Foundations Book 1 (What Does the Bible Say About God?)"
+    )
+    parser.add_argument(
+        "--bk-2",
+        action="store_true",
+        help="Compile Foundations Book 2 (What Does the Bible Say About Education?)"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Report which files would be modified vs. unchanged without writing to disk."
+    )
+    args = parser.parse_args()
 
-    raw_text = RAW_MD_PATH.read_text(encoding="utf-8")
-    cleaned_md = clean_manuscript_text(raw_text)
-    doc_data = parse_manuscript_to_json(cleaned_md)
+    target = args.target
+    if target is None and not (args.bk_1 or args.bk_2):
+        target = "bks"
 
-    # 1. Write Canonical JSON Data Layer (data/education.json)
-    JSON_OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    JSON_OUT_PATH.write_text(json.dumps(doc_data, indent=2, ensure_ascii=False), encoding="utf-8")
+    do_bk1 = args.bk_1 or (target in ("all", "bks"))
+    do_bk2 = args.bk_2 or (target in ("all", "bks"))
+    do_stubs = target in ("all", "stubs")
+    do_htaccess = target in ("all", "htaccess")
 
-    # 2. Write Book 2 Canonical SEO Guide (what-does-the-bible-say-about-education.html)
-    html_output = build_education_html(doc_data)
-    EDU_CANONICAL_PATH.write_text(html_output, encoding="utf-8")
+    mode_label = "DRY-RUN" if args.dry_run else "WRITE"
+    print(f"[FL Build Start — Mode: {mode_label} | bk1={do_bk1}, bk2={do_bk2}, stubs={do_stubs}, htaccess={do_htaccess}]")
 
-    # 3. Sync Book 1 Canonical SEO Guide (what-does-the-bible-say-about-god.html)
-    sync_book1_god_html()
+    if do_bk2:
+        if not RAW_MD_PATH.exists():
+            raise FileNotFoundError(f"Source manuscript not found at: {RAW_MD_PATH}")
+        raw_text = RAW_MD_PATH.read_text(encoding="utf-8")
+        cleaned_md = clean_manuscript_text(raw_text)
+        doc_data = parse_manuscript_to_json(cleaned_md)
 
-    # 4. Write All 1-Hop Alias Stubs
-    stubs = [
-        (BASE_DIR / "education.html", f"/foundations/{EDU_CANONICAL_SLUG}", "What Does the Bible Say About Education?"),
-        (BASE_DIR / "god.html", f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (What We Know About God)"),
-        (BASE_DIR / "what-we-know.html", f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (What We Know About God)"),
-        (BASE_DIR / "what-we-know-about-god.html", f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (What We Know About God)"),
-    ]
-    for stub_path, target_url, label in stubs:
-        stub_path.write_text(make_redirect_stub(target_url, label), encoding="utf-8")
+        write_json_if_changed(JSON_OUT_PATH, doc_data, dry_run=args.dry_run)
+        html_output = build_education_html(doc_data)
+        write_if_changed(EDU_CANONICAL_PATH, html_output, dry_run=args.dry_run)
 
-    # 5. Write 1-Hop Legacy /365DBR/What_We_Know.html Redirect Stub -> /foundations/what-does-the-bible-say-about-god.html
-    if REDIRECT_365DBR_PATH.parent.exists():
-        REDIRECT_365DBR_PATH.write_text(
-            make_redirect_stub(f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (Foundations Library)"),
-            encoding="utf-8"
-        )
+    if do_bk1:
+        sync_book1_god_html(dry_run=args.dry_run)
 
-    # 6. Write GoDaddy Apache .htaccess & 404 Case-Insensitive Router
-    HTACCESS_PATH.write_text(HTACCESS_CONTENT, encoding="utf-8")
-    CASE_ROUTER_PATH.write_text(CASE_ROUTER_HTML, encoding="utf-8")
+    if do_stubs:
+        stubs = [
+            (BASE_DIR / "education.html", f"/foundations/{EDU_CANONICAL_SLUG}", "What Does the Bible Say About Education?"),
+            (BASE_DIR / "god.html", f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (What We Know About God)"),
+            (BASE_DIR / "what-we-know.html", f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (What We Know About God)"),
+            (BASE_DIR / "what-we-know-about-god.html", f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (What We Know About God)"),
+        ]
+        for stub_path, target_url, label in stubs:
+            write_if_changed(stub_path, make_redirect_stub(target_url, label), dry_run=args.dry_run)
 
-    total_chapters = sum(len(p["chapters"]) for p in doc_data["parts"])
-    total_labs = sum(1 for p in doc_data["parts"] for c in p["chapters"] if c.get("lab"))
+        if REDIRECT_365DBR_PATH.parent.exists():
+            write_if_changed(
+                REDIRECT_365DBR_PATH,
+                make_redirect_stub(f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (Foundations Library)"),
+                dry_run=args.dry_run
+            )
+
+    if do_htaccess:
+        write_if_changed(HTACCESS_PATH, HTACCESS_CONTENT, dry_run=args.dry_run)
+        write_if_changed(CASE_ROUTER_PATH, CASE_ROUTER_HTML, dry_run=args.dry_run)
+        sync_root_htaccess(dry_run=args.dry_run)
+
     print("[FL Build Complete]")
-    print(f" - JSON Data Layer : {JSON_OUT_PATH} ({len(doc_data['parts'])} Parts, {total_chapters} Chapters, {total_labs} Labs)")
-    print(f" - Book 1 Canonical: {GOD_CANONICAL_PATH}")
-    print(f" - Book 2 Canonical: {EDU_CANONICAL_PATH}")
-    print(f" - 1-Hop Stubs     : education.html, god.html, what-we-know.html, what-we-know-about-god.html, /365DBR/What_We_Know.html")
-    print(f" - GoDaddy Routing : {HTACCESS_PATH} + {CASE_ROUTER_PATH}")
+
 
 if __name__ == "__main__":
     main()

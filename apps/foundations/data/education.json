@@ -1,6 +1,5 @@
 {
   "schema_version": "1.2.0",
-  "generated_at": "2026-11-13T04:33:25.388276Z",
   "app": {
     "name": "Foundations Library",
     "abbr": "FL",
@@ -126,23 +125,23 @@
           "sections": [
             {
               "id": "ch-1-sec-1",
-              "heading": "1. The Imperative Command: Stop Listening to Ungodly Instruction (Proverbs 19:27)",
+              "heading": "1. The Imperative Command: Stop Listening to Ungodly Instruction",
               "blocks": [
                 {
                   "type": "paragraph",
-                  "text": "If you want a single verse that cuts straight through the fog and addresses sitting under instruction that contradicts God’s Word, open your Bible to **Proverbs 19:27**."
+                  "text": "If you want a single passage that cuts straight through the fog and addresses sitting under instruction that contradicts God’s Word, open your Bible to **Proverbs 19:27–29**."
                 },
                 {
                   "type": "paragraph",
-                  "text": "In **Proverbs 19:27**, King Solomon gives his son a direct command—an imperative in the Hebrew text, not a gentle suggestion. He commands his son to **cease listening to discipline and instruction** that causes one to stray from the words of knowledge."
+                  "text": "In **Proverbs 19:27–29**, King Solomon gives his son a direct command—an imperative in the Hebrew text, not a gentle suggestion. He commands his son to **cease listening to discipline and instruction** that causes one to stray from the words of knowledge, and then immediately warns in **verses 28–29** what happens when a culture mocks God's standard of justice and truth."
                 },
                 {
                   "type": "paragraph",
-                  "text": "Read that verse carefully in your preferred literal translation using the integrated 365DBR Scripture reader and look at the three pieces of that command:"
+                  "text": "Look at the key Hebrew terms across **Proverbs 19:27–29**:"
                 },
                 {
                   "type": "ol_item",
-                  "text": "**\"Cease listening...\"** (Hebrew: *chadal* (חָדַל) — to stop, desist, leave off, forsake)."
+                  "text": "**\"Cease listening...\"** (Hebrew imperative: *chadal* (חַדַל), from the root *chadal* (חָדַל) — to stop, desist, leave off, forsake)."
                 },
                 {
                   "type": "ol_item",
@@ -150,21 +149,25 @@
                 },
                 {
                   "type": "ol_item",
-                  "text": "**\"...that causes you to stray...\"** (Hebrew: *shagah* (שָׁגָה) — to go astray, err, swerve)."
+                  "text": "**\"...that causes you to stray...\"** (Hebrew infinitive: *lishgoth* (לִשְׁגּוֹת), from the root *shagah* (שָׁגָה) — to go astray, err, swerve)."
+                },
+                {
+                  "type": "ol_item",
+                  "text": "**The Corrupt Fruit & The Certainty of Judgment (vv. 28–29):** Solomon continues in **verse 28** that a corrupt or worthless witness (*ed beliya'al* (עֵד בְּלִיַּעַל)) mocks justice, and the mouth of the wicked swallows down (*bala* (בָּלַע)) iniquity; and **verse 29** concludes that judgments (*shephatim* (שְׁפָטִים)) are prepared for scoffers (*letsim* (לֵצִים), plural of *lets* (לֵץ)), and blows for the back of fools (*kesilim* (כְּסִילִים), plural of *kesil* (כְּסִיל))."
                 },
                 {
                   "type": "paragraph",
-                  "text": "Notice that Solomon does not say, *\"Listen to five hours of ungodly instruction every day so you can get a state diploma, and then try to filter out the bad parts at dinner.\"* He says **stop listening to it**."
+                  "text": "Notice the unbroken biblical chain in **Proverbs 19:27–29**! God is not merely talking about avoiding bad friends in an alleyway; He is specifically addressing **musar**—formal instruction, curriculum, and educational training. When a person or institution rejects godly *musar* and strays from the words of knowledge (v. 27), they inevitably mock objective justice and swallow iniquity (v. 28), bringing themselves under the certain judgment God has prepared for scoffers and fools (v. 29)—whereas loving parents are commanded to apply faithful biblical discipline and instruction (*paideia* (παιδεία)) in the Lord (**Ephesians 6:4**)."
                 },
                 {
                   "type": "paragraph",
-                  "text": "When a school system requires children to sit at a desk and be taught that the universe created itself out of nothing, that life evolved over millions of years of death and struggle without God, and that biological sex and morality are fluid human inventions, is that instruction causing children to stray from the words of knowledge? By definition, yes. And God’s command in **Proverbs 19:27** is crystal clear: **cease listening to it.**"
+                  "text": "When a school system requires children to sit at a desk and be taught that the universe created itself out of nothing, that life evolved over millions of years of death and struggle without God, and that biological sex and morality are fluid human inventions, is that instruction causing children to stray from the words of knowledge? By definition, yes. And God’s command in **Proverbs 19:27–29** is crystal clear: **cease listening to it.**"
                 }
               ]
             },
             {
               "id": "ch-1-sec-2",
-              "heading": "2. What Is the True Foundation of Knowledge? (Proverbs 1:7; 9:10; Psalm 14:1)",
+              "heading": "2. What Is the True Foundation of Knowledge?",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -194,7 +197,7 @@
             },
             {
               "id": "ch-1-sec-3",
-              "heading": "3. The Trajectory of Compromise: Walking, Standing, Sitting (Psalm 1:1–2; 2 Peter 3:3–6; Genesis 1:27; 2:24)",
+              "heading": "3. The Trajectory of Compromise: Walking, Standing, Sitting",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -226,7 +229,7 @@
                 },
                 {
                   "type": "paragraph",
-                  "text": "What did the Apostle Peter warn that \"scoffers\"—*empaiktēs* (ἐμπαίκτης)—would specifically attack in the last days? Look at **2 Peter 3:3–6**: Peter prophesied that scoffers would come mocking God's Word with a three-part attack:"
+                  "text": "What did the Apostle Peter warn that \"scoffers\"—*empaiktai* (ἐμπαῖκται, plural of *empaiktēs* (ἐμπαίκτης))—would specifically attack in the last days? Look at **2 Peter 3:3–6**: Peter prophesied that scoffers would come mocking God's Word with a three-part attack:"
                 },
                 {
                   "type": "ol_item",
@@ -234,11 +237,11 @@
                 },
                 {
                   "type": "ol_item",
-                  "text": "**Willfully Forgetting the Six-Day Creation:** Willfully ignoring—*lanthanō* (λανθάνω)—that by the Word of God the heavens existed long ago and the earth was formed out of water and by water (**2 Peter 3:5**; **Genesis 1**)."
+                  "text": "**Willfully Forgetting the Six-Day Creation:** Willfully ignoring—*lanthanei* (λανθάνει, from *lanthanō* (λανθάνω), meaning \"it escapes their notice by their own will\")—that by the Word of God the heavens existed long ago and the earth was formed out of water and by water (**2 Peter 3:5**; **Genesis 1**)."
                 },
                 {
                   "type": "ol_item",
-                  "text": "**Denying the Global Flood:** Denying that the world in Noah's day was cataclysmically destroyed—*apollumi* (ἀπόλλυμι)—being flooded with water in the **Global Flood** (**2 Peter 3:6**; **Genesis 6–8**)."
+                  "text": "**Denying the Global Flood:** Denying that the world in Noah's day was cataclysmically destroyed—*apōleto* (ἀπώλετο, from *apollymi* (ἀπόλλυμι))—being flooded with water in the **Global Flood** (**2 Peter 3:6**; **Genesis 6–8**)."
                 },
                 {
                   "type": "paragraph",
@@ -246,7 +249,7 @@
                 },
                 {
                   "type": "paragraph",
-                  "text": "Instead of putting impressionable children under the authority of scoffers, God's Word commands in **Proverbs 22:10**: *\"Drive out the scoffer (lets (לֵץ)), and contention will go out; strife and dishonor will cease.\"* Solomon adds in **Proverbs 13:20** that *\"he who walks with wise men will be wise, but the companion of fools will suffer harm.\"* The Apostle Peter and Jude both prophesied that last-days mockers—*empaiktēs* (ἐμπαίκτης)—would come walking after their own ungodly lusts, being worldly-minded—*psychikos* (ψυχικός)—and devoid of the Spirit (**2 Peter 3:3–6**; **Jude 17–19**), mocking three specific pillars of divine truth: the six-day Creation (**2 Peter 3:5**; **Genesis 1**), the global catastrophic Flood (**2 Peter 3:6**; **Genesis 6–8**), and the promise of Christ's Second Coming (**2 Peter 3:3–4**)."
+                  "text": "Instead of putting impressionable children under the authority of scoffers, God's Word commands in **Proverbs 22:10**: *\"Drive out the scoffer (lets (לֵץ)), and contention will go out; strife and dishonor will cease.\"* Solomon adds in **Proverbs 13:20** that *\"he who walks with wise men will be wise, but the companion of fools will suffer harm.\"* The Apostle Peter and Jude both prophesied that last-days mockers—*empaiktai* (ἐμπαῖκται, plural of *empaiktēs* (ἐμπαίκτης))—would come walking after their own ungodly lusts, being worldly-minded—*psychikoi* (ψυχικοί, plural of *psychikos* (ψυχικός))—and devoid of the Spirit (**2 Peter 3:3–6**; **Jude 17–19**), mocking three specific pillars of divine truth: the six-day Creation (**2 Peter 3:5**; **Genesis 1**), the global catastrophic Flood (**2 Peter 3:6**; **Genesis 6–8**), and the promise of Christ's Second Coming (**2 Peter 3:3–4**)."
                 },
                 {
                   "type": "paragraph",
@@ -279,7 +282,7 @@
               },
               {
                 "type": "paragraph",
-                "text": "Look up **Proverbs 1:7**, **Proverbs 19:27**, **2 Peter 3:3–6**, and **Matthew 19:4–6** in your print Bible or by using the interactive verse links. Read them out loud together."
+                "text": "Look up **Proverbs 1:7**, **Proverbs 19:27–29**, **2 Peter 3:3–6**, and **Matthew 19:4–6** in your print Bible or by using the interactive verse links. Read them out loud together."
               },
               {
                 "type": "paragraph",
@@ -295,7 +298,7 @@
               },
               {
                 "type": "ol_item",
-                "text": "*\"When we read **Proverbs 19:27**—where God commands us to stop (chadal (חָדַל)) listening to instruction (musar (מוּסָר)) that pulls us away from His words of knowledge—how does that compare to what is being taught in school right now?\"*"
+                "text": "*\"When we read **Proverbs 19:27–29**—where God commands us to stop (chadal (חַדַל)) listening to instruction (musar (מוּסָר)) that pulls us away from His words of knowledge—how does that compare to what is being taught in school right now?\"*"
               },
               {
                 "type": "paragraph",
@@ -303,7 +306,7 @@
               },
               {
                 "type": "ul_item",
-                "text": "**Spot the Concordance Trap:** If someone says, *\"The Bible doesn't mention the phrase 'public school,' so God doesn't care where kids go to school,\"* how would you explain why that argument fails using **Proverbs 1:7** and **Proverbs 19:27**?"
+                "text": "**Spot the Concordance Trap:** If someone says, *\"The Bible doesn't mention the phrase 'public school,' so God doesn't care where kids go to school,\"* how would you explain why that argument fails using **Proverbs 1:7** and **Proverbs 19:27–29**?"
               },
               {
                 "type": "lab_input",
@@ -313,7 +316,7 @@
               },
               {
                 "type": "ul_item",
-                "text": "**Check the Foundation:** According to **2 Peter 3:3–6** and **Jude 17–19**, what foundational truths do scoffers (*lets* (לֵץ) / *empaiktēs* (ἐμπαίκτης)) mock or willfully forget? And how does scoffing at **Genesis 1:27** and **2:24** lead directly to rebelling against God's created design for marriage (**Matthew 19:4–6**; **Romans 1:21–25**)?"
+                "text": "**Check the Foundation:** According to **2 Peter 3:3–6** and **Jude 17–19**, what foundational truths do scoffers (*letsim* (לֵצִים), plural of *lets* (לֵץ) / *empaiktai* (ἐμπαῖκται), plural of *empaiktēs* (ἐμπαίκτης)) mock or willfully forget? And how does scoffing at **Genesis 1:27** and **2:24** lead directly to rebelling against God's created design for marriage (**Matthew 19:4–6**; **Romans 1:21–25**)?"
               },
               {
                 "type": "lab_input",
@@ -596,7 +599,7 @@
           "sections": [
             {
               "id": "ch-3-sec-1",
-              "heading": "1. God’s Chain of Custody: *Shanan* (שָׁנַן) and *Paideia* (παιδεία) (Deuteronomy 6:6–9; Ephesians 6:4; Proverbs 22:6)",
+              "heading": "1. God’s Chain of Custody: *Shanan* (שָׁנַן) and *Paideia* (παιδεία)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -608,7 +611,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "Look closely at the Hebrew word translated *\"teach diligently\"*: **shanan (שָׁנַן)**. Literally, *shanan* (שָׁנַן) means **to whet or sharpen** (like sharpening a sword on a whetstone) or **to pierce through constant repetition**."
+                  "text": "Look closely at the Hebrew word translated *\"teach diligently\"*: **weshinnantam (וְשִׁנַּנְתָּם)**, the intensive *Piel* form of the root **shanan (שָׁנַן)**. Literally, *shanan* (שָׁנַן) in this intensive stem means **to whet or sharpen** (like sharpening a sword on a whetstone) or **to pierce through constant repetition**."
                 },
                 {
                   "type": "ul_item",
@@ -628,13 +631,13 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Proverbs 22:6 (Directing the Foundation):** Solomon writes to **train up** (Hebrew: *chanak* (חָנַךְ) — to dedicate, initiate, narrow, and discipline) a child according to his way, so that even when he is old he will not depart from it. Just as a builder pours concrete into forms while it is wet so it holds its shape when it hardens, parents are commanded to shape the foundational years of a child's thinking around the truth of God."
+                  "text": "**Proverbs 22:6 (Directing the Foundation):** Solomon writes to **train up** (Hebrew imperative: *chanok* (חֲנֹךְ), from the root *chanak* (חָנַךְ) — to dedicate, initiate, narrow, and discipline) a child according to his way, so that even when he is old he will not depart from it. Just as a builder pours concrete into forms while it is wet so it holds its shape when it hardens, parents are commanded to shape the foundational years of a child's thinking around the truth of God."
                 }
               ]
             },
             {
               "id": "ch-3-sec-2",
-              "heading": "2. Demolishing the Myth of \"Neutrality\" (Matthew 12:30; Colossians 2:3, 8)",
+              "heading": "2. Demolishing the Myth of \"Neutrality\"",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -662,7 +665,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Colossians 2:3 & 2:8 (Kidnapped by Worldly Philosophy):** In **Colossians 2:3**, Paul declares that in **Christ** are hidden **all** (Greek: *pas* (πᾶς) — every single one of) the treasures of **wisdom** (*sophia* (σοφία)) and **knowledge** (*gnōsis* (γνῶσις))."
+                  "text": "**Colossians 2:3 & 2:8 (Kidnapped by Worldly Philosophy):** In **Colossians 2:3**, Paul declares that in **Christ** are hidden **all** (Greek: *pantes* (πάντες), plural of *pas* (πᾶς) — every single one of) the treasures of **wisdom** (*sophia* (σοφία)) and **knowledge** (*gnōsis* (γνῶσις))."
                 },
                 {
                   "type": "ul_item",
@@ -680,7 +683,7 @@
             },
             {
               "id": "ch-3-sec-3",
-              "heading": "3. The Unavoidable Law of Discipleship: *Katartizō* (καταρτίζω) and *Theopneustos* (θεόπνευστος) (Luke 6:40; 2 Timothy 3:15–17)",
+              "heading": "3. The Unavoidable Law of Discipleship: *Katartizō* (καταρτίζω) and *Theopneustos* (θεόπνευστος)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -692,15 +695,15 @@
                 },
                 {
                   "type": "paragraph",
-                  "text": "Look at the Greek word translated *\"fully trained\"*: **katartizō (καταρτίζω)**—meaning to thoroughly equip, complete, prepare, and mold into final form."
+                  "text": "Look at the Greek participle translated *\"after he has been fully trained\"*: **katērtismenos (κατηρτισμένος)**, from the verb **katartizō (καταρτίζω)**—meaning to thoroughly equip, complete, prepare, and mold into final form."
                 },
                 {
                   "type": "paragraph",
-                  "text": "**Luke 6:40** is not a parable; it is an ironclad law of cause and effect. Education *is* discipleship. Whoever trains the student molds the student into their own likeness. If a child sits under secular humanist teachers and textbooks for 12,000 hours until they are *katartizō* (καταρτίζω)—fully trained and graduated—Jesus tells us exactly what the result will be: **they will be like their teacher.**"
+                  "text": "**Luke 6:40** is not a parable; it is an ironclad law of cause and effect. Education *is* discipleship. Whoever trains the student molds the student into their own likeness. If a child sits under secular humanist teachers and textbooks for 12,000 hours until they are *katērtismenos* (κατηρτισμένος, from *katartizō* (καταρτίζω))—fully trained and graduated—Jesus tells us exactly what the result will be: **they will be like their teacher.**"
                 },
                 {
                   "type": "paragraph",
-                  "text": "Contrast this secular shaping with the biblical equipping outlined in **2 Timothy 3:15–17**. Paul reminds Timothy that from childhood—*brephos* (βρέφος)—he had known the sacred writings, which are able to make a person wise unto salvation through faith in Christ Jesus. Paul then declares: *\"All Scripture is God-breathed (theopneustos (θεόπνευστος)) and profitable for teaching, for reproof, for correction, for training in righteousness; so that the man of God may be adequate, equipped (exartizō (ἐξαρτίζω)) for every good work.\"* Notice that *exartizō* (ἐξαρτίζω) shares the exact same Greek root as *katartizō* (καταρτίζω) in **Luke 6:40**! God-breathed Scripture is the only tool that can thoroughly equip and complete a child's mind so they stand firm in truth."
+                  "text": "Contrast this secular shaping with the biblical equipping outlined in **2 Timothy 3:15–17**. Paul reminds Timothy that from childhood—*brephos* (βρέφος)—he had known the sacred writings, which are able to make a person wise unto salvation through faith in Christ Jesus. Paul then declares: *\"All Scripture is God-breathed (theopneustos (θεόπνευστος)) and profitable for teaching, for reproof, for correction, for training in righteousness; so that the man of God may be adequate (artios (ἄρτιος)), equipped (exērtismenos (ἐξηρτισμένος), from exartizō (ἐξαρτίζω)) for every good work.\"* Notice that *artios* (ἄρτιος) and *exartizō* (ἐξαρτίζω) share the exact same Greek root as *katartizō* (καταρτίζω) in **Luke 6:40**! God-breathed Scripture is the only tool that can thoroughly equip and complete a child's mind so they stand firm in truth."
                 },
                 {
                   "type": "paragraph",
@@ -812,7 +815,7 @@
           "sections": [
             {
               "id": "ch-4-sec-1",
-              "heading": "1. The \"Salt and Light\" Misapplication (Matthew 5:13–16)",
+              "heading": "1. The \"Salt and Light\" Misapplication",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -830,11 +833,11 @@
             },
             {
               "id": "ch-4-sec-2",
-              "heading": "2. Pearls Before Swine & The Millstone Warning (Matthew 7:6; Luke 17:1–2; Psalm 127:3)",
+              "heading": "2. Pearls Before Swine & The Millstone Warning",
               "blocks": [
                 {
                   "type": "paragraph",
-                  "text": "Just two chapters after speaking of salt and light, Jesus issues a sharp counterbalance in **Matthew 7:6**: do not give what is holy to dogs, and do not cast your pearls—*margaritēs* (μαργαρίτης)—before swine, lest they trample them under their feet, turn, and tear you to pieces."
+                  "text": "Just two chapters after speaking of salt and light, Jesus issues a sharp counterbalance in **Matthew 7:6**: do not give what is holy to dogs, and do not cast your pearls—*margaritas* (μαργαρίτας, plural of *margaritēs* (μαργαρίτης))—before swine, lest they trample them under their feet, turn, and tear you to pieces."
                 },
                 {
                   "type": "paragraph",
@@ -842,13 +845,13 @@
                 },
                 {
                   "type": "paragraph",
-                  "text": "Jesus reinforces the gravity of protecting young believers in **Luke 17:1–2**. Speaking of the \"little ones\"—*mikros* (μικρός)—who believe in Him, Christ warns that it would be better for a person to have a heavy millstone hung around his neck and be thrown into the sea than to cause—*skandalizō* (σκανδαλίζω), meaning to entrap, trip up, or entice to sin and apostasy—one of these little ones to stumble. When a school curriculum systematically teaches a child that cosmic evolution, millions of years, and moral relativism are \"science,\" and that Genesis is primitive folklore, its entire intellectual machinery is calibrated to *skandalizō* (σκανδαλίζω) a child's faith in Scripture."
+                  "text": "Jesus reinforces the gravity of protecting young believers in **Luke 17:1–2**. Speaking of the \"little ones\"—*tōn mikrōn* (τῶν μικρῶν, plural of *mikros* (μικρός))—who believe in Him, Christ warns that it would be better for a person to have a heavy millstone hung around his neck and be thrown into the sea than to cause—*skandalizō* (σκανδαλίζω), meaning to entrap, trip up, or entice to sin and apostasy—one of these little ones to stumble. When a school curriculum systematically teaches a child that cosmic evolution, millions of years, and moral relativism are \"science,\" and that Genesis is primitive folklore, its entire intellectual machinery is calibrated to *skandalizō* (σκανδαλίζω) a child's faith in Scripture."
                 }
               ]
             },
             {
               "id": "ch-4-sec-3",
-              "heading": "3. The Truth About Joseph and Daniel: Captivity vs. Enrollment (Genesis 37:2, 28; 39:9; 50:20; Daniel 1:1–8)",
+              "heading": "3. The Truth About Joseph and Daniel: Captivity vs. Enrollment",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -877,7 +880,7 @@
             "lab_number": 4,
             "id": "lab-4",
             "direction": "Parent-to-Child",
-            "title": "Family Table Lab #4: The Salt, The Water, and The Armor (Matthew 5:13–16; 7:6; Luke 17:1–2; Daniel 1:1–8; Ephesians 6:13–17)",
+            "title": "Family Table Lab #4: The Salt, The Water, and The Armor",
             "blocks": [
               {
                 "type": "paragraph",
@@ -981,7 +984,7 @@
           "sections": [
             {
               "id": "ch-5-sec-1",
-              "heading": "1. Front #1: Daniel and the Secular Classroom (Daniel 1:3–20; Psalm 119:99–100)",
+              "heading": "1. Front #1: Daniel and the Secular Classroom",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1019,7 +1022,7 @@
             },
             {
               "id": "ch-5-sec-2",
-              "heading": "2. Front #2: Joseph Inside the Walls — When School Feels Like a Prison (Genesis 39:1–23; 50:20; Proverbs 4:14–15; 22:3; Colossians 3:23)",
+              "heading": "2. Front #2: Joseph Inside the Walls — When School Feels Like a Prison",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1045,7 +1048,7 @@
             },
             {
               "id": "ch-5-sec-3",
-              "heading": "3. Patricia Engler's \"Prepare to Thrive\" Principle (Prepare to Thrive; Genesis 1–11)",
+              "heading": "3. Patricia Engler's \"Prepare to Thrive\" Principle",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1062,7 +1065,7 @@
             "lab_number": 5,
             "id": "lab-5",
             "direction": "Student-to-Parent",
-            "title": "Student-to-Parent Lab #5: The Daniel & Joseph Survival Blueprint (Daniel 1:8–20; Genesis 39:1–23; Proverbs 22:3)",
+            "title": "Student-to-Parent Lab #5: The Daniel & Joseph Survival Blueprint",
             "blocks": [
               {
                 "type": "paragraph",
@@ -1135,7 +1138,7 @@
           "sections": [
             {
               "id": "ch-6-sec-1",
-              "heading": "1. Tool #1: The 3 E's of Spiritual Defense (Examine, Expose, Escape) (1 Thessalonians 5:21; Acts 17:11; Ephesians 5:11; 2 Corinthians 10:5; 1 Corinthians 10:13; 2 Timothy 2:22)",
+              "heading": "1. Tool #1: The 3 E's of Spiritual Defense (Examine, Expose, Escape)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1157,7 +1160,7 @@
             },
             {
               "id": "ch-6-sec-2",
-              "heading": "2. The Workman's Standard (2 Timothy 2:15 — LSB)",
+              "heading": "2. The Workman's Standard",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1167,7 +1170,7 @@
             },
             {
               "id": "ch-6-sec-3",
-              "heading": "3. Tool #2: Patricia Engler's 7 Checks of Critical Thinking (Genesis 1:21; Titus 1:2; Matthew 7:16–20; Psalm 119:99–100)",
+              "heading": "3. Tool #2: Patricia Engler's 7 Checks of Critical Thinking",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1238,7 +1241,7 @@
             "lab_number": 6,
             "id": "lab-6",
             "direction": "Student-to-Parent",
-            "title": "Student-to-Parent Lab #6: Putting Claims Under the Microscope (Acts 17:11; 1 Thessalonians 5:21; 2 Corinthians 10:3–5; Ephesians 5:11)",
+            "title": "Student-to-Parent Lab #6: Putting Claims Under the Microscope",
             "blocks": [
               {
                 "type": "paragraph",
@@ -1307,7 +1310,7 @@
           "sections": [
             {
               "id": "ch-7-sec-1",
-              "heading": "1. The Biblical Posture: Respectful Boldness, Not Fleshly Quarreling (1 Peter 3:15–16; 2 Timothy 2:24–26)",
+              "heading": "1. The Biblical Posture: Respectful Boldness, Not Fleshly Quarreling",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1329,7 +1332,7 @@
             },
             {
               "id": "ch-7-sec-2",
-              "heading": "2. How to Answer Secular Test Questions Without Lying (Daniel 1:17–20; 1 Peter 3:16)",
+              "heading": "2. How to Answer Secular Test Questions Without Lying",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1367,7 +1370,7 @@
             },
             {
               "id": "ch-7-sec-3",
-              "heading": "3. Deconstructing Four Real-World Classroom Scenarios (Genesis 1:21; 6–8; 2 Peter 3:5–6; Ephesians 5:3, 11; Acts 5:29)",
+              "heading": "3. Deconstructing Four Real-World Classroom Scenarios",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1440,7 +1443,7 @@
             "lab_number": 7,
             "id": "lab-7",
             "direction": "Student-to-Parent",
-            "title": "Student-to-Parent Lab #7: Roleplaying the Classroom Playbook (2 Timothy 2:15, 24–26; 1 Peter 3:15–16; Acts 5:29)",
+            "title": "Student-to-Parent Lab #7: Roleplaying the Classroom Playbook",
             "blocks": [
               {
                 "type": "paragraph",
@@ -1507,11 +1510,11 @@
           "blocks": [
             {
               "type": "paragraph",
-              "text": "Diagnosis without action never healed a patient, and warning without equipping never won a war. Throughout this guide, we have looked squarely at the infallible standard of God's Word: the command to cease—*chadal* (חָדַל)—listening to instruction—*musar* (מוּסָר)—that causes our minds to stray from the words of knowledge (**Proverbs 19:27**); the mandate for parents to sharpen—*shanan* (שָׁנַן)—their children in Scripture all day long (**Deuteronomy 6:6–9**) and bring them up in the holistic training and education—*paideia* (παιδεία)—of the Lord (**Ephesians 6:4**); and the tactical blueprint of Daniel and Joseph for standing uncompromisingly when a student must navigate a secular classroom (**Daniel 1:8**; **Genesis 39:9**)."
+              "text": "Diagnosis without action never healed a patient, and warning without equipping never won a war. Throughout this guide, we have looked squarely at the infallible standard of God's Word: the command to cease—*chadal* (חַדַל, root חָדַל)—listening to instruction—*musar* (מוּסָר)—that causes our minds to stray from the words of knowledge (**Proverbs 19:27–29**); the mandate for parents to sharpen—*shanan* (שָׁנַן)—their children in Scripture all day long (**Deuteronomy 6:6–9**) and bring them up in the holistic training and education—*paideia* (παιδεία)—of the Lord (**Ephesians 6:4**); and the tactical blueprint of Daniel and Joseph for standing uncompromisingly when a student must navigate a secular classroom (**Daniel 1:8**; **Genesis 39:9**)."
             },
             {
               "type": "paragraph",
-              "text": "As **James 1:22** commands, we must become **doers**—*poiētēs* (ποιητής)—of the Word, and not merely **hearers**—*akroatēs* (ἀκροατής)—who delude themselves. Whether your family is ready to step out of the secular state system into full-time biblical homeschooling today, or you are equipping a student who currently sits in a secular high school or university, you do not have to walk this road alone or reinvent the wheel."
+              "text": "As **James 1:22** commands, we must become **doers**—*poiētai* (ποιηταί, plural of *poiētēs* (ποιητής))—of the Word, and not merely **hearers**—*akroatai* (ἀκροαταί, plural of *akroatēs* (ἀκροατής))—who delude themselves. Whether your family is ready to step out of the secular state system into full-time biblical homeschooling today, or you are equipping a student who currently sits in a secular high school or university, you do not have to walk this road alone or reinvent the wheel."
             },
             {
               "type": "paragraph",
@@ -1521,7 +1524,7 @@
           "sections": [
             {
               "id": "ch-8-sec-1",
-              "heading": "1. Daily Scripture Immersion Tools (Personal & Family) (Psalm 1:2; Joshua 1:8; Acts 17:11; Deuteronomy 6:6–9)",
+              "heading": "1. Daily Scripture Immersion Tools (Personal & Family)",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1533,7 +1536,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**The Integrated 365DBR Scripture Reader (**[`https://mt-sin.ai/365DBR/`](https://mt-sin.ai/365DBR/)**):** Our free, no-login *365-Day Daily Bible Reading* web platform. It requires no accounts, no downloads, and no tracking—giving you structured daily readings with side-by-side literal translations (including the King James Version and Literal Standard Version), synchronized audio, and instant click-through access to the underlying Hebrew and Greek interlinear text so you can verify every word for yourself."
+                  "text": "**The Integrated 365DBR Scripture Reader (**[`https://mt-sin.ai/365DBR/`](https://mt-sin.ai/365DBR/)**):** Our free, no-login *365-Day Daily Bible Reading* web platform. It requires no accounts, no downloads, and no third-party tracking or cookies (your reading progress and lab entries are saved privately on your own device via local browser storage)—giving you structured daily readings with side-by-side literal translations (including the KJV, LSB, LSV, YLT, and WEB translations), synchronized audio, and instant click-through access to the underlying Hebrew and Greek interlinear text so you can verify every word for yourself."
                 },
                 {
                   "type": "ul_item",
@@ -1547,7 +1550,7 @@
             },
             {
               "id": "ch-8-sec-2",
-              "heading": "2. The Answers in Genesis (AiG) Core Arsenal & Frontline PhD Scientists (Genesis 1–11; 6–8)",
+              "heading": "2. The Answers in Genesis (AiG) Core Arsenal & Frontline PhD Scientists",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1657,7 +1660,7 @@
             },
             {
               "id": "ch-8-sec-3",
-              "heading": "3. Breaking Classroom Isolation, Campus Evangelism & Time-Tested Pillars of Truth (Daniel 1:3–4; 1 Kings 19:18; Romans 1:16)",
+              "heading": "3. Breaking Classroom Isolation, Campus Evangelism & Time-Tested Pillars of Truth",
               "blocks": [
                 {
                   "type": "paragraph",
@@ -1731,11 +1734,11 @@
             },
             {
               "id": "ch-8-sec-4",
-              "heading": "4. Practical Pathways: Biblical Education Pioneers, Homeschooling & Church Equipping (Proverbs 19:27; Deuteronomy 6:6–9; Luke 6:40)",
+              "heading": "4. Practical Pathways: Biblical Education Pioneers, Homeschooling & Church Equipping",
               "blocks": [
                 {
                   "type": "paragraph",
-                  "text": "When parents read **Proverbs 19:27**, **Deuteronomy 6:6–9**, and **Luke 6:40** and realize they can no longer hand 12,000 hours of their children's minds over to Caesar, the immediate question is: *\"Who can walk us through the transition, and how do we practically start teaching at home?\"* Here is your step-by-step roadmap:"
+                  "text": "When parents read **Proverbs 19:27–29**, **Deuteronomy 6:6–9**, and **Luke 6:40** and realize they can no longer hand 12,000 hours of their children's minds over to Caesar, the immediate question is: *\"Who can walk us through the transition, and how do we practically start teaching at home?\"* Here is your step-by-step roadmap:"
                 },
                 {
                   "type": "ul_item",
@@ -1853,7 +1856,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Ken Ham:** [`https://www.youtube.com/@KenHamAiG`](https://www.youtube.com/@KenHamAiG) (`@KenHamAiG`)"
+                  "text": "**Ken Ham:** [`https://www.youtube.com/@AiGKenHam`](https://www.youtube.com/@AiGKenHam) (`@AiGKenHam`)"
                 },
                 {
                   "type": "ul_item",
@@ -1869,7 +1872,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Biblical Science Institute (Dr. Jason Lisle):** [`https://www.youtube.com/@BiblicalScienceInstitute`](https://www.youtube.com/@BiblicalScienceInstitute)"
+                  "text": "**Biblical Science Institute (Dr. Jason Lisle):** [`https://www.youtube.com/@biblicalscienceinstitute259`](https://www.youtube.com/@biblicalscienceinstitute259)"
                 },
                 {
                   "type": "ul_item",
@@ -1877,7 +1880,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Answers in Genesis:** [`https://x.com/AiG`](https://x.com/AiG) (`@AiG`) \\| **Creation Museum:** [`https://x.com/CreationMuseum`](https://x.com/CreationMuseum) \\| **Ark Encounter:** [`https://x.com/ArkEncounter`](https://x.com/ArkEncounter)"
+                  "text": "**Answers in Genesis:** [`https://x.com/AiG`](https://x.com/AiG) (`@AiG`) | **Creation Museum:** [`https://x.com/CreationMuseum`](https://x.com/CreationMuseum) | **Ark Encounter:** [`https://x.com/ArkEncounter`](https://x.com/ArkEncounter)"
                 },
                 {
                   "type": "ul_item",
@@ -1885,15 +1888,11 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Patricia Engler:** [`https://x.com/engler_patricia`](https://x.com/engler_patricia) (`@engler_patricia`)"
-                },
-                {
-                  "type": "ul_item",
                   "text": "**Dr. Georgia Purdom:** [`https://x.com/georgiapurdom`](https://x.com/georgiapurdom) (`@georgiapurdom`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Dr. Jason Lisle:** [`https://x.com/DrJasonLisle`](https://x.com/DrJasonLisle) (`@DrJasonLisle`) \\| [`https://biblicalscienceinstitute.com`](https://biblicalscienceinstitute.com)"
+                  "text": "**Dr. Jason Lisle:** [`https://x.com/jason_lisle`](https://x.com/jason_lisle) (`@DrJasonLisle`) | [`https://biblicalscienceinstitute.com`](https://biblicalscienceinstitute.com)"
                 },
                 {
                   "type": "ul_item",
@@ -1917,7 +1916,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Bodie Hodge, Bryan Osborne & Tim Chaffey:** [`https://answersingenesis.org/bios/bodie-hodge/`](https://answersingenesis.org/bios/bodie-hodge/) \\| [`https://answersingenesis.org/bios/bryan-osborne/`](https://answersingenesis.org/bios/bryan-osborne/) \\| [`https://answersingenesis.org/bios/tim-chaffey/`](https://answersingenesis.org/bios/tim-chaffey/)"
+                  "text": "**Bryan Osborne & Tim Chaffey:**  [`https://answersingenesis.org/bios/bryan-osborne/`](https://answersingenesis.org/bios/bryan-osborne/) | [`https://answersingenesis.org/bios/tim-chaffey/`](https://answersingenesis.org/bios/tim-chaffey/)"
                 },
                 {
                   "type": "ul_item",
@@ -1925,7 +1924,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Websites:** [`https://tpusa.com`](https://tpusa.com) (Club America High School & College Chapters) \\| [`https://tpusafaith.com`](https://tpusafaith.com) \\| [`https://turningpointed.com`](https://turningpointed.com)"
+                  "text": "**Websites:** [`https://tpusa.com`](https://tpusa.com) (Club America High School & College Chapters) | [`https://tpusafaith.com`](https://tpusafaith.com) | [`https://turningpointed.com`](https://turningpointed.com)"
                 },
                 {
                   "type": "ul_item",
@@ -1933,7 +1932,7 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**X (`x.com`) Accounts:** [`https://x.com/TPUSA`](https://x.com/TPUSA) (`@TPUSA`) \\| [`https://x.com/TPUSAFaith`](https://x.com/TPUSAFaith) (`@TPUSAFaith`)"
+                  "text": "**X (`x.com`) Accounts:** [`https://x.com/TPUSA`](https://x.com/TPUSA) (`@TPUSA`) | [`https://x.com/TPUSAFaith`](https://x.com/TPUSAFaith) (`@TPUSAFaith`)"
                 },
                 {
                   "type": "ul_item",
@@ -1941,15 +1940,15 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Website & Streaming:** [`https://livingwaters.com`](https://livingwaters.com) \\| [`https://livingwaters.tv`](https://livingwaters.tv)"
+                  "text": "**Website & Streaming:** [`https://livingwaters.com`](https://livingwaters.com) | [`https://livingwaters.tv`](https://livingwaters.tv)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**YouTube Channel (Over 1.5 Million Subscribers — Campus Documentaries & Q&A):** [`https://www.youtube.com/@thewayofthemaster`](https://www.youtube.com/@thewayofthemaster) (`@thewayofthemaster`)"
+                  "text": "**YouTube Channel (Over 1.7 Million Subscribers — Campus Documentaries & Q&A):** [`https://www.youtube.com/@LivingWaters`](https://www.youtube.com/@LivingWaters) (`@LivingWaters`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**X (`x.com`) Accounts:** [`https://x.com/RayComfort`](https://x.com/RayComfort) (`@RayComfort`) \\| [`https://x.com/LivingWatersPub`](https://x.com/LivingWatersPub) (`@LivingWatersPub`)"
+                  "text": "**X (`x.com`) Accounts:** [`https://x.com/RayComfort`](https://x.com/RayComfort) (`@RayComfort`) | [`https://x.com/LivingWatersPub`](https://x.com/LivingWatersPub) (`@LivingWatersPub`)"
                 },
                 {
                   "type": "ul_item",
@@ -1957,47 +1956,47 @@
                 },
                 {
                   "type": "ul_item",
-                  "text": "**John MacArthur / Grace to You:** [`https://gty.org`](https://gty.org) \\| [`https://www.youtube.com/@grace2you`](https://www.youtube.com/@grace2you) (`@grace2you`) \\| [`https://x.com/grace2you`](https://x.com/grace2you) (`@grace2you`)"
+                  "text": "**John MacArthur / Grace to You:** [`https://gty.org`](https://gty.org) | [`https://www.youtube.com/@gracetoyou`](https://www.youtube.com/@gracetoyou) (`@GraceToYou`) | [`https://x.com/gracetoyou`](https://x.com/gracetoyou) (`@GraceToYou`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Hillsdale College (Free Online Courses & K–12 Curriculum):** [`https://hillsdale.edu`](https://hillsdale.edu) \\| [`https://online.hillsdale.edu`](https://online.hillsdale.edu) \\| [`https://k12.hillsdale.edu`](https://k12.hillsdale.edu) \\| [`https://www.youtube.com/@hillsdalecollege`](https://www.youtube.com/@hillsdalecollege) (`@hillsdalecollege`) \\| [`https://x.com/Hillsdale`](https://x.com/Hillsdale) (`@Hillsdale`)"
+                  "text": "**Hillsdale College (Free Online Courses & K–12 Curriculum):** [`https://hillsdale.edu`](https://hillsdale.edu) | [`https://online.hillsdale.edu`](https://online.hillsdale.edu) | [`https://k12.hillsdale.edu`](https://k12.hillsdale.edu) | [`https://www.youtube.com/@hillsdalecollege`](https://www.youtube.com/@hillsdalecollege) (`@HillsdaleCollege`) | [`https://x.com/Hillsdale`](https://x.com/Hillsdale) (`@Hillsdale`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**WallBuilders (David & Tim Barton):** [`https://wallbuilders.com`](https://wallbuilders.com) \\| [`https://www.youtube.com/@WallBuilders`](https://www.youtube.com/@WallBuilders) (`@WallBuilders`) \\| [`https://x.com/WallBuilders`](https://x.com/WallBuilders) (`@WallBuilders`)"
+                  "text": "**WallBuilders (David & Tim Barton):** [`https://wallbuilders.com`](https://wallbuilders.com) | [`https://www.youtube.com/@WallBuilders`](https://www.youtube.com/@WallBuilders) (`@WallBuilders`) | [`https://twitter.com/TimDavidBarton`](https://twitter.com/TimDavidBarton) (`@WallBuilders`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Billy Graham Evangelistic Association & Franklin Graham:** [`https://billygraham.org`](https://billygraham.org) \\| [`https://www.youtube.com/@BillyGraham`](https://www.youtube.com/@BillyGraham) (`@BillyGraham`) \\| [`https://x.com/BGEA`](https://x.com/BGEA) (`@BGEA`) \\| [`https://x.com/Franklin_Graham`](https://x.com/Franklin_Graham) (`@Franklin_Graham`)"
+                  "text": "**Billy Graham Evangelistic Association & Franklin Graham:** [`https://billygraham.org`](https://billygraham.org) | [`https://www.youtube.com/@BillyGraham`](https://www.youtube.com/@BillyGraham) (`@BillyGraham`) | [`https://x.com/BGEA`](https://x.com/BGEA) (`@BGEA`) | [`https://x.com/Franklin_Graham`](https://x.com/Franklin_Graham) (`@Franklin_Graham`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Dr. Voddie Baucham Ministries:** [`https://voddiebaucham.org`](https://voddiebaucham.org) \\| [`https://x.com/VoddieBaucham`](https://x.com/VoddieBaucham) (`@VoddieBaucham`)"
+                  "text": "**Dr. Voddie Baucham Ministries:** [`https://voddiebaucham.org`](https://voddiebaucham.org) | [`https://x.com/VoddieBaucham`](https://x.com/VoddieBaucham) (`@VoddieBaucham`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Israel Wayne (Family Renewal):** [`https://familyrenewal.org`](https://familyrenewal.org) \\| [`https://x.com/IsraelWayne`](https://x.com/IsraelWayne) (`@IsraelWayne`)"
+                  "text": "**Israel Wayne (Family Renewal):** [`https://familyrenewal.org`](https://familyrenewal.org) | [`https://x.com/IsraelWayne`](https://x.com/IsraelWayne) (`@IsraelWayne`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Kevin Swanson & Generations:** [`https://generations.org`](https://generations.org) \\| [`https://www.youtube.com/@GenerationsRadio`](https://www.youtube.com/@GenerationsRadio)"
+                  "text": "**Kevin Swanson & Generations:** [`https://generations.org`](https://generations.org) | [`https://x.com/generations_min`](https://x.com/generations_min) | [`https://www.youtube.com/@generations_min`](https://www.youtube.com/@generations_min)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Alex Newman (Liberty Sentinel):** [`https://libertysentinel.org`](https://libertysentinel.org) \\| [`https://x.com/ALEXNEWMAN_JOU`](https://x.com/ALEXNEWMAN_JOU) (`@ALEXNEWMAN_JOU`)"
+                  "text": "**Alex Newman (Liberty Sentinel):** [`https://libertysentinel.org`](https://libertysentinel.org) | [`https://www.youtube.com/@LibertySentinel`](https://www.youtube.com/@LibertySentinel) (`@LibertySentinel`)  | [`https://x.com/ALEXNEWMAN_JOU`](https://x.com/ALEXNEWMAN_JOU) (`@ALEXNEWMAN_JOU`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**HSLDA (Legal Rights & State Laws):** [`https://hslda.org`](https://hslda.org) \\| [`https://x.com/HSLDA`](https://x.com/HSLDA) (`@HSLDA`)"
+                  "text": "**HSLDA (Legal Rights & State Laws):** [`https://hslda.org`](https://hslda.org) | [`https://x.com/HSLDA`](https://x.com/HSLDA) (`@HSLDA`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Master Books (AiG Homeschool Curriculum):** [`https://masterbooks.com`](https://masterbooks.com) \\| [`https://www.youtube.com/@MasterBooks`](https://www.youtube.com/@MasterBooks) (`@MasterBooks`)"
+                  "text": "**Master Books (AiG Homeschool Curriculum):** [`https://masterbooks.com`](https://masterbooks.com) | [`https://www.youtube.com/@MasterBooksCurriculum`](https://www.youtube.com/@MasterBooksCurriculum) (`@MasterBooksCurriculum`)"
                 },
                 {
                   "type": "ul_item",
-                  "text": "**Apologia Curriculum:** [`https://apologia.com`](https://apologia.com)"
+                  "text": "**Apologia Curriculum:** [`https://apologia.com`](https://apologia.com) | [`https://www.youtube.com/@ApologiaWorld`](https://www.youtube.com/@ApologiaWorld) (`@ApologiaWorld`)"
                 }
               ]
             }
@@ -2006,7 +2005,7 @@
             "lab_number": 8,
             "id": "lab-8",
             "direction": "Joint Family & Student Commissioning",
-            "title": "Family & Student Commissioning Lab #8: Our Household Covenant & Action Plan (Joshua 24:14–15; Deuteronomy 6:6–9; 2 Timothy 2:15; 1 Peter 3:15–16)",
+            "title": "Family & Student Commissioning Lab #8: Our Household Covenant & Action Plan",
             "blocks": [
               {
                 "type": "paragraph",
@@ -2070,7 +2069,7 @@
               },
               {
                 "type": "ul_item",
-                "text": "*Based on Proverbs 19:27, Ephesians 6:4, and Luke 6:40, what is the next faithful step God is calling our family to take regarding how and where we educate—and which resource from the Answers in Genesis, Turning Point USA, Living Waters, or Sola Scriptura directory will we plug into first?*"
+                "text": "*Based on Proverbs 19:27–29, Ephesians 6:4, and Luke 6:40, what is the next faithful step God is calling our family to take regarding how and where we educate—and which resource from the Answers in Genesis, Turning Point USA, Living Waters, or Sola Scriptura directory will we plug into first?*"
               },
               {
                 "type": "lab_input",
@@ -2135,5 +2134,6 @@
         }
       ]
     }
-  ]
+  ],
+  "generated_at": "2026-11-14T09:35:42.576016Z"
 }

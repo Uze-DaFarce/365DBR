@@ -1,9 +1,8 @@
 /* ==========================================================================
    Foundations Library (FL) — fl-core.js (100% CSP 'script-src self' Compliant)
-   2-Line Topbar Height Sync, 365DBR Reader, LocalStorage, Print & Coffee
+   2-Line Topbar Height Sync, Universal TOC Toggle, Scroll-Lock & 365DBR Reader
    ========================================================================== */
 const FLApp = (() => {
-  // Set your Stripe Payment Link or Ko-fi URL here once created; all pages update automatically!
   const COFFEE_TIP_URL = "#support-coffee";
 
   function syncTopbarHeight() {
@@ -62,12 +61,83 @@ const FLApp = (() => {
     }
   }
 
+  function findReadingAnchor(preferredEl) {
+    if (preferredEl && preferredEl.getBoundingClientRect) {
+      const r = preferredEl.getBoundingClientRect();
+      if (r.width > 0 || r.height > 0) return preferredEl;
+    }
+    const topbarH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--fl-topbar-height")) || 76;
+    const candidates = document.querySelectorAll(
+      ".fl-main p, .fl-main li, .fl-main h2, .fl-main h3, .container .point, .container h2, .hub-container .book-card"
+    );
+    for (let i = 0; i < candidates.length; i++) {
+      const rect = candidates[i].getBoundingClientRect();
+      if (rect.bottom > topbarH + 12 && rect.height > 0) {
+        return candidates[i];
+      }
+    }
+    return null;
+  }
+
+  function withScrollLock(preferredEl, mutateLayoutFn) {
+    const anchor = findReadingAnchor(preferredEl);
+    const prevTop = anchor ? anchor.getBoundingClientRect().top : null;
+    const htmlEl = document.documentElement;
+    const prevScrollBehavior = htmlEl.style.scrollBehavior;
+    htmlEl.style.scrollBehavior = "auto";
+
+    mutateLayoutFn();
+
+    if (anchor && prevTop !== null) {
+      const newTop = anchor.getBoundingClientRect().top;
+      const delta = newTop - prevTop;
+      if (Math.abs(delta) > 0.5) {
+        window.scrollBy(0, delta);
+      }
+    }
+    requestAnimationFrame(() => {
+      htmlEl.style.scrollBehavior = prevScrollBehavior;
+    });
+  }
+
+  function isCompactTocViewport() {
+    return window.matchMedia("(max-width: 1200px), (max-height: 500px)").matches;
+  }
+
+  function syncTocAria() {
+    const btn = document.querySelector('[data-fl-action="toggle-toc"]');
+    if (!btn) return;
+    const isOpen = isCompactTocViewport()
+      ? document.body.classList.contains("toc-open")
+      : !document.body.classList.contains("toc-collapsed");
+    btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  }
+
+  function toggleToc() {
+    if (isCompactTocViewport()) {
+      document.body.classList.toggle("toc-open");
+      syncTocAria();
+    } else {
+      withScrollLock(null, () => {
+        document.body.classList.toggle("toc-collapsed");
+      });
+      syncTocAria();
+    }
+  }
+
   function closeReader() {
     const drawer = document.getElementById("bible-drawer");
     if (!drawer) return;
-    drawer.classList.remove("open");
-    drawer.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("drawer-open");
+    if (document.activeElement && drawer.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
+    withScrollLock(null, () => {
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+      drawer.setAttribute("inert", "");
+      drawer.inert = true;
+      document.body.classList.remove("drawer-open");
+    });
   }
 
   function initDelegatedActions() {
@@ -85,7 +155,28 @@ const FLApp = (() => {
       });
     }
 
+    window.addEventListener("resize", syncTocAria);
+    syncTocAria();
+
     document.addEventListener("click", (e) => {
+      // 0. Toggle Left Table of Contents Drawer
+      const tocToggleBtn = e.target.closest('[data-fl-action="toggle-toc"]');
+      if (tocToggleBtn) {
+        e.preventDefault();
+        toggleToc();
+        return;
+      }
+
+      // Auto-close TOC Drawer on Compact Viewports When Clicking a TOC Link or Outside
+      if (document.body.classList.contains("toc-open") && isCompactTocViewport()) {
+        const clickedTocLink = e.target.closest(".fl-sidebar a");
+        const clickedInsideSidebar = e.target.closest(".fl-sidebar");
+        if (clickedTocLink || !clickedInsideSidebar) {
+          document.body.classList.remove("toc-open");
+          syncTocAria();
+        }
+      }
+
       // 1. Print Full Page
       const printPageBtn = e.target.closest('[data-fl-action="print-page"]');
       if (printPageBtn) {
@@ -118,7 +209,7 @@ const FLApp = (() => {
         return;
       }
 
-      // 5. Scripture Reference Links -> Open Docked 450px 365DBR Scripture Reader
+      // 5. Scripture Reference Links -> Open Docked 450px 365DBR Scripture Reader (Scroll-Locked)
       const link = e.target.closest(".refs a, a.fl-scripture-link");
       if (!link || !drawer || !frame) return;
 
@@ -129,16 +220,20 @@ const FLApp = (() => {
       const targetUrl = normalizeScriptureUrl(rawHref);
       const refLabel = (link.textContent || "Scripture").trim();
 
-      if (title) title.textContent = `${refLabel} — 365DBR Scripture Reader`;
+      if (title) title.textContent = refLabel;
       if (extLink) extLink.setAttribute("href", targetUrl);
 
       if (frame.getAttribute("src") !== targetUrl) {
         frame.setAttribute("src", targetUrl);
       }
 
-      drawer.classList.add("open");
-      drawer.setAttribute("aria-hidden", "false");
-      document.body.classList.add("drawer-open");
+      withScrollLock(link, () => {
+        drawer.classList.add("open");
+        drawer.setAttribute("aria-hidden", "false");
+        drawer.removeAttribute("inert");
+        drawer.inert = false;
+        document.body.classList.add("drawer-open");
+      });
     });
 
     if (closeBtn) {
@@ -146,8 +241,13 @@ const FLApp = (() => {
     }
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && drawer && drawer.classList.contains("open")) {
-        closeReader();
+      if (e.key === "Escape") {
+        if (document.body.classList.contains("toc-open")) {
+          document.body.classList.remove("toc-open");
+          syncTocAria();
+        } else if (drawer && drawer.classList.contains("open")) {
+          closeReader();
+        }
       }
     });
   }
@@ -282,5 +382,5 @@ const FLApp = (() => {
     initCoBranding();
   });
 
-  return { printLab, printAllLabs, clearLab, closeReader };
+  return { printLab, printAllLabs, clearLab, closeReader, toggleToc };
 })();
