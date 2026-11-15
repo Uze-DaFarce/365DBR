@@ -1,3 +1,5 @@
+import sys
+sys.stdout.reconfigure(encoding="utf-8")
 #!/usr/bin/env python3
 """
 Foundations Library (FL) Compiler — build_fl.py
@@ -463,19 +465,82 @@ def parse_manuscript_to_json(cleaned_md: str) -> dict:
 # ==============================================================================
 # 5. INLINE MARKDOWN FORMATTER & WIDGET RENDERERS
 # ==============================================================================
+SOCIAL_SVG_PATHS = {
+    "x": (
+        "X (Twitter)",
+        '<svg class="fl-social-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+    ),
+    "youtube": (
+        "YouTube",
+        '<svg class="fl-social-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
+    ),
+    "facebook": (
+        "Facebook",
+        '<svg class="fl-social-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
+    ),
+    "instagram": (
+        "Instagram",
+        '<svg class="fl-social-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>',
+    ),
+    "rumble": (
+        "Rumble",
+        '<svg class="fl-social-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><path d="M13.39 2.22c-3.15-.63-6.52.27-8.79 2.37-2.31 2.13-3.23 5.48-2.42 8.53.79 2.98 3.19 5.48 6.13 6.42 3.12 1 6.69.34 9.21-1.72 2.47-2.02 3.69-5.32 3.14-8.47-.55-3.19-3.03-5.94-6.17-6.88-.36-.11-.73-.18-1.1-.25zM9.5 8.25c.28-.16.63-.15.91.02l5.25 3.25c.46.28.46.96 0 1.24l-5.25 3.25c-.28.17-.63.18-.91.02-.28-.16-.45-.46-.45-.79v-6.2c0-.33.17-.63.45-.79z"/></svg>',
+    ),
+}
+
+def render_ext_or_social_link(label: str, url: str) -> str:
+    u_low = url.lower()
+    platform_key = None
+    if "x.com/" in u_low or "twitter.com/" in u_low:
+        platform_key = "x"
+    elif "youtube.com/" in u_low or "youtu.be/" in u_low:
+        platform_key = "youtube"
+    elif "facebook.com/" in u_low:
+        platform_key = "facebook"
+    elif "instagram.com/" in u_low:
+        platform_key = "instagram"
+    elif "rumble.com/" in u_low:
+        platform_key = "rumble"
+
+    if not platform_key:
+        return f'<a href="{url}" target="_blank" rel="noopener" class="fl-ext-link">{label}</a>'
+
+    plat_name, svg_icon = SOCIAL_SVG_PATHS[platform_key]
+    clean_label = label.strip()
+    if clean_label.startswith("http://") or clean_label.startswith("https://"):
+        m_handle = re.search(r"/(@[A-Za-z0-9_.-]+)", url)
+        if m_handle:
+            clean_label = m_handle.group(1)
+        else:
+            m_slug = re.search(r"/(?:c|user|channel)/([^/?#]+)", url)
+            if m_slug:
+                clean_label = m_slug.group(1)
+            else:
+                m_tail = re.search(r"https?://[^/]+/([^/?#]+)", url)
+                if m_tail:
+                    clean_label = "@" + m_tail.group(1).lstrip("@")
+
+    title_attr = html.escape(f"{clean_label} on {plat_name}", quote=True)
+    return (
+        f'<a href="{url}" target="_blank" rel="noopener" '
+        f'class="fl-ext-link fl-social-link fl-social-{platform_key}" '
+        f'title="{title_attr}" aria-label="{title_attr}">'
+        f'{svg_icon}<span>{clean_label}</span></a>'
+    )
+
 def format_inline_md(text: str) -> str:
   s = html.escape(text, quote=False)
-  # Strip markdown backticks around URLs or @handles so they never print raw `backticks`
-  s = re.sub(r"`(https?://[^`\s]+)`", r"\1", s)
-  s = re.sub(r"`(@[A-Za-z0-9_]+)`", r"\1", s)
+  # Strip markdown backticks around URLs, bare domains (e.g. `x.com`), or @handles (including dots/hyphens)
+  s = re.sub(r"`((?:https?://)?[A-Za-z0-9.-]+\.[a-z]{2,}[^`\s]*)`", r"\1", s)
+  s = re.sub(r"`(@[A-Za-z0-9_.-]+)`", r"\1", s)
   s = re.sub(
       r"&lt;(https?://[^&>\s]+)&gt;",
-      r'<a href="\1" target="_blank" rel="noopener" class="fl-ext-link">\1</a>',
+      lambda m: render_ext_or_social_link(m.group(1), m.group(1)),
       s,
   )
   s = re.sub(
       r"\[([^\]]+)\]\((https?://[^\)]+)\)",
-      r'<a href="\2" target="_blank" rel="noopener" class="fl-ext-link">\1</a>',
+      lambda m: render_ext_or_social_link(m.group(1), m.group(2)),
       s,
   )
   s = re.sub(r"\*\*\*(.+?)\*\*\*", r"<strong><em>\1</em></strong>", s)
@@ -884,7 +949,7 @@ def build_education_html(doc_data: dict) -> str:
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/foundations/fl-core.css" />
+  <link rel="stylesheet" href="/foundations/fl-core.css?v=3" />
   <link rel="stylesheet" href="/foundations/fl-education.css" />
   <script type="application/ld+json">
 {json.dumps(schema_ld, indent=2)}
@@ -903,7 +968,7 @@ def build_education_html(doc_data: dict) -> str:
         <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
       </div>
       <div class="fl-top-actions">
-        <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing"><span class="fl-lbl-full">☕ Buy Your Brother a Coffee</span><span class="fl-lbl-short">☕ Coffee</span></a>
+        <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing"><span class="fl-lbl-full">❤️ Support FL 🏛️</span><span class="fl-lbl-short">❤️ FL</span></a>
         <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-all-labs" title="Print only the 8 Family &amp; Student Lab Worksheets"><span class="fl-lbl-full">🖨️ Print All 8 Labs</span><span class="fl-lbl-short">🖨️ 8 Labs</span></button>
         <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page" title="Print full book and worksheets"><span class="fl-lbl-full">🖨️ Print</span><span class="fl-lbl-short">🖨️ Print</span></button>
       </div>
@@ -938,25 +1003,41 @@ def build_education_html(doc_data: dict) -> str:
 
       {"".join(body_sections)}
 
-      <aside id="support-coffee" class="fl-support-footer no-print" aria-label="Voluntary Ministry Support">
+      <aside id="support-coffee" class="fl-support-footer" aria-label="Voluntary Ministry Support">
+      <div class="fl-support-body">
         <p class="fl-support-text">
-          <strong>☕ Support Independent Sola Scriptura Writing:</strong> All Scripture tools (<em>365DBR</em> &amp; the <em>Legacy Standard Bible</em>) are provided 100% free of charge and strictly non-commercial. Voluntary gifts solely support <strong>Rowley &amp; Patty Shaw's</strong> independent writing and server hosting.
+          <strong>❤️ Support Foundations Library 🏛️ (100% Optional):</strong> Every book, study, and Scripture tool on <em>Foundations Library</em> and <em>365DBR</em> is provided <strong>100% free of charge, with zero paywalls, ads, or commercial restrictions—forever</strong> (<em>Matthew 10:8</em>). If this work has blessed your household and you would like to help your brother and sister in Christ (<strong>Rowley &amp; Patty Shaw</strong>) cover independent writing, research, and server hosting costs, you can send a voluntary gift via <strong>Intuit QuickBooks Payments</strong> (<em>Mt. Sinai LLC</em>; personal gifts are not tax-deductible). If your family's budget is tight, please use and print everything freely with our joy and blessing!
         </p>
-        <a href="#support-coffee" class="fl-btn fl-btn-coffee" data-coffee-link="pending">☕ Buy Your Brother a Coffee</a>
-      </aside>
+        <div class="fl-support-controls no-print">
+          <label for="fl-support-tier" class="fl-support-label">Gift Amount:</label>
+          <select id="fl-support-tier" class="fl-support-select" aria-label="Select voluntary support amount">
+            <option value="https://connect.intuit.com/pay/PattyShaw/scs-v1-c1c2a59720144473a27aee64ff2d9701e09df4cb5801458fb017d7b16833e957f51b78ed6ca2491c8fd5923d577d212f-0?locale=EN_US&cta=saveandcopylink">$3 — Support Foundations Library</option>
+            <option value="https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta" selected>$5 — Support Foundations Library</option>
+            <option value="https://connect.intuit.com/pay/PattyShaw/scs-v1-02fd4483942540d0a9766b7279d6912e6f9fcef4710e4c28a72b95be583e33f6a97dd9f96bd4431fa5640ebfc369d7bd-1?locale=EN_US&cta=saveandcopylink">$10 — Support Foundations Library</option>
+            <option value="https://connect.intuit.com/pay/PattyShaw/scs-v1-dc9f5b03e1b24c53a659e8e409a0b2e66698a1f75d024e7f88de8b15c83afbee92e8ce95daff4bbcb59c12de14a4385a-0?locale=EN_US&cta=saveandcopylink">$25 — Support Foundations Library</option>
+            <option value="https://connect.intuit.com/pay/PattyShaw/scs-v1-cc97092ddbce45b7a7bf9cdb0e07e11cb6f52f0dd12d40ae89554617e1e4a4f393af842986d94db0b6401b68127bbbeb-0?locale=EN_US&cta=saveandcopylink">$50 — Support Foundations Library</option>
+          </select>
+          <a href="https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta" id="fl-support-cta" class="fl-btn fl-btn-coffee" data-coffee-link="tiered" target="_blank" rel="noopener noreferrer">❤️ Support FL (via Intuit QuickBooks) ↗</a>
+        </div>
+      </div>
+      <div class="fl-support-qr">
+        <img src="https://quickchart.io/qr?format=svg&margin=1&size=110&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2Fsupport" alt="Support Foundations Library QR Code" width="56" height="56" />
+        <div class="fl-support-qr-caption"><strong>❤️ Support FL</strong><br/>mt-sin.ai/fl/support</div>
+      </div>
+    </aside>
 
       <div class="print-qr">
         <div class="print-qr-item">
             <div class="print-qr-title">Foundations Library</div>
-            <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2F" alt="Foundations Library QR"/>
+            <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2F" alt="Foundations Library QR"/>
             <div class="print-qr-desc">Free Sola Scriptura books &amp; family equipping guides</div>
-            <div class="print-qr-url">mt-sin.ai/foundations/</div>
+            <div class="print-qr-url">mt-sin.ai/fl/</div>
         </div>
         <div class="print-qr-item">
             <div class="print-qr-title">Book 1 Online</div>
-            <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffoundations%2Fgod.html" alt="Book Online QR"/>
+            <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2Fgod" alt="Book Online QR"/>
             <div class="print-qr-desc">Tap any verse online for live Hebrew/Greek interlinear</div>
-            <div class="print-qr-url">mt-sin.ai/foundations/god.html</div>
+            <div class="print-qr-url">mt-sin.ai/fl/god</div>
         </div>
         <div class="print-qr-item">
             <div class="print-qr-title">365 Daily Bible Plan</div>
@@ -988,7 +1069,7 @@ def build_education_html(doc_data: dict) -> str:
     </iframe>
   </aside>
 
-  <script src="/foundations/fl-core.js"></script>
+  <script src="/foundations/fl-core.js?v=3"></script>
 </body>
 </html>
 """
@@ -1058,7 +1139,7 @@ def make_redirect_stub(target_path: str, title_label: str) -> str:
 """
 
 
-HTACCESS_CONTENT = """# ==============================================================================
+HTACCESS_CONTENT = r"""# ==============================================================================
 # Foundations Library (apps/foundations/.htaccess) — Mt. Sinai LLC
 # GoDaddy / Apache Case-Insensitive Router & CSP Header Override
 # ==============================================================================
@@ -1086,6 +1167,13 @@ RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-educatio
 RewriteRule ^(what-does-the-bible-say-about-education|biblical-education|education)(\\.html)?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
 
 # 4. Fallback Case-Normalizer for any other future Foundations Library guide
+RewriteRule ^support(\.html)?/?$ /foundations/#support-coffee [R=302,L,NC,NE]
+RewriteRule ^(coffee|support5)(\.html)?/?$ https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta [R=302,L,NC,NE]
+RewriteRule ^support3(\.html)?/?$ https://connect.intuit.com/pay/PattyShaw/scs-v1-c1c2a59720144473a27aee64ff2d9701e09df4cb5801458fb017d7b16833e957f51b78ed6ca2491c8fd5923d577d212f-0?locale=EN_US&cta=saveandcopylink [R=302,L,NC,NE]
+RewriteRule ^support10(\.html)?/?$ https://connect.intuit.com/pay/PattyShaw/scs-v1-02fd4483942540d0a9766b7279d6912e6f9fcef4710e4c28a72b95be583e33f6a97dd9f96bd4431fa5640ebfc369d7bd-1?locale=EN_US&cta=saveandcopylink [R=302,L,NC,NE]
+RewriteRule ^support25(\.html)?/?$ https://connect.intuit.com/pay/PattyShaw/scs-v1-dc9f5b03e1b24c53a659e8e409a0b2e66698a1f75d024e7f88de8b15c83afbee92e8ce95daff4bbcb59c12de14a4385a-0?locale=EN_US&cta=saveandcopylink [R=302,L,NC,NE]
+RewriteRule ^support50(\.html)?/?$ https://connect.intuit.com/pay/PattyShaw/scs-v1-cc97092ddbce45b7a7bf9cdb0e07e11cb6f52f0dd12d40ae89554617e1e4a4f393af842986d94db0b6401b68127bbbeb-0?locale=EN_US&cta=saveandcopylink [R=302,L,NC,NE]
+
 ErrorDocument 404 /foundations/404-case-router.html
 """
 
@@ -1095,7 +1183,7 @@ CASE_ROUTER_HTML = """<!DOCTYPE html>
   <meta charset="UTF-8" />
   <title>Routing | Foundations Library (Mt. Sinai LLC)</title>
   <meta name="robots" content="noindex, follow" />
-  <link rel="stylesheet" href="/foundations/fl-core.css" />
+  <link rel="stylesheet" href="/foundations/fl-core.css?v=3" />
 </head>
 <body data-fl-case-router="true" style="font-family: Georgia, serif; padding: 40px;">
   <h2>Mt. Sinai LLC — Foundations Library</h2>
@@ -1104,7 +1192,7 @@ CASE_ROUTER_HTML = """<!DOCTYPE html>
     <li><a href="/foundations/what-does-the-bible-say-about-god.html">1: What Does the Bible Say About God? (What We Know About God — Foundational Facts, Biblically Backed)</a></li>
     <li><a href="/foundations/what-does-the-bible-say-about-education.html">2: What Does the Bible Say About Education? (Foundational Truths for Parents &amp; Students)</a></li>
   </ul>
-  <script src="/foundations/fl-core.js"></script>
+  <script src="/foundations/fl-core.js?v=3"></script>
 </body>
 </html>
 """

@@ -63,8 +63,28 @@ body {
 .fl-toc-list li { margin-bottom: 6px; }
 .fl-toc-part { margin-top: 12px; font-weight: 700; color: var(--crimson); }
 .fl-toc-lab { padding-left: 10px; font-size: 12.5px; }
-.fl-toc-list a { color: var(--text); text-decoration: none; display: block; padding: 2px 0; }
-.fl-toc-list a:hover { color: var(--accent); text-decoration: underline; }
+.fl-toc-list a,
+.fl-toc-list a:link {
+  color: var(--accent);
+  text-decoration: none;
+  display: block;
+  padding: 2px 0;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.fl-toc-list a:visited {
+  color: var(--link-visited);
+}
+
+.fl-toc-list a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+}
+
+.fl-toc-list a:active {
+  color: var(--link-active);
+}
 
 /* Compact / Tablet / Mobile / Landscape Phone (<= 1200px OR max-height: 500px):
    Off-Canvas Slide-Out Left TOC Drawer */
@@ -144,16 +164,27 @@ h1, h2, h3, h4 {
   margin-top: 0.35rem;
 }
 
-.fl-scripture-link {
-  color: var(--accent);
+.fl-scripture-link,
+.fl-scripture-link:link {
+  color: var(--link);
   font-weight: 700;
   text-decoration: underline;
-  text-decoration-color: rgba(92, 64, 40, 0.45);
+  text-decoration-color: rgba(122, 32, 32, 0.45);
   text-underline-offset: 3px;
 }
+
+.fl-scripture-link:visited {
+  color: var(--link-visited);
+  text-decoration-color: rgba(92, 67, 50, 0.45);
+}
+
 .fl-scripture-link:hover {
-  color: var(--crimson);
-  text-decoration-color: var(--crimson);
+  color: var(--link-hover);
+  text-decoration-color: var(--gold);
+}
+
+.fl-scripture-link:active {
+  color: var(--link-active);
 }
 
 .fl-part-banner {
@@ -372,3 +403,41 @@ h1, h2, h3, h4 {
     line-height: 1.85;
   }
 }
+
+/* Sprint 4: Monochrome Inline SVG Social Links */
+.fl-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+  white-space: nowrap;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+  background: rgba(120, 110, 95, 0.08);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.fl-social-link:hover,
+.fl-social-link:focus-visible {
+  background: rgba(120, 110, 95, 0.18);
+  text-decoration: underline;
+}
+.fl-social-icon {
+  width: 0.92em;
+  height: 0.92em;
+  flex-shrink: 0;
+  fill: currentColor;
+  vertical-align: -0.12em;
+}
+@media print {
+  .fl-social-link {
+    background: transparent !important;
+    padding: 0 !important;
+    gap: 0.2em !important;
+  }
+  .fl-social-icon {
+    width: 9pt !important;
+    height: 9pt !important;
+  }
+}
+/* End Sprint 4 Social Links */

@@ -3,8 +3,6 @@
    2-Line Topbar Height Sync, Universal TOC Toggle, Scroll-Lock & 365DBR Reader
    ========================================================================== */
 const FLApp = (() => {
-  const COFFEE_TIP_URL = "#support-coffee";
-
   function syncTopbarHeight() {
     const topbar = document.querySelector(".fl-topbar");
     if (!topbar) return;
@@ -147,19 +145,24 @@ const FLApp = (() => {
     const extLink = document.getElementById("drawer-ext");
     const closeBtn = document.getElementById("drawer-close-btn");
 
-    if (COFFEE_TIP_URL && COFFEE_TIP_URL !== "#support-coffee") {
-      document.querySelectorAll(".fl-btn-coffee").forEach((btn) => {
-        btn.setAttribute("href", COFFEE_TIP_URL);
-        btn.setAttribute("target", "_blank");
-        btn.setAttribute("rel", "noopener");
+    const tierSelect = document.getElementById("fl-support-tier");
+    const tierCta = document.getElementById("fl-support-cta");
+    if (tierSelect && tierCta) {
+      const syncTier = () => {
+        tierCta.setAttribute("href", tierSelect.value);
+      };
+      tierSelect.addEventListener("change", syncTier);
+      tierCta.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.open(tierSelect.value, "_blank", "noopener,noreferrer");
       });
+      syncTier();
     }
 
     window.addEventListener("resize", syncTocAria);
     syncTocAria();
 
     document.addEventListener("click", (e) => {
-      // 0. Toggle Left Table of Contents Drawer
       const tocToggleBtn = e.target.closest('[data-fl-action="toggle-toc"]');
       if (tocToggleBtn) {
         e.preventDefault();
@@ -167,7 +170,6 @@ const FLApp = (() => {
         return;
       }
 
-      // Auto-close TOC Drawer on Compact Viewports When Clicking a TOC Link or Outside
       if (document.body.classList.contains("toc-open") && isCompactTocViewport()) {
         const clickedTocLink = e.target.closest(".fl-sidebar a");
         const clickedInsideSidebar = e.target.closest(".fl-sidebar");
@@ -177,7 +179,6 @@ const FLApp = (() => {
         }
       }
 
-      // 1. Print Full Page
       const printPageBtn = e.target.closest('[data-fl-action="print-page"]');
       if (printPageBtn) {
         e.preventDefault();
@@ -185,7 +186,6 @@ const FLApp = (() => {
         return;
       }
 
-      // 2. Print All 8 Labs Only (Book 2)
       const printAllLabsBtn = e.target.closest('[data-fl-action="print-all-labs"]');
       if (printAllLabsBtn) {
         e.preventDefault();
@@ -193,7 +193,6 @@ const FLApp = (() => {
         return;
       }
 
-      // 3. Print Single Lab
       const printLabBtn = e.target.closest("[data-fl-print-lab]");
       if (printLabBtn) {
         e.preventDefault();
@@ -201,7 +200,6 @@ const FLApp = (() => {
         return;
       }
 
-      // 4. Clear Single Lab
       const clearLabBtn = e.target.closest("[data-fl-clear-lab]");
       if (clearLabBtn) {
         e.preventDefault();
@@ -209,7 +207,6 @@ const FLApp = (() => {
         return;
       }
 
-      // 5. Scripture Reference Links -> Open Docked 450px 365DBR Scripture Reader (Scroll-Locked)
       const link = e.target.closest(".refs a, a.fl-scripture-link");
       if (!link || !drawer || !frame) return;
 
