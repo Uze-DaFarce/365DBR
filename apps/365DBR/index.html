@@ -224,6 +224,27 @@ function normStrong(value) {
   return m[1] + String(parseInt(m[2], 10)) + m[3];
 }
 
+// Digits only. G2424G is not G2424. Same rule as db/query/verify.py.
+function plainStrong(value) {
+  const raw = String(value || '').trim().toUpperCase();
+  const m = raw.match(/^([HG])0*(\d+)$/);
+  if (!m) return '';
+  return m[1] + String(parseInt(m[2], 10));
+}
+
+function storedNumberMatch(token) {
+  if (token && typeof token.number_match === 'boolean') return token.number_match;
+  const notes = (token && token.step_notes) || [];
+  if (notes.length !== 1) return null;
+  const stored = String(token.strong || '').trim();
+  const dstrong = String(notes[0].dstrong || '').trim();
+  if (!stored && !dstrong) return null;
+  const left = plainStrong(stored);
+  const right = plainStrong(dstrong);
+  if (left && right) return left === right;
+  return stored.toUpperCase() === dstrong.toUpperCase();
+}
+
 function originalLetters(text) {
   let out = '';
   for (const ch of String(text || '').normalize('NFD')) {
@@ -873,7 +894,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
                                                     <span className="ml-1 text-[10px] font-normal text-stone-400">(STEPBible contextual English)</span>
                                                 </span>
                                             )}
-                                            {selected.lemma && (
+                                            {selected.lemma && originalLetters(selected.lemma) && (
                                                 <span>
                                                     <span className="mx-1.5 text-stone-300">|</span>
                                                     <span className={isHeb ? 'hebrew' : 'greek'} dir={isHeb ? 'rtl' : 'ltr'} style={{ unicodeBidi: 'isolate' }}>{selected.lemma}</span>
@@ -884,7 +905,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
                                                 <span>
                                                     <span className="mx-1.5 text-stone-300">|</span>
                                                     {selected.lexicon_gloss}
-                                                    <span className="ml-1 text-[10px] font-normal text-stone-400">(TBESG lexicon gloss)</span>
+                                                    <span className="ml-1 text-[10px] font-normal text-stone-400">{storedNumberMatch(selected) === false ? '(TBESG gloss of the stored number)' : '(TBESG lexicon gloss)'}</span>
                                                 </span>
                                             )}
                                             {(selected.step_notes || []).length > 0 && (
@@ -899,7 +920,7 @@ function StrongsPanel({ verseId, apiBase, onClose, onJumpVerse, onMarkWord, pref
                                                             {note.alt ? ` · Alt ${note.alt}` : ''}
                                                         </span>
                                                     ))}
-                                                    {selected.strong ? ` · stored ${selected.strong}` : ''}
+                                                    {selected.strong ? ` · stored ${selected.strong}${storedNumberMatch(selected) === true ? ' matches dStrong' : storedNumberMatch(selected) === false ? ' does not match dStrong' : ''}` : ''}
                                                 </span>
                                             )}
                                             {selected.strong && !(selected.step_notes && selected.step_notes.length) && (

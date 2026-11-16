@@ -7,12 +7,146 @@ body {
   font-weight: 400;
   font-size: clamp(1.06rem, 2.5vw, 1.14rem);
   line-height: 1.65;
+  text-align: left;
+}
+
+.fl-layout {
+  max-width: 1360px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: 32px;
+  padding: 24px 24px 64px;
+}
+
+/* Wide Desktop (>= 1201px and taller than 500px): Collapsible Side-by-Side TOC */
+@media (min-width: 1201px) and (min-height: 501px) {
+  body.toc-collapsed .fl-layout {
+    grid-template-columns: 1fr;
+  }
+  body.toc-collapsed .fl-sidebar {
+    display: none;
+  }
+  body.toc-collapsed .fl-main {
+    margin: 0 auto;
+  }
+}
+
+.fl-sidebar {
+  position: sticky;
+  top: calc(var(--fl-topbar-height, 76px) + 12px);
+  align-self: start;
+  max-height: calc(100vh - var(--fl-topbar-height, 76px) - 24px);
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.fl-sidebar h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.fl-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 13px;
+  line-height: 1.42;
+}
+.fl-toc-list li { margin-bottom: 5px; }
+.fl-toc-part {
+  margin-top: 12px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--crimson);
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+.fl-toc-part:first-child { border-top: none; padding-top: 0; margin-top: 4px; }
+.fl-toc-day {
+  margin-top: 8px;
+  font-weight: 700;
+}
+.fl-toc-pt {
+  padding-left: 10px;
+  font-size: 12px;
+}
+.fl-toc-lab {
+  padding-left: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 3px;
+  margin-bottom: 8px;
+}
+
+.fl-toc-list a,
+.fl-toc-list a:link {
+  color: var(--accent);
+  text-decoration: none;
+  display: block;
+  padding: 2px 0;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.fl-toc-list a:visited { color: var(--link-visited); }
+.fl-toc-list a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+}
+.fl-toc-list a:active { color: var(--link-active); }
+
+/* Compact / Tablet / Mobile / Landscape Phone (<= 1200px OR max-height: 500px):
+   Off-Canvas Slide-Out Left TOC Drawer */
+@media (max-width: 1200px), (max-height: 500px) {
+  .fl-layout {
+    grid-template-columns: 1fr;
+    padding: 18px 14px 72px;
+  }
+  .fl-sidebar {
+    position: fixed;
+    top: var(--fl-topbar-height, 64px);
+    left: -350px;
+    width: 310px;
+    max-width: 86vw;
+    height: calc(100vh - var(--fl-topbar-height, 64px));
+    height: calc(100dvh - var(--fl-topbar-height, 64px));
+    max-height: none;
+    z-index: 1000;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 4px 4px 24px rgba(0, 0, 0, 0.18);
+    transition: left 0.25s ease;
+  }
+  body.toc-open .fl-sidebar {
+    left: 0;
+  }
+}
+
+.fl-main {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 36px 44px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .container {
-  max-width: 1360px;
-  margin: 0 auto;
-  padding: 24px 32px 64px;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .page-hero {
@@ -46,17 +180,46 @@ h2 {
   color: var(--accent);
   border-left: 4px solid var(--accent);
   padding-left: 10px;
-  margin-top: 26px;
+  margin-top: 28px;
   margin-bottom: 14px;
+}
+
+.fl-day-section {
+  margin-top: 24px;
+  padding-top: 8px;
+}
+
+.fl-day-header {
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fl-day-title {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-weight: 700;
+  font-size: clamp(1.06rem, 2.5vw, 1.2rem);
+  color: var(--crimson);
+  margin: 0 0 2px 0;
+}
+
+.fl-day-sub {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 0;
+  font-style: italic;
 }
 
 .point {
   position: relative;
-  padding-left: 22px;
-  margin-bottom: 13px;
+  padding-left: 26px;
+  margin-bottom: 14px;
 }
 
-.point:target {
+.point:target,
+.fl-day-section:target,
+.fl-lab-card:target {
   background: rgba(212, 175, 55, 0.18);
   border-left: 3px solid var(--gold);
   padding-left: 10px;
@@ -73,6 +236,12 @@ h2 {
   font-weight: bold;
   font-size: 1.05em;
   user-select: none;
+}
+
+.pt-num {
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: 4px;
 }
 
 .refs {
@@ -97,25 +266,97 @@ h2 {
   transition: all 0.15s ease;
 }
 
-.refs a:visited {
-  color: var(--link-visited);
-}
-
+.refs a:visited { color: var(--link-visited); }
 .refs a:hover {
   color: #fff;
   background: var(--link-hover);
   border-color: var(--gold);
   text-decoration: none;
 }
-
 .refs a:active {
   color: #fff;
   background: var(--link-active);
   border-color: var(--link-active);
 }
 
-@media (max-width: 900px) {
-  .container { padding: 20px 16px 56px; }
+/* Daily Personal & Family Bible Study Review Cards */
+.fl-lab-card {
+  margin: 20px 0 30px;
+  padding: 20px 24px;
+  background: var(--accent-bg);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.fl-lab-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+.fl-lab-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 9px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.fl-lab-header h4 {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.05rem;
+  margin: 0;
+  color: var(--accent);
+}
+
+.fl-lab-body p {
+  margin: 0 0 10px;
+}
+
+.fl-lab-response-block {
+  margin: 12px 0 16px;
+}
+
+.fl-response-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.fl-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.fl-print-blank-line {
+  display: none;
+}
+
+.fl-lab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
 }
 
 @media (max-width: 768px), (max-height: 500px) {
@@ -123,17 +364,28 @@ h2 {
     font-size: clamp(1.06rem, 2.5vw, 1.16rem);
     line-height: 1.75;
   }
-  .container { padding: 16px 15px 76px; }
+  .fl-main { padding: 20px 16px; }
+  .fl-lab-card { padding: 16px; }
   .point:target { scroll-margin-top: 75px; scroll-margin-bottom: 70px; }
 }
 
 @media print {
-  .container {
+  .fl-layout {
+    display: block !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
   }
-  .point { font-size: 12pt !important; }
+  .fl-sidebar {
+    display: none !important;
+  }
+  .fl-main {
+    border: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    background: transparent !important;
+  }
+  .point { font-size: 11.5pt !important; }
   .refs, .refs a {
     font-size: 9pt !important;
     color: #444 !important;
@@ -141,5 +393,29 @@ h2 {
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
+  }
+  .fl-textarea.fl-is-empty {
+    display: none !important;
+  }
+  .fl-textarea.fl-is-empty + .fl-print-blank-line {
+    display: block !important;
+    color: #555;
+    line-height: 2;
+    margin-top: 4px;
+  }
+  body.fl-print-single-lab .page-hero,
+  body.fl-print-single-lab h2,
+  body.fl-print-single-lab .fl-day-header,
+  body.fl-print-single-lab .point,
+  body.fl-print-single-lab .fl-support-footer,
+  body.fl-print-single-lab .fl-lab-card:not(.fl-lab-target-active) {
+    display: none !important;
+  }
+  body.fl-print-all-labs .page-hero,
+  body.fl-print-all-labs h2,
+  body.fl-print-all-labs .fl-day-header,
+  body.fl-print-all-labs .point,
+  body.fl-print-all-labs .fl-support-footer {
+    display: none !important;
   }
 }

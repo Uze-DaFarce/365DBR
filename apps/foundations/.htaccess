@@ -8,7 +8,7 @@ RewriteBase /foundations/
 
 # 0. Override Root CSP so 365DBR Iframe ('self') & Print QR Codes Load Cleanly
 <IfModule mod_headers.c>
-  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self';"
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self';"
 </IfModule>
 
 # 1. Enable Apache mod_speling if available on GoDaddy server (auto-fixes mixed case)
@@ -26,7 +26,7 @@ RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-educatio
 RewriteRule ^(what-does-the-bible-say-about-education|biblical-education|education)(\\.html)?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
 
 # 4. Fallback Case-Normalizer for any other future Foundations Library guide
-RewriteRule ^support(\.html)?/?$ /foundations/#support-coffee [R=302,L,NC,NE]
+RewriteRule ^support(\.html)?/?$ /foundations/#support-fl [R=302,L,NC,NE]
 RewriteRule ^(coffee|support5)(\.html)?/?$ https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta [R=302,L,NC,NE]
 RewriteRule ^support3(\.html)?/?$ https://connect.intuit.com/pay/PattyShaw/scs-v1-c1c2a59720144473a27aee64ff2d9701e09df4cb5801458fb017d7b16833e957f51b78ed6ca2491c8fd5923d577d212f-0?locale=EN_US&cta=saveandcopylink [R=302,L,NC,NE]
 RewriteRule ^support10(\.html)?/?$ https://connect.intuit.com/pay/PattyShaw/scs-v1-02fd4483942540d0a9766b7279d6912e6f9fcef4710e4c28a72b95be583e33f6a97dd9f96bd4431fa5640ebfc369d7bd-1?locale=EN_US&cta=saveandcopylink [R=302,L,NC,NE]

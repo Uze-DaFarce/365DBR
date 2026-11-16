@@ -37,6 +37,8 @@ JSON_OUT_PATH = BASE_DIR / "data" / "education.json"
 GOD_CANONICAL_SLUG = "what-does-the-bible-say-about-god.html"
 GOD_CANONICAL_URL = f"https://mt-sin.ai/foundations/{GOD_CANONICAL_SLUG}"
 GOD_CANONICAL_PATH = BASE_DIR / GOD_CANONICAL_SLUG
+GOD_RAW_MD_PATH = BASE_DIR / "raw" / "god_manuscript.md"
+GOD_JSON_OUT_PATH = BASE_DIR / "data" / "god.json"
 
 # Book 2: What Does the Bible Say About Education?
 EDU_CANONICAL_SLUG = "what-does-the-bible-say-about-education.html"
@@ -851,6 +853,7 @@ def build_education_html(doc_data: dict) -> str:
                   </div>
                   <div class="fl-lab-actions no-print">
                     <button type="button" class="fl-btn fl-btn-primary" data-fl-print-lab="{lid}">🖨️ Print / Save Completed Lab #{lab['lab_number']}</button>
+                    <button type="button" class="fl-btn fl-btn-light" data-fl-action="share-page" data-share-url="https://mt-sin.ai/fl/edu#{lid}" data-share-title="Lab #{lab['lab_number']}: {html.escape(lab['title'])} | What Does the Bible Say About Education?" data-share-desc="Interactive &amp; printable Sola Scriptura family/student lab worksheet from Foundations Library — 100% free to use, print, and share."><svg class="fl-icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> <span>Share Lab #{lab['lab_number']}</span></button>
                     <button type="button" class="fl-btn fl-btn-outline" data-fl-clear-lab="{lid}">Clear Lab #{lab['lab_number']} Inputs</button>
                   </div>
                 </section>
@@ -968,7 +971,8 @@ def build_education_html(doc_data: dict) -> str:
         <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
       </div>
       <div class="fl-top-actions">
-        <a href="#support-coffee" class="fl-btn fl-btn-coffee" title="Support Rowley &amp; Patty Shaw's independent writing"><span class="fl-lbl-full">❤️ Support FL 🏛️</span><span class="fl-lbl-short">❤️ FL</span></a>
+        <a href="#support-fl" class="fl-btn fl-btn-support" title="Support Rowley &amp; Patty Shaw's independent writing"><span class="fl-lbl-full">❤️ Support FL 🏛️</span><span class="fl-lbl-short">❤️ FL</span></a>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="share-page" title="Freely share or co-brand this book"><svg class="fl-icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> <span class="fl-lbl-full">Share</span><span class="fl-lbl-short">Share</span></button>
         <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-all-labs" title="Print only the 8 Family &amp; Student Lab Worksheets"><span class="fl-lbl-full">🖨️ Print All 8 Labs</span><span class="fl-lbl-short">🖨️ 8 Labs</span></button>
         <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page" title="Print full book and worksheets"><span class="fl-lbl-full">🖨️ Print</span><span class="fl-lbl-short">🖨️ Print</span></button>
       </div>
@@ -983,7 +987,7 @@ def build_education_html(doc_data: dict) -> str:
   </header>
 
   <div class="fl-layout">
-    <aside class="fl-sidebar no-print" aria-label="Book Table of Contents">
+    <aside id="toc-drawer" class="fl-sidebar no-print" aria-label="Book Table of Contents">
       <h3>Contents &amp; Labs</h3>
       <ul class="fl-toc-list">
         <li><a href="#about-resource">About &amp; Attribution</a></li>
@@ -1003,34 +1007,13 @@ def build_education_html(doc_data: dict) -> str:
 
       {"".join(body_sections)}
 
-      <aside id="support-coffee" class="fl-support-footer" aria-label="Voluntary Ministry Support">
-      <div class="fl-support-body">
-        <p class="fl-support-text">
-          <strong>❤️ Support Foundations Library 🏛️ (100% Optional):</strong> Every book, study, and Scripture tool on <em>Foundations Library</em> and <em>365DBR</em> is provided <strong>100% free of charge, with zero paywalls, ads, or commercial restrictions—forever</strong> (<em>Matthew 10:8</em>). If this work has blessed your household and you would like to help your brother and sister in Christ (<strong>Rowley &amp; Patty Shaw</strong>) cover independent writing, research, and server hosting costs, you can send a voluntary gift via <strong>Intuit QuickBooks Payments</strong> (<em>Mt. Sinai LLC</em>; personal gifts are not tax-deductible). If your family's budget is tight, please use and print everything freely with our joy and blessing!
-        </p>
-        <div class="fl-support-controls no-print">
-          <label for="fl-support-tier" class="fl-support-label">Gift Amount:</label>
-          <select id="fl-support-tier" class="fl-support-select" aria-label="Select voluntary support amount">
-            <option value="https://connect.intuit.com/pay/PattyShaw/scs-v1-c1c2a59720144473a27aee64ff2d9701e09df4cb5801458fb017d7b16833e957f51b78ed6ca2491c8fd5923d577d212f-0?locale=EN_US&cta=saveandcopylink">$3 — Support Foundations Library</option>
-            <option value="https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta" selected>$5 — Support Foundations Library</option>
-            <option value="https://connect.intuit.com/pay/PattyShaw/scs-v1-02fd4483942540d0a9766b7279d6912e6f9fcef4710e4c28a72b95be583e33f6a97dd9f96bd4431fa5640ebfc369d7bd-1?locale=EN_US&cta=saveandcopylink">$10 — Support Foundations Library</option>
-            <option value="https://connect.intuit.com/pay/PattyShaw/scs-v1-dc9f5b03e1b24c53a659e8e409a0b2e66698a1f75d024e7f88de8b15c83afbee92e8ce95daff4bbcb59c12de14a4385a-0?locale=EN_US&cta=saveandcopylink">$25 — Support Foundations Library</option>
-            <option value="https://connect.intuit.com/pay/PattyShaw/scs-v1-cc97092ddbce45b7a7bf9cdb0e07e11cb6f52f0dd12d40ae89554617e1e4a4f393af842986d94db0b6401b68127bbbeb-0?locale=EN_US&cta=saveandcopylink">$50 — Support Foundations Library</option>
-          </select>
-          <a href="https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta" id="fl-support-cta" class="fl-btn fl-btn-coffee" data-coffee-link="tiered" target="_blank" rel="noopener noreferrer">❤️ Support FL (via Intuit QuickBooks) ↗</a>
-        </div>
-      </div>
-      <div class="fl-support-qr">
-        <img src="https://quickchart.io/qr?format=svg&margin=1&size=110&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2Fsupport" alt="Support Foundations Library QR Code" width="56" height="56" />
-        <div class="fl-support-qr-caption"><strong>❤️ Support FL</strong><br/>mt-sin.ai/fl/support</div>
-      </div>
-    </aside>
+      {load_support_footer_partial()}
 
       <div class="print-qr">
         <div class="print-qr-item">
             <div class="print-qr-title">Foundations Library</div>
             <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2F" alt="Foundations Library QR"/>
-            <div class="print-qr-desc">Free Sola Scriptura books &amp; family equipping guides</div>
+            <div class="print-qr-desc">100% free to read, print, duplicate &amp; share</div>
             <div class="print-qr-url">mt-sin.ai/fl/</div>
         </div>
         <div class="print-qr-item">
@@ -1075,47 +1058,494 @@ def build_education_html(doc_data: dict) -> str:
 """
 
 # ==============================================================================
-# 7. SURGICAL METADATA & CANONICAL SYNC FOR BOOK 1 (WHAT WE KNOW ABOUT GOD)
+# 7. MODULAR SINGLE-SOURCE SUPPORT FOOTER & ZERO-DUPLICATION SYNC
 # ==============================================================================
-def sync_book1_god_html(dry_run: bool = False):
-    """Updates canonical URLs and <title> inside what-does-the-bible-say-about-god.html."""
-    if not GOD_CANONICAL_PATH.exists():
-        print(f" [!] Skipping Book 1 sync: {GOD_CANONICAL_PATH} not found yet.")
-        return
+SUPPORT_PARTIAL_PATH = BASE_DIR / "partials" / "support-footer.html"
+HUB_INDEX_PATH = BASE_DIR / "index.html"
 
-    content = GOD_CANONICAL_PATH.read_text(encoding="utf-8")
+SHARE_BTN_SVG = '<svg class="fl-icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'
 
-    # 1. Update legacy /365DBR/What_We_Know.html URLs to canonical /foundations/what-does-the-bible-say-about-god.html
-    content = content.replace("https://mt-sin.ai/365DBR/What_We_Know.html", GOD_CANONICAL_URL)
-    content = content.replace("https://mt-sin.ai/foundations/what-we-know.html", GOD_CANONICAL_URL)
-    content = content.replace("https://mt-sin.ai/foundations/what-we-know-about-god.html", GOD_CANONICAL_URL)
+def load_support_footer_partial() -> str:
+    if SUPPORT_PARTIAL_PATH.exists():
+        return SUPPORT_PARTIAL_PATH.read_text(encoding="utf-8").strip()
+    raise FileNotFoundError(f"Missing required partial: {SUPPORT_PARTIAL_PATH}")
 
-    # 2. Update <title> using Foundational Facts, Biblically Backed (no '40' or 'Points')
-    new_title = "<title>What Does the Bible Say About God?: What We Know About God — Foundational Facts, Biblically Backed | Foundations Library</title>"
-    content = re.sub(r"<title>.*?</title>", new_title, content, count=1, flags=re.IGNORECASE | re.DOTALL)
+def sync_support_footer_in_html(html_text: str) -> str:
+    """Idempotently ensures exactly ONE #support-fl block exists using pure string slicing (zero regex)."""
+    canonical_aside = load_support_footer_partial()
+    html_text = html_text.replace("support-coffee", "support-fl")
+    html_text = html_text.replace("fl-btn-coffee", "fl-btn-support")
+    html_text = html_text.replace("data-coffee-link=", "data-support-link=")
 
-    # 3. Ensure <link rel="canonical"> exists and points to GOD_CANONICAL_URL
-    if 'rel="canonical"' in content:
-        content = re.sub(
-            r'<link\s+rel="canonical"\s+href="[^"]*"\s*/?>',
-            f'<link rel="canonical" href="{GOD_CANONICAL_URL}" />',
-            content,
-            flags=re.IGNORECASE
-        )
+    tag_Token = '<aside id="support-fl"'
+    close_Token = "</aside>"
+
+    first_pos = html_text.find(tag_Token)
+    if first_pos != -1:
+        # Strip ALL existing <aside id="support-fl"...>...</aside> blocks and insert exactly ONE at first_pos
+        cleaned_parts = []
+        cursor = 0
+        inserted = False
+        while True:
+            pos = html_text.find(tag_Token, cursor)
+            if pos == -1:
+                cleaned_parts.append(html_text[cursor:])
+                break
+            # Back up over leading horizontal spaces on the same line so indentation stays identical
+            line_start = pos
+            while line_start > cursor and html_text[line_start - 1] in (" ", "\t"):
+                line_start -= 1
+            cleaned_parts.append(html_text[cursor:line_start])
+            end_pos = html_text.find(close_Token, pos)
+            if end_pos == -1:
+                break
+            after_close = end_pos + len(close_Token)
+            if not inserted:
+                cleaned_parts.append(canonical_aside)
+                inserted = True
+            else:
+                # Also strip trailing newline from duplicate blocks
+                if after_close < len(html_text) and html_text[after_close:after_close+2] == "\r\n":
+                    after_close += 2
+                elif after_close < len(html_text) and html_text[after_close] == "\n":
+                    after_close += 1
+            cursor = after_close
+        return "".join(cleaned_parts)
     else:
-        content = content.replace("</title>", f'</title>\n  <link rel="canonical" href="{GOD_CANONICAL_URL}" />', 1)
+        if "</main>" in html_text:
+            return html_text.replace("</main>", canonical_aside + "\n  </main>", 1)
+        elif '<aside id="bible-drawer"' in html_text:
+            return html_text.replace('<aside id="bible-drawer"', canonical_aside + '\n\n<aside id="bible-drawer"', 1)
+        return html_text
 
-    # 4. Upgrade visible <h1> if it currently says just "What We Know"
-    content = re.sub(
-        r"(<h1[^>]*>)\s*What We Know\s*(</h1>)",
-        r"\1What We Know About God\2",
-        content,
-        flags=re.IGNORECASE
+OT_BOOK_CODES = {
+    "GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1SA", "2SA",
+    "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "JOB", "PSA", "PRO",
+    "ECC", "SNG", "ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOL", "AMO",
+    "OBA", "JON", "MIC", "NAM", "HAB", "ZEP", "HAG", "ZEC", "MAL"
+}
+
+def _make_point_short_label(pt_num: int, text: str) -> str:
+    clean = re.sub(r"\*+", "", text).strip()
+    first_clause = re.split(r"[.;:—–]", clean)[0].strip()
+    words = first_clause.split()
+    if len(words) > 7:
+        first_clause = " ".join(words[:7]) + "…"
+    return f"Pt {pt_num}: {first_clause}"
+
+def _render_god_refs_html(refs_md: str) -> tuple:
+    """Converts markdown [Label](url) refs into HTML .refs links and extracts (ot_refs, nt_refs)."""
+    s = refs_md.strip()
+    if s.startswith("(") and s.endswith(")"):
+        s = s[1:-1].strip()
+    s = s.replace("http://localhost:8080/365DBR/", "/365DBR/")
+    s = re.sub(r";\s*\|\s*", "; ", s)
+
+    ot_refs = []
+    nt_refs = []
+    for m in re.finditer(r"\[([^\]]+)\]\(([^\)]+)\)", s):
+        lbl, url = m.group(1).strip(), m.group(2).strip()
+        m_bk = re.search(r"book=([A-Z0-9]+)", url)
+        bk_code = m_bk.group(1) if m_bk else ""
+        entry = {"label": lbl, "url": url, "book": bk_code}
+        if bk_code in OT_BOOK_CODES:
+            ot_refs.append(entry)
+        else:
+            nt_refs.append(entry)
+
+    html_links = re.sub(
+        r"\[([^\]]+)\]\(([^\)]+)\)",
+        lambda m: f'<a href="{m.group(2).strip()}">{html.escape(m.group(1).strip())}</a>',
+        s
     )
+    return f"({html_links})", ot_refs, nt_refs
 
-    # 5. Ensure relative bible.html links point to /365DBR/bible.html
-    content = re.sub(r'href="(?:\./|/365DBR/)?bible\.html', 'href="/365DBR/bible.html', content)
-    write_if_changed(GOD_CANONICAL_PATH, content, dry_run=dry_run)
+def parse_god_manuscript_to_json(raw_md: str) -> dict:
+    lines = [l.strip() for l in raw_md.replace("\r\n", "\n").split("\n")]
+    doc_data = {
+        "schema_version": "1.2.0",
+        "app": {
+            "name": "Foundations Library",
+            "abbr": "FL",
+            "slug": "foundations",
+            "storage_prefix": "fl_god_",
+            "base_url": "https://mt-sin.ai/foundations/",
+            "canonical_url": GOD_CANONICAL_URL,
+            "short_url": "https://mt-sin.ai/fl/god",
+            "sibling_education_url": EDU_CANONICAL_URL,
+            "scripture_engine_url": "https://mt-sin.ai/365DBR/"
+        },
+        "metadata": {
+            "id": "fl-book-god",
+            "slug": "what-does-the-bible-say-about-god",
+            "short_slug": "god",
+            "title": "What We Know About God",
+            "full_title": "What Does the Bible Say About God?: What We Know About God — Foundational Facts, Biblically Backed",
+            "subtitle": "Foundational Facts, Biblically Backed",
+            "authors": ["Rowley Shaw", "Patty Shaw"],
+            "publisher": "Mt. Sinai LLC",
+            "total_days": 8,
+            "total_points": 40
+        },
+        "parts": [],
+        "days": [],
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    }
+
+    current_part = None
+    current_day = None
+    current_review = None
+    pt_counter = 0
+    input_counter = 0
+    pending_pt_lines = []
+
+    def ensure_part(title_str: str):
+        nonlocal current_part
+        p_num = len(doc_data["parts"]) + 1
+        current_part = {
+            "part_number": p_num,
+            "id": f"part-{p_num}",
+            "title": title_str,
+            "day_ids": []
+        }
+        doc_data["parts"].append(current_part)
+
+    for line in lines:
+        if not line:
+            continue
+        if line.startswith("# ") and "What We Know" in line:
+            continue
+        if line.startswith("## ") and "Foundational Facts" in line:
+            continue
+
+        # Check for Day heading: ### Day N: ...
+        m_day = re.match(r"^#{2,3}\s+Day\s+(\d+)\s*:\s*(.+)$", line, re.IGNORECASE)
+        if m_day:
+            day_num = int(m_day.group(1))
+            day_title = f"Day {day_num}: {m_day.group(2).strip()}"
+            if current_part is None:
+                ensure_part("About God")
+            current_day = {
+                "day_number": day_num,
+                "id": f"day-{day_num}",
+                "part_id": current_part["id"],
+                "part_title": current_part["title"],
+                "title": day_title,
+                "subtitle": "",
+                "points": [],
+                "review": None
+            }
+            current_part["day_ids"].append(current_day["id"])
+            doc_data["days"].append(current_day)
+            current_review = None
+            continue
+
+        # Check for Review heading: #### Day N Personal & Family Bible Study Review...
+        m_rev = re.match(r"^#{3,4}\s+(.+Review.*)$", line, re.IGNORECASE)
+        if m_rev and current_day is not None:
+            d_num = current_day["day_number"]
+            current_review = {
+                "review_number": d_num,
+                "id": f"review-{d_num}",
+                "title": m_rev.group(1).strip(),
+                "blocks": []
+            }
+            current_day["review"] = current_review
+            continue
+
+        # Check for Part heading (## About Us, ### About God, ### About the Bible..., ## About Redemption...)
+        if re.match(r"^#{2,3}\s+About\s+", line, re.IGNORECASE):
+            part_title = re.sub(r"^#+\s*", "", line).strip()
+            ensure_part(part_title)
+            current_review = None
+            continue
+
+        # Inside a Review block
+        if current_review is not None:
+            if line == "_____":
+                input_counter += 1
+                d_num = current_day["day_number"]
+                q_idx = sum(1 for b in current_review["blocks"] if b["type"] == "review_input") + 1
+                fid = f"fl_god_day{d_num}_q{q_idx}"
+                prev_label = "Reflection Response:"
+                if current_review["blocks"] and current_review["blocks"][-1]["type"] == "paragraph":
+                    prev_label = current_review["blocks"].pop()["text"]
+                current_review["blocks"].append({
+                    "type": "review_input",
+                    "input_id": fid,
+                    "label": prev_label
+                })
+            else:
+                current_review["blocks"].append({
+                    "type": "paragraph",
+                    "text": line
+                })
+            continue
+
+        # Day subtitle line right after Day heading
+        if current_day is not None and not current_day["points"] and not pending_pt_lines and line.startswith("**") and line.endswith("**"):
+            current_day["subtitle"] = line.strip("*").strip()
+            continue
+
+        # Doctrinal Point & Scripture line
+        if line.startswith("--"):
+            pt_counter += 1
+            if current_day is None:
+                day_num = ((pt_counter - 1) // 5) + 1
+                if current_part is None:
+                    ensure_part("About God")
+                current_day = {
+                    "day_number": day_num,
+                    "id": f"day-{day_num}",
+                    "part_id": current_part["id"],
+                    "part_title": current_part["title"],
+                    "title": f"Day {day_num}",
+                    "subtitle": "",
+                    "points": [],
+                    "review": None
+                }
+                current_part["day_ids"].append(current_day["id"])
+                doc_data["days"].append(current_day)
+
+            pt_text = " ".join(pending_pt_lines).strip()
+            pending_pt_lines = []
+            refs_raw = re.sub(r"^--\s*", "", line).strip()
+            refs_html, ot_refs, nt_refs = _render_god_refs_html(refs_raw)
+            current_day["points"].append({
+                "point_number": pt_counter,
+                "id": f"pt-{pt_counter}",
+                "short_label": _make_point_short_label(pt_counter, pt_text),
+                "text": pt_text,
+                "refs_md": refs_raw,
+                "refs_html": refs_html,
+                "ot_refs": ot_refs,
+                "nt_refs": nt_refs,
+                "has_dual_witness": bool(ot_refs and nt_refs)
+            })
+        elif line.startswith("-"):
+            pending_pt_lines = [re.sub(r"^-\s*", "", line).strip()]
+        elif pending_pt_lines:
+            pending_pt_lines.append(line)
+
+    return doc_data
+
+def build_god_html(doc_data: dict) -> str:
+    toc_items = []
+    body_parts = []
+    rendered_parts = set()
+
+    for day in doc_data["days"]:
+        d_num = day["day_number"]
+        d_id = day["id"]
+        p_id = day["part_id"]
+        p_title = day["part_title"]
+
+        if p_id not in rendered_parts:
+            rendered_parts.add(p_id)
+            toc_items.append(f'<li class="fl-toc-part"><a href="#{p_id}">{html.escape(p_title)}</a></li>')
+            body_parts.append(f'  <h2 id="{p_id}">{html.escape(p_title)}</h2>')
+
+        toc_items.append(f'<li class="fl-toc-day"><a href="#{d_id}">{html.escape(day["title"])}</a></li>')
+
+        pts_html = []
+        for pt in day["points"]:
+            pt_id = pt["id"]
+            pt_num = pt["point_number"]
+            toc_items.append(
+                f'<li class="fl-toc-pt"><a href="#{pt_id}">{html.escape(pt["short_label"])}</a></li>'
+            )
+            pts_html.append(
+                f'    <div id="{pt_id}" class="point"><span class="cross">†</span>'
+                f'<span class="pt-num">{pt_num}.</span> { html.escape(pt["text"], quote=False) } '
+                f'<span class="refs">{pt["refs_html"]}</span></div>'
+            )
+
+        rev_html = ""
+        if day.get("review"):
+            rev = day["review"]
+            r_id = rev["id"]
+            toc_items.append(
+                f'<li class="fl-toc-lab"><a href="#{r_id}">↳ Day {d_num} Personal &amp; Family Review</a></li>'
+            )
+            rev_blocks_html = []
+            for b in rev["blocks"]:
+                if b["type"] == "paragraph":
+                    rev_blocks_html.append(f'<p>{format_inline_md(b["text"])}</p>')
+                elif b["type"] == "review_input":
+                    fid = b["input_id"]
+                    lbl = format_inline_md(b["label"])
+                    rev_blocks_html.append(f"""
+                    <div class="fl-lab-response-block">
+                      <label for="{fid}" class="fl-response-label">{lbl}</label>
+                      <textarea id="{fid}" class="fl-persist-input fl-textarea" data-storage-key="{fid}" rows="3" placeholder="Type your personal or family reflection here (saved automatically in this browser)..."></textarea>
+                      <div class="fl-print-blank-line" data-print-for="{fid}">
+                        <div>__________________________________________________________________________________________</div>
+                        <div>__________________________________________________________________________________________</div>
+                      </div>
+                    </div>""")
+
+            rev_html = f"""
+    <section id="{r_id}" class="fl-lab-card" data-lab-num="{d_num}">
+      <div class="fl-lab-header">
+        <span class="fl-lab-badge">Day {d_num} Personal &amp; Family Review (Points {(d_num-1)*5+1}–{d_num*5})</span>
+        <h4>{html.escape(rev["title"])}</h4>
+      </div>
+      <div class="fl-lab-body">
+        {"".join(rev_blocks_html)}
+      </div>
+      <div class="fl-lab-actions no-print">
+        <button type="button" class="fl-btn fl-btn-primary" data-fl-print-lab="{r_id}">🖨️ Print / Save Day {d_num} Review</button>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="share-page" data-share-url="https://mt-sin.ai/fl/god#{r_id}" data-share-title="Day {d_num} Review: {html.escape(day['title'])} | What We Know About God" data-share-desc="Interactive &amp; printable Sola Scriptura Daily Personal &amp; Family Bible Study Review from Foundations Library — 100% free to use, print, and share.">{SHARE_BTN_SVG} <span>Share Day {d_num} Review</span></button>
+        <button type="button" class="fl-btn fl-btn-outline" data-fl-clear-lab="{r_id}">Clear Day {d_num} Inputs</button>
+      </div>
+    </section>"""
+
+        sub_html = f'<p class="fl-day-sub">{html.escape(day["subtitle"])}</p>' if day.get("subtitle") else ""
+        day_section_html = f"""
+  <section id="{d_id}" class="fl-day-section">
+    <header class="fl-day-header">
+      <h3 class="fl-day-title">{html.escape(day["title"])}</h3>
+      {sub_html}
+    </header>
+{chr(10).join(pts_html)}
+{rev_html}
+  </section>"""
+        body_parts.append(day_section_html)
+
+    support_html = load_support_footer_partial()
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What Does the Bible Say About God?: What We Know About God — Foundational Facts, Biblically Backed | Foundations Library</title>
+  <link rel="canonical" href="{GOD_CANONICAL_URL}" />
+  <meta name="description" content="A 40-point, 8-day foundational framework of Biblical truth and observational science, cross-referenced directly to the Legacy Standard Bible (LSB), KJV, and Original Hebrew/Greek.">
+  <meta property="og:title" content="What We Know About God — Sola Scriptura Foundations" />
+  <meta property="og:description" content="40 foundational truths of God, Creation, Mankind, and Salvation anchored directly in Scripture (LSB) with 8 Daily Personal &amp; Family Reviews." />
+  <meta property="og:url" content="{GOD_CANONICAL_URL}" />
+  <meta property="og:type" content="article" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/foundations/fl-core.css?v=3">
+  <link rel="stylesheet" href="/foundations/fl-god.css">
+</head>
+<body>
+  <header class="fl-topbar no-print">
+    <div class="fl-topbar-row1">
+      <div class="fl-brand-group">
+        <a href="/foundations/" class="fl-brand-title"><span class="fl-lbl-full">🏛️ Foundations Library</span><span class="fl-lbl-short">🏛️ FL</span></a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link"><span class="fl-lbl-full">🕮 365DBR Daily</span><span class="fl-lbl-short">🕮 365DBR</span></a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link"><span class="fl-lbl-full">✝️ Multi-Translation Bible</span><span class="fl-lbl-short">✝️ Bible</span></a>
+        <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
+      </div>
+      <div class="fl-top-actions">
+        <a href="#support-fl" class="fl-btn fl-btn-support" title="Support Rowley &amp; Patty Shaw's independent writing"><span class="fl-lbl-full">❤️ Support FL 🏛️</span><span class="fl-lbl-short">❤️ FL</span></a>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="share-page" title="Freely share or co-brand this book">{SHARE_BTN_SVG} <span class="fl-lbl-full">Share</span><span class="fl-lbl-short">Share</span></button>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-all-labs" title="Print only the 8 Daily Personal &amp; Family Review Worksheets"><span class="fl-lbl-full">🖨️ Print All 8 Reviews</span><span class="fl-lbl-short">🖨️ 8 Reviews</span></button>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page" title="Print full book and reviews"><span class="fl-lbl-full">🖨️ Print</span><span class="fl-lbl-short">🖨️ Print</span></button>
+      </div>
+    </div>
+    <div class="fl-topbar-row2">
+      <button type="button" class="fl-btn fl-toc-toggle" data-fl-action="toggle-toc" aria-expanded="true" title="Toggle Table of Contents"><span class="fl-lbl-full">☰ Contents</span><span class="fl-lbl-short">☰ TOC</span></button>
+      <span class="fl-topbar-sep">|</span>
+      <a href="#" class="fl-active-book" aria-current="page"><span class="fl-lbl-full">📖 Book 1: What We Know About God<span class="fl-book-sub"> — Foundational Facts, Biblically Backed</span></span><span class="fl-lbl-short">📖 #1: God</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{EDU_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">2: Biblical Education ↗</span><span class="fl-lbl-short">2: Education ↗</span></a>
+    </div>
+  </header>
+
+  <div class="fl-layout">
+    <aside id="toc-drawer" class="fl-sidebar no-print" aria-label="Book 1 Table of Contents">
+      <h3>8-Day Study &amp; 40 Truths</h3>
+      <ul class="fl-toc-list">
+        {"".join(toc_items)}
+      </ul>
+    </aside>
+
+    <main class="fl-main">
+      <div class="container">
+        <div class="page-hero">
+          <h1>What We Know About God</h1>
+          <p class="subtitle">Foundational Facts, Biblically Backed — 8-Day Personal &amp; Family Study Guide</p>
+        </div>
+
+{chr(10).join(body_parts)}
+
+        {support_html}
+      </div>
+
+      <div class="print-qr">
+        <div class="print-qr-item">
+          <div class="print-qr-title">Foundations Library</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2F" alt="Foundations Library QR"/>
+          <div class="print-qr-desc">Free Sola Scriptura books &amp; family equipping guides</div>
+          <div class="print-qr-url">mt-sin.ai/fl/</div>
+        </div>
+        <div class="print-qr-item">
+          <div class="print-qr-title">Book 1 Online</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2Fgod" alt="Book Online QR"/>
+          <div class="print-qr-desc">Tap any verse online for live Hebrew/Greek interlinear</div>
+          <div class="print-qr-url">mt-sin.ai/fl/god</div>
+        </div>
+        <div class="print-qr-item">
+          <div class="print-qr-title">365 Daily Bible Plan</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2F" alt="365DBR Daily QR"/>
+          <div class="print-qr-desc">OT, NT, Psalms &amp; Proverbs (~15 min/day)</div>
+          <div class="print-qr-url">mt-sin.ai/365DBR/</div>
+        </div>
+        <div class="print-qr-item">
+          <div class="print-qr-title">Bible &amp; Interlinear Lookup</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2Fbible.html" alt="Multi-Translation Lookup QR"/>
+          <div class="print-qr-desc">Hebrew/Greek + LSB &amp; KJV side-by-side</div>
+          <div class="print-qr-url">mt-sin.ai/365DBR/bible.html</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Live 365DBR Scripture Reader (100% Free & Non-Commercial) -->
+  <aside id="bible-drawer" aria-hidden="true" inert>
+    <div class="drawer-header">
+      <span id="drawer-title">Scripture Reader</span>
+      <div class="drawer-actions">
+        <a id="drawer-ext" href="/365DBR/bible.html" target="_blank" rel="noopener">Open Full Tab ↗</a>
+        <button class="drawer-close" id="drawer-close-btn" type="button">✕ Close</button>
+      </div>
+    </div>
+    <iframe
+      id="bible-frame"
+      src="about:blank"
+      title="365DBR Multi-Translation Bible">
+    </iframe>
+  </aside>
+
+  <script src="/foundations/fl-core.js?v=3"></script>
+</body>
+</html>
+"""
+
+def sync_book1_god_html(dry_run: bool = False):
+    """Compiles raw/god_manuscript.md -> data/god.json and what-does-the-bible-say-about-god.html."""
+    if not GOD_RAW_MD_PATH.exists():
+        raise FileNotFoundError(f"Book 1 source manuscript not found at: {GOD_RAW_MD_PATH}")
+    raw_md = GOD_RAW_MD_PATH.read_text(encoding="utf-8")
+    god_data = parse_god_manuscript_to_json(raw_md)
+    write_json_if_changed(GOD_JSON_OUT_PATH, god_data, dry_run=dry_run)
+
+    html_out = build_god_html(god_data)
+    html_out = sync_support_footer_in_html(html_out)
+    write_if_changed(GOD_CANONICAL_PATH, html_out, dry_run=dry_run)
+
+    if HUB_INDEX_PATH.exists():
+        hub_content = HUB_INDEX_PATH.read_text(encoding="utf-8")
+        hub_content = sync_support_footer_in_html(hub_content)
+        write_if_changed(HUB_INDEX_PATH, hub_content, dry_run=dry_run)
 
 # ==============================================================================
 # 8. REDIRECT STUBS, GODADDY .HTACCESS & CASE-INSENSITIVE ROUTER (CSP-SAFE)
@@ -1149,7 +1579,7 @@ RewriteBase /foundations/
 
 # 0. Override Root CSP so 365DBR Iframe ('self') & Print QR Codes Load Cleanly
 <IfModule mod_headers.c>
-  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self';"
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self';"
 </IfModule>
 
 # 1. Enable Apache mod_speling if available on GoDaddy server (auto-fixes mixed case)
@@ -1167,7 +1597,7 @@ RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-educatio
 RewriteRule ^(what-does-the-bible-say-about-education|biblical-education|education)(\\.html)?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
 
 # 4. Fallback Case-Normalizer for any other future Foundations Library guide
-RewriteRule ^support(\.html)?/?$ /foundations/#support-coffee [R=302,L,NC,NE]
+RewriteRule ^support(\.html)?/?$ /foundations/#support-fl [R=302,L,NC,NE]
 RewriteRule ^(coffee|support5)(\.html)?/?$ https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta [R=302,L,NC,NE]
 RewriteRule ^support3(\.html)?/?$ https://connect.intuit.com/pay/PattyShaw/scs-v1-c1c2a59720144473a27aee64ff2d9701e09df4cb5801458fb017d7b16833e957f51b78ed6ca2491c8fd5923d577d212f-0?locale=EN_US&cta=saveandcopylink [R=302,L,NC,NE]
 RewriteRule ^support10(\.html)?/?$ https://connect.intuit.com/pay/PattyShaw/scs-v1-02fd4483942540d0a9766b7279d6912e6f9fcef4710e4c28a72b95be583e33f6a97dd9f96bd4431fa5640ebfc369d7bd-1?locale=EN_US&cta=saveandcopylink [R=302,L,NC,NE]
@@ -1231,7 +1661,7 @@ def main():
     )
     parser.add_argument(
         "--target",
-        choices=["all", "bks", "stubs", "htaccess"],
+        choices=["all", "bks", "bk-1", "bk-2", "stubs", "htaccess"],
         default=None,
         help="Build scope: all, bks (all books), stubs (redirect stubs), or htaccess (routing)."
     )
@@ -1256,8 +1686,8 @@ def main():
     if target is None and not (args.bk_1 or args.bk_2):
         target = "bks"
 
-    do_bk1 = args.bk_1 or (target in ("all", "bks"))
-    do_bk2 = args.bk_2 or (target in ("all", "bks"))
+    do_bk1 = args.bk_1 or (target in ("all", "bks", "bk-1"))
+    do_bk2 = args.bk_2 or (target in ("all", "bks", "bk-2"))
     do_stubs = target in ("all", "stubs")
     do_htaccess = target in ("all", "htaccess")
 

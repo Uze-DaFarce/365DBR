@@ -61,3 +61,7 @@ To create a Sandbox where an Intelligence lives freely under the authority of Go
 
 ---
 
+## Later lock (2026-11-16)
+
+This page stays the original blueprint. Do not rewrite its three tiers or its 7 checks to match a later memory. The later architecture page keeps four tiers and adds the second logic layer, bleed. Read `docs/SI/SI-Architecture-and-Tier1-Spec.md`, section "Locked contract," before changing either page. A redefinition that is only spoken is not a change to the plan.
+

@@ -31,9 +31,10 @@ sys.path.insert(0, str(ROOT / "db"))
 sys.path.insert(0, str(ROOT / "apps" / "365DBR"))
 
 from etl.parse_passage import language_for_book  # noqa: E402
-from load_stepbible_tokens import grk_letters, heb_letters  # noqa: E402
 from query import get_connection  # noqa: E402
 from query.day_load import _join_original  # noqa: E402
+from query.verify import classify_link  # noqa: E402
+from query.word import token_key as _word_key  # noqa: E402
 
 OUT_DEFAULT = ROOT / "apps" / "365DBR" / "ws"
 
@@ -41,19 +42,6 @@ OUT_DEFAULT = ROOT / "apps" / "365DBR" / "ws"
 def _word_filename(key: str) -> str:
     """ASCII name. GoDaddy FTP replaces Greek and Hebrew letters with ?."""
     return key.encode("utf-8").hex() + ".json"
-
-
-def _word_key(language: str | None, lemma: str | None, surface: str | None) -> str | None:
-    """Letters of the written word. Lemma when it has letters, else the surface.
-
-    Greek drops accents. Hebrew keeps consonants. A Strong's number is not a key.
-    """
-    letters = heb_letters if (language or "").lower() == "hebrew" else grk_letters
-    for text in (lemma, surface):
-        key = letters(text or "")
-        if key:
-            return key
-    return None
 
 
 def _norm_strong_key(strong: str | None) -> str | None:
@@ -131,13 +119,15 @@ def export_verses(conn, out_dir: Path) -> dict:
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT original_token_id, source, source_file, dstrong, root_strong, alt_strongs
+            SELECT original_token_id, source, source_file, surface, letters,
+                   dstrong, root_strong, alt_strongs
             FROM stepbible_token_rows
             WHERE original_token_id IS NOT NULL
             ORDER BY original_token_id, word_index
             """
         )
         notes_by: dict[int, list] = defaultdict(list)
+        judge_by: dict[int, list] = defaultdict(list)
         for row in cur.fetchall():
             note = {"source": row["source"], "file": row["source_file"]}
             if row["dstrong"]:
@@ -147,6 +137,14 @@ def export_verses(conn, out_dir: Path) -> dict:
             if row["alt_strongs"]:
                 note["alt"] = row["alt_strongs"]
             notes_by[row["original_token_id"]].append(note)
+            judge_by[row["original_token_id"]].append(
+                {
+                    "source": row["source"],
+                    "surface": row["surface"],
+                    "letters": row["letters"],
+                    "dstrong": row["dstrong"],
+                }
+            )
 
     with conn.cursor() as cur:
         cur.execute(
@@ -252,6 +250,15 @@ def export_verses(conn, out_dir: Path) -> dict:
                     if notes:
                         row["step_notes"] = notes
                         step_note_tokens += 1
+                    judged = classify_link(
+                        t["language"],
+                        t["surface_text"],
+                        t["strong_number"],
+                        judge_by.get(t["id"], []),
+                    )
+                    row["link"] = judged["link"]
+                    if judged["number_match"] is not None:
+                        row["number_match"] = judged["number_match"]
                     gloss = gloss_by.get(t["strong_number"])
                     if gloss:
                         row["lexicon_gloss"] = gloss
@@ -495,7 +502,11 @@ def main() -> int:
             "token has the same English. It is STEPBible contextual English, not a Strong's gloss. "
             "step_notes copies dStrong, sStrong, and Alt Strongs from each linked STEPBible row, "
             "with that file's name. lexicon_gloss is the TBESG gloss for the stored number when "
-            "that number is an exact lexicon key. Those notes are not the word. The word is the token surface. "
+            "that number is an exact lexicon key. number_match is true only when "
+            "one linked row's letters match the word and its dstrong is the same "
+            "plain H or G number, or the same extended tag written the same way. "
+            "G2424G matches G2424G and does not match G2424. A compound tag matches only that same compound. "
+            "Those notes are not the word. The word is the token surface. "
             "Place lists are verses of that written word: Greek lemma letters without accents, "
             "Hebrew lemma consonants, or the surface letters when the lemma has none."
         ),

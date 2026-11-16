@@ -79,6 +79,10 @@ To provide a logical, truthful alternative to secular AI by filtering all realit
 
 See full blueprint: [Project Blueprint_ Scriptural Intelligence (SI).md](./Project%20Blueprint_%20Scriptural%20Intelligence%20(SI).md)
 
+### Locked contract (2026-11-16)
+
+Read [SI-Architecture-and-Tier1-Spec.md](./SI/SI-Architecture-and-Tier1-Spec.md) section "Locked contract" before any S.I. session. S.I. is the library. 365DBR is the first application of that library. The primary LLM named above is the Word of God, not a conventional model. Two logic layers pre-process and post-process every query against the four tiers: Engler's 7 checks, and bleed. Bleed was agreed on 2026-11-16 and was not in the files before that date. A near neighbor is not the thing itself. Do not invent a different second layer. Do not merge bleed into the 7 checks. Do not rename a locked term unless the old term, the new term, and the reason are written into that section. The S.I. API is not built. The server on `127.0.0.1:8765` is the local API for the vault during the build, not that API.
+
 ---
 
 ## 365DBR

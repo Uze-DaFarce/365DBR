@@ -279,11 +279,13 @@ a:focus-visible,
 .fl-btn-primary:hover { opacity: 0.92; }
 .fl-btn-light { background: var(--bg); color: var(--accent); border-color: var(--border); }
 .fl-btn-light:hover { background: var(--accent-bg); }
+.fl-btn-support,
 .fl-btn-coffee {
   background: #fff8eb;
   color: #5c4028;
   border: 1px solid var(--gold);
 }
+.fl-btn-support:hover,
 .fl-btn-coffee:hover {
   background: var(--gold);
   color: #fff;
@@ -660,3 +662,264 @@ a:focus-visible,
     color: #000 !important;
   }
 }
+
+/* ==========================================================================
+   Universal Share & Church Co-Branding Modal + Print Co-Brand Header
+   ========================================================================== */
+.fl-icon-svg {
+  display: inline-block;
+  vertical-align: -2px;
+  flex-shrink: 0;
+}
+
+.fl-cobrand-banner {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  padding: 2px 9px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  color: #fff;
+}
+.fl-cobrand-banner img.fl-cobrand-logo {
+  max-height: 22px;
+  width: auto;
+  border-radius: 2px;
+  background: #fff;
+  padding: 1px;
+}
+
+.fl-print-cobrand-header {
+  display: none;
+}
+
+.fl-share-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 24, 29, 0.62);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.fl-share-backdrop.open {
+  display: flex;
+}
+
+.fl-share-modal {
+  background: var(--bg);
+  color: var(--text);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13.5px;
+}
+
+.fl-share-header {
+  background: var(--fl-topbar-bg);
+  color: var(--fl-topbar-text);
+  border-bottom: 2px solid var(--fl-topbar-border);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--fl-topbar-font);
+}
+.fl-share-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fl-share-body {
+  padding: 16px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fl-share-lead {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.fl-share-lead strong {
+  color: var(--text);
+}
+
+.fl-share-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.fl-share-url-input {
+  flex: 1 1 240px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--text);
+  font-family: monospace;
+  font-size: 12.5px;
+}
+
+.fl-share-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 8px;
+}
+.fl-share-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  background: var(--card);
+  color: var(--text) !important;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.fl-share-tile:hover {
+  background: var(--accent-bg);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+.fl-share-tile svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.fl-share-qr-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.fl-share-qr-strip img {
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.fl-cobrand-studio {
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+.fl-cobrand-studio summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--text);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.fl-cobrand-studio summary::-webkit-details-marker {
+  display: none;
+}
+.fl-cobrand-form {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.fl-cobrand-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.fl-cobrand-field input[type="text"],
+.fl-cobrand-field input[type="url"],
+.fl-cobrand-field select {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 12.5px;
+}
+.fl-cobrand-colors {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding-top: 4px;
+}
+.fl-cobrand-color-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.fl-cobrand-color-item input[type="color"] {
+  width: 30px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+}
+.fl-cobrand-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+@media print {
+  .fl-share-backdrop {
+    display: none !important;
+  }
+  .fl-print-cobrand-header.has-cobrand {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0 8px;
+    margin-bottom: 12px;
+    border-bottom: 1.5pt solid #000;
+    font-family: Georgia, serif;
+    font-size: 9.5pt;
+    color: #000 !important;
+  }
+  .fl-print-cobrand-header img {
+    max-height: 32px;
+    width: auto;
+  }
+}
+
