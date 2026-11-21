@@ -43,6 +43,9 @@ ServerSignature Off
   RewriteCond %{REQUEST_URI} ^/cmc(?:/|$) [NC]
   RewriteCond %{REQUEST_URI} !^/CMC/
   RewriteRule ^cmc/?(.*)$ /CMC/$1 [R=301,NC,L]
+
+  # Short redirect for Delivery Zoomed (/dz -> /delivery-zoomed/index.html)
+  RewriteRule ^dz/?$ /delivery-zoomed/index.html [R=301,NC,L,QSA]
 </IfModule>
 
 <IfModule mod_autoindex.c>

@@ -8,7 +8,16 @@ RewriteBase /foundations/
 
 # 0. Override Root CSP so 365DBR Iframe ('self') & Print QR Codes Load Cleanly
 <IfModule mod_headers.c>
-  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self';"
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self';"
+</IfModule>
+
+# 0B. Never browser-cache sw.js so PWA updates propagate immediately
+<IfModule mod_headers.c>
+  <Files "sw.js">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </Files>
 </IfModule>
 
 # 1. Enable Apache mod_speling if available on GoDaddy server (auto-fixes mixed case)

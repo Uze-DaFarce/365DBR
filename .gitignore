@@ -50,3 +50,4 @@ scripts/publish_365dbr.ftp.example.json
 patch_export.py
 
 apps/365DBR/finish_all.py
+**/temp/

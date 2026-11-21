@@ -22,6 +22,7 @@ import argparse
 import json
 import re
 import html
+import time
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -1559,12 +1560,12 @@ def sync_book1_god_html(dry_run: bool = False):
     write_json_if_changed(GOD_JSON_OUT_PATH, god_data, dry_run=dry_run)
 
     html_out = build_god_html(god_data)
-    html_out = sync_support_footer_in_html(html_out)
+    html_out = inject_pwa_tags(sync_support_footer_in_html(html_out))
     write_if_changed(GOD_CANONICAL_PATH, html_out, dry_run=dry_run)
 
     if HUB_INDEX_PATH.exists():
         hub_content = HUB_INDEX_PATH.read_text(encoding="utf-8")
-        hub_content = sync_support_footer_in_html(hub_content)
+        hub_content = inject_pwa_tags(sync_support_footer_in_html(hub_content))
         write_if_changed(HUB_INDEX_PATH, hub_content, dry_run=dry_run)
 
 
@@ -2128,7 +2129,7 @@ def sync_book3_government_html(dry_run: bool = False):
     write_json_if_changed(GOV_JSON_OUT_PATH, gov_data, dry_run=dry_run)
 
     html_out = build_government_html(gov_data)
-    html_out = sync_support_footer_in_html(html_out)
+    html_out = inject_pwa_tags(sync_support_footer_in_html(html_out))
     write_if_changed(GOV_CANONICAL_PATH, html_out, dry_run=dry_run)
 
 
@@ -2164,7 +2165,16 @@ RewriteBase /foundations/
 
 # 0. Override Root CSP so 365DBR Iframe ('self') & Print QR Codes Load Cleanly
 <IfModule mod_headers.c>
-  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self';"
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: https://quickchart.io; frame-src 'self'; frame-ancestors 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self';"
+</IfModule>
+
+# 0B. Never browser-cache sw.js so PWA updates propagate immediately
+<IfModule mod_headers.c>
+  <Files "sw.js">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </Files>
 </IfModule>
 
 # 1. Enable Apache mod_speling if available on GoDaddy server (auto-fixes mixed case)
@@ -2218,6 +2228,127 @@ CASE_ROUTER_HTML = """<!DOCTYPE html>
 """
 
 # ==============================================================================
+# 8B. PWA MANIFEST, SERVICE WORKER & HTML TAG INJECTION
+# ==============================================================================
+PWA_HEAD_TAGS = """  <meta name="theme-color" content="#7a2020" />
+  <meta name="apple-mobile-web-app-title" content="Foundations" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/foundations/manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="/foundations/icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/foundations/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/foundations/icons/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/foundations/icons/apple-touch-icon.png" />"""
+
+PWA_SCRIPT_TAG = '  <script src="/foundations/fl-pwa.js"></script>'
+
+def inject_pwa_tags(html_text: str) -> str:
+    """Idempotently injects PWA manifest, icons, and CSP-safe SW loader into HTML."""
+    if 'rel="manifest"' not in html_text and "</head>" in html_text:
+        html_text = html_text.replace("</head>", PWA_HEAD_TAGS + "\n</head>", 1)
+    if '/foundations/fl-pwa.js' not in html_text and "</body>" in html_text:
+        html_text = html_text.replace("</body>", PWA_SCRIPT_TAG + "\n</body>", 1)
+    return html_text
+
+def sync_pwa_assets(dry_run: bool = False):
+    """Generates manifest.webmanifest, fl-pwa.js, and dynamic date-time-seeded sw.js."""
+    manifest_obj = {
+        "name": "Foundations Library",
+        "short_name": "Foundations",
+        "start_url": "/foundations/index.html",
+        "scope": "/foundations/",
+        "display": "standalone",
+        "orientation": "portrait-primary",
+        "background_color": "#7a2020",
+        "theme_color": "#7a2020",
+        "icons": [
+            {"src": "/foundations/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+            {"src": "/foundations/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+        ],
+    }
+    write_if_changed(BASE_DIR / "manifest.webmanifest", json.dumps(manifest_obj, indent=2) + "\n", dry_run=dry_run)
+
+    pwa_js = (
+        "if ('serviceWorker' in navigator) {\n"
+        "  window.addEventListener('load', () => {\n"
+        "    navigator.serviceWorker.register('/foundations/sw.js', { scope: '/foundations/' });\n"
+        "  });\n"
+        "}\n"
+    )
+    write_if_changed(BASE_DIR / "fl-pwa.js", pwa_js, dry_run=dry_run)
+
+    build_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    seed_ns = time.time_ns()
+    cache_name = f"fl-v-{build_ts}"
+    sw_js = f"""const CACHE_NAME = '{cache_name}'; // seed_ns={seed_ns}
+const CORE_ASSETS = [
+  '/foundations/index.html',
+  '/foundations/what-does-the-bible-say-about-god.html',
+  '/foundations/what-does-the-bible-say-about-education.html',
+  '/foundations/what-does-the-bible-say-about-government.html',
+  '/foundations/fl-core.css?v=3',
+  '/foundations/fl-god.css',
+  '/foundations/fl-education.css',
+  '/foundations/fl-government.css',
+  '/foundations/fl-core.js?v=3',
+  '/foundations/fl-pwa.js',
+  '/foundations/manifest.webmanifest',
+  '/foundations/icons/icon-192.png',
+  '/foundations/icons/icon-512.png',
+  '/foundations/icons/apple-touch-icon.png',
+  '/foundations/icons/favicon.svg'
+];
+
+self.addEventListener('install', (event) => {{
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)).then(() => self.skipWaiting())
+  );
+}});
+
+self.addEventListener('activate', (event) => {{
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+}});
+
+self.addEventListener('fetch', (event) => {{
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET') return;
+
+  // Explicit 365DBR pass-through
+  if (url.pathname.startsWith('/365DBR/')) return;
+
+  const isHtml = event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname === '/foundations/';
+
+  if (isHtml) {{
+    event.respondWith(
+      fetch(event.request)
+        .then((res) => {{
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          return res;
+        }})
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }}
+
+  event.respondWith(
+    caches.match(event.request).then((cached) => {{
+      if (cached) return cached;
+      return fetch(event.request).then((res) => {{
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return res;
+      }});
+    }})
+  );
+}});
+"""
+    write_if_changed(BASE_DIR / "sw.js", sw_js, dry_run=dry_run)
+
+# ==============================================================================
 # 9. MAIN EXECUTION PIPELINE
 # ==============================================================================
 
@@ -2257,7 +2388,7 @@ def main():
     )
     parser.add_argument(
         "--target",
-        choices=["all", "bks", "bk-1", "bk-2", "bk-3", "stubs", "htaccess"],
+        choices=["all", "bks", "bk-1", "bk-2", "bk-3", "stubs", "htaccess", "pwa"],
         default=None,
         help="Build scope: all, bks (all books), bk-1, bk-2, bk-3, stubs (redirect stubs), or htaccess (routing)."
     )
@@ -2292,6 +2423,7 @@ def main():
     do_bk3 = args.bk_3 or (target in ("all", "bks", "bk-3"))
     do_stubs = target in ("all", "stubs")
     do_htaccess = target in ("all", "htaccess")
+    do_pwa = target in ("all", "bks", "pwa")
 
     mode_label = "DRY-RUN" if args.dry_run else "WRITE"
     print(f"[FL Build Start — Mode: {mode_label} | bk1={do_bk1}, bk2={do_bk2}, bk3={do_bk3}, stubs={do_stubs}, htaccess={do_htaccess}]")
@@ -2304,7 +2436,7 @@ def main():
         doc_data = parse_manuscript_to_json(cleaned_md)
 
         write_json_if_changed(JSON_OUT_PATH, doc_data, dry_run=args.dry_run)
-        html_output = build_education_html(doc_data)
+        html_output = inject_pwa_tags(build_education_html(doc_data))
         write_if_changed(EDU_CANONICAL_PATH, html_output, dry_run=args.dry_run)
 
     if do_bk3:
@@ -2335,6 +2467,9 @@ def main():
         write_if_changed(HTACCESS_PATH, HTACCESS_CONTENT, dry_run=args.dry_run)
         write_if_changed(CASE_ROUTER_PATH, CASE_ROUTER_HTML, dry_run=args.dry_run)
         sync_root_htaccess(dry_run=args.dry_run)
+
+    if do_pwa:
+        sync_pwa_assets(dry_run=args.dry_run)
 
     print("[FL Build Complete]")
 
