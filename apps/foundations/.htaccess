@@ -25,6 +25,10 @@ RewriteRule ^(what-does-the-bible-say-about-god|what-we-know-about-god|what-we-k
 RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-education\\.html$
 RewriteRule ^(what-does-the-bible-say-about-education|biblical-education|education)(\\.html)?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
 
+# 3B. Case-Insensitive [NC] 301 Redirects for Book 3 (What Does the Bible Say About Government?)
+RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-government\\.html$
+RewriteRule ^(what-does-the-bible-say-about-government|biblical-government|government|gov)(\\.html)?$ /foundations/what-does-the-bible-say-about-government.html [R=301,L,NC,QSA]
+
 # 4. Fallback Case-Normalizer for any other future Foundations Library guide
 RewriteRule ^support(\.html)?/?$ /foundations/#support-fl [R=302,L,NC,NE]
 RewriteRule ^(coffee|support5)(\.html)?/?$ https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta [R=302,L,NC,NE]

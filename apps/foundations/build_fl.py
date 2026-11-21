@@ -45,6 +45,13 @@ EDU_CANONICAL_SLUG = "what-does-the-bible-say-about-education.html"
 EDU_CANONICAL_URL = f"https://mt-sin.ai/foundations/{EDU_CANONICAL_SLUG}"
 EDU_CANONICAL_PATH = BASE_DIR / EDU_CANONICAL_SLUG
 
+# Book 3: What Does the Bible Say About Government?
+GOV_CANONICAL_SLUG = "what-does-the-bible-say-about-government.html"
+GOV_CANONICAL_URL = f"https://mt-sin.ai/foundations/{GOV_CANONICAL_SLUG}"
+GOV_CANONICAL_PATH = BASE_DIR / GOV_CANONICAL_SLUG
+GOV_RAW_MD_PATH = BASE_DIR / "raw" / "government_manuscript.md"
+GOV_JSON_OUT_PATH = BASE_DIR / "data" / "government.json"
+
 # Redirect & Server Config Paths
 REDIRECT_365DBR_PATH = MONOREPO_APPS_DIR / "365DBR" / "What_We_Know.html"
 HTACCESS_PATH = BASE_DIR / ".htaccess"
@@ -548,6 +555,8 @@ def format_inline_md(text: str) -> str:
   s = re.sub(r"\*\*\*(.+?)\*\*\*", r"<strong><em>\1</em></strong>", s)
   s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
   s = re.sub(r"\*(.+?)\*", r"<em>\1</em>", s)
+  s = re.sub(r"(?<![A-Za-z0-9])_(.+?)_(?![A-Za-z0-9])", r"<em>\1</em>", s)
+  s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
 
   # Swap web-only phrasing for natural print-table phrasing when printed
   web_to_print_swaps = [
@@ -737,6 +746,8 @@ def render_blocks_html(blocks: list) -> str:
             close_lists()
             if btype == "paragraph":
                 html_out.append(f"<p>{format_inline_md(b['text'])}</p>")
+            elif btype == "h4":
+                html_out.append(f'<h4 class="fl-h4-subheading">{format_inline_md(b["text"])}</h4>')
             elif btype == "widget":
                 if b["widget_id"] == "k12_hours_svg_chart":
                     html_out.append(render_k12_static_svg_chart())
@@ -756,9 +767,14 @@ def render_blocks_html(blocks: list) -> str:
                     </div>
                     """)
                 else:
+                    extra_items_html = ""
+                    if b.get("prompt_items"):
+                        li_str = "".join(f"<li>{format_inline_md(it)}</li>" for it in b["prompt_items"])
+                        extra_items_html = f'<ol class="fl-list" style="margin: 6px 0 10px;">{li_str}</ol>'
                     html_out.append(f"""
                     <div class="fl-lab-response-block">
                       <label for="{fid}" class="fl-response-label">{lbl}</label>
+                      {extra_items_html}
                       <textarea id="{fid}" class="fl-persist-input fl-textarea" data-storage-key="{fid}" rows="3" placeholder="Type your household's biblical response here (saved automatically in this browser)..."></textarea>
                       <div class="fl-print-blank-line" data-print-for="{fid}">
                         <div>__________________________________________________________________________________________</div>
@@ -983,6 +999,8 @@ def build_education_html(doc_data: dict) -> str:
       <a href="/foundations/{GOD_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">1: What About God? ↗</span><span class="fl-lbl-short">1: God ↗</span></a>
       <span class="fl-topbar-sep">|</span>
       <a href="#" class="fl-active-book" aria-current="page"><span class="fl-lbl-full">📖 Book 2: What Does the Bible Say About Education?<span class="fl-book-sub"> — Foundational Truths, Biblically Backed</span></span><span class="fl-lbl-short">📖 #2: Education</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{GOV_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">3: Biblical Government ↗</span><span class="fl-lbl-short">3: Government ↗</span></a>
     </div>
   </header>
 
@@ -1131,7 +1149,7 @@ def _make_point_short_label(pt_num: int, text: str) -> str:
     words = first_clause.split()
     if len(words) > 7:
         first_clause = " ".join(words[:7]) + "…"
-    return f"Pt {pt_num}: {first_clause}"
+    return f"{pt_num}: {first_clause}"
 
 def _render_god_refs_html(refs_md: str) -> tuple:
     """Converts markdown [Label](url) refs into HTML .refs links and extracts (ot_refs, nt_refs)."""
@@ -1355,7 +1373,7 @@ def build_god_html(doc_data: dict) -> str:
                 f'<li class="fl-toc-pt"><a href="#{pt_id}">{html.escape(pt["short_label"])}</a></li>'
             )
             pts_html.append(
-                f'    <div id="{pt_id}" class="point"><span class="cross">†</span>'
+                f'    <div id="{pt_id}" class="point">'
                 f'<span class="pt-num">{pt_num}.</span> { html.escape(pt["text"], quote=False) } '
                 f'<span class="refs">{pt["refs_html"]}</span></div>'
             )
@@ -1457,6 +1475,8 @@ def build_god_html(doc_data: dict) -> str:
       <a href="#" class="fl-active-book" aria-current="page"><span class="fl-lbl-full">📖 Book 1: What We Know About God<span class="fl-book-sub"> — Foundational Facts, Biblically Backed</span></span><span class="fl-lbl-short">📖 #1: God</span></a>
       <span class="fl-topbar-sep">|</span>
       <a href="/foundations/{EDU_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">2: Biblical Education ↗</span><span class="fl-lbl-short">2: Education ↗</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{GOV_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">3: Biblical Government ↗</span><span class="fl-lbl-short">3: Government ↗</span></a>
     </div>
   </header>
 
@@ -1547,6 +1567,571 @@ def sync_book1_god_html(dry_run: bool = False):
         hub_content = sync_support_footer_in_html(hub_content)
         write_if_changed(HUB_INDEX_PATH, hub_content, dry_run=dry_run)
 
+
+# ==============================================================================
+# 7B. BOOK 3 COMPILER (WHAT DOES THE BIBLE SAY ABOUT GOVERNMENT?)
+# ==============================================================================
+def parse_government_manuscript_to_json(raw_md: str) -> dict:
+    cleaned = raw_md.lstrip("\ufeff").replace("\r\n", "\n").replace("\u00a0", " ")
+    lines = cleaned.split("\n")
+
+    doc_data = {
+        "schema_version": "1.2.0",
+        "app": {
+            "name": "Foundations Library",
+            "abbr": "FL",
+            "slug": "foundations",
+            "storage_prefix": "fl_gov_",
+            "base_url": "https://mt-sin.ai/foundations/",
+            "canonical_url": GOV_CANONICAL_URL,
+            "short_url": "https://mt-sin.ai/fl/gov",
+            "sibling_god_url": GOD_CANONICAL_URL,
+            "sibling_education_url": EDU_CANONICAL_URL,
+            "scripture_engine_url": "https://mt-sin.ai/365DBR/"
+        },
+        "metadata": {
+            "id": "fl-book-government",
+            "slug": "what-does-the-bible-say-about-government",
+            "short_slug": "government",
+            "title": "What Does the Bible Say About Government?",
+            "subtitle": "Foundational Facts on Law, Order, Politics, and Our Constitutional Republic — Directly from the Infallible Word of God",
+            "series_label": "Foundations Library — Book 3 — Foundational Laws, Biblically Backed",
+            "authors": ["Rowley Shaw", "Patty Shaw"],
+            "publisher": "Mt. Sinai LLC",
+            "attributions": [
+                "Nick Freitas",
+                "Ken Ham",
+                "Patricia Engler",
+                "Dr. Nathaniel Jeanson",
+                "Answers in Genesis (AiG)",
+                "Hillsdale College",
+                "Gemini"
+            ],
+            "anchor_scriptures": [
+                "Genesis 9:5–6",
+                "Romans 13:1–4",
+                "Acts 5:29",
+                "Isaiah 33:22",
+                "Psalm 146:3"
+            ]
+        },
+        "intro": {
+            "title": "Introduction: Why Christians Must Study Government from Scripture Alone",
+            "blocks": [],
+            "sections": []
+        },
+        "parts": [],
+        "attribution_notes": {
+            "title": "Scripture & Attribution Notes",
+            "blocks": []
+        },
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    }
+
+    mode = "frontmatter"
+    current_part = None
+    current_chapter = None
+    current_section = None
+    current_lab = None
+    last_Header_obj = None
+
+    def add_gov_block(target_list: list, raw_line: str, in_lab: bool = False):
+        s = raw_line.strip()
+        if not s or s == "---":
+            return
+
+        if in_lab:
+            # Check for Lab Question / Exercise item with (`fl_gov_...`)
+            m_q = re.match(r"^[\*\-]\s+\*\*(.+?)\s*\(`(fl_gov_[a-zA-Z0-9_]+)`\)\s*:\*\*\s*(.+)$", s)
+            if not m_q:
+                m_q = re.match(r"^[\*\-]\s+\*\*(.+?)\s*\(`(fl_gov_[a-zA-Z0-9_]+)`\)\*\*\s*:?\s*(.+)$", s)
+            if m_q:
+                q_heading = m_q.group(1).strip().rstrip(":")
+                fid = m_q.group(2).strip()
+                q_prompt = m_q.group(3).strip()
+                target_list.append({
+                    "type": "lab_input",
+                    "input_id": fid,
+                    "label": f"**{q_heading}:** {q_prompt}",
+                    "input_kind": "textarea",
+                    "prompt_items": []
+                })
+                return
+
+            # Numbered sub-items inside a lab prompt (e.g. fl_gov_p4_lab items 1..4)
+            m_sub_ol = re.match(r"^\d+\.\s+(.+)$", s)
+            if m_sub_ol and target_list and target_list[-1].get("type") == "lab_input":
+                target_list[-1].setdefault("prompt_items", []).append(m_sub_ol.group(1).strip())
+                return
+
+        if s.startswith("#### "):
+            target_list.append({"type": "h4", "text": s[5:].strip()})
+            return
+        if re.match(r"^[\*\-]\s+", s):
+            content = re.sub(r"^[\*\-]\s+", "", s).strip()
+            target_list.append({"type": "ul_item", "text": content})
+            return
+        if re.match(r"^\d+\.\s+", s):
+            content = re.sub(r"^\d+\.\s+", "", s).strip()
+            target_list.append({"type": "ol_item", "text": content})
+            return
+
+        target_list.append({"type": "paragraph", "text": s})
+
+    for raw_line in lines:
+        s = raw_line.strip()
+        if not s or s == "---":
+            continue
+
+        # Book H1 & subtitle in frontmatter
+        if s.startswith("# What Does the Bible Say About Government?"):
+            last_Header_obj = doc_data["metadata"]
+            continue
+        if mode == "frontmatter" and s.startswith(">"):
+            doc_data["metadata"]["subtitle"] = s.lstrip(">").strip()
+            continue
+        if mode == "frontmatter" and (s.startswith("**Authors:**") or s.startswith("**Series:**") or s.startswith("**Scripture Standard:**")):
+            continue
+
+        # Intro H2
+        if s.startswith("## Introduction:"):
+            mode = "intro"
+            doc_data["intro"]["title"] = s[3:].strip()
+            current_section = None
+            last_Header_obj = None
+            continue
+
+        # Attribution Notes H2 at end of book
+        if s.startswith("## Scripture & Attribution Notes"):
+            mode = "attribution"
+            doc_data["attribution_notes"]["title"] = s[3:].strip()
+            current_section = None
+            current_lab = None
+            last_Header_obj = None
+            continue
+
+        # Part H1: # Part I: ...
+        m_part = re.match(r"^#\s+(Part\s+(?:I|II|III|IV)\s*:\s*.+)$", s, re.IGNORECASE)
+        if m_part:
+            mode = "body"
+            p_num = len(doc_data["parts"]) + 1
+            current_part = {
+                "part_number": p_num,
+                "id": f"part-{p_num}",
+                "title": m_part.group(1).strip(),
+                "subtitle": "",
+                "chapters": []
+            }
+            doc_data["parts"].append(current_part)
+            current_chapter = None
+            current_section = None
+            current_lab = None
+            last_Header_obj = current_part
+            continue
+
+        # Lab H2: ## Chapter N ... Lab (`fl_gov_...`)
+        m_lab = re.match(r"^##\s+(.+?Lab)\s*(?:\(`(fl_gov_[a-zA-Z0-9_]+)`\))?\s*$", s)
+        if m_lab and current_chapter is not None:
+            mode = "lab"
+            lab_title_raw = m_lab.group(1).strip()
+            lab_id = m_lab.group(2).strip() if m_lab.group(2) else f"fl_gov_ch{current_chapter['chapter_number']}"
+            ch_num = current_chapter["chapter_number"]
+            is_master = "Master Study Lab" in lab_title_raw
+            badge_str = f"Part {current_part['part_number']} & Chapter {ch_num} Master Lab" if is_master else f"Chapter {ch_num} Study Lab"
+            current_lab = {
+                "lab_number": ch_num,
+                "id": lab_id,
+                "badge": badge_str,
+                "title": lab_title_raw,
+                "blocks": []
+            }
+            current_chapter["lab"] = current_lab
+            current_section = None
+            last_Header_obj = current_lab
+            continue
+
+        # Chapter H2: ## Chapter N: ...
+        m_ch = re.match(r"^##\s+Chapter\s+(\d+)\s*:\s*(.+)$", s, re.IGNORECASE)
+        if m_ch:
+            mode = "body"
+            ch_num = int(m_ch.group(1))
+            ch_title = f"Chapter {ch_num}: {m_ch.group(2).strip()}"
+            current_chapter = {
+                "chapter_number": ch_num,
+                "id": f"ch-{ch_num}",
+                "title": ch_title,
+                "subtitle": "",
+                "blocks": [],
+                "sections": [],
+                "lab": None
+            }
+            current_part["chapters"].append(current_chapter)
+            current_section = None
+            current_lab = None
+            last_Header_obj = current_chapter
+            continue
+
+        # Blockquote > Subtitle right after Part or Chapter heading
+        if s.startswith(">") and last_Header_obj is not None and "subtitle" in last_Header_obj and not last_Header_obj["subtitle"]:
+            last_Header_obj["subtitle"] = s.lstrip(">").strip()
+            last_Header_obj = None
+            continue
+
+        # H3 Section inside Intro or Chapter
+        if s.startswith("### "):
+            sec_heading = s[4:].strip()
+            if mode == "intro":
+                sec_idx = len(doc_data["intro"]["sections"]) + 1
+                current_section = {
+                    "id": f"intro-sec-{sec_idx}",
+                    "heading": sec_heading,
+                    "blocks": []
+                }
+                doc_data["intro"]["sections"].append(current_section)
+            elif current_chapter is not None:
+                sec_idx = len(current_chapter["sections"]) + 1
+                current_section = {
+                    "id": f"ch-{current_chapter['chapter_number']}-sec-{sec_idx}",
+                    "heading": sec_heading,
+                    "blocks": []
+                }
+                current_chapter["sections"].append(current_section)
+            last_Header_obj = None
+            continue
+
+        # Content lines
+        last_Header_obj = None
+        if mode == "intro":
+            if current_section is not None:
+                add_gov_block(current_section["blocks"], raw_line)
+            else:
+                add_gov_block(doc_data["intro"]["blocks"], raw_line)
+        elif mode == "lab" and current_lab is not None:
+            add_gov_block(current_lab["blocks"], raw_line, in_lab=True)
+        elif mode == "attribution":
+            # Replace developer (`#bible-drawer`) note with reader-friendly wording
+            clean_attr_line = raw_line.replace("(`#bible-drawer`)", "")
+            add_gov_block(doc_data["attribution_notes"]["blocks"], clean_attr_line)
+        elif current_section is not None:
+            add_gov_block(current_section["blocks"], raw_line)
+        elif current_chapter is not None:
+            add_gov_block(current_chapter["blocks"], raw_line)
+
+    return doc_data
+
+
+def build_government_html(doc_data: dict) -> str:
+    toc_items = []
+    body_sections = []
+
+    intro_sub_html = []
+    for isec in doc_data["intro"].get("sections", []):
+        intro_sub_html.append(f"""
+        <div id="{isec['id']}" class="fl-chapter-subsection">
+          <h3>{format_inline_md(isec['heading'])}</h3>
+          {render_blocks_html(isec['blocks'])}
+        </div>
+        """)
+
+    intro_html = f"""
+    <section id="about-resource" class="fl-intro-card">
+      <h2>{format_inline_md(doc_data['intro']['title'])}</h2>
+      {render_blocks_html(doc_data['intro']['blocks'])}
+      {"".join(intro_sub_html)}
+    </section>
+    """
+    body_sections.append(intro_html)
+
+    part_badges = {
+        1: "Part I • Ordained Institution, Law & Order",
+        2: "Part II • Stewardship, Submission & Defiance",
+        3: "Part III • Our Constitutional Republic",
+        4: "Part IV • World Ideologies & The Coming King"
+    }
+
+    for part in doc_data["parts"]:
+        pid = part["id"]
+        pnum = part["part_number"]
+        toc_items.append(f'<li class="fl-toc-part"><a href="#{pid}">{html.escape(part["title"])}</a></li>')
+
+        p_badge = part_badges.get(pnum, f"Part {pnum}")
+        part_header_html = f"""
+        <section id="{pid}" class="fl-part-section fl-page-break-before">
+          <div class="fl-part-banner">
+            <span class="fl-part-badge">{html.escape(p_badge)}</span>
+            <h1>{format_inline_md(part['title'])}</h1>
+            {f'<h2 class="fl-part-subtitle">{format_inline_md(part["subtitle"])}</h2>' if part.get("subtitle") else ''}
+          </div>
+        </section>
+        """
+        body_sections.append(part_header_html)
+
+        for ch in part["chapters"]:
+            cid = ch["id"]
+            cnum = ch["chapter_number"]
+            toc_items.append(f'<li class="fl-toc-ch"><a href="#{cid}">{html.escape(ch["title"])}</a></li>')
+
+            sec_html_list = []
+            for sec in ch["sections"]:
+                sec_html_list.append(f"""
+                <div id="{sec['id']}" class="fl-chapter-subsection">
+                  <h3>{format_inline_md(sec['heading'])}</h3>
+                  {render_blocks_html(sec['blocks'])}
+                </div>
+                """)
+
+            lab_html = ""
+            if ch.get("lab"):
+                lab = ch["lab"]
+                lid = lab["id"]
+                lnum = lab["lab_number"]
+                toc_label = f"↳ Ch {lnum} & Part {pnum} Master Lab" if "Master" in lab["title"] else f"↳ Ch {lnum} Study Lab"
+                toc_items.append(f'<li class="fl-toc-lab"><a href="#{lid}">{html.escape(toc_label)}</a></li>')
+                lab_html = f"""
+                <section id="{lid}" class="fl-lab-card fl-page-break-before" data-lab-num="{lnum}">
+                  <div class="fl-lab-header">
+                    <span class="fl-lab-badge">{html.escape(lab['badge'])}</span>
+                    <h3>{format_inline_md(lab['title'])}</h3>
+                  </div>
+                  <div class="fl-lab-body">
+                    {render_blocks_html(lab['blocks'])}
+                  </div>
+                  <div class="fl-lab-actions no-print">
+                    <button type="button" class="fl-btn fl-btn-primary" data-fl-print-lab="{lid}">🖨️ Print / Save Ch {lnum} Lab</button>
+                    <button type="button" class="fl-btn fl-btn-light" data-fl-action="share-page" data-share-url="https://mt-sin.ai/fl/gov#{lid}" data-share-title="{html.escape(lab['title'])} | What Does the Bible Say About Government?" data-share-desc="Interactive &amp; printable Sola Scriptura family study lab worksheet from Foundations Library Book 3 — 100% free to use, print, and share.">{SHARE_BTN_SVG} <span>Share Lab #{lnum}</span></button>
+                    <button type="button" class="fl-btn fl-btn-outline" data-fl-clear-lab="{lid}">Clear Lab #{lnum} Inputs</button>
+                  </div>
+                </section>
+                """
+
+            ch_html = f"""
+            <article id="{cid}" class="fl-chapter-article fl-page-break-before">
+              <header class="fl-chapter-header">
+                <h2>{format_inline_md(ch['title'])}</h2>
+                {f'<p class="fl-chapter-subtitle">{format_inline_md(ch["subtitle"])}</p>' if ch.get("subtitle") else ''}
+              </header>
+              <div class="fl-chapter-intro">
+                {render_blocks_html(ch['blocks'])}
+              </div>
+              {"".join(sec_html_list)}
+              {lab_html}
+            </article>
+            """
+            body_sections.append(ch_html)
+
+    if doc_data.get("attribution_notes") and doc_data["attribution_notes"].get("blocks"):
+        toc_items.append('<li><a href="#scripture-attribution-notes">Scripture &amp; Attribution Notes</a></li>')
+        attr_html = f"""
+        <section id="scripture-attribution-notes" class="fl-attribution-card">
+          <h2>{html.escape(doc_data['attribution_notes']['title'])}</h2>
+          {render_blocks_html(doc_data['attribution_notes']['blocks'])}
+        </section>
+        """
+        body_sections.append(attr_html)
+
+    schema_ld = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": ["Book", "LearningResource"],
+                "@id": f"{GOV_CANONICAL_URL}#book",
+                "name": "What Does the Bible Say About Government?: Foundational Facts on Law, Order, Politics, and Our Constitutional Republic",
+                "headline": "What Does the Bible Say About Government?",
+                "alternativeHeadline": doc_data["metadata"]["subtitle"],
+                "author": [
+                    {"@type": "Person", "name": "Rowley Shaw"},
+                    {"@type": "Person", "name": "Patty Shaw"}
+                ],
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "Mt. Sinai LLC",
+                    "url": "https://mt-sin.ai/"
+                },
+                "contributor": [
+                    {"@type": "Person", "name": "Nick Freitas"},
+                    {"@type": "Person", "name": "Ken Ham"},
+                    {"@type": "Person", "name": "Patricia Engler"},
+                    {"@type": "Person", "name": "Dr. Nathaniel Jeanson"},
+                    {"@type": "Organization", "name": "Answers in Genesis"},
+                    {"@type": "Organization", "name": "Hillsdale College"}
+                ],
+                "inLanguage": "en-US",
+                "isAccessibleForFree": True,
+                "url": GOV_CANONICAL_URL,
+                "sameAs": "https://mt-sin.ai/foundations/government.html",
+                "educationalUse": ["Discipleship", "Civics & Constitutional Study", "Family Bible Study", "Worldview Training"],
+                "about": ["Biblical Government", "Three Jurisdictions", "Constitutional Republic", "Romans 13", "Acts 5:29", "Isaiah 33:22"]
+            },
+            {
+                "@type": "FAQPage",
+                "@id": f"{GOV_CANONICAL_URL}#faq",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "Why did God institute human civil government after the Flood of Noah?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Before the Flood, the earth became filled with unrestrained violence (chamas, Genesis 6:11–13). Immediately after the Flood, God instituted the covenantal sword of civil justice in Genesis 9:5–6 to restrain evil and execute murderers because man is made in the very image of God (Imago Dei)."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "What are the three divine jurisdictions ordained in Scripture?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Scripture divides human authority under God into three covenantal jurisdictions: the Family (entrusted with the Rod of instruction and welfare, Deuteronomy 6:6–7; 1 Timothy 5:8), the Church (entrusted with the Keys of the Kingdom and the Word of God, Matthew 16:19), and the State (entrusted strictly with the Sword of civil justice against violent crime, fraud, and invasion, Romans 13:1–4)."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Where did America's Founders get the blueprint for three separated branches of government?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Recognizing total human depravity (Jeremiah 17:9), the Founders divided power across the Legislative, Executive, and Judicial branches modeled directly on Deuteronomy 1:13–17, Deuteronomy 17:14–20, and Isaiah 33:22 ('For the LORD is our judge, the LORD is our lawgiver, the LORD is our king; He will save us')."
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Does the Bible Say About Government?: Law, Order, Politics &amp; Our Constitutional Republic | Foundations Library</title>
+  <meta name="description" content="What Does the Bible Say About Government?: Foundational Facts on Law, Order, Politics, and Our Constitutional Republic by Rowley and Patty Shaw (Mt. Sinai LLC), attributing Nick Freitas, Ken Ham, Patricia Engler, Answers in Genesis, and Hillsdale College." />
+  <link rel="canonical" href="{GOV_CANONICAL_URL}" />
+  <meta property="og:title" content="What Does the Bible Say About Government?: Law, Order, Politics &amp; Our Constitutional Republic" />
+  <meta property="og:description" content="A 4-Part, 14-Chapter Sola Scriptura guide on Civil Authority, the Three Jurisdictions, True Law, and America's Constitutional Republic by Rowley and Patty Shaw (Mt. Sinai LLC)." />
+  <meta property="og:url" content="{GOV_CANONICAL_URL}" />
+  <meta property="og:type" content="book" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/foundations/fl-core.css?v=3" />
+  <link rel="stylesheet" href="/foundations/fl-government.css" />
+  <script type="application/ld+json">
+{json.dumps(schema_ld, indent=2)}
+  </script>
+</head>
+<body>
+
+  <header class="fl-topbar no-print">
+    <div class="fl-topbar-row1">
+      <div class="fl-brand-group">
+        <a href="/foundations/" class="fl-brand-title"><span class="fl-lbl-full">🏛️ Foundations Library</span><span class="fl-lbl-short">🏛️ FL</span></a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link"><span class="fl-lbl-full">🕮 365DBR Daily</span><span class="fl-lbl-short">🕮 365DBR</span></a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link"><span class="fl-lbl-full">✝️ Multi-Translation Bible</span><span class="fl-lbl-short">✝️ Bible</span></a>
+        <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
+      </div>
+      <div class="fl-top-actions">
+        <a href="#support-fl" class="fl-btn fl-btn-support" title="Support Rowley &amp; Patty Shaw's independent writing"><span class="fl-lbl-full">❤️ Support FL 🏛️</span><span class="fl-lbl-short">❤️ FL</span></a>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="share-page" title="Freely share or co-brand this book">{SHARE_BTN_SVG} <span class="fl-lbl-full">Share</span><span class="fl-lbl-short">Share</span></button>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-all-labs" title="Print only the 14 Personal &amp; Family Study Lab Worksheets"><span class="fl-lbl-full">🖨️ Print All 14 Labs</span><span class="fl-lbl-short">🖨️ 14 Labs</span></button>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page" title="Print full book and worksheets"><span class="fl-lbl-full">🖨️ Print</span><span class="fl-lbl-short">🖨️ Print</span></button>
+      </div>
+    </div>
+    <div class="fl-topbar-row2">
+      <button type="button" class="fl-btn fl-toc-toggle" data-fl-action="toggle-toc" aria-expanded="true" title="Toggle Table of Contents"><span class="fl-lbl-full">☰ Contents</span><span class="fl-lbl-short">☰ TOC</span></button>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{GOD_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">1: What About God? ↗</span><span class="fl-lbl-short">1: God ↗</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{EDU_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">2: Biblical Education ↗</span><span class="fl-lbl-short">2: Education ↗</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="#" class="fl-active-book" aria-current="page"><span class="fl-lbl-full">📖 Book 3: What Does the Bible Say About Government?<span class="fl-book-sub"> — Foundational Laws, Biblically Backed</span></span><span class="fl-lbl-short">📖 #3: Government</span></a>
+    </div>
+  </header>
+
+  <div class="fl-layout">
+    <aside id="toc-drawer" class="fl-sidebar no-print" aria-label="Book 3 Table of Contents">
+      <h3>Contents &amp; 14 Labs</h3>
+      <ul class="fl-toc-list">
+        <li><a href="#about-resource">Introduction &amp; Stewardship</a></li>
+        {"".join(toc_items)}
+      </ul>
+    </aside>
+
+    <main class="fl-main">
+      <div class="fl-hero-header">
+        <h1>{html.escape(doc_data['metadata']['title'])}</h1>
+        <p class="fl-hero-subtitle">{html.escape(doc_data['metadata']['subtitle'])}</p>
+        <p class="fl-hero-meta">
+          By <strong>Rowley and Patty Shaw</strong> (<em>Mt. Sinai LLC</em>) &bull;
+          Attributing <strong>Nick Freitas</strong>, <strong>Ken Ham</strong>, <strong>Patricia Engler</strong>, <strong>Dr. Nathaniel Jeanson</strong> &amp; <strong>Answers in Genesis (AiG)</strong>, and <strong>Hillsdale College</strong>, with <strong>Gemini</strong>
+        </p>
+      </div>
+
+      {"".join(body_sections)}
+
+      {load_support_footer_partial()}
+
+      <div class="print-qr">
+        <div class="print-qr-item">
+          <div class="print-qr-title">Foundations Library</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2F" alt="Foundations Library QR"/>
+          <div class="print-qr-desc">100% free to read, print, duplicate &amp; share</div>
+          <div class="print-qr-url">mt-sin.ai/fl/</div>
+        </div>
+        <div class="print-qr-item">
+          <div class="print-qr-title">Book 3 Online</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2Fgov" alt="Book 3 Online QR"/>
+          <div class="print-qr-desc">Tap any verse online for live Hebrew/Greek interlinear</div>
+          <div class="print-qr-url">mt-sin.ai/fl/gov</div>
+        </div>
+        <div class="print-qr-item">
+          <div class="print-qr-title">365 Daily Bible Plan</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2F" alt="365DBR Daily QR"/>
+          <div class="print-qr-desc">OT, NT, Psalms &amp; Proverbs (~15 min/day)</div>
+          <div class="print-qr-url">mt-sin.ai/365DBR/</div>
+        </div>
+        <div class="print-qr-item">
+          <div class="print-qr-title">Bible &amp; Interlinear Lookup</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2Fbible.html" alt="Multi-Translation Lookup QR"/>
+          <div class="print-qr-desc">Hebrew/Greek + LSB &amp; KJV side-by-side</div>
+          <div class="print-qr-url">mt-sin.ai/365DBR/bible.html</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Live 365DBR Scripture Reader (100% Free & Non-Commercial) -->
+  <aside id="bible-drawer" aria-hidden="true" inert>
+    <div class="drawer-header">
+      <span id="drawer-title">Scripture Reader</span>
+      <div class="drawer-actions">
+        <a id="drawer-ext" href="/365DBR/bible.html" target="_blank" rel="noopener">Open Full Tab ↗</a>
+        <button class="drawer-close" id="drawer-close-btn" type="button">✕ Close</button>
+      </div>
+    </div>
+    <iframe
+      id="bible-frame"
+      src="about:blank"
+      title="365DBR Multi-Translation Bible">
+    </iframe>
+  </aside>
+
+  <script src="/foundations/fl-core.js?v=3"></script>
+</body>
+</html>
+"""
+
+def sync_book3_government_html(dry_run: bool = False):
+    """Compiles raw/government_manuscript.md -> data/government.json and what-does-the-bible-say-about-government.html."""
+    if not GOV_RAW_MD_PATH.exists():
+        raise FileNotFoundError(f"Book 3 source manuscript not found at: {GOV_RAW_MD_PATH}")
+    raw_md = GOV_RAW_MD_PATH.read_text(encoding="utf-8")
+    gov_data = parse_government_manuscript_to_json(raw_md)
+    write_json_if_changed(GOV_JSON_OUT_PATH, gov_data, dry_run=dry_run)
+
+    html_out = build_government_html(gov_data)
+    html_out = sync_support_footer_in_html(html_out)
+    write_if_changed(GOV_CANONICAL_PATH, html_out, dry_run=dry_run)
+
+
 # ==============================================================================
 # 8. REDIRECT STUBS, GODADDY .HTACCESS & CASE-INSENSITIVE ROUTER (CSP-SAFE)
 # ==============================================================================
@@ -1596,6 +2181,10 @@ RewriteRule ^(what-does-the-bible-say-about-god|what-we-know-about-god|what-we-k
 RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-education\\.html$
 RewriteRule ^(what-does-the-bible-say-about-education|biblical-education|education)(\\.html)?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
 
+# 3B. Case-Insensitive [NC] 301 Redirects for Book 3 (What Does the Bible Say About Government?)
+RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-government\\.html$
+RewriteRule ^(what-does-the-bible-say-about-government|biblical-government|government|gov)(\\.html)?$ /foundations/what-does-the-bible-say-about-government.html [R=301,L,NC,QSA]
+
 # 4. Fallback Case-Normalizer for any other future Foundations Library guide
 RewriteRule ^support(\.html)?/?$ /foundations/#support-fl [R=302,L,NC,NE]
 RewriteRule ^(coffee|support5)(\.html)?/?$ https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta [R=302,L,NC,NE]
@@ -1621,6 +2210,7 @@ CASE_ROUTER_HTML = """<!DOCTYPE html>
   <ul>
     <li><a href="/foundations/what-does-the-bible-say-about-god.html">1: What Does the Bible Say About God? (What We Know About God — Foundational Facts, Biblically Backed)</a></li>
     <li><a href="/foundations/what-does-the-bible-say-about-education.html">2: What Does the Bible Say About Education? (Foundational Truths for Parents &amp; Students)</a></li>
+    <li><a href="/foundations/what-does-the-bible-say-about-government.html">3: What Does the Bible Say About Government? (Foundational Laws, Biblically Backed)</a></li>
   </ul>
   <script src="/foundations/fl-core.js?v=3"></script>
 </body>
@@ -1641,6 +2231,7 @@ FL_ROOT_REWRITE_BLOCK = r"""
   RewriteRule ^fl/?$ /foundations/ [R=301,L,NC,QSA]
   RewriteRule ^fl/god(\.html)?/?$ /foundations/what-does-the-bible-say-about-god.html [R=301,L,NC,QSA]
   RewriteRule ^fl/edu(\.html)?/?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
+  RewriteRule ^fl/gov(\.html)?/?$ /foundations/what-does-the-bible-say-about-government.html [R=301,L,NC,QSA]
 </IfModule>
 """
 
@@ -1649,8 +2240,13 @@ def sync_root_htaccess(dry_run: bool = False):
         print(f" [!] Skipping root .htaccess sync: {MTSINAI_HTACCESS_PATH} not found.")
         return
     root_content = MTSINAI_HTACCESS_PATH.read_text(encoding="utf-8")
+    root_content = root_content.replace("/foundations/#support-coffee", "/foundations/#support-fl")
+    edu_rule = "RewriteRule ^fl/edu(\\.html)?/?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]"
+    gov_rule = "RewriteRule ^fl/gov(\\.html)?/?$ /foundations/what-does-the-bible-say-about-government.html [R=301,L,NC,QSA]"
     if "RewriteRule ^fl/god" not in root_content:
         root_content = root_content.rstrip() + "\n" + FL_ROOT_REWRITE_BLOCK
+    elif "RewriteRule ^fl/gov" not in root_content:
+        root_content = root_content.replace(edu_rule, edu_rule + "\n  " + gov_rule)
     write_if_changed(MTSINAI_HTACCESS_PATH, root_content, dry_run=dry_run)
     write_if_changed(MONOREPO_HTACCESS_PATH, root_content, dry_run=dry_run)
 
@@ -1661,9 +2257,9 @@ def main():
     )
     parser.add_argument(
         "--target",
-        choices=["all", "bks", "bk-1", "bk-2", "stubs", "htaccess"],
+        choices=["all", "bks", "bk-1", "bk-2", "bk-3", "stubs", "htaccess"],
         default=None,
-        help="Build scope: all, bks (all books), stubs (redirect stubs), or htaccess (routing)."
+        help="Build scope: all, bks (all books), bk-1, bk-2, bk-3, stubs (redirect stubs), or htaccess (routing)."
     )
     parser.add_argument(
         "--bk-1",
@@ -1676,6 +2272,11 @@ def main():
         help="Compile Foundations Book 2 (What Does the Bible Say About Education?)"
     )
     parser.add_argument(
+        "--bk-3",
+        action="store_true",
+        help="Compile Foundations Book 3 (What Does the Bible Say About Government?)"
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Report which files would be modified vs. unchanged without writing to disk."
@@ -1683,16 +2284,17 @@ def main():
     args = parser.parse_args()
 
     target = args.target
-    if target is None and not (args.bk_1 or args.bk_2):
+    if target is None and not (args.bk_1 or args.bk_2 or args.bk_3):
         target = "bks"
 
     do_bk1 = args.bk_1 or (target in ("all", "bks", "bk-1"))
     do_bk2 = args.bk_2 or (target in ("all", "bks", "bk-2"))
+    do_bk3 = args.bk_3 or (target in ("all", "bks", "bk-3"))
     do_stubs = target in ("all", "stubs")
     do_htaccess = target in ("all", "htaccess")
 
     mode_label = "DRY-RUN" if args.dry_run else "WRITE"
-    print(f"[FL Build Start — Mode: {mode_label} | bk1={do_bk1}, bk2={do_bk2}, stubs={do_stubs}, htaccess={do_htaccess}]")
+    print(f"[FL Build Start — Mode: {mode_label} | bk1={do_bk1}, bk2={do_bk2}, bk3={do_bk3}, stubs={do_stubs}, htaccess={do_htaccess}]")
 
     if do_bk2:
         if not RAW_MD_PATH.exists():
@@ -1705,11 +2307,15 @@ def main():
         html_output = build_education_html(doc_data)
         write_if_changed(EDU_CANONICAL_PATH, html_output, dry_run=args.dry_run)
 
+    if do_bk3:
+        sync_book3_government_html(dry_run=args.dry_run)
+
     if do_bk1:
         sync_book1_god_html(dry_run=args.dry_run)
 
     if do_stubs:
         stubs = [
+            (BASE_DIR / "government.html", f"/foundations/{GOV_CANONICAL_SLUG}", "What Does the Bible Say About Government?"),
             (BASE_DIR / "education.html", f"/foundations/{EDU_CANONICAL_SLUG}", "What Does the Bible Say About Education?"),
             (BASE_DIR / "god.html", f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (What We Know About God)"),
             (BASE_DIR / "what-we-know.html", f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (What We Know About God)"),

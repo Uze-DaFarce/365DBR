@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "1.0.0",
+  "townId": "conrad-mt-59425",
+  "townName": "Conrad, MT",
+  "defaultCity": "Conrad",
+  "defaultState": "MT",
+  "defaultZip": "59425",
+  "shop": {
+    "name": "Coaches Corner Pizza Inc",
+    "address": "608 S Front St, Conrad, MT 59425",
+    "coordinates": {
+      "lat": 48.1651,
+      "lng": -111.9443
+    },
+    "trackSide": "SHOP_SIDE"
+  },
+  "deliveryFeePolicy": {
+    "standardFee": 3.00,
+    "maxExpectedFee": 10.00,
+    "normalRadiusMiles": 1.8,
+    "normalDriveMinutes": 7,
+    "generousTipEncouragementThreshold": 5.00
+  },
+  "routingDefaults": {
+    "noAlleysOrParkingLotsByDefault": true,
+    "alleyTriggerKeywords": ["alley", "back", "rear"],
+    "enforceRightSideCurbApproach": true,
+    "avoidNarrowStreetUTurns": true,
+    "trafficLightAvoidance": {
+      "enabled": true,
+      "intersection": "HWY 91 (Main St) & 4th Ave SW",
+      "note": "Only traffic light in Conrad — avoid approaching HWY 91 & 4th Ave SW from 608 S Front St.",
+      "frontStDepartureBypassWaypoint": {
+        "lat": 48.1651,
+        "lng": -111.9422,
+        "description": "Depart 608 S Front St eastbound/northbound via side avenues to bypass the HWY 91 & 4th Ave SW light"
+      }
+    }
+  },
+  "railroadContingency": {
+    "description": "BNSF tracks run right behind Coach's Pizza. Most of town is on SHOP_SIDE. Toggle when a multi-engine cargo train blocks crossings.",
+    "trackBisectLongitude": -111.9475,
+    "contingencyCrossings": [
+      {
+        "id": "north_crossing_bypass",
+        "name": "North Crossing / 4th Ave Overpass Contingency",
+        "waypoint": { "lat": 48.1785, "lng": -111.9472 }
+      },
+      {
+        "id": "south_crossing_bypass",
+        "name": "South Crossing Contingency",
+        "waypoint": { "lat": 48.1638, "lng": -111.9478 }
+      }
+    ]
+  },
+  "addressRules": [
+    {
+      "normalizedKey": "TAMARACK APARTMENTS",
+      "displayName": "Tamarack Apartments",
+      "matchPatterns": ["TAMARACK", "600 S MAIN"],
+      "trackSide": "SHOP_SIDE",
+      "isExtendedDistance": false,
+      "recommendedFee": 3.00,
+      "geofence": {
+        "frontCurbPin": { "lat": 48.16521, "lng": -111.94612 },
+        "customOverridePin": { "lat": 48.16535, "lng": -111.94590 },
+        "snapPolicy": "CUSTOM_PIN",
+        "approachWaypoint": {
+          "lat": 48.16610,
+          "lng": -111.94590,
+          "directionNote": "Enter southbound on Main so apartment curb is on passenger (right) side; no U-turn needed."
+        }
+      },
+      "preDepartureRule": {
+        "requireSmsBeforeStart": true,
+        "buttonLabel": "📱 Text Customer Before Leaving Shop (Tamarack Locked Entry)",
+        "smsTemplate": "Hi! This is your Coach's Pizza driver. I'm heading out from the shop now and will arrive at Tamarack Apartments in about 5-7 minutes!"
+      },
+      "driverNotes": {
+        "accessCode": "Locked Outer Door",
+        "parkingSpot": "Pull into North visitor bay on right-hand curb.",
+        "permanentAlert": "LOCKED BUILDING — Text customer before leaving shop so they meet you at the entry."
+      },
+      "tipHistory": {
+        "totalDeliveries": 12,
+        "averageTip": 4.50,
+        "lastTip": 5.00,
+        "generousRegular": true
+      }
+    },
+    {
+      "normalizedKey": "THE LODGE",
+      "displayName": "The Lodge Assisted Living / Senior Complex",
+      "matchPatterns": ["THE LODGE", "LODGE", "310 S VIRGINIA", "VIRGINIA ST LODGE"],
+      "trackSide": "SHOP_SIDE",
+      "isExtendedDistance": false,
+      "recommendedFee": 3.00,
+      "geofence": {
+        "frontCurbPin": { "lat": 48.16840, "lng": -111.93980 },
+        "customOverridePin": { "lat": 48.16858, "lng": -111.93955 },
+        "snapPolicy": "CUSTOM_PIN",
+        "approachWaypoint": {
+          "lat": 48.16920,
+          "lng": -111.93955,
+          "directionNote": "Approach from North so The Lodge main covered turnout is on passenger right."
+        }
+      },
+      "preDepartureRule": {
+        "requireSmsBeforeStart": false,
+        "buttonLabel": null,
+        "smsTemplate": null
+      },
+      "driverNotes": {
+        "accessCode": "Main Sliding Doors",
+        "parkingSpot": "Use custom GPS pin at East main entrance turnaround (do NOT use back kitchen alley).",
+        "permanentAlert": "PIN OVERRIDE ACTIVE — Routes directly to closest entry & parking spot."
+      },
+      "tipHistory": {
+        "totalDeliveries": 8,
+        "averageTip": 4.00,
+        "lastTip": 4.00,
+        "generousRegular": false
+      }
+    },
+    {
+      "normalizedKey": "RURAL WEST BENCH RD",
+      "displayName": "West Bench / Out-of-Town Extended Zone",
+      "matchPatterns": ["BENCH RD", "COUNTY RD", "HWY 91", "LEDGER"],
+      "trackSide": "ACROSS_TRACKS",
+      "isExtendedDistance": true,
+      "recommendedFee": 6.00,
+      "geofence": {
+        "frontCurbPin": { "lat": 48.17450, "lng": -111.96800 },
+        "customOverridePin": null,
+        "snapPolicy": "FRONT_CURB",
+        "approachWaypoint": null
+      },
+      "preDepartureRule": {
+        "requireSmsBeforeStart": false,
+        "buttonLabel": null,
+        "smsTemplate": null
+      },
+      "driverNotes": {
+        "accessCode": "",
+        "parkingSpot": "Front driveway turnaround.",
+        "permanentAlert": "Extended distance across tracks — check if ticket only charged $3.00."
+      },
+      "tipHistory": {
+        "totalDeliveries": 3,
+        "averageTip": 6.00,
+        "lastTip": 6.00,
+        "generousRegular": true
+      }
+    }
+  ]
+}

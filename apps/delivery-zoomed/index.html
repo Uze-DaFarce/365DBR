@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="DeliveryZoom" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <title>Delivery Zoomed — Small-Town Driver PWA</title>
+  <link rel="stylesheet" href="./styles.css?v=20261120_5" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-block">
+      <div class="brand-title">
+        <span class="brand-line-top">🍕 Delivery</span>
+        <span class="brand-line-bottom">Zoomed</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <label class="btn-nav-snap" id="snapTixLabel" title="Snap 1–4 Tickets">
+        <span id="snapTixBtnText">📷 SnapTix</span>
+        <input id="ticketPhotoInput" type="file" accept="image/*" capture="environment" />
+      </label>
+      <button id="btnTrainToggle" class="btn-nav-train" title="Toggle Railroad Crossing Contingency">🚂 Train?Pivot!</button>
+      <button id="btnOpenSettings" class="btn-secondary btn-nav-compact" title="Vision API, History & Display Settings">⚙️</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="ocrStatusBanner" class="ocr-status"></div>
+    <div id="startShiftReminderBanner" class="alert-banner alert-modifier dismissible-banner hidden">
+      <span>🚗 Reminder: You haven't logged your <strong>Start Shift odometer photo</strong> yet!</span>
+      <div style="display:flex; align-items:center; gap:0.35rem; flex-shrink:0;">
+        <button id="btnReminderStartShift" type="button" class="btn-secondary btn-nav-compact">📸 Snap Odo</button>
+        <button id="btnDismissStartShiftReminder" type="button" class="btn-dismiss-banner" title="Dismiss">✕</button>
+      </div>
+    </div>
+
+    <!-- Multi-Run Grouping & One-Tap Navigation Handoff -->
+    <section class="multi-run-toolbar">
+      <div>
+        <strong>Multi-Run:</strong> <span id="selectedRunCount">0</span> stop(s)
+        <span id="trainStatusSubtext" class="train-subtext-inline"></span>
+      </div>
+      <div class="multi-run-actions">
+        <button id="btnQueueSelectedRun" class="btn-action">📋 Queue Checked</button>
+        <button id="btnLaunchMultiRunNav" class="btn-action primary-green">🗺️ Launch Route</button>
+        <button id="btnOpenHistory" class="btn-action" title="Search Delivered Orders & Customer History">📜 History (<span id="deliveredHistoryCount">0</span>)</button>
+      </div>
+    </section>
+
+    <!-- Strict Non-Delivery Filter Output (Pickup / In-House Ignored) -->
+    <div id="ignoredTicketsContainer"></div>
+
+    <!-- Active Interactive Delivery Cards (Priority at Top of Page) -->
+    <section id="cardsContainer"></section>
+
+    <!-- Shift Ledger, Start/End Shift Odometer Photos, 1099 Payout & Post-Rush Notes -->
+    <section class="section-card">
+      <h3>📊 End-of-Night 1099 Settlement & Shift Ledger</h3>
+      <div class="scanner-btn-row">
+        <label class="btn-secondary" style="text-align:center; cursor:pointer;">
+          <span id="shiftStartBtnText">🚗 Start Shift (Odometer Photo)</span>
+          <input id="shiftStartPhotoInput" type="file" accept="image/*" capture="environment" style="display:none;" />
+        </label>
+        <label class="btn-secondary" style="text-align:center; cursor:pointer;">
+          <span id="shiftEndBtnText">🏁 End Shift (Odometer Photo)</span>
+          <input id="shiftEndPhotoInput" type="file" accept="image/*" capture="environment" style="display:none;" />
+        </label>
+      </div>
+      <div id="odoPhotosPreview" class="odo-photos-row"></div>
+      <div class="odo-row">
+        <label>
+          Odometer Start:
+          <input id="odoStart" type="number" step="0.1" placeholder="e.g. 142510.0" />
+        </label>
+        <label>
+          Odometer End:
+          <input id="odoEnd" type="number" step="0.1" placeholder="e.g. 142548.5" />
+        </label>
+      </div>
+      <div id="ledgerSummaryMetrics" class="ledger-grid"></div>
+
+      <div>
+        <h4>🚩 Post-Rush Review Notes</h4>
+        <div id="postRushReviewList"></div>
+      </div>
+
+      <div class="multi-run-actions">
+        <button id="btnExportJson" class="btn-action">💾 Export Shift JSON</button>
+        <button id="btnExportCsv" class="btn-action">📄 Export Shift CSV</button>
+        <button id="btnClearShift" class="btn-action">🗑️ Reset Shift</button>
+      </div>
+    </section>
+
+    <!-- Local Map Rules & Building Profiles Reference -->
+    <section class="section-card">
+      <div class="rules-section-header">
+        <h3>🧭 Active Local Map Rules</h3>
+        <div class="multi-run-actions">
+          <button id="btnAddMapRule" class="btn-action primary-green btn-nav-compact">➕ Add Rule</button>
+          <button id="btnExportMapRules" class="btn-secondary btn-nav-compact" title="Download full local-map-rules.json">💾 Export JSON</button>
+          <button id="btnResetMapRules" class="btn-secondary btn-nav-compact" title="Reset custom phone rules back to repo defaults">↺ Reset</button>
+        </div>
+      </div>
+      <p class="muted">No alleys/parking lots unless Special Instructions specify "alley" or "back". Edits save locally on your phone right away.</p>
+      <div id="addressRulesList"></div>
+    </section>
+  </main>
+
+  <!-- Minimal Post-Rush Review Modal (Order # + Note) -->
+  <div id="postRushModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h3>🚩 Flag for Post-Rush Review</h3>
+      <p class="muted">Log a constructive note (e.g., extended distance still charged at $3.00 or ETA adjustment) to review with the boss after the rush.</p>
+      <label>
+        Order #:
+        <input id="postRushOrderNum" type="text" placeholder="e.g. 142" />
+      </label>
+      <label>
+        What to consider later:
+        <textarea id="postRushNoteInput" rows="3" placeholder="e.g. Far drive at standard $3.00 fee — suggest +$2 fee & +10m quoted ETA next time so we underpromise and overdeliver."></textarea>
+      </label>
+      <div class="modal-actions">
+        <button id="btnCancelPostRushModal" class="btn-secondary">Cancel</button>
+        <button id="btnSavePostRushNote" class="btn-action primary-green">Save Flag</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delivered Orders & Customer History Modal -->
+  <div id="historyModal" class="modal-backdrop hidden">
+    <div class="modal-card modal-wide">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem;">
+        <h3>📜 Delivery & Customer History</h3>
+        <div style="display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
+          <button id="btnExportHistoryJson" class="btn-secondary btn-nav-compact" title="Save private local backup JSON">💾 Export</button>
+          <label class="btn-secondary btn-nav-compact" style="cursor:pointer; display:inline-flex; align-items:center;" title="Import/merge private History JSON backup">
+            <span>📥 Import</span>
+            <input id="historyImportInput" type="file" accept="application/json,.json" style="display:none;" />
+          </label>
+          <button id="btnCloseHistory" class="btn-secondary btn-nav-compact">✕ Close</button>
+        </div>
+      </div>
+      <div class="history-filter-row">
+        <input id="historySearchInput" type="text" placeholder="Search by First/Last Name, Phone, or Order #..." />
+        <select id="historyDateFilter">
+          <option value="ALL">All Nights</option>
+        </select>
+      </div>
+      <div id="historyResultsList" class="history-results-list"></div>
+    </div>
+  </div>
+
+  <!-- Full Ticket Editor Modal (Fix any OCR misread & view original ticket photo) -->
+  <div id="editTicketModal" class="modal-backdrop hidden">
+    <div class="modal-card modal-wide">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3>✏️ Edit Ticket Details</h3>
+        <button id="btnCancelEditTicket" class="btn-secondary btn-nav-compact">✕ Cancel</button>
+      </div>
+      <img id="editTicketPhotoPreview" src="" alt="Scanned Ticket Photo" class="hidden" style="width:100%; max-height:36vh; object-fit:contain; border-radius:8px; border:1px solid var(--border-color); background:#000;" />
+      <div class="scanner-btn-row">
+        <label>
+          Order # (2000+):
+          <input id="editOrderNumber" type="text" placeholder="e.g. 2018" />
+        </label>
+        <label>
+          Customer Phone:
+          <input id="editCustomerPhone" type="text" placeholder="406-..." />
+        </label>
+      </div>
+      <label>
+        Customer Name:
+        <input id="editCustomerName" type="text" />
+      </label>
+      <label>
+        Street Address (Conrad, MT 59425):
+        <input id="editStreetAddress" type="text" />
+      </label>
+      <label>
+        Special Delivery Instructions:
+        <input id="editSpecialInstructions" type="text" placeholder="None" />
+      </label>
+      <div class="scanner-btn-row">
+        <label>
+          Payment Status:
+          <select id="editPaymentStatus">
+            <option value="PAID_ONLINE">CC (Paid Online) — $0.00 Due</option>
+            <option value="COLLECT">COLLECT PAYMENT (Cash or In-Person CC)</option>
+          </select>
+        </label>
+        <label>
+          Amount Due ($):
+          <input id="editAmountDue" type="number" step="0.01" min="0" />
+        </label>
+      </div>
+      <div class="scanner-btn-row">
+        <label>
+          POS Delivery Fee ($):
+          <input id="editDeliveryFee" type="number" step="0.50" min="0" />
+        </label>
+        <label>
+          Online Tip ($):
+          <input id="editOnlineTip" type="number" step="0.01" min="0" />
+        </label>
+      </div>
+      <label>
+        Pizzas (1 per line — e.g. <code>1x Lg Double Crust Meat Lovers</code>):
+        <textarea id="editPizzasText" rows="2"></textarea>
+      </label>
+      <label>
+        Other Items (1 per line — e.g. <code>1x Cup Of Soup</code>):
+        <textarea id="editOtherItemsText" rows="2"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button id="btnSaveEditTicket" class="btn-action primary-green">💾 Save Corrections</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Odometer Photo Viewer & Manual Entry Modal -->
+  <div id="odoViewerModal" class="modal-backdrop hidden">
+    <div class="modal-card modal-wide">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="odoViewerTitle">🚗 Odometer Photo</h3>
+        <button id="btnCloseOdoViewer" class="btn-secondary btn-nav-compact">✕ Close</button>
+      </div>
+      <img id="odoViewerImg" src="" alt="Odometer Dashboard Photo" style="width:100%; max-height:55vh; object-fit:contain; border-radius:8px; border:1px solid var(--border-color); background:#000;" />
+      <label>
+        Enter / Verify Odometer Reading (miles):
+        <input id="odoViewerInput" type="number" step="0.1" placeholder="e.g. 142510.4" />
+      </label>
+      <div class="modal-actions">
+        <button id="btnSaveOdoViewer" class="btn-action primary-green">Save Mileage</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local Map Rule Add / Edit Modal -->
+  <div id="mapRuleModal" class="modal-backdrop hidden">
+    <div class="modal-card modal-wide">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="mapRuleModalTitle">🧭 Add Local Map Rule</h3>
+        <button id="btnCancelMapRule" class="btn-secondary btn-nav-compact">✕ Cancel</button>
+      </div>
+      <label>
+        Display Name:
+        <input id="ruleDisplayName" type="text" placeholder="e.g. Tamarack Apartments or 412 N Main St" />
+      </label>
+      <label>
+        Match Patterns (comma-separated street/building keywords):
+        <input id="ruleMatchPatterns" type="text" placeholder="e.g. TAMARACK, 600 S MAIN" />
+      </label>
+      <div class="scanner-btn-row">
+        <label>
+          Track Side:
+          <select id="ruleTrackSide">
+            <option value="SHOP_SIDE">✓ Shop Side</option>
+            <option value="ACROSS_TRACKS">⚠️ Across Tracks</option>
+          </select>
+        </label>
+        <label>
+          Pin Policy:
+          <select id="ruleSnapPolicy">
+            <option value="FRONT_CURB">FRONT_CURB</option>
+            <option value="CUSTOM_PIN">CUSTOM_PIN</option>
+            <option value="ALLEY_ALLOWED">ALLEY_ALLOWED</option>
+          </select>
+        </label>
+      </div>
+      <div class="scanner-btn-row">
+        <label>
+          Recommended Fee ($):
+          <input id="ruleRecommendedFee" type="number" step="0.50" min="0" value="3.00" />
+        </label>
+        <label style="flex-direction: row; align-items: center; gap: 0.5rem; align-self: end; padding-bottom: 0.45rem;">
+          <input id="ruleIsExtended" type="checkbox" />
+          <span>Extended Distance Zone</span>
+        </label>
+      </div>
+      <div class="scanner-btn-row">
+        <label>
+          Custom Pin Lat (optional):
+          <input id="ruleCustomLat" type="number" step="0.00001" placeholder="e.g. 48.16535" />
+        </label>
+        <label>
+          Custom Pin Lng (optional):
+          <input id="ruleCustomLng" type="number" step="0.00001" placeholder="e.g. -111.94590" />
+        </label>
+      </div>
+      <button id="btnRuleUseCurrentGps" type="button" class="btn-secondary" style="width:100%;">📍 Use My Current Phone GPS for Custom Pin</button>
+      <label>
+        Parking Spot / Curb Note:
+        <input id="ruleParkingSpot" type="text" placeholder="e.g. Pull into North visitor bay on right-hand curb." />
+      </label>
+      <label>
+        Approach / Direction Note (optional):
+        <input id="ruleDirectionNote" type="text" placeholder="e.g. Approach southbound so curb is on passenger side." />
+      </label>
+      <label>
+        Permanent Alert Banner (optional):
+        <input id="rulePermanentAlert" type="text" placeholder="e.g. LOCKED BUILDING — Call or text on arrival." />
+      </label>
+      <label style="flex-direction: row; align-items: center; gap: 0.5rem;">
+        <input id="ruleRequireSms" type="checkbox" />
+        <span><strong>Require Pre-Departure SMS Gate</strong> (e.g. locked entry)</span>
+      </label>
+      <label>
+        Pre-Departure SMS Template (if required):
+        <textarea id="ruleSmsTemplate" rows="2" placeholder="Hi! Your Coach's Pizza driver is heading out now and will arrive in 5-7 minutes!"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button id="btnSaveMapRule" class="btn-action primary-green">💾 Save Rule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h3>⚙️ Vision OCR & Driver Preferences</h3>
+      <button id="btnOpenHistoryFromSettings" class="btn-action" style="width:100%;">📜 Open Delivery & Customer History</button>
+      <label>
+        Primary Vision OCR Provider (Auto-fails over if both keys are saved):
+        <select id="settingProvider">
+          <option value="google">Google Vision Cascade (Auto-Promotes Fastest Working Model)</option>
+          <option value="grok">xAI Grok Vision Primary (Auto-Fallback to Google)</option>
+        </select>
+      </label>
+      <label>
+        Google Gemini API Key (Starts with AQ.Ab...):
+        <input id="settingGeminiApiKey" type="text" autocomplete="off" spellcheck="false" placeholder="Paste full AQ.Ab... Google API key string" />
+      </label>
+      <label>
+        xAI Grok API Key (Starts with xai-...):
+        <input id="settingGrokApiKey" type="text" autocomplete="off" spellcheck="false" placeholder="Paste full xai-... secret key string" />
+      </label>
+      <div id="keyDiagnosticStatus" class="muted"></div>
+      <label style="flex-direction: row; align-items: center; gap: 0.5rem;">
+        <input id="settingEncouragementOnly" type="checkbox" checked />
+        <span><strong>Encouragement-Only Tip Display</strong> (Only show generous pre-tips; keep full data in JSON)</span>
+      </label>
+      <label style="flex-direction: row; align-items: center; gap: 0.5rem;">
+        <input id="settingUploadFromGallery" type="checkbox" />
+        <span><strong>Upload from Gallery / Files</strong> (Changes SnapTix to "Upload" instead of opening the camera directly)</span>
+      </label>
+      <div class="modal-actions">
+        <button id="btnCloseSettings" class="btn-secondary">Cancel</button>
+        <button id="btnSaveSettings" class="btn-action primary-green">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js?v=20261120_6"></script>
+</body>
+</html>

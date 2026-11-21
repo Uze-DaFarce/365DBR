@@ -1,0 +1,6 @@
+# Delivery Zoomed Sub-App Security Header Overrides
+# Overrides root /public_html/.htaccess restrictions so camera capture, local image previews, and Vision OCR API calls work.
+<IfModule mod_headers.c>
+  Header set Permissions-Policy "camera=(self), geolocation=(self), microphone=(), payment=(), usb=()"
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; connect-src 'self' https://generativelanguage.googleapis.com https://aiplatform.googleapis.com https://api.x.ai; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests;"
+</IfModule>

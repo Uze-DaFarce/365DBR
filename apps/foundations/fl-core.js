@@ -52,6 +52,10 @@ const FLApp = (() => {
       window.location.replace("/foundations/what-does-the-bible-say-about-education.html" + search + hash);
       return;
     }
+    if (lower.indexOf("government") !== -1 || lower.indexOf("gov") !== -1) {
+      window.location.replace("/foundations/what-does-the-bible-say-about-government.html" + search + hash);
+      return;
+    }
     if (path !== lower) {
       window.location.replace(lower + search + hash);
     }
@@ -339,6 +343,10 @@ const FLApp = (() => {
       shortUrl = "https://mt-sin.ai/fl/edu";
       title = "Book 2: What Does the Bible Say About Education? (Foundational Truths for Parents & Students Survival Guide)";
       desc = "Exposes the Concordance Trap and secular neutrality myth with 8 printable family & student labs and the K–12 Worldview Hour Calculator — 100% free to read, print & share.";
+    } else if (path.indexOf("government") !== -1) {
+      shortUrl = "https://mt-sin.ai/fl/gov";
+      title = "Book 3: What Does the Bible Say About Government? (Foundational Laws, Biblically Backed)";
+      desc = "4 Parts, 14 Chapters & 14 printable family study labs on Civil Authority, the Three Jurisdictions, True Law vs. Sharia & Marxism, and America's Constitutional Republic — 100% free to read, print & share.";
     }
 
     if (triggerEl) {
