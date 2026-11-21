@@ -76,6 +76,8 @@
     "areaServed": "US",
     "priceRange": "$$"
   }
+    const cy = document.getElementById('copyright-year');
+    if (cy) cy.textContent = Math.max(2026, new Date().getFullYear());
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -350,6 +352,10 @@
     .project-content { padding: 32px; }
     .project-content h3 { font-size: 24px; margin-bottom: 12px; }
     .project-content p { font-size: 16px; margin-bottom: 24px; }
+    .project-card { display: flex; flex-direction: column; }
+    .project-content { display: flex; flex-direction: column; flex: 1; }
+    .project-subtitle { font-size: 14px; font-weight: 600; color: #401b51; margin: -6px 0 12px; letter-spacing: 0.01em; }
+    .project-short-url { font-size: 13px; color: #6b7280; margin-top: -12px; margin-bottom: 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
     /* Bookkeeping Packages */
     .packages-table { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; margin-top: 48px; }
@@ -897,7 +903,17 @@
           </div>
           <div class="services-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
             <div class="project-card">
-              <img src="pics/projects/bible.webp" alt="Open Bible" class="project-image" width="800" height="601" loading="lazy" decoding="async">
+              <img src="pics/projects/foundations-hero.webp" alt="Foundations Library app icon" class="project-image" width="800" height="450" loading="lazy" decoding="async">
+              <div class="project-content">
+                <h3>Foundations Library</h3>
+                <div class="project-subtitle">Foundational Laws &amp; Doctrinal Proof-Text Labs</div>
+                <p>Original Scripture-first books and doctrinal study labs anchored directly to Hebrew and Greek proof texts. Read online, install on your phone, or print co-branded editions for your church.</p>
+                <div class="project-short-url">Quick link: mt-sin.ai/fl/</div>
+                <a href="https://mt-sin.ai/foundations/" class="service-link" target="_blank" rel="noopener noreferrer" aria-label="Open Foundations Library (opens in new tab)">Open Library →</a>
+              </div>
+            </div>
+            <div class="project-card">
+              <img src="pics/projects/365dbr-hero.webp" alt="365DBR Bible reading app icon" class="project-image" width="800" height="450" loading="lazy" decoding="async">
               <div class="project-content">
                 <h3>365DBR</h3>
                 <p>Read the Bible cover to cover in a Year in less than 15 minutes per day. A balanced plan presenting original texts alongside literal English translations. Totally free and ad-free.</p>
@@ -905,20 +921,10 @@
               </div>
             </div>
             <div class="project-card">
-              <img src="pics/projects/kids.webp" alt="Children Reading" class="project-image" width="800" height="533" loading="lazy" decoding="async">
-              <div class="project-content">
-                <h3>DayByDayKids</h3>
-                <p>Christian education resources for children. Helping families raise the next generation in faith with engaging content and activities.</p>
-                <a href="https://daybydaykids.com" class="service-link" target="_blank" rel="noopener noreferrer" aria-label="Visit DayByDayKids Website (opens in new tab)">Visit Website →</a>
-              </div>
-            </div>
-            <div class="project-card">
-              <div class="project-image" style="background: linear-gradient(45deg, #F4A623, #ffb845); display: flex; align-items: center; justify-content: center;">
-                <div style="font-size: 64px;" aria-hidden="true">🥚</div>
-              </div>
+              <img src="pics/projects/he-is-risen-hero.webp" alt="He Is Risen! Easter Egg Hunt Game screenshot" class="project-image" width="800" height="450" loading="lazy" decoding="async">
               <div class="project-content">
                 <h3>He Is Risen! Game</h3>
-                <p>A Christian Easter Egg Hunt Game. Hunt with P.A.L. for the Meaning of Easter in this interactive experience.</p>
+                <p>A Christian Easter Egg Hunt Game built for desktop and mobile play as an installable offline PWA phone app. Hunt with P.A.L. for the true meaning of Easter anywhere, even offline.</p>
                 <a href="/HeIsRisen/" class="service-link" target="_blank" rel="noopener noreferrer" aria-label="Play He Is Risen! Game Now (opens in new tab)">Play Now →</a>
               </div>
             </div>
@@ -1136,7 +1142,7 @@
           <h4>Projects</h4>
           <a href="#ministry">Our Ministry Projects</a>
           <a href="https://mt-sin.ai/365DBR/" target="_blank" rel="noopener noreferrer" aria-label="365DBR (opens in new tab)">365DBR</a>
-          <a href="https://daybydaykids.com" target="_blank" rel="noopener noreferrer" aria-label="DayByDayKids (opens in new tab)">DayByDayKids</a>
+          <a href="https://mt-sin.ai/foundations/" target="_blank" rel="noopener noreferrer" aria-label="Foundations Library (opens in new tab)">Foundations Library</a>
           <a href="/HeIsRisen/" target="_blank" rel="noopener noreferrer" aria-label="He Is Risen! (opens in new tab)">He Is Risen!</a>
         </div>
         <div class="footer-section">
@@ -1148,7 +1154,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p id="copyright">© 2024-2025 Mt. Sinai LLC. All rights reserved. | Serving God through excellence in business.</p>
+        <p id="copyright">&copy; 2024-<span id="copyright-year">2027</span> Mt. Sinai LLC. All rights reserved. | Serving God through excellence in business.</p>
       </div>
     </footer>
 

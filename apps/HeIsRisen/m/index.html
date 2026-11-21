@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-      <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'self' https://mt-sin.ai http://127.0.0.1:8080;">
+      <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'self' https://mt-sin.ai http://127.0.0.1:8080; manifest-src 'self';">
       <meta name="referrer" content="strict-origin-when-cross-origin">
       <meta name="description" content="Play He Is Risen: Easter Egg Hunt! A fun and meaningful visual search game where you find hidden eggs and discover the true meaning of Easter">
       <meta name="keywords" content="Easter, egg hunt, game, christian, He Is Risen, hidden objects">
@@ -9,7 +9,12 @@
       <meta property="og:description" content="Hunt for the Meaning of Easter in this interactive hidden object game.">
       <title>He Is Risen! Hunt for the Meaning of Easter</title>
       <meta name="theme-color" content="#000000" />
-      <link rel="icon" type="image/png" href="assets/eggs/egg-1.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="He Is Risen!">
       <link rel="canonical" href="https://mt-sin.ai/m/index.html">
       <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
       <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,7 +24,8 @@
       <meta name="screen-orientation" content="landscape">
       <link rel="stylesheet" href="styles.css">
       <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.min.js" integrity="sha384-FzyFD/9s7Evhi1zOgIM9G92fGDrGcGjOF8GB5SdXPCyodb2DIUVLcZqm2SExe9OK" crossorigin="anonymous"></script>
-  </head>
+    <script src="hir-pwa.js" defer></script>
+</head>
 <body>
   <main>
     <noscript>

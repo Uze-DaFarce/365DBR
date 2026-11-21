@@ -1,0 +1,25 @@
+{
+  "id": "/365DBR/",
+  "name": "365DBR \u2014 Interlinear Daily Bread",
+  "short_name": "365DBR",
+  "description": "365-Day Interlinear Daily Bread & Biblical Word Study",
+  "start_url": "/365DBR/",
+  "scope": "/365DBR/",
+  "display": "standalone",
+  "background_color": "#1e293b",
+  "theme_color": "#1e293b",
+  "icons": [
+    {
+      "src": "/365DBR/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/365DBR/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
