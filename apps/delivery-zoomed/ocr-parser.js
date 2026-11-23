@@ -622,6 +622,17 @@ export function normalizeAndVerifyTicket(raw, mapRules, previewUrl = null, batch
   // Resolve Navigation Coordinates (Custom Override Pin vs Front Street Curb vs Alley Allowed)
   const routing = resolveTicketCoordinates(streetRaw, matchedRule, allowAlleyAccess, mapRules);
 
+  const rawPhoneCandidate =
+    raw.customerPhone ||
+    raw.phone ||
+    raw.phoneNumber ||
+    raw.customerPhoneNumber ||
+    "";
+  const fallbackPhoneMatch = !rawPhoneCandidate
+    ? `${raw.specialDeliveryInstructions || ""} ${raw.streetAddress || ""}`.match(/(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}/)
+    : null;
+  const resolvedPhone = String(rawPhoneCandidate || fallbackPhoneMatch?.[0] || "").trim();
+
   return {
     id: `tkt_${dynamicSeed}`,
     orderNumber,
@@ -630,7 +641,7 @@ export function normalizeAndVerifyTicket(raw, mapRules, previewUrl = null, batch
     isDelivery: true,
     ignoredBanner: null,
     customerName: (raw.customerName || "Valued Customer").trim(),
-    customerPhone: (raw.customerPhone || "").trim(),
+    customerPhone: resolvedPhone,
     address: {
       rawStreet: streetRaw,
       normalizedKey: matchedRule ? matchedRule.normalizedKey : normalizedStreetKey,
@@ -696,6 +707,38 @@ export function normalizeAndVerifyTicket(raw, mapRules, previewUrl = null, batch
       cashTip: 0
     }
   };
+}
+
+export function applyMapRulesToTicket(ticket, mapRules) {
+  if (!ticket || !mapRules) return ticket;
+  const streetRaw = (ticket.address?.rawStreet || "").trim();
+  const normalizedStreetKey = streetRaw.toUpperCase().replace(/[.,#]/g, "").replace(/\s+/g, " ").trim();
+  const matchedRule = findMatchingAddressRule(normalizedStreetKey, ticket.customerName || "", mapRules);
+  const allowAlleyAccess = Boolean(ticket.allowAlleyAccess) || ALLEY_KEYWORD_REGEX.test(ticket.specialInstructions || "");
+  const routing = resolveTicketCoordinates(streetRaw, matchedRule, allowAlleyAccess, mapRules);
+
+  ticket.routing = {
+    ...(ticket.routing || {}),
+    ...routing
+  };
+  if (ticket.address) {
+    ticket.address.normalizedKey = matchedRule ? matchedRule.normalizedKey : normalizedStreetKey;
+  }
+  if (ticket.deliveryFee) {
+    ticket.deliveryFee.isExtendedZone = Boolean(matchedRule?.isExtendedDistance);
+    ticket.deliveryFee.recommendedFee = matchedRule?.recommendedFee || 3.0;
+    if (ticket.deliveryFee.isExtendedZone && Number(ticket.deliveryFee.chargedAmount || 3) <= 3.0) {
+      ticket.deliveryFee.underchargedWarning = true;
+    }
+  }
+  ticket.specialAlerts = (ticket.specialAlerts || []).filter((al) => al.category !== "BUILDING_RULE");
+  if (matchedRule?.driverNotes?.permanentAlert) {
+    ticket.specialAlerts.push({
+      category: "BUILDING_RULE",
+      bannerText: matchedRule.driverNotes.permanentAlert
+    });
+  }
+  return ticket;
 }
 
 function findMatchingAddressRule(normalizedStreetKey, customerName, mapRules) {
@@ -786,7 +829,7 @@ function resolveTicketCoordinates(streetRaw, matchedRule, allowAlleyAccess, mapR
     const destPin =
       geo.snapPolicy === "CUSTOM_PIN" && geo.customOverridePin
         ? geo.customOverridePin
-        : geo.frontCurbPin || { lat: 48.1695, lng: -111.9435 };
+        : geo.frontCurbPin || null;
 
     return {
       ruleMatched: matchedRule.displayName,
@@ -804,15 +847,18 @@ function resolveTicketCoordinates(streetRaw, matchedRule, allowAlleyAccess, mapR
 
   // Default Conrad front-street curb geocoding heuristic (no alley snapping unless Rule #3 says alley/back)
   const isWestOfTracks = /\b(bench|west|w\s+|RR|rural|hwy\s*91)\b/i.test(streetRaw);
+  const isApartment = /\b(apt|apartment|unit)\b/i.test(streetRaw);
   return {
     ruleMatched: null,
     trackSide: isWestOfTracks ? "ACROSS_TRACKS" : "SHOP_SIDE",
     snapMode: allowAlleyAccess ? "ALLEY_EXPLICITLY_REQUESTED" : "FRONT_CURB_CENTERLINE (No Alley)",
     destinationPin: null,
     approachWaypoint: null,
-    requireSmsBeforeStart: false,
-    smsButtonLabel: null,
-    smsTemplate: null,
+    requireSmsBeforeStart: isApartment,
+    smsButtonLabel: isApartment ? "📱 Text Customer Before Leaving Shop (Apartment)" : null,
+    smsTemplate: isApartment
+      ? "Hi! This is your Coach's Pizza driver. I'm heading out from the shop now and will arrive at your apartment in about 5-7 minutes!"
+      : null,
     driverNotes: null,
     tipHistory: null
   };

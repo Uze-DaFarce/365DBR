@@ -55,31 +55,27 @@
   },
   "addressRules": [
     {
-      "normalizedKey": "TAMARACK APARTMENTS",
-      "displayName": "Tamarack Apartments",
-      "matchPatterns": ["TAMARACK", "600 S MAIN"],
+      "normalizedKey": "218 S MARYLAND",
+      "displayName": "Tamarack Apartments (218 S Maryland)",
+      "matchPatterns": ["TAMARACK", "218 S MARYLAND", "218 SOUTH MARYLAND"],
       "trackSide": "SHOP_SIDE",
       "isExtendedDistance": false,
       "recommendedFee": 3.00,
       "geofence": {
-        "frontCurbPin": { "lat": 48.16521, "lng": -111.94612 },
-        "customOverridePin": { "lat": 48.16535, "lng": -111.94590 },
-        "snapPolicy": "CUSTOM_PIN",
-        "approachWaypoint": {
-          "lat": 48.16610,
-          "lng": -111.94590,
-          "directionNote": "Enter southbound on Main so apartment curb is on passenger (right) side; no U-turn needed."
-        }
+        "frontCurbPin": null,
+        "customOverridePin": null,
+        "snapPolicy": "FRONT_CURB",
+        "approachWaypoint": null
       },
       "preDepartureRule": {
         "requireSmsBeforeStart": true,
-        "buttonLabel": "📱 Text Customer Before Leaving Shop (Tamarack Locked Entry)",
-        "smsTemplate": "Hi! This is your Coach's Pizza driver. I'm heading out from the shop now and will arrive at Tamarack Apartments in about 5-7 minutes!"
+        "buttonLabel": "📱 Text Customer Before Leaving Shop (Tamarack — 218 S Maryland)",
+        "smsTemplate": "Hi! This is your Coach's Pizza driver. I'm heading out from the shop now and will arrive at Tamarack Apartments (218 S Maryland) in about 5-7 minutes!"
       },
       "driverNotes": {
-        "accessCode": "Locked Outer Door",
-        "parkingSpot": "Pull into North visitor bay on right-hand curb.",
-        "permanentAlert": "LOCKED BUILDING — Text customer before leaving shop so they meet you at the entry."
+        "accessCode": "Front, Side & Back Entrances",
+        "parkingSpot": "Has front, side, and back entrances — check apt/door note before walking up.",
+        "permanentAlert": "TAMARACK APTS (218 S Maryland) — Text customer before leaving shop; has front, side & back entrances."
       },
       "tipHistory": {
         "totalDeliveries": 12,
@@ -119,6 +115,36 @@
         "totalDeliveries": 8,
         "averageTip": 4.00,
         "lastTip": 4.00,
+        "generousRegular": false
+      }
+    },
+    {
+      "normalizedKey": "340 EDGEWOOD",
+      "displayName": "340 Edgewood (Google calls it Hoover Rd)",
+      "matchPatterns": ["340 EDGEWOOD", "EDGEWOOD"],
+      "trackSide": "ACROSS_TRACKS",
+      "isExtendedDistance": false,
+      "recommendedFee": 3.00,
+      "geofence": {
+        "frontCurbPin": { "lat": 48.178819, "lng": -111.961229 },
+        "customOverridePin": { "lat": 48.178819, "lng": -111.961229 },
+        "snapPolicy": "CUSTOM_PIN",
+        "approachWaypoint": null
+      },
+      "preDepartureRule": {
+        "requireSmsBeforeStart": false,
+        "buttonLabel": null,
+        "smsTemplate": null
+      },
+      "driverNotes": {
+        "accessCode": "",
+        "parkingSpot": "Driveway directly off Edgewood (mislabeled Hoover Rd in Google Maps) — Custom Pin locked to driveway.",
+        "permanentAlert": "CUSTOM DRIVEWAY PIN ACTIVE — Google Maps mislabels Edgewood as Hoover Rd; follow pin straight to driveway."
+      },
+      "tipHistory": {
+        "totalDeliveries": 0,
+        "averageTip": 0,
+        "lastTip": 0,
         "generousRegular": false
       }
     },

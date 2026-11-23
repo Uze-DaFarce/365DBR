@@ -483,12 +483,63 @@ body {
   flex-wrap: wrap;
 }
 
+.customer-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
 .customer-name {
   font-weight: 700;
   font-size: 0.96rem;
   flex: 1;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.customer-contact-btns {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.btn-contact-mini {
+  width: 28px;
+  height: 26px;
+  padding: 0;
+  font-size: 0.82rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-contact-mini.active-contact {
+  border-color: var(--accent-green-bright);
+  background: #132f20;
+}
+
+.btn-contact-mini.missing-phone {
+  opacity: 0.4;
+}
+
+.card-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.btn-delete-ticket {
+  background: #2b1417;
+  border: 1px solid rgba(248, 81, 73, 0.55);
+  color: #fca5a5;
+  padding: 0.36rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
 }
 
 .reorder-controls {
@@ -1031,6 +1082,7 @@ body {
 }
 
 .modal-card input[type="text"],
+.modal-card input[type="email"],
 .modal-card input[type="number"],
 .modal-card input[type="password"],
 .modal-card select,

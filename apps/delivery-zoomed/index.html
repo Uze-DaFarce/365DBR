@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   <link rel="apple-touch-icon" href="./icon-192.png" />
   <title>Delivery Zoomed — Small-Town Driver PWA</title>
-  <link rel="stylesheet" href="./styles.css?v=20261120_5" />
+  <link rel="stylesheet" href="./styles.css?v=20261123_1" />
 </head>
 <body>
   <header class="app-header">
@@ -96,6 +96,7 @@
       </div>
 
       <div class="multi-run-actions">
+        <button id="btnEmailShiftSummary" class="btn-action primary-green">📧 Email Shift Summary</button>
         <button id="btnExportJson" class="btn-action">💾 Export Shift JSON</button>
         <button id="btnExportCsv" class="btn-action">📄 Export Shift CSV</button>
         <button id="btnClearShift" class="btn-action">🗑️ Reset Shift</button>
@@ -354,6 +355,10 @@
         <input id="settingUploadFromGallery" type="checkbox" />
         <span><strong>Upload from Gallery / Files</strong> (Changes SnapTix to "Upload" instead of opening the camera directly)</span>
       </label>
+      <label>
+        End-of-Shift Summary Email (auto-opens prefilled email at End Shift):
+        <input id="settingSummaryEmail" type="email" autocomplete="email" placeholder="e.g. patty@example.com" />
+      </label>
       <div class="modal-actions">
         <button id="btnCloseSettings" class="btn-secondary">Cancel</button>
         <button id="btnSaveSettings" class="btn-action primary-green">Save Settings</button>
@@ -361,6 +366,6 @@
     </div>
   </div>
 
-  <script type="module" src="./app.js?v=20261120_6"></script>
+  <script type="module" src="./app.js?v=20261123_1"></script>
 </body>
 </html>

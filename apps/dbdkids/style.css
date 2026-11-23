@@ -1,532 +1,495 @@
-/* Reset and Base */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* Day by Day Kids — Responsive Treehouse Clubhouse */
+:root {
+  --teal-deep: #0f3d4c;
+  --teal-mid: #176177;
+  --sky-soft: #e9f6fb;
+  --cream: #fffdf7;
+  --gold: #ffcc33;
+  --gold-dark: #d99b00;
+  --crimson: #c62828;
+  --blue-btn: #1648c7;
+  --blue-btn-hover: #0f3494;
+  --ink: #1d2a33;
+  --muted: #4a5d6a;
+  --radius: 18px;
+  --shadow: 0 10px 26px rgba(15, 61, 76, 0.16);
 }
 
-@font-face {
-    font-family: 'Comic Sans MS';
-    src: url('fonts/ComicSansMS.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--cream);
+  line-height: 1.55;
 }
 
-@font-face {
-    font-family: 'Comic Sans MS';
-    src: url('fonts/ComicSansMSBold.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
+h1, h2, h3, .brand-badge, .btn-primary, .btn-secondary, .tx7-badge {
+  font-family: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
 }
 
-/* Ensure we load our downloaded font explicitly */
-/* Ensure we load our downloaded font explicitly */
-body, html {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #2b2b2b;
-    font-family: "Comic Sans MS", cursive;
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--blue-btn); }
+
+.container {
+  width: min(1080px, 92%);
+  margin: 0 auto;
 }
 
-/* Main App Container */
-#app-container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    background-image: url('images/treehouse_bg.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    overflow: hidden;
+/* HEADER */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15, 61, 76, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 3px solid var(--gold);
 }
 
-/* Page Management */
-.page {
+.nav-inner {
+  width: min(1120px, 94%);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0;
+  gap: 1rem;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+  color: var(--gold);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+}
+
+.site-nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.site-nav a:hover { background: rgba(255, 255, 255, 0.14); color: var(--gold); }
+.site-nav .nav-pill {
+  font-family: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+  background: rgba(198, 40, 40, 0.92);
+  color: var(--gold);
+  border: 2px solid var(--gold);
+  padding: 0.25rem 0.9rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+}
+.site-nav .nav-pill:hover { background: #a31d1d; color: #ffe082; }
+
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  font-size: 1.3rem;
+  border-radius: 10px;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+}
+
+/* HERO */
+.hero {
+  position: relative;
+  min-height: clamp(460px, 72vh, 660px);
+  display: flex;
+  align-items: center;
+  background: var(--teal-deep) url('images/treehouse_bg.webp') center/cover no-repeat;
+  overflow: hidden;
+  padding: 2.5rem 0;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, rgba(11, 44, 56, 0.84) 0%, rgba(11, 44, 56, 0.42) 52%, rgba(11, 44, 56, 0.72) 100%);
+}
+
+.hero-grid {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, 92%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.tx7-badge {
+  display: inline-block;
+  color: var(--gold);
+  background: rgba(198, 40, 40, 0.92);
+  border: 2px solid var(--gold);
+  border-radius: 999px;
+  padding: 0.25rem 0.9rem;
+  font-size: 1.05rem;
+  text-decoration: none;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+}
+
+.hero-title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  line-height: 1.02;
+  color: var(--gold);
+  text-shadow: 0 4px 0 var(--crimson), 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+.hero-tagline {
+  margin: 0 0 1.4rem;
+  color: #f4fbff;
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  font-weight: 700;
+  max-width: 34ch;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.hero-spots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.spot-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 215px;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 1rem 0.75rem;
+  border-radius: var(--radius);
+  background: rgba(15, 61, 76, 0.78);
+  border: 2px solid rgba(255, 204, 51, 0.75);
+  backdrop-filter: blur(4px);
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 0.95rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.spot-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+}
+
+.spot-card img {
+  width: 155px;
+  height: 155px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.4));
+}
+
+/* BUTTONS */
+.btn-primary, .btn-secondary, .btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.78rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.14s ease, background 0.14s ease;
+}
+
+.btn-primary {
+  background: var(--blue-btn);
+  color: #ffffff;
+  border-color: var(--gold);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.25);
+}
+.btn-primary:hover { background: var(--blue-btn-hover); transform: translateY(-2px); }
+
+.btn-secondary {
+  background: var(--gold);
+  color: var(--teal-deep);
+}
+.btn-secondary:hover { background: #ffd966; transform: translateY(-2px); }
+
+.btn-outline {
+  background: #ffffff;
+  color: var(--teal-deep);
+  border-color: var(--teal-mid);
+}
+.btn-outline:hover { background: var(--sky-soft); transform: translateY(-2px); }
+
+.btn-sm { padding: 0.52rem 1.05rem; font-size: 0.92rem; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 1rem; }
+
+/* SECTIONS */
+.section { padding: 3.2rem 0; }
+.section-light { background: var(--cream); }
+.section-sky { background: var(--sky-soft); }
+.section-wood {
+  background:
+    linear-gradient(rgba(255, 250, 238, 0.92), rgba(255, 250, 238, 0.92)),
+    url('images/wood_texture.webp') center/cover;
+}
+
+.section-head { margin-bottom: 1.8rem; max-width: 72ch; }
+.section-head h2, .bible-header h2, .bekah-copy h2 {
+  margin: 0.2rem 0 0.6rem;
+  font-size: clamp(1.75rem, 3.2vw, 2.35rem);
+  color: var(--teal-deep);
+}
+.kicker {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--crimson);
+}
+.lead { font-size: 1.06rem; color: var(--muted); margin: 0; }
+
+/* CARDS */
+.card-grid.two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.feature-card {
+  background: #ffffff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 2px solid #d9e6ec;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-media {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: #102a36;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-media-soft { background: #eef7fb; padding: 0.75rem; }
+.card-media img { width: 100%; height: 100%; object-fit: contain; }
+
+.card-body { padding: 1.35rem; flex: 1; display: flex; flex-direction: column; }
+.card-body h3 { margin: 0.2rem 0 0.5rem; font-size: 1.35rem; color: var(--teal-deep); }
+.card-body p { margin: 0; color: var(--muted); flex: 1; }
+
+/* VERSE CHIPS & CLUBHOUSE BIBLE */
+.verse-chip {
+  display: inline;
+  background: #fff3c4;
+  color: var(--teal-deep);
+  border: 1px solid var(--gold-dark);
+  border-radius: 6px;
+  padding: 0.05rem 0.42rem;
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.92em;
+  cursor: pointer;
+}
+.verse-chip:hover { background: var(--gold); }
+.verse-chip-light { background: rgba(255, 204, 51, 0.2); color: var(--gold); border-color: var(--gold); }
+
+.bible-header {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.bible-open-art { width: 140px; flex-shrink: 0; }
+.bible-header > div { flex: 1; min-width: 220px; }
+
+.verse-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.verse-btn {
+  background: #ffffff;
+  color: var(--teal-deep);
+  border: 2px solid #c5dce6;
+  border-radius: 999px;
+  padding: 0.42rem 0.9rem;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+.verse-btn:hover { border-color: var(--teal-mid); background: var(--sky-soft); }
+.verse-btn.active { background: var(--teal-deep); color: var(--gold); border-color: var(--teal-deep); }
+
+.bible-frame-wrap {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 3px solid var(--teal-deep);
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+#clubhouse-bible-frame {
+  width: 100%;
+  height: clamp(460px, 64vh, 680px);
+  border: 0;
+  display: block;
+}
+
+/* BEKAH */
+.bekah-grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.bekah-art {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  border: 2px solid #cde4ef;
+  box-shadow: var(--shadow);
+}
+
+.bekah-img { max-height: 290px; object-fit: contain; }
+.footprints-accent {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  height: 110px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* TX7 GRID */
+.tx7-grid {
+  list-style: none;
+  counter-reset: tx;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.tx7-grid li { counter-increment: tx; }
+
+.tx7-grid a {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1.05rem;
+  background: #ffffff;
+  border: 2px solid #d9e6ec;
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--teal-deep);
+  font-weight: 800;
+  box-shadow: 0 4px 10px rgba(15, 61, 76, 0.07);
+  transition: transform 0.14s ease, border-color 0.14s ease;
+}
+
+.tx7-grid a::before {
+  content: counter(tx);
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--teal-deep);
+  display: grid;
+  place-items: center;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.95rem;
+}
+
+.tx7-grid a:hover { border-color: var(--teal-mid); transform: translateY(-2px); }
+
+/* FOOTER */
+.site-footer {
+  background: var(--teal-deep);
+  color: #dbeaf0;
+  padding: 1.6rem 0;
+  border-top: 4px solid var(--gold);
+}
+
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+.footer-brand { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--gold); }
+.site-footer a { color: var(--gold); }
+.site-footer p { margin: 0; font-size: 0.92rem; }
+
+/* MOBILE BREAKPOINT (<= 768px & <= 500px) */
+@media (max-width: 768px) {
+  .hero-grid, .card-grid.two-col, .bekah-grid, .tx7-grid {
+    grid-template-columns: 1fr;
+  }
+  .spot-card img { height: 105px; }
+}
+
+@media (max-width: 500px) {
+  .nav-toggle { display: inline-block; }
+  .site-nav {
+    display: none;
     position: absolute;
-    top: 0;
+    top: 100%;
     left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.page.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* Common Element Positioning */
-.element {
-    position: absolute;
-    transform-origin: top left;
-    flex-shrink: 0;
-}
-
-/* Animations */
-@keyframes riseDown {
-    0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
-    100% { transform: translateY(0) rotate(0deg); opacity: 1; }
-}
-
-@keyframes breatheOutBible {
-    0% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.05) rotate(0deg); }
-    100% { transform: scale(1) rotate(0deg); }
-}
-
-@keyframes breatheOutIntro {
-    0% { transform: scale(1) rotate(-8.7deg); }
-    50% { transform: scale(1.05) rotate(-8.7deg); }
-    100% { transform: scale(1) rotate(-8.7deg); }
-}
-
-.anim-rise {
-    animation: riseDown 1s ease-out both;
-}
-
-.anim-breathe-bible {
-    animation: breatheOutBible 4s infinite ease-in-out;
-}
-
-.anim-breathe-intro {
-    animation: breatheOutIntro 4s infinite ease-in-out;
-}
-
-/*
-  Specific Elements - Page 1
-*/
-
-/* 1. Title "Day by Day Kids" */
-#title-dbdk {
-    font-size: 128px;
-    font-weight: bold;
-    transform: rotate(-9.6deg);
-    line-height: 1.1;
-    text-align: center;
-    white-space: nowrap;
-
-    left: 10px;
-    top: 30px;
-
-    color: transparent;
-    -webkit-text-stroke: 4px #FFF000;
-    text-shadow: 4px 4px 0px #FF0000;
-}
-
-/* 2. (Tx7) Link */
-#link-tx7 {
-    font-size: 75px;
-    font-weight: bold;
-    text-decoration: none;
-    cursor: pointer;
-    white-space: nowrap;
-
-    right: 15px;
-    top: 15px;
-    left: auto;
-
-    color: #8080FF;
-    -webkit-text-stroke: 0px;
-
-    text-shadow:
-        1px 1px 0px #FF0000,
-        2px 1px 0px #FF0000,
-        1px 2px 0px #FF0000,
-        2px 2px 0px #FF0000,
-        3px 2px 0px #FF0000,
-        2px 3px 0px #FF0000,
-        3px 3px 0px #FF0000;
-}
-
-/* 3. ENTER CLUBHOUSE Button */
-#btn-enter {
-    color: #FFF000;
-    font-size: 22px;
-    font-weight: bold;
-    padding: 5px 15px;
-    left: 873.8px;
-    top: 415.4px;
-    transform: rotate(-4.2deg);
-
-    background-color: #0000FF;
-    border: 2px solid #FFF000;
-    border-radius: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: inherit;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-/* 4. Closed Bible */
-#img-bible {
-    width: 275.7px;
-    height: 299.3px;
-    left: 41.7px;
-    top: 404.7px;
-    cursor: pointer;
-}
-
-/* 5. introducing Bekah: your new p.a.l.
-   Bekah Text needs to move left another 10px.
-   (was 1019.8px -> now 1009.8px)
-*/
-#txt-bekah-intro {
-    text-transform: uppercase;
-    color: #FFF000;
-    font-size: 32px;
-    font-weight: bold;
-    width: 350px;
-    left: 1009.8px; /* Moved left 10px */
-    top: 470.7px;
-    transform: rotate(-8.7deg);
-    text-align: center;
-    line-height: 1.2;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-}
-
-/* 6. Bekah (armor of God) */
-#link-bekah-p1 {
-    width: 442px;
-    height: 249.8px;
-    left: 1038px;
-    top: 527.3px;
-    cursor: pointer;
-}
-
-#img-bekah {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-/* 7. footprints */
-#img-footprints {
-    width: 59px;
-    height: 191px;
-    left: 813px;
-    top: 602.5px;
-    transform: rotate(-22.5deg);
-}
-
-
-
-/*
-  Specific Elements - Page 2
-*/
-
-#nav-home-p2 {
-    left: 0;
-    top: 0;
-    text-decoration: none;
-    cursor: pointer;
-    z-index: 10;
-    transform: scale(0.5);
-    transform-origin: top left;
-}
-
-/* Picture frame image filled with yellow background */
-.nav-bg-yellow {
-    position: absolute;
-    width: 328.6px;
-    height: 306.5px;
-    left: -28.4px;
-    top: -43.3px;
-    transform: rotate(-6.7deg);
-    background-color: #FFF000;
-    border: 5px solid #000;
-    box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
-    background-image: url('images/whiteboard_frame.png');
-    background-blend-mode: overlay;
-    border-radius: 10px;
-    background-size: 100% 100%;
-}
-
-/* Green Hand */
-.nav-handprint-p2 {
-    position: absolute;
-    width: 72.9px;
-    height: 75.2px;
-    left: 198.2px;
-    top: 20.9px;
-    transform: rotate(0deg);
-    z-index: 12;
-}
-
-/* Day by Day Kids text */
-.nav-text-p2 {
-    position: absolute;
-    font-size: 30.9pt;
-    font-weight: bold;
-    width: 225.4px;
-    height: 105.8px;
-    left: 34.4px;
-    top: 77.6px;
-    transform: rotate(-7.1deg);
-    color: transparent;
-    -webkit-text-stroke: 1.5px #FFF000;
-    text-shadow: 2px 2px 0px #FF0000;
-    line-height: 1;
-    text-align: center;
-    z-index: 11;
-}
-
-/* Armor of God */
-#link-bekah-p3 {
-    position: absolute;
-    width: 476.4px;
-    height: 473.7px;
-    left: 1016.6px;
-    top: 68.2px;
-    transform: rotate(0deg);
-    z-index: 5;
-    cursor: pointer;
-}
-
-#img-bekah-p2 {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-/* Clubhouse Bible Text */
-#txt-clubhouse-bible-p2 {
-    text-decoration: none;
-    cursor: pointer;
-    position: absolute;
-    font-size: 96.2pt;
-    font-weight: bold;
-    width: 961.9px;
-    height: 153.3px;
-    left: 202px;
-    top: 341px;
-    transform: rotate(0deg);
-    color: #FFF000;
-    text-align: center;
-    -webkit-text-stroke: 2px #000;
-    text-shadow: 4px 4px 0px #FF0000;
-    z-index: 10;
-    line-height: 1;
-}
-
-/* Open Bible */
-#link-open-bible-p2 {
-    position: absolute;
-    width: 1368.1px;
-    height: 378.2px;
-    left: -9.1px;
-    top: 368.9px;
-    transform: rotate(0deg);
-    z-index: 6;
-    cursor: pointer;
-}
-
-#img-open-bible-p2 {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-#page-2 {
-    background-image: url('images/wood_texture.jpg');
-    background-size: cover;
-    background-position: center;
-}
-
-/* New page styles - positioned absolutely to match Canva style. Adjust coords using your watermarked screenshots. */
-#pal-title, #learn-title, #tx7-title {
-    font-size: 48px;
-    font-weight: bold;
-    color: #FFF000;
-    text-shadow: 2px 2px 0px #FF0000;
-    left: 100px;
-    top: 100px;
-}
-
-#pal-text, #learn-text, #tx7-intro {
-    font-size: 24px;
-    color: #FFF000;
-    width: 600px;
-    left: 100px;
-    top: 200px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-#learn-more-p3 {
-    font-size: 28px;
-    color: #FFF000;
-    left: 100px;
-    top: 500px;
-}
-
-#computer-link {
-    width: 300px;
-    height: 200px;
-    left: 100px;
-    top: 400px;
-}
-
-#heisrisen-label {
-    font-size: 24px;
-    color: #FFF000;
-    left: 420px;
-    top: 450px;
-}
-
-#heisrisen-mobile {
-    font-size: 18px;
-    color: #FFF000;
-    left: 420px;
-    top: 480px;
-}
-
-#tx7-list {
-    font-size: 20px;
-    color: #FFF000;
-    left: 100px;
-    top: 300px;
-    width: 800px;
-}
-
-.tx7-item {
-    margin: 5px 0;
-}
-
-/* Nav for new pages */
-.nav-handprint-p3, .nav-handprint-p4, .nav-handprint-p6 {
-    position: absolute;
-    width: 72.9px;
-    height: 75.2px;
-    left: 198.2px;
-    top: 20.9px;
-    transform: rotate(0deg);
-    z-index: 12;
-}
-
-.nav-text-p3, .nav-text-p4, .nav-text-p6 {
-    position: absolute;
-    font-size: 30.9pt;
-    font-weight: bold;
-    width: 225.4px;
-    height: 105.8px;
-    left: 34.4px;
-    top: 77.6px;
-    transform: rotate(-7.1deg);
-    color: transparent;
-    -webkit-text-stroke: 1.5px #FFF000;
-    text-shadow: 2px 2px 0px #FF0000;
-    line-height: 1;
-    text-align: center;
-    z-index: 11;
-}
-
-#page-3, #page-4, #page-6 {
-    background-image: url('images/wood_texture.jpg');
-    background-size: cover;
-    background-position: center;
-}
-
-#page-2 {
-    background-image: url('images/wood_texture.jpg');
-    background-size: cover;
-    background-position: center;
-}
-
-/* New page styles - positioned absolutely to match Canva style. Adjust coords using your watermarked screenshots. */
-#pal-title, #learn-title, #tx7-title {
-    font-size: 48px;
-    font-weight: bold;
-    color: #FFF000;
-    text-shadow: 2px 2px 0px #FF0000;
-    left: 100px;
-    top: 100px;
-}
-
-#pal-text, #learn-text, #tx7-intro {
-    font-size: 24px;
-    color: #FFF000;
-    width: 600px;
-    left: 100px;
-    top: 200px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-#learn-more-p3 {
-    font-size: 28px;
-    color: #FFF000;
-    left: 100px;
-    top: 500px;
-}
-
-#computer-link {
-    width: 300px;
-    height: 200px;
-    left: 100px;
-    top: 400px;
-}
-
-#heisrisen-label {
-    font-size: 24px;
-    color: #FFF000;
-    left: 420px;
-    top: 450px;
-}
-
-#heisrisen-mobile {
-    font-size: 18px;
-    color: #FFF000;
-    left: 420px;
-    top: 480px;
-}
-
-#tx7-list {
-    font-size: 20px;
-    color: #FFF000;
-    left: 100px;
-    top: 300px;
-    width: 800px;
-}
-
-.tx7-item {
-    margin: 5px 0;
-}
-
-/* Nav for new pages */
-.nav-handprint-p3, .nav-handprint-p4, .nav-handprint-p6 {
-    position: absolute;
-    width: 72.9px;
-    height: 75.2px;
-    left: 198.2px;
-    top: 20.9px;
-    transform: rotate(0deg);
-    z-index: 12;
-}
-
-.nav-text-p3, .nav-text-p4, .nav-text-p6 {
-    position: absolute;
-    font-size: 30.9pt;
-    font-weight: bold;
-    width: 225.4px;
-    height: 105.8px;
-    left: 34.4px;
-    top: 77.6px;
-    transform: rotate(-7.1deg);
-    color: transparent;
-    -webkit-text-stroke: 1.5px #FFF000;
-    text-shadow: 2px 2px 0px #FF0000;
-    line-height: 1;
-    text-align: center;
-    z-index: 11;
-}
-
-#page-3, #page-4, #page-6 {
-    background-image: url('images/wood_texture.jpg');
-    background-size: cover;
-    background-position: center;
+    right: 0;
+    background: var(--teal-deep);
+    flex-direction: column;
+    padding: 0.8rem 1rem 1rem;
+    border-bottom: 3px solid var(--gold);
+  }
+  .site-nav.open { display: flex; }
+  .site-nav a { width: 100%; text-align: center; }
+  .hero { padding: 1.8rem 0; min-height: auto; }
+  #clubhouse-bible-frame { height: 480px; }
 }

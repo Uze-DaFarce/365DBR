@@ -1,274 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day By Day Kids</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day by Day Kids — Sola Scriptura Clubhouse</title>
+  <meta name="description" content="Day by Day Kids: A fun, Scripture-first clubhouse featuring Bekah (your P.A.L.), the Clubhouse Bible, He Is Risen!, and curated Bible adventures.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app-container">
-
-
-
-        <!-- PAGE 1 -->
-        <div id="page-1" class="page">
-
-            <!-- 1. Title -->
-            <div id="title-dbdk" class="element">
-                Day by<br>Day Kids
-            </div>
-
-            <!-- 2. (Tx7) Link -->
-            <a href="#" id="link-tx7" class="element anim-rise" onclick="goToPage(6)">
-                (Tx7)
-            </a>
-
-            <!-- 3. ENTER CLUBHOUSE Button -->
-            <button id="btn-enter" class="element" onclick="goToPage(4)">
-                ENTER CLUBHOUSE
-            </button>
-
-            <!-- 4. Closed Bible -->
-            <a href="#" onclick="goToPage(2)">
-                <img src="images/bible_closed.png" id="img-bible" class="element anim-breathe-bible" alt="Closed Bible">
-            </a>
-
-            <!-- 5. introducing Bekah text -->
-            <div id="txt-bekah-intro" class="element anim-breathe-intro">
-                introducing Bekah:<br>your new p.a.l.
-            </div>
-
-            <!-- 6. Bekah (armor of God) -->
-            <a href="#" id="link-bekah-p1" class="element" onclick="goToPage(3)">
-                <img src="images/armor_of_god.png" id="img-bekah" alt="Bekah in Armor of God">
-            </a>
-
-            <!-- 7. footprints -->
-            <img src="images/footprints.png" id="img-footprints" class="element" alt="Footprints">
-
-        </div>
-
-
-        <!-- PAGE 2 -->
-        <div id="page-2" class="page">
-
-            <!-- Top Left Navigation (Day by Day Kids sign with handprint) -->
-            <a href="#" id="nav-home-p2" class="element" onclick="goToPage(1)">
-                <div class="nav-bg-yellow"></div>
-                <img src="images/handprint.svg" class="nav-handprint-p2" alt="Handprint">
-                <div class="nav-text-p2">
-                    Day by<br>Day Kids
-                </div>
-            </a>
-
-            <!-- Armor of God -->
-            <a href="#" id="link-bekah-p3" class="element" onclick="goToPage(3)">
-                <img src="images/armor_of_god.png" id="img-bekah-p2" alt="Bekah in Armor of God">
-            </a>
-
-            <!-- Clubhouse Bible Text -->
-            <a href="https://mt-sin.ai/365DBR/bible.html" target="_blank" id="txt-clubhouse-bible-p2" class="element">Clubhouse Bible</a>
-
-            <!-- Open Bible -->
-            <a href="https://mt-sin.ai/365DBR/bible.html" target="_blank" id="link-open-bible-p2" class="element">
-                <img src="images/bible_open.png" id="img-open-bible-p2" alt="Open Bible">
-            </a>
-
-        </div>
-
-        <!-- PAGE 3: What is a P.A.L. anyway? -->
-        <div id="page-3" class="page">
-            <!-- Top Left Navigation -->
-            <a href="#" id="nav-home-p3" class="element" onclick="goToPage(1)">
-                <div class="nav-bg-yellow"></div>
-                <img src="images/handprint.svg" class="nav-handprint-p3" alt="Handprint">
-                <div class="nav-text-p3">
-                    Day by<br>Day Kids
-                </div>
-            </a>
-
-            <!-- Armor of God (links to page 3 or self) -->
-            <a href="#" id="link-bekah-p3" class="element" onclick="goToPage(3)">
-                <img src="images/armor_of_god.png" id="img-bekah-p3" alt="Bekah in Armor of God">
-            </a>
-
-            <!-- Title -->
-            <div id="pal-title" class="element">
-                What is a P.A.L. anyway?
-            </div>
-
-            <!-- Main text -->
-            <div id="pal-text" class="element">
-                A P.A.L. is your Playing And Learning buddy – Bekah has studied God’s word diligently; she even equips herself every day with the Armor of God! She set out on a quest to discover by how to learn while having fun, and she discovered having fun learning.
-            </div>
-
-            <!-- Learn More -->
-            <a href="#" id="learn-more-p3" class="element" onclick="goToPage(4)">
-                Learn More
-            </a>
-        </div>
-
-        <!-- PAGE 4: Learn to Play Play to Learn! -->
-        <div id="page-4" class="page">
-            <!-- Top Left Navigation -->
-            <a href="#" id="nav-home-p4" class="element" onclick="goToPage(1)">
-                <div class="nav-bg-yellow"></div>
-                <img src="images/handprint.svg" class="nav-handprint-p4" alt="Handprint">
-                <div class="nav-text-p4">
-                    Day by<br>Day Kids
-                </div>
-            </a>
-
-            <!-- Title -->
-            <div id="learn-title" class="element">
-                Learn to Play<br>Play to Learn!
-            </div>
-
-            <!-- Main text -->
-            <div id="learn-text" class="element">
-                We are hard at work building out this site and creating fun Bible based games, activities, and growing together as brother’s and sister’s in Christ. The Bible says there is one one race, and that every human was created in God’s image. LOOK OUT!! You learned something already!
-            </div>
-
-            <!-- Computer / HeIsRisen link area -->
-            <div id="computer-area" class="element">
-                <img src="images/computer_desk.png" id="img-computer" alt="Computer">
-                <a href="https://mt-sin.ai/HeIsRisen/" target="_blank" id="heisrisen-link" class="element">HeIsRisen!</a>
-                <a href="https://mt-sin.ai/m/" target="_blank" id="heisrisen-mobile-link" class="element">(mobile)</a>
-            </div>
-
-            <!-- Tx7 link -->
-            <a href="#" id="tx7-p4" class="element" onclick="goToPage(6)">
-                Tx7
-            </a>
-        </div>
-
-        <!-- PAGE 6: This Tuesday's Top Ten Terrific Thinking Things (Tx7) -->
-        <div id="page-6" class="page">
-            <!-- Top Left Navigation -->
-            <a href="#" id="nav-home-p6" class="element" onclick="goToPage(1)">
-                <div class="nav-bg-yellow"></div>
-                <img src="images/handprint.svg" class="nav-handprint-p6" alt="Handprint">
-                <div class="nav-text-p6">
-                    Day by<br>Day Kids
-                </div>
-            </a>
-
-            <!-- Title -->
-            <div id="tx7-title" class="element">
-                This Tuesday's Top Ten Terrific Thinking Things (Tx7)
-            </div>
-
-            <!-- Subtitle -->
-            <div id="tx7-subtitle" class="element">
-                Did you know the Bible reveals wondrous truths?
-            </div>
-
-            <!-- List of items -->
-            <div id="tx7-list" class="element">
-                <a href="https://kidsanswers.org/how-did-people-translate-bible-english/" target="_blank" class="tx7-item">How Did People Translate the Bible into English?</a>
-                <a href="https://kidsanswers.org/why-is-genesis-1-11-foundational-everything/" target="_blank" class="tx7-item">Why is Genesis 1–11 Foundational for Everything?</a>
-                <a href="https://kidsanswers.org/why-do-people-have-different-skin-shades/" target="_blank" class="tx7-item">Why Do People Have Different Skin Shades?</a>
-                <a href="https://kidsanswers.org/god-great/" target="_blank" class="tx7-item">Devotion - Week One - God is Great! (Duh!?)</a>
-                <a href="https://kidsanswers.org/where-is-the-garden-eden/" target="_blank" class="tx7-item">Where is the Garden of Eden?</a>
-                <a href="https://kidsanswers.org/space-tastes-like-raspberries/" target="_blank" class="tx7-item">God's Word in Our World: Space Tastes like Raspberries?</a>
-                <a href="https://kidsanswers.org/two-by-tuesday/" target="_blank" class="tx7-item">Two By Tuesday</a>
-                <a href="https://kidsanswers.org/how-be-sure-im-going-to-heaven/" target="_blank" class="tx7-item">How Can I Be Sure I’m Going to Heaven?</a>
-                <a href="https://kidsanswers.org/what-do-you-do-if-you-find-a-baby-bird/" target="_blank" class="tx7-item">What Do You Do If You Find a Baby Bird?</a>
-                <a href="https://kidsanswers.org/hop-it/" target="_blank" class="tx7-item">Hop to It</a>
-            </div>
-        </div>
-
-        <!-- PAGE 3: What is a P.A.L. anyway? -->
-        <div id="page-3" class="page">
-            <!-- Persistent Nav -->
-            <a href="#" id="nav-home-p3" class="element" onclick="goToPage(1)">
-                <div class="nav-bg-yellow"></div>
-                <img src="images/handprint.svg" class="nav-handprint-p3" alt="Handprint">
-                <div class="nav-text-p3">
-                    Day by<br>Day Kids
-                </div>
-            </a>
-
-            <div id="pal-title" class="element">
-                What is a P.A.L. anyway?
-            </div>
-
-            <div id="pal-text" class="element">
-                A P.A.L. is your Playing And Learning buddy – Bekah has studied God’s word diligently; she even equips herself every day with the Armor of God! She set out on a quest to discover by how to learn while having fun, and she discovered having fun learning.
-            </div>
-
-            <a href="#" id="learn-more-p3" class="element" onclick="goToPage(4)">
-                Learn More
-            </a>
-        </div>
-
-        <!-- PAGE 4: Learn to Play Play to Learn! -->
-        <div id="page-4" class="page">
-            <!-- Persistent Nav -->
-            <a href="#" id="nav-home-p4" class="element" onclick="goToPage(1)">
-                <div class="nav-bg-yellow"></div>
-                <img src="images/handprint.svg" class="nav-handprint-p4" alt="Handprint">
-                <div class="nav-text-p4">
-                    Day by<br>Day Kids
-                </div>
-            </a>
-
-            <div id="learn-title" class="element">
-                Learn to Play<br>Play to Learn!
-            </div>
-
-            <div id="learn-text" class="element">
-                We are hard at work building out this site and creating fun Bible based games, activities, and growing together as brother’s and sister’s in Christ. The Bible says there is one one race, and that every human was created in God’s image. LOOK OUT!! You learned something already!
-            </div>
-
-            <!-- Computer for HeIsRisen -->
-            <a href="https://mt-sin.ai/HeIsRisen/" target="_blank" id="computer-link" class="element">
-                <img src="images/computer_desk.png" id="img-computer" alt="Computer">
-            </a>
-            <div id="heisrisen-label" class="element">HeIsRisen!</div>
-            <a href="https://mt-sin.ai/m/" target="_blank" id="heisrisen-mobile" class="element">(mobile)</a>
-
-            <a href="#" id="tx7-p4" class="element" onclick="goToPage(6)">
-                Tx7
-            </a>
-        </div>
-
-        <!-- PAGE 6: This Tuesday's Top Ten Terrific Thinking Things (Tx7) -->
-        <div id="page-6" class="page">
-            <!-- Persistent Nav -->
-            <a href="#" id="nav-home-p6" class="element" onclick="goToPage(1)">
-                <div class="nav-bg-yellow"></div>
-                <img src="images/handprint.svg" class="nav-handprint-p6" alt="Handprint">
-                <div class="nav-text-p6">
-                    Day by<br>Day Kids
-                </div>
-            </a>
-
-            <div id="tx7-title" class="element">
-                This Tuesday's Top Ten Terrific Thinking Things (Tx7)
-            </div>
-
-            <div id="tx7-intro" class="element">
-                Did you know the Bible reveals wondrous truths?
-            </div>
-
-            <div id="tx7-list" class="element">
-                <div class="tx7-item"><a href="https://kidsanswers.org/how-did-people-translate-bible-english/" target="_blank">How Did People Translate the Bible into English?</a></div>
-                <div class="tx7-item"><a href="https://kidsanswers.org/why-is-genesis-1-11-foundational-everything/" target="_blank">Why is Genesis 1–11 Foundational for Everything?</a></div>
-                <div class="tx7-item"><a href="https://kidsanswers.org/why-do-people-have-different-skin-shades/" target="_blank">Why Do People Have Different Skin Shades?</a></div>
-                <div class="tx7-item"><a href="https://kidsanswers.org/god-great/" target="_blank">Devotion - Week One - God is Great! (Duh!?)</a></div>
-                <div class="tx7-item"><a href="https://kidsanswers.org/where-is-the-garden-eden/" target="_blank">Where is the Garden of Eden?</a></div>
-                <div class="tx7-item"><a href="https://kidsanswers.org/space-tastes-like-raspberries/" target="_blank">Space Tastes like Raspberries?</a></div>
-                <div class="tx7-item"><a href="https://kidsanswers.org/two-by-tuesday/" target="_blank">Two By Tuesday</a></div>
-                <div class="tx7-item"><a href="https://kidsanswers.org/how-be-sure-im-going-to-heaven/" target="_blank">How Can I Be Sure I’m Going to Heaven?</a></div>
-                <div class="tx7-item"><a href="https://kidsanswers.org/what-do-you-do-if-you-find-a-baby-bird/" target="_blank">What Do You Do If You Find a Baby Bird?</a></div>
-                <div class="tx7-item"><a href="https://kidsanswers.org/hop-it/" target="_blank">Hop to It</a></div>
-            </div>
-        </div>
-
+  <header class="site-header">
+    <div class="nav-inner">
+      <a href="#home" class="brand-badge">
+        <img src="images/handprint.svg" alt="Day by Day Kids Handprint" width="38" height="38">
+        <span>Day by Day Kids</span>
+      </a>
+      <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <nav id="site-nav" class="site-nav" aria-label="Clubhouse Navigation">
+        <a href="#play">Play &amp; Games</a>
+        <a href="#bible">Clubhouse Bible</a>
+        <a href="#bekah">Meet Bekah</a>
+        <a href="#tx7" class="nav-pill">Tx7</a>
+      </nav>
     </div>
+  </header>
 
-    <script src="script.js"></script>
+  <main>
+    <!-- HERO: TREEHOUSE CLUBHOUSE -->
+    <section id="home" class="hero">
+      <div class="hero-overlay"></div>
+      <div class="hero-grid">
+        <div class="hero-brand-col">
+          <a href="#tx7" class="tx7-badge" title="This Tuesday's Top Ten Terrific Thinking Things">(Tx7)</a>
+          <h1 class="hero-title">Day by<br>Day Kids</h1>
+          <p class="hero-tagline">Fun, Bible-based games, adventures, and God's Word—every single day.</p>
+          <div class="hero-actions">
+            <a href="#play" class="btn-primary">ENTER CLUBHOUSE</a>
+            <a href="#bible" class="btn-secondary">Open Clubhouse Bible</a>
+          </div>
+        </div>
+
+        <div class="hero-spots">
+          <a href="#bible" class="spot-card spot-bible" title="Open the Clubhouse Bible">
+            <img src="images/bible_closed.webp" alt="Clubhouse Bible">
+            <span>Clubhouse Bible</span>
+          </a>
+          <a href="#bekah" class="spot-card spot-bekah" title="Meet Bekah, your new P.A.L.">
+            <img src="images/armor_of_god.webp" alt="Bekah wearing the Armor of God">
+            <span>Meet Bekah:<br>Your New P.A.L.</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: LEARN TO PLAY / PLAY TO LEARN -->
+    <section id="play" class="section section-wood">
+      <div class="container">
+        <div class="section-head">
+          <h2>Learn to Play, Play to Learn!</h2>
+          <p class="lead">
+            We are building out this clubhouse with fun, Bible-based games and activities as we grow together as brothers and sisters in Christ.
+            God's Word tells us there is only one human race—and every person is made in God's image
+            (<button type="button" class="verse-chip" data-ref="GEN.1.27">Gen 1:27</button>,
+            <button type="button" class="verse-chip" data-ref="ACT.17.26">Acts 17:26</button>).
+            <strong>LOOK OUT!! You learned something already!</strong>
+          </p>
+        </div>
+
+        <div class="card-grid two-col">
+          <article class="feature-card">
+            <div class="card-media">
+              <img src="images/he-is-risen-hero.webp" alt="He Is Risen! Bible Adventure">
+            </div>
+            <div class="card-body">
+              <span class="kicker">Featured Game</span>
+              <h3>He Is Risen!</h3>
+              <p>Walk through the historical reality of Jesus Christ's death and resurrection directly from Scripture.</p>
+              <div class="btn-row">
+                <a href="https://mt-sin.ai/HeIsRisen/" data-mtsinai-path="/HeIsRisen/" target="_blank" rel="noopener" class="btn-primary btn-sm">Play Desktop</a>
+                <a href="https://mt-sin.ai/HeIsRisen/m/" data-mtsinai-path="/HeIsRisen/m/" target="_blank" rel="noopener" class="btn-outline btn-sm">Play Mobile</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="feature-card">
+            <div class="card-media card-media-soft">
+              <img src="images/computer_desk.webp" alt="Kids Bible Activities Computer Desk">
+            </div>
+            <div class="card-body">
+              <span class="kicker">Curated Partner Hub</span>
+              <h3>Kids Answers Activities</h3>
+              <p>Puzzles, coloring sheets, creation science projects, and Bible activities grounded in a literal six-day creation.</p>
+              <div class="btn-row">
+                <a href="https://kidsanswers.org/activities/" target="_blank" rel="noopener" class="btn-primary btn-sm">Explore Activities ↗</a>
+                <a href="#tx7" class="btn-outline btn-sm">See Tx7 Picks</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: CLUBHOUSE BIBLE (FRAMED 365DBR KIDS MODE) -->
+    <section id="bible" class="section section-light">
+      <div class="container">
+        <div class="bible-header">
+          <img src="images/bible_open.webp" alt="Open Bible" class="bible-open-art">
+          <div>
+            <h2>Clubhouse Bible</h2>
+            <p class="lead">Read God's Word right here in the clubhouse—tap a verse below or open the full Bible.</p>
+          </div>
+          <a id="bible-full-link" href="https://mt-sin.ai/365DBR/bible.html" data-mtsinai-path="/365DBR/bible.html" target="_blank" rel="noopener" class="btn-outline btn-sm">Full Bible ↗</a>
+        </div>
+
+        <div class="verse-toolbar" role="group" aria-label="Quick Bible Verses">
+          <button type="button" class="verse-btn active" data-ref="GEN.1.1">Genesis 1:1 (Creation)</button>
+          <button type="button" class="verse-btn" data-ref="GEN.1.27">Genesis 1:27 (God's Image)</button>
+          <button type="button" class="verse-btn" data-ref="PSA.119.105">Psalm 119:105 (Light)</button>
+          <button type="button" class="verse-btn" data-ref="EPH.6.10">Ephesians 6:10 (Armor)</button>
+          <button type="button" class="verse-btn" data-ref="JHN.3.16">John 3:16 (Salvation)</button>
+          <button type="button" class="verse-btn" data-ref="ACT.17.26">Acts 17:26 (One Blood)</button>
+        </div>
+
+        <div class="bible-frame-wrap">
+          <iframe
+            id="clubhouse-bible-frame"
+            title="Clubhouse Bible Reader"
+            src="about:blank"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: MEET BEKAH (P.A.L.) -->
+    <section id="bekah" class="section section-sky">
+      <div class="container bekah-grid">
+        <div class="bekah-art">
+          <img src="images/armor_of_god.webp" alt="Bekah equipped with the Armor of God" class="bekah-img">
+          <img src="images/footprints.webp" alt="Colorful footprints" class="footprints-accent" aria-hidden="true">
+        </div>
+        <div class="bekah-copy">
+          <span class="kicker">Introducing Bekah</span>
+          <h2>What is a P.A.L. anyway?</h2>
+          <p class="lead">
+            A <strong>P.A.L.</strong> is your <strong>Playing And Learning</strong> buddy!
+            Bekah studies God's Word diligently—she even equips herself every day with the full Armor of God
+            (<button type="button" class="verse-chip" data-ref="EPH.6.10">Ephesians 6:10–18</button>).
+          </p>
+          <p>
+            She set out on a quest to discover how to learn while having fun, and discovered how much fun it is to learn when everything starts with the truth of Scripture!
+          </p>
+          <div class="btn-row">
+            <button type="button" class="btn-outline btn-sm verse-jump" data-ref="EPH.6.10">Read Armor of God</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: TX7 -->
+    <section id="tx7" class="section section-light">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">Tx7</span>
+          <h2>This Tuesday's Top Ten Terrific Thinking Things</h2>
+          <p class="lead">Did you know the Bible reveals wondrous truths? Pick a question and dig in!</p>
+        </div>
+
+        <ol class="tx7-grid">
+          <li><a href="https://kidsanswers.org/how-did-people-translate-bible-english/" target="_blank" rel="noopener">How Did People Translate the Bible into English?</a></li>
+          <li><a href="https://kidsanswers.org/why-is-genesis-1-11-foundational-everything/" target="_blank" rel="noopener">Why is Genesis 1–11 Foundational for Everything?</a></li>
+          <li><a href="https://kidsanswers.org/why-do-people-have-different-skin-shades/" target="_blank" rel="noopener">Why Do People Have Different Skin Shades?</a></li>
+          <li><a href="https://kidsanswers.org/god-great/" target="_blank" rel="noopener">Devotion — Week One: God is Great! (Duh!?)</a></li>
+          <li><a href="https://kidsanswers.org/where-is-the-garden-eden/" target="_blank" rel="noopener">Where is the Garden of Eden?</a></li>
+          <li><a href="https://kidsanswers.org/space-tastes-like-raspberries/" target="_blank" rel="noopener">God's Word in Our World: Space Tastes like Raspberries?</a></li>
+          <li><a href="https://kidsanswers.org/two-by-tuesday/" target="_blank" rel="noopener">Two By Tuesday</a></li>
+          <li><a href="https://kidsanswers.org/how-be-sure-im-going-to-heaven/" target="_blank" rel="noopener">How Can I Be Sure I'm Going to Heaven?</a></li>
+          <li><a href="https://kidsanswers.org/what-do-you-do-if-you-find-a-baby-bird/" target="_blank" rel="noopener">What Do You Do If You Find a Baby Bird?</a></li>
+          <li><a href="https://kidsanswers.org/hop-it/" target="_blank" rel="noopener">Hop to It</a></li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="images/handprint.svg" alt="" width="28" height="28">
+        <strong>Day by Day Kids</strong>
+      </div>
+      <p>
+        Built on the authority of Scripture
+        (<button type="button" class="verse-chip verse-chip-light" data-ref="2TI.3.16">2 Tim 3:16</button>) ·
+        A project of <a href="https://mt-sin.ai/" target="_blank" rel="noopener">Mt. Sinai LLC</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

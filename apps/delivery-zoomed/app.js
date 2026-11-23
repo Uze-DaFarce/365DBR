@@ -9,8 +9,9 @@ import {
   extractOdometerFromPhoto,
   resolveApiKeys,
   isUuidKeyId,
-  isValidShift4OrderNumber
-} from "./ocr-parser.js?v=20261120_4";
+  isValidShift4OrderNumber,
+  applyMapRulesToTicket
+} from "./ocr-parser.js?v=20261123_1";
 
 const STORAGE_KEY = "delivery_zoomed_state_v1";
 const SETTINGS_KEY = "delivery_zoomed_settings_v1";
@@ -41,7 +42,8 @@ const state = {
     grokApiKey: "",
     apiKey: "",
     encouragementOnlyTips: true,
-    uploadFromGallery: false
+    uploadFromGallery: false,
+    summaryEmail: ""
   }
 };
 
@@ -224,6 +226,8 @@ function bindEvents() {
     document.getElementById("settingGrokApiKey").value = grokKey;
     document.getElementById("settingEncouragementOnly").checked = state.settings.encouragementOnlyTips;
     document.getElementById("settingUploadFromGallery").checked = Boolean(state.settings.uploadFromGallery);
+    const emailEl = document.getElementById("settingSummaryEmail");
+    if (emailEl) emailEl.value = state.settings.summaryEmail || "";
     updateKeyDiagnostics();
     document.getElementById("settingsModal")?.classList.remove("hidden");
   });
@@ -241,6 +245,7 @@ function bindEvents() {
     state.settings.apiKey = geminiKey;
     state.settings.encouragementOnlyTips = document.getElementById("settingEncouragementOnly").checked;
     state.settings.uploadFromGallery = document.getElementById("settingUploadFromGallery").checked;
+    state.settings.summaryEmail = document.getElementById("settingSummaryEmail")?.value.trim() || "";
     saveSettings();
     document.getElementById("settingsModal")?.classList.add("hidden");
     renderAll();
@@ -321,6 +326,9 @@ function bindEvents() {
     saveShiftState();
     renderLedger();
     modal?.classList.add("hidden");
+    if (mode === "end" && state.settings.summaryEmail) {
+      launchShiftSummaryEmail(true);
+    }
   });
 
   // Odometer inputs
@@ -336,7 +344,8 @@ function bindEvents() {
     renderLedger();
   });
 
-  // Export JSON & CSV
+  // Export JSON, CSV & Shift Summary Email
+  document.getElementById("btnEmailShiftSummary")?.addEventListener("click", () => launchShiftSummaryEmail(false));
   document.getElementById("btnExportJson")?.addEventListener("click", exportShiftJson);
   document.getElementById("btnExportCsv")?.addEventListener("click", exportShiftCsv);
   document.getElementById("btnClearShift")?.addEventListener("click", () => {
@@ -463,6 +472,9 @@ function saveEditTicketModal() {
   const t = state.tickets.find((x) => x.id === ticketId);
   if (!t) return;
 
+  const prevName = (t.customerName || "").trim();
+  const prevStreet = (t.address?.rawStreet || "").trim();
+
   const newOrderNum = document.getElementById("editOrderNumber").value.trim().replace(/^#/, "") || t.orderNumber;
   t.orderNumber = newOrderNum;
   t.customerPhone = document.getElementById("editCustomerPhone").value.trim();
@@ -536,7 +548,7 @@ function saveEditTicketModal() {
   t.orderSummary.otherItemCount = t.orderSummary.otherItems.reduce((s, it) => s + Number(it.qty || 1), 0);
 
   // Clear or update invalid Order # warning based on >= 2000 rule
-  t.specialAlerts = (t.specialAlerts || []).filter((al) => !al.isOrderNumWarning);
+  t.specialAlerts = (t.specialAlerts || []).filter((al) => !al.isOrderNumWarning && !al.isCustomerCheck);
   if (!isValidShift4OrderNumber(t.orderNumber)) {
     t.specialAlerts.unshift({
       category: "SOUP_SALAD_DRINK",
@@ -544,6 +556,10 @@ function saveEditTicketModal() {
       bannerText: `INVALID ORDER # (#${t.orderNumber}) — Expected #2000+. Ticket clipped on board? Re-snap or tap ✏️ Edit!`
     });
   }
+
+  // Re-apply local-map-rules.json for the edited address & learn verified customer corrections
+  applyMapRulesToTicket(t, state.mapRules);
+  learnFromEditedTicket(t, prevName, prevStreet);
 
   saveShiftState();
   renderAll();
@@ -583,6 +599,8 @@ async function handleOdometerPhotoUpload(file, mode) {
     // If OCR could not auto-read the digits, automatically pop open the full-size photo viewer + input
     if (!result.odometerReading) {
       openOdometerViewer(mode);
+    } else if (mode === "end" && state.settings.summaryEmail) {
+      launchShiftSummaryEmail(true);
     }
   } catch (err) {
     statusEl.textContent = `⚠️ Odometer photo error: ${err.message}`;
@@ -724,21 +742,160 @@ function ingestParsedBatch(batch) {
   return { addedCount, skippedDuplicates, diffWarnings };
 }
 
+function normalizePhone10(phone) {
+  const digits = String(phone || "").replace(/[^0-9]/g, "");
+  return digits.length >= 7 ? digits.slice(-10) : "";
+}
+
 function getCustomerProfileKey(customerName, customerPhone, fallbackAddrKey = "") {
-  const normName = normalizeNameForCompare(customerName) || "CUSTOMER";
-  const normPhone = String(customerPhone || "").replace(/[^0-9]/g, "");
-  if (normPhone.length >= 7) {
-    return `${normName}::${normPhone.slice(-10)}`;
+  const normPhone = normalizePhone10(customerPhone);
+  if (normPhone) {
+    return `PHONE::${normPhone}`;
   }
+  const normName = normalizeNameForCompare(customerName) || "CUSTOMER";
   return `${normName}::${String(fallbackAddrKey || "CONRAD").replace(/\s+/g, "_")}`;
 }
 
+function findCustomerProfileMatch(customerName, customerPhone, fallbackAddrKey = "") {
+  const normPhone = normalizePhone10(customerPhone);
+  const normName = normalizeNameForCompare(customerName);
+  const allProfiles = Object.values(state.customers || {});
+
+  // 1. Phone-first lookup (most stable identifier across OCR runs)
+  if (normPhone) {
+    const byPhone = allProfiles.find((p) => normalizePhone10(p.customerPhone) === normPhone);
+    if (byPhone) {
+      const pNormName = normalizeNameForCompare(byPhone.customerName);
+      const isKnownAlias = (byPhone.nameAliases || []).some((a) => normalizeNameForCompare(a) === normName);
+      const nameMismatch = Boolean(normName && pNormName && normName !== pNormName && !isKnownAlias);
+      return { profile: byPhone, matchedBy: "phone", nameMismatch, phoneMismatch: false, isKnownAlias };
+    }
+  }
+
+  // 2. Fallback: exact name or known OCR alias lookup
+  if (normName) {
+    const byName = allProfiles.find(
+      (p) =>
+        normalizeNameForCompare(p.customerName) === normName ||
+        (p.nameAliases || []).some((a) => normalizeNameForCompare(a) === normName)
+    );
+    if (byName) {
+      const pPhone = normalizePhone10(byName.customerPhone);
+      const phoneMismatch = Boolean(normPhone && pPhone && normPhone !== pPhone);
+      const isKnownAlias = (byName.nameAliases || []).some((a) => normalizeNameForCompare(a) === normName);
+      return { profile: byName, matchedBy: "name", nameMismatch: false, phoneMismatch, isKnownAlias };
+    }
+  }
+
+  // 3. Exact legacy key fallback
+  const legacyKey = getCustomerProfileKey(customerName, customerPhone, fallbackAddrKey);
+  if (state.customers[legacyKey]) {
+    return { profile: state.customers[legacyKey], matchedBy: "key", nameMismatch: false, phoneMismatch: false, isKnownAlias: false };
+  }
+  return null;
+}
+
+function learnFromEditedTicket(ticket, prevName, prevStreet) {
+  const match = findCustomerProfileMatch(ticket.customerName, ticket.customerPhone, ticket.address?.normalizedKey);
+  const key = match?.profile?.key || getCustomerProfileKey(ticket.customerName, ticket.customerPhone, ticket.address?.normalizedKey);
+  const profile = match?.profile || state.customers[key] || {
+    key,
+    customerName: ticket.customerName,
+    customerPhone: ticket.customerPhone || "",
+    deliveryCount: 0,
+    generousTipCount: 0,
+    addressesVisited: [],
+    nameAliases: [],
+    streetAliases: {},
+    lastSpecialInstructions: "None",
+    lastDeliveredAt: null
+  };
+
+  profile.nameAliases = Array.isArray(profile.nameAliases) ? profile.nameAliases : [];
+  profile.streetAliases = profile.streetAliases && typeof profile.streetAliases === "object" ? profile.streetAliases : {};
+  profile.addressesVisited = Array.isArray(profile.addressesVisited) ? profile.addressesVisited : [];
+
+  // Record OCR typo aliases so future scans auto-correct without re-editing
+  if (prevName && normalizeNameForCompare(prevName) !== normalizeNameForCompare(ticket.customerName)) {
+    if (!profile.nameAliases.includes(prevName)) profile.nameAliases.push(prevName);
+  }
+  const newStreet = (ticket.address?.rawStreet || "").trim();
+  if (prevStreet && prevStreet.toUpperCase() !== newStreet.toUpperCase()) {
+    profile.streetAliases[prevStreet.toUpperCase()] = newStreet;
+  }
+
+  profile.customerName = ticket.customerName || profile.customerName;
+  if (ticket.customerPhone) profile.customerPhone = ticket.customerPhone;
+  if (newStreet && !profile.addressesVisited.some((a) => a.toUpperCase() === newStreet.toUpperCase())) {
+    profile.addressesVisited.push(newStreet);
+  }
+  if (ticket.specialInstructions && ticket.specialInstructions !== "None") {
+    profile.lastSpecialInstructions = ticket.specialInstructions;
+  }
+
+  state.customers[profile.key] = profile;
+  ticket.customerProfileKey = profile.key;
+  savePermanentCustomerAndHistoryDb();
+}
+
 function enrichTicketFromCustomerDb(ticket) {
-  const key = getCustomerProfileKey(ticket.customerName, ticket.customerPhone, ticket.address?.normalizedKey);
-  const profile = state.customers[key];
-  if (!profile) return;
-  ticket.customerProfileKey = key;
+  const match = findCustomerProfileMatch(ticket.customerName, ticket.customerPhone, ticket.address?.normalizedKey);
+  if (!match?.profile) return;
+  const { profile, nameMismatch, phoneMismatch, isKnownAlias } = match;
+
+  ticket.customerProfileKey = profile.key;
   ticket.customerRepeatCount = profile.deliveryCount || 0;
+  ticket.specialAlerts = ticket.specialAlerts || [];
+
+  // Auto-fill missing phone from verified profile
+  if (!ticket.customerPhone && profile.customerPhone) {
+    ticket.customerPhone = profile.customerPhone;
+  }
+
+  // Auto-correct known OCR name alias
+  if (isKnownAlias && profile.customerName) {
+    ticket.customerName = profile.customerName;
+  }
+
+  // Auto-correct known OCR street alias and re-run map rules if corrected
+  const rawStreet = (ticket.address?.rawStreet || "").trim();
+  const mappedStreet = profile.streetAliases?.[rawStreet.toUpperCase()];
+  if (mappedStreet && mappedStreet.toUpperCase() !== rawStreet.toUpperCase()) {
+    ticket.address.rawStreet = mappedStreet;
+    ticket.address.fullFormatted = `${mappedStreet}, ${ticket.address.city}, ${ticket.address.state} ${ticket.address.zip}`;
+    applyMapRulesToTicket(ticket, state.mapRules);
+  }
+
+  // Flag Name vs. Phone mismatches for OCR double-check
+  if (nameMismatch) {
+    ticket.specialAlerts.unshift({
+      category: "PIZZA_OPTION",
+      isCustomerCheck: true,
+      bannerText: `OCR CHECK: Phone matches "${profile.customerName}" (scanned "${ticket.customerName}") — verify name/phone!`
+    });
+  } else if (phoneMismatch) {
+    ticket.specialAlerts.unshift({
+      category: "PIZZA_OPTION",
+      isCustomerCheck: true,
+      bannerText: `OCR CHECK: "${profile.customerName}" usually has phone ${profile.customerPhone} (scanned ${ticket.customerPhone}) — verify!`
+    });
+  }
+
+  // Quick chip / banner if regular customer ordered to a new address (e.g., work or friend's house)
+  const currentStreet = (ticket.address?.rawStreet || "").trim();
+  const knownAddrs = profile.addressesVisited || [];
+  if (
+    currentStreet &&
+    knownAddrs.length > 0 &&
+    !knownAddrs.some((a) => a.toUpperCase() === currentStreet.toUpperCase())
+  ) {
+    ticket.specialAlerts.push({
+      category: "PIZZA_OPTION",
+      isCustomerCheck: true,
+      bannerText: `Different address for ${profile.customerName} (past: ${knownAddrs.slice(0, 2).join(" / ")}) — confirm before driving.`
+    });
+  }
+
   if (profile.generousTipCount > 0 && ticket.routing) {
     ticket.routing.tipHistory = {
       ...(ticket.routing.tipHistory || {}),
@@ -748,15 +905,18 @@ function enrichTicketFromCustomerDb(ticket) {
 }
 
 function recordCustomerAndHistoryOnDelivery(ticket) {
-  const key = getCustomerProfileKey(ticket.customerName, ticket.customerPhone, ticket.address?.normalizedKey);
+  const match = findCustomerProfileMatch(ticket.customerName, ticket.customerPhone, ticket.address?.normalizedKey);
+  const key = match?.profile?.key || getCustomerProfileKey(ticket.customerName, ticket.customerPhone, ticket.address?.normalizedKey);
   const nowIso = new Date().toISOString();
-  const existing = state.customers[key] || {
+  const existing = match?.profile || state.customers[key] || {
     key,
     customerName: ticket.customerName,
     customerPhone: ticket.customerPhone || "",
     deliveryCount: 0,
     generousTipCount: 0,
     addressesVisited: [],
+    nameAliases: [],
+    streetAliases: {},
     lastSpecialInstructions: "None",
     lastDeliveredAt: null
   };
@@ -835,11 +995,11 @@ function getShopOriginParam() {
 }
 
 /**
- * Builds a single-stop Google Maps navigation URL using exact front-curb / custom pin coordinates.
- * Never injects synthetic pass-through coordinates into &waypoints= because Google Maps treats every waypoint as an extra delivery stop.
+ * Builds a single-stop Google Maps turn-by-turn navigation URL from the driver's LIVE current GPS location.
+ * Omitting &origin= and adding &dir_action=navigate prevents Google Maps from opening in "Preview" mode
+ * when departing from a previous customer's driveway instead of the shop.
  */
 function buildSingleStopNavUrl(ticket) {
-  const originStr = getShopOriginParam();
   let destStr;
   if (ticket.routing?.destinationPin) {
     destStr = `${ticket.routing.destinationPin.lat},${ticket.routing.destinationPin.lng}`;
@@ -847,18 +1007,18 @@ function buildSingleStopNavUrl(ticket) {
     destStr = encodeURIComponent(ticket.address.fullFormatted);
   }
 
-  return `https://www.google.com/maps/dir/?api=1&origin=${originStr}&destination=${destStr}&travelmode=driving`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${destStr}&travelmode=driving&dir_action=navigate`;
 }
 
 /**
- * Builds a multi-stop Google Maps deep link containing ONLY the checked delivery tickets in current card order.
+ * Builds a multi-stop Google Maps deep link from the driver's LIVE current GPS location
+ * containing ONLY the checked delivery tickets in current card order.
  */
 function buildMultiStopNavigationUrl() {
   const selected = state.tickets.filter((t) => t.selectedForRun && t.status !== "Delivered");
   if (selected.length === 0) return null;
   if (selected.length === 1) return buildSingleStopNavUrl(selected[0]);
 
-  const originStr = getShopOriginParam();
   const waypoints = [];
 
   selected.slice(0, -1).forEach((t) => {
@@ -875,7 +1035,7 @@ function buildMultiStopNavigationUrl() {
     : encodeURIComponent(last.address.fullFormatted);
 
   const wpParam = waypoints.length > 0 ? `&waypoints=${waypoints.join("|")}` : "";
-  return `https://www.google.com/maps/dir/?api=1&origin=${originStr}${wpParam}&destination=${destStr}&travelmode=driving`;
+  return `https://www.google.com/maps/dir/?api=1${wpParam}&destination=${destStr}&travelmode=driving&dir_action=navigate`;
 }
 
 /**
@@ -912,10 +1072,6 @@ function updateTicketStatus(ticketId, nextStatus) {
       const diffMs = new Date(nowIso) - new Date(ticket.metrics.startDeliveryAt);
       const mins = Math.max(1, Math.round((diffMs / 60000) * 10) / 10);
       ticket.metrics.driveTimeMinutes = mins;
-    }
-    const normalMins = state.mapRules?.deliveryFeePolicy?.normalDriveMinutes || 7;
-    if ((ticket.metrics.driveTimeMinutes || 0) > normalMins && ticket.deliveryFee.chargedAmount <= 3.0) {
-      ticket.deliveryFee.underchargedWarning = true;
     }
     if (ticket.payment.status === "COLLECT" && ticket.financials.cashCollected === 0) {
       ticket.financials.cashCollected = ticket.payment.amountDue;
@@ -1167,8 +1323,9 @@ function renderDeliveryCards() {
           </div>`;
       } else if (t.deliveryFee.underchargedWarning && !t.postRushReview?.flagged) {
         feeBannerHtml = `
-          <div class="fee-banner undercharged-notice">
-            💡 <strong>Extended Run at Standard $3.00 Fee</strong> — Consider flagging for Post-Rush Review so you & boss can adjust future fee/ETA.
+          <div class="fee-banner undercharged-notice dismissible-banner">
+            <span>💡 <strong>Extended Run at Standard $3.00 Fee</strong> — Consider flagging for Post-Rush Review so you & boss can adjust future fee/ETA.</span>
+            <button class="btn-dismiss-banner" data-action="dismiss-undercharged" data-id="${t.id}" title="Dismiss">✕</button>
           </div>`;
       }
 
@@ -1217,6 +1374,17 @@ function renderDeliveryCards() {
         return `<button class="${activeCls}" data-action="set-status" data-id="${t.id}" data-status="${st}">${escapeHtml(st)}</button>`;
       }).join("");
 
+      const dialPhone = resolveDialablePhone(t);
+      const contactBtnsHtml = dialPhone
+        ? `<div class="customer-contact-btns">
+            <a href="tel:${escapeHtml(dialPhone)}" rel="external" class="btn-icon btn-contact-mini active-contact" title="Call ${escapeHtml(t.customerPhone || dialPhone)}">📞</a>
+            <a href="sms:${escapeHtml(dialPhone)}" rel="external" class="btn-icon btn-contact-mini active-contact" title="Text ${escapeHtml(t.customerPhone || dialPhone)}">💬</a>
+          </div>`
+        : `<div class="customer-contact-btns">
+            <button type="button" class="btn-icon btn-contact-mini missing-phone" data-action="edit-ticket" data-id="${t.id}" title="No phone saved — tap to add">📞</button>
+            <button type="button" class="btn-icon btn-contact-mini missing-phone" data-action="edit-ticket" data-id="${t.id}" title="No phone saved — tap to add">💬</button>
+          </div>`;
+
       return `
       <article class="delivery-card ${t.selectedForRun ? "selected-for-run" : ""} status-${statusSlug}">
         <header class="card-header status-header-${statusSlug}">
@@ -1224,9 +1392,12 @@ function renderDeliveryCards() {
           <label for="run-cb-${t.id}" class="order-badge status-badge-${statusSlug}">#${escapeHtml(t.orderNumber)} • ${escapeHtml(currentStatus)}</label>
           <button class="btn-icon btn-arrow-mini" data-action="move-up" data-index="${fullIndex}" title="Move stop earlier">▲</button>
           <button class="btn-icon btn-edit-mini" data-action="edit-ticket" data-id="${t.id}" title="Edit misread ticket details">✏️</button>
-          <span class="customer-name">${escapeHtml(t.customerName)}${
-            t.customerRepeatCount > 0 ? ` <small class="repeat-tag">(${t.customerRepeatCount + 1}x)</small>` : ""
-          }</span>
+          <div class="customer-name-row">
+            <span class="customer-name">${escapeHtml(t.customerName)}${
+              t.customerRepeatCount > 0 ? ` <small class="repeat-tag">(${t.customerRepeatCount + 1}x)</small>` : ""
+            }</span>
+            ${contactBtnsHtml}
+          </div>
           <button class="btn-icon btn-arrow-mini" data-action="move-down" data-index="${fullIndex}" title="Move stop later">▼</button>
         </header>
 
@@ -1264,7 +1435,10 @@ function renderDeliveryCards() {
                   : ""
               }
             </div>
-            <button type="button" class="btn-secondary btn-nav-compact" data-action="save-map-rule-from-ticket" data-id="${t.id}" title="Save or edit Local Map Rule for this address">➕ Map Rule</button>
+            <div style="display:flex; align-items:center; gap:0.3rem; flex-wrap:wrap;">
+              <button type="button" class="btn-secondary btn-nav-compact" data-action="quick-pin-here" data-id="${t.id}" title="1-tap: Save my current car GPS as permanent driveway pin for this address">📍 Pin Here</button>
+              <button type="button" class="btn-secondary btn-nav-compact" data-action="save-map-rule-from-ticket" data-id="${t.id}" title="Save or edit Local Map Rule for this address">➕ Map Rule</button>
+            </div>
           </div>
           ${
             t.routing?.driverNotes?.parkingSpot
@@ -1322,9 +1496,12 @@ function renderDeliveryCards() {
               <input type="number" step="0.1" min="0" class="input-metric" data-action="edit-mileage" data-id="${t.id}" value="${t.metrics.mileageMiles ?? ""}" placeholder="0.0"/>
             </label>
           </div>
-          <button class="btn-post-rush ${t.postRushReview?.flagged ? "flagged" : ""}" data-action="flag-post-rush" data-order="${escapeHtml(t.orderNumber)}">
-            ${t.postRushReview?.flagged ? "🚩 Flagged for Post-Rush Review" : "🏳️ Flag for Post-Rush Review"}
-          </button>
+          <div class="card-footer-actions">
+            <button class="btn-post-rush ${t.postRushReview?.flagged ? "flagged" : ""}" data-action="flag-post-rush" data-order="${escapeHtml(t.orderNumber)}">
+              ${t.postRushReview?.flagged ? "🚩 Flagged for Post-Rush Review" : "🏳️ Flag for Post-Rush Review"}
+            </button>
+            <button type="button" class="btn-delete-ticket" data-action="delete-ticket" data-id="${t.id}" title="Delete / remove ticket from queue">🗑️</button>
+          </div>
         </footer>
         ${
           t.postRushReview?.flagged
@@ -1450,6 +1627,17 @@ function bindCardEvents(container) {
     });
   });
 
+  container.querySelectorAll("[data-action='dismiss-undercharged']").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const t = state.tickets.find((x) => x.id === btn.dataset.id);
+      if (t?.deliveryFee) {
+        t.deliveryFee.underchargedWarning = false;
+        saveShiftState();
+        renderDeliveryCards();
+      }
+    });
+  });
+
   // Status Pills
   container.querySelectorAll("[data-action='set-status']").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1463,10 +1651,6 @@ function bindCardEvents(container) {
       const t = state.tickets.find((x) => x.id === inp.dataset.id);
       if (!t) return;
       t.metrics.driveTimeMinutes = inp.value !== "" ? Number(inp.value) : null;
-      const normalMins = state.mapRules?.deliveryFeePolicy?.normalDriveMinutes || 7;
-      if (t.metrics.driveTimeMinutes > normalMins && t.deliveryFee.chargedAmount <= 3.0) {
-        t.deliveryFee.underchargedWarning = true;
-      }
       saveShiftState();
       renderAll();
     });
@@ -1500,6 +1684,27 @@ function bindCardEvents(container) {
     });
   });
 
+  // Delete / Remove Ticket Button (with confirmation guard)
+  container.querySelectorAll("[data-action='delete-ticket']").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const t = state.tickets.find((x) => x.id === btn.dataset.id);
+      if (!t) return;
+      if (!confirm(`Delete Order #${t.orderNumber} (${t.customerName}) from tonight's queue?`)) {
+        return;
+      }
+      state.tickets = state.tickets.filter((x) => x.id !== t.id);
+      saveShiftState();
+      renderAll();
+    });
+  });
+
+  // 1-Tap "Pin Here" (Save current car GPS as permanent Custom Pin rule without typing)
+  container.querySelectorAll("[data-action='quick-pin-here']").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      quickPinCurrentGpsForTicket(btn.dataset.id, btn);
+    });
+  });
+
   // Save / Edit Local Map Rule directly from delivery card
   container.querySelectorAll("[data-action='save-map-rule-from-ticket']").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1511,6 +1716,84 @@ function bindCardEvents(container) {
 function saveCustomMapRules() {
   if (!state.mapRules) return;
   localStorage.setItem(CUSTOM_RULES_KEY, JSON.stringify(state.mapRules.addressRules || []));
+}
+
+function quickPinCurrentGpsForTicket(ticketId, btnEl) {
+  const t = state.tickets.find((x) => x.id === ticketId);
+  if (!t || !state.mapRules) return;
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported on this browser.");
+    return;
+  }
+  const rawStreet = (t.address?.rawStreet || "").trim();
+  if (!rawStreet) return;
+
+  const origText = btnEl.textContent;
+  btnEl.textContent = "📡 Pinning...";
+  btnEl.disabled = true;
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = Number(pos.coords.latitude.toFixed(6));
+      const lng = Number(pos.coords.longitude.toFixed(6));
+      const pin = { lat, lng };
+      const pattern = rawStreet.toUpperCase();
+      const rules = Array.isArray(state.mapRules.addressRules) ? state.mapRules.addressRules : [];
+      const existingIdx = rules.findIndex((r) =>
+        (r.matchPatterns || []).some((p) => p && pattern.includes(String(p).toUpperCase()))
+      );
+
+      if (existingIdx >= 0) {
+        const cur = rules[existingIdx];
+        cur.geofence = {
+          ...(cur.geofence || {}),
+          frontCurbPin: pin,
+          customOverridePin: pin,
+          snapPolicy: "CUSTOM_PIN"
+        };
+      } else {
+        rules.push({
+          normalizedKey: pattern.replace(/[^A-Z0-9 ]/g, "").trim(),
+          displayName: rawStreet,
+          matchPatterns: [pattern],
+          trackSide: t.routing?.trackSide || "SHOP_SIDE",
+          isExtendedDistance: Number(t.deliveryFee?.chargedAmount || 3) > 3,
+          recommendedFee: Number(t.deliveryFee?.chargedAmount || 3),
+          geofence: {
+            frontCurbPin: pin,
+            customOverridePin: pin,
+            snapPolicy: "CUSTOM_PIN",
+            approachWaypoint: null
+          },
+          preDepartureRule: { requireSmsBeforeStart: false, buttonLabel: null, smsTemplate: null },
+          driverNotes: {
+            accessCode: "",
+            parkingSpot: "Custom GPS pin saved from driveway.",
+            permanentAlert: "CUSTOM DRIVEWAY PIN ACTIVE"
+          },
+          tipHistory: { totalDeliveries: 0, averageTip: 0, lastTip: 0, generousRegular: false }
+        });
+      }
+
+      state.mapRules.addressRules = rules;
+      t.routing = { ...(t.routing || {}), destinationPin: pin, snapMode: "CUSTOM_PIN" };
+      saveCustomMapRules();
+      saveShiftState();
+      renderAll();
+
+      const statusEl = document.getElementById("ocrStatusBanner");
+      if (statusEl) {
+        statusEl.textContent = `📍 Saved driveway GPS pin (${lat}, ${lng}) for ${rawStreet}!`;
+        statusEl.className = "ocr-status success";
+      }
+    },
+    (err) => {
+      alert(`Could not read GPS: ${err.message}`);
+      btnEl.textContent = origText;
+      btnEl.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
 }
 
 function openMapRuleFromTicket(ticketId) {
@@ -1841,6 +2124,67 @@ function renderLedger() {
   }
 }
 
+function resolveDialablePhone(ticket) {
+  let raw = String(ticket?.customerPhone || "").trim();
+  if (!raw && ticket?.customerProfileKey && state.customers?.[ticket.customerProfileKey]?.customerPhone) {
+    raw = String(state.customers[ticket.customerProfileKey].customerPhone).trim();
+  }
+  if (!raw && ticket) {
+    const match = findCustomerProfileMatch(ticket.customerName, "", ticket.address?.normalizedKey);
+    if (match?.profile?.customerPhone) raw = String(match.profile.customerPhone).trim();
+  }
+  if (!raw && ticket?.specialInstructions) {
+    const m = String(ticket.specialInstructions).match(/(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}/);
+    if (m) raw = m[0];
+  }
+  const digits = raw.replace(/[^0-9]/g, "");
+  if (digits.length === 7) return `406${digits}`;
+  if (digits.length >= 10) return digits.slice(-10);
+  return "";
+}
+
+function launchShiftSummaryEmail(autoTriggered = false) {
+  const toEmail = (state.settings.summaryEmail || "").trim();
+  if (!toEmail && !autoTriggered) {
+    alert("Set your End-of-Shift Summary Email (e.g., Patty Shaw) in ⚙️ Settings first, or enter it in your mail app.");
+  }
+
+  const completed = state.tickets.filter((t) => t.status === "Delivered" || t.status === "End Delivery");
+  const totalDeliveries = completed.length;
+  const standardFeeSum = totalDeliveries * 3.0;
+  const extraFeeSum = completed
+    .filter((t) => t.deliveryFee.chargedAmount > 3.0)
+    .reduce((sum, t) => sum + t.deliveryFee.extraOverStandard, 0);
+  const totalDriverFeeEarned = standardFeeSum + extraFeeSum;
+  const ticketMilesSum = state.tickets.reduce((sum, t) => sum + Number(t.metrics?.mileageMiles || 0), 0);
+  const odoDiff =
+    state.shift.odometerEnd && state.shift.odometerStart
+      ? Math.max(0, Number(state.shift.odometerEnd) - Number(state.shift.odometerStart))
+      : ticketMilesSum;
+
+  const shiftDate = state.shift.date || new Date().toISOString().slice(0, 10);
+  const odoDetail =
+    state.shift.odometerStart && state.shift.odometerEnd
+      ? ` (Start: ${state.shift.odometerStart} → End: ${state.shift.odometerEnd})`
+      : "";
+
+  const lines = [
+    `Delivery Zoomed — Shift Summary (${shiftDate})`,
+    "",
+    `1. Mileage Logged: ${odoDiff.toFixed(1)} mi${odoDetail}`,
+    `2. Total 1099 Delivery Fees Earned: $${totalDriverFeeEarned.toFixed(2)}`,
+    `3. Number of Deliveries: ${totalDeliveries}`,
+    `4. Base Fees ($3.00 × ${totalDeliveries}): $${standardFeeSum.toFixed(2)}`
+  ];
+  if (extraFeeSum > 0) {
+    lines.push(`   (Plus Extended Fees > $3.00: +$${extraFeeSum.toFixed(2)})`);
+  }
+
+  const subject = encodeURIComponent(`Delivery Zoomed Shift Summary — ${shiftDate}`);
+  const body = encodeURIComponent(lines.join("\n"));
+  window.location.href = `mailto:${encodeURIComponent(toEmail)}?subject=${subject}&body=${body}`;
+}
+
 function exportShiftJson() {
   const payload = {
     exportedAt: new Date().toISOString(),
@@ -2089,6 +2433,7 @@ function renderHistoryModal() {
       }
       if (ticket) {
         ticket.status = nextStatus;
+        applyMapRulesToTicket(ticket, state.mapRules);
         sortActiveTickets();
         saveShiftState();
         renderAll();
