@@ -9,6 +9,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#0f3d4c">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="canonical" href="https://daybydaykids.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://daybydaykids.com/">
+  <meta property="og:title" content="Day by Day Kids — Treehouse Clubhouse">
+  <meta property="og:description" content="A kid-friendly Bible clubhouse featuring the World English Bible, Bekah's guided tour, and He Is Risen! games.">
+  <meta property="og:image" content="https://daybydaykids.com/icons/icon-512.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Day by Day Kids — Treehouse Clubhouse">
+  <meta name="twitter:description" content="A kid-friendly Bible clubhouse featuring the World English Bible, Bekah's guided tour, and He Is Risen! games.">
+  <meta name="twitter:image" content="https://daybydaykids.com/icons/icon-512.png">
 </head>
 <body>
   <header class="site-header">
@@ -107,21 +121,55 @@
     <section id="bible" class="section section-light">
       <div class="container">
         <div class="bible-header">
-          <img src="images/bible_open.webp" alt="Open Bible" class="bible-open-art">
-          <div>
-            <h2>Clubhouse Bible</h2>
-            <p class="lead">Read God's Word right here in the clubhouse—tap a verse below or open the full Bible.</p>
+          <div class="bible-title-block">
+            <div class="bible-title-row">
+              <img src="images/bible_open.webp" alt="Open Bible" class="bible-open-art">
+              <h2>Clubhouse Bible</h2>
+            </div>
+            <p class="lead">Read or listen to God's Word every day—your spot is saved automatically, and you can bookmark favorite verses or explore any book.</p>
           </div>
-          <a id="bible-full-link" href="https://mt-sin.ai/365DBR/bible.html" data-mtsinai-path="/365DBR/bible.html" target="_blank" rel="noopener" class="btn-outline btn-sm">Full Bible ↗</a>
+          <div class="bible-header-actions">
+            <button type="button" id="tour-toggle" class="btn-secondary btn-sm" aria-expanded="false">How to Use Your Bible</button>
+            <button type="button" id="bible-full-toggle" class="btn-outline btn-sm" aria-pressed="false">⛶ Full Screen</button>
+          </div>
         </div>
 
-        <div class="verse-toolbar" role="group" aria-label="Quick Bible Verses">
-          <button type="button" class="verse-btn active" data-ref="GEN.1.1">Genesis 1:1 (Creation)</button>
-          <button type="button" class="verse-btn" data-ref="GEN.1.27">Genesis 1:27 (God's Image)</button>
-          <button type="button" class="verse-btn" data-ref="PSA.119.105">Psalm 119:105 (Light)</button>
-          <button type="button" class="verse-btn" data-ref="EPH.6.10">Ephesians 6:10 (Armor)</button>
-          <button type="button" class="verse-btn" data-ref="JHN.3.16">John 3:16 (Salvation)</button>
-          <button type="button" class="verse-btn" data-ref="ACT.17.26">Acts 17:26 (One Blood)</button>
+        <!-- BEKAH'S 4-STEP INTERACTIVE BIBLE TOUR -->
+        <div id="bible-tour" class="bible-tour" hidden>
+          <div class="tour-head">
+            <img src="images/armor_of_god.webp" alt="Bekah" class="tour-avatar">
+            <div>
+              <span class="kicker">Bekah's Clubhouse Guide</span>
+              <h3 id="tour-title">Step 1: How Bible Addresses Work</h3>
+            </div>
+            <button type="button" id="tour-close" class="tour-close" aria-label="Close guide">✕</button>
+          </div>
+          <p id="tour-body" class="tour-body"></p>
+          <div class="tour-actions">
+            <div class="tour-step-nav">
+              <button type="button" id="tour-prev" class="btn-outline btn-sm">← Back</button>
+              <span id="tour-counter" class="tour-counter">1 / 4</span>
+              <button type="button" id="tour-next" class="btn-primary btn-sm">Next →</button>
+            </div>
+            <button type="button" id="tour-try" class="btn-secondary btn-sm">Try It Now!</button>
+          </div>
+        </div>
+
+        <!-- QUICK VERSE JUMPS + ATTACHED READER TABS -->
+        <div class="bible-controls">
+          <div class="verse-toolbar" role="group" aria-label="Quick Bible Verses">
+            <button type="button" class="verse-btn" data-ref="GEN.1.1">Genesis 1:1</button>
+            <button type="button" class="verse-btn" data-ref="GEN.1.27">Genesis 1:27</button>
+            <button type="button" class="verse-btn" data-ref="PSA.119.105">Psalm 119:105</button>
+            <button type="button" class="verse-btn" data-ref="EPH.6.10-18">Ephesians 6:10–18</button>
+            <button type="button" class="verse-btn" data-ref="JHN.3.16">John 3:16</button>
+            <button type="button" class="verse-btn" data-ref="ACT.17.26">Acts 17:26</button>
+          </div>
+
+          <div class="mode-tabs" role="tablist" aria-label="Clubhouse Bible Mode">
+            <button type="button" role="tab" id="tab-dbr" class="mode-tab active" aria-selected="true" data-mode="dbr">📅 Daily Reading</button>
+            <button type="button" role="tab" id="tab-browse" class="mode-tab" aria-selected="false" data-mode="browse">📖 Look it Up!</button>
+          </div>
         </div>
 
         <div class="bible-frame-wrap">
@@ -148,13 +196,13 @@
           <p class="lead">
             A <strong>P.A.L.</strong> is your <strong>Playing And Learning</strong> buddy!
             Bekah studies God's Word diligently—she even equips herself every day with the full Armor of God
-            (<button type="button" class="verse-chip" data-ref="EPH.6.10">Ephesians 6:10–18</button>).
+            (<button type="button" class="verse-chip" data-ref="EPH.6.10-18">Ephesians 6:10–18</button>).
           </p>
           <p>
             She set out on a quest to discover how to learn while having fun, and discovered how much fun it is to learn when everything starts with the truth of Scripture!
           </p>
           <div class="btn-row">
-            <button type="button" class="btn-outline btn-sm verse-jump" data-ref="EPH.6.10">Read Armor of God</button>
+            <button type="button" class="btn-outline btn-sm verse-jump" data-ref="EPH.6.10-18">Read Armor of God</button>
           </div>
         </div>
       </div>

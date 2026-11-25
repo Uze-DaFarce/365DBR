@@ -1,8 +1,10 @@
-const CACHE_NAME = "dbr-v-20261121_004055";
+const CACHE_NAME = "dbr-v-20261125_162525";
 const SHELL_ASSETS = [
   "/365DBR/",
   "/365DBR/index.html",
   "/365DBR/bible.html",
+  "/365DBR/bible.bundle.js",
+  "/365DBR/index.bundle.js",
   "/365DBR/tailwind.prod.css",
   "/365DBR/bible_meta.js",
   "/365DBR/strongs_optional.js",

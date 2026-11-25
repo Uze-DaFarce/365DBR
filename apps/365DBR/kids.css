@@ -1,0 +1,328 @@
+/* Day by Day Kids — Clubhouse Theme for 365DBR (?mode=kids) | build=20261123_202809 */
+html.kids-mode,
+html.kids-mode body,
+html.kids-mode #root > div {
+  background-color: #fffdf7 !important;
+  color: #1d2a33 !important;
+  font-family: 'Nunito', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+html.kids-mode #root header {
+  background-color: #0f3d4c !important;
+  border-bottom: 3px solid #ffcc33 !important;
+  color: #ffffff !important;
+}
+
+/* Single-row desktop header inside iframe (exclude progressbar!) */
+@media (min-width: 520px) {
+  html.kids-mode #root header > div:first-child {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 44px !important;
+  }
+  html.kids-mode #root header h1 {
+    font-size: 0.95rem !important;
+  }
+}
+
+/* Keep ReadingProgress wrapper & bar pinned cleanly at the bottom of the header */
+html.kids-mode #root header > div:last-child:not(:first-child) {
+  height: 4px !important;
+  min-height: 4px !important;
+  bottom: 0 !important;
+  top: auto !important;
+}
+html.kids-mode #root header [role="progressbar"] {
+  height: 4px !important;
+}
+
+html.kids-mode #root header a,
+html.kids-mode #root header button,
+html.kids-mode #root header h1,
+html.kids-mode #root header span {
+  color: #ffffff;
+}
+
+html.kids-mode #root header .bg-stone-100 {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 204, 51, 0.5) !important;
+  color: #fffdf7 !important;
+}
+
+html.kids-mode #root header .bg-stone-100:hover {
+  background-color: rgba(255, 204, 51, 0.28) !important;
+}
+
+html.kids-mode #root header .text-stone-400,
+html.kids-mode #root header .text-stone-500,
+html.kids-mode #root header .text-stone-600,
+html.kids-mode #root header .text-stone-900 {
+  color: #fffdf7 !important;
+}
+
+/* Prominent Clubhouse Listen Button */
+html.kids-mode #root header button[aria-keyshortcuts="k"] {
+  background-color: #ffcc33 !important;
+  color: #0f3d4c !important;
+  font-weight: 900 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Kids Section Palette: OT=Deep Gold | NT=Navy Blue | Psalms=Teal | Proverbs=Forest Green */
+html.kids-mode #root .bg-amber-600 { background-color: #b87a00 !important; }
+html.kids-mode #root .bg-blue-600 { background-color: #163a6b !important; }
+html.kids-mode #root .bg-rose-600 { background-color: #0f5e59 !important; }
+html.kids-mode #root .bg-emerald-600 { background-color: #1b5e3a !important; }
+
+/* Active Focal Verse Cards */
+html.kids-mode #root [id^="verse-"] .bg-amber-100 {
+  background-color: #8f5e00 !important;
+  border-color: #ffcc33 !important;
+  color: #ffffff !important;
+}
+html.kids-mode #root [id^="verse-"] .bg-blue-100 {
+  background-color: #163a6b !important;
+  border-color: #60a5fa !important;
+  color: #ffffff !important;
+}
+html.kids-mode #root [id^="verse-"] .bg-rose-100 {
+  background-color: #0f5e59 !important;
+  border-color: #2dd4bf !important;
+  color: #ffffff !important;
+}
+html.kids-mode #root [id^="verse-"] .bg-emerald-100 {
+  background-color: #1b5e3a !important;
+  border-color: #4ade80 !important;
+  color: #ffffff !important;
+}
+
+html.kids-mode #root [id^="verse-"] .bg-amber-100 *,
+html.kids-mode #root [id^="verse-"] .bg-blue-100 *,
+html.kids-mode #root [id^="verse-"] .bg-rose-100 *,
+html.kids-mode #root [id^="verse-"] .bg-emerald-100 * {
+  color: #ffffff !important;
+}
+
+html.kids-mode #root [id^="verse-"] .bg-amber-100 .text-amber-700,
+html.kids-mode #root [id^="verse-"] .bg-blue-100 .text-blue-700,
+html.kids-mode #root [id^="verse-"] .bg-rose-100 .text-rose-700,
+html.kids-mode #root [id^="verse-"] .bg-emerald-100 .text-emerald-700 {
+  color: #ffeb99 !important;
+}
+
+/* Words of Jesus ONLY (.text-red-600 from USX style="wj") */
+html.kids-mode #root [id^="verse-"] .text-red-600 {
+  color: #c62828 !important;
+}
+html.kids-mode #root [id^="verse-"] .bg-amber-100 .text-red-600,
+html.kids-mode #root [id^="verse-"] .bg-blue-100 .text-red-600,
+html.kids-mode #root [id^="verse-"] .bg-rose-100 .text-red-600,
+html.kids-mode #root [id^="verse-"] .bg-emerald-100 .text-red-600 {
+  color: #ffcdd2 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* Verse Card Layout */
+html.kids-mode #main-content {
+  padding-top: 0.85rem !important;
+  padding-bottom: 5.5rem !important;
+}
+
+html.kids-mode #root [id^="verse-"] {
+  background-color: transparent !important;
+  margin-bottom: 0.65rem !important;
+}
+
+html.kids-mode #root [id^="verse-"] > div > div {
+  border-radius: 16px !important;
+  padding: 0.9rem 1.15rem !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+}
+
+html.kids-mode #root [id^="verse-"] .bg-white\/40 {
+  background-color: #ffffff !important;
+  border-color: #d9ecf2 !important;
+}
+
+/* Slot 3 Header Bar & Icons */
+html.kids-mode #root [id^="verse-"] .justify-between.items-center {
+  margin-bottom: 0.45rem !important;
+  gap: 0.4rem !important;
+}
+html.kids-mode #root [id^="verse-"] .justify-between.items-center > span,
+html.kids-mode #root [id^="verse-"] .justify-between.items-center > div {
+  font-family: 'Fredoka', 'Nunito', 'Trebuchet MS', system-ui, sans-serif !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.2 !important;
+}
+html.kids-mode #root [id^="verse-"] .justify-between.items-center > div {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+html.kids-mode #root [id^="verse-"] .justify-between.items-center button {
+  padding: 0.25rem !important;
+}
+html.kids-mode #root [id^="verse-"] .justify-between.items-center button svg {
+  width: 19px !important;
+  height: 19px !important;
+}
+
+/* Verse Body Text */
+html.kids-mode #root [id^="verse-"] p,
+html.kids-mode #root [id^="verse-"] .font-serif {
+  font-family: 'Nunito', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif !important;
+  font-size: 1.2rem !important;
+  line-height: 1.65 !important;
+}
+
+/* Compact Mobile (< 450px) so card header stays on one clean line */
+@media (max-width: 449px) {
+  html.kids-mode #main-content {
+    padding-left: 0.35rem !important;
+    padding-right: 0.35rem !important;
+  }
+  html.kids-mode #root [id^="verse-"] > div > div {
+    padding: 0.55rem 0.65rem !important;
+    border-radius: 12px !important;
+  }
+  html.kids-mode #root [id^="verse-"] .justify-between.items-center > span,
+  html.kids-mode #root [id^="verse-"] .justify-between.items-center > div {
+    font-size: 0.72rem !important;
+    letter-spacing: 0 !important;
+  }
+  html.kids-mode #root [id^="verse-"] .justify-between.items-center > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  html.kids-mode #root [id^="verse-"] .justify-between.items-center button {
+    padding: 0.15rem !important;
+  }
+  html.kids-mode #root [id^="verse-"] .justify-between.items-center button svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  html.kids-mode #root [id^="verse-"] p,
+  html.kids-mode #root [id^="verse-"] .font-serif {
+    font-size: 1.05rem !important;
+    line-height: 1.55 !important;
+  }
+}
+
+html.kids-mode #footer {
+  background-color: #0f3d4c !important;
+  border-top: 3px solid #ffcc33 !important;
+  color: #e9f6fb !important;
+}
+
+html.kids-mode #footer span,
+html.kids-mode #footer button,
+html.kids-mode #footer a {
+  color: #ffcc33 !important;
+}
+
+/* Inactive section pill hover contrast */
+html.kids-mode #root header button.hover\:bg-stone-200:hover {
+  background-color: rgba(255, 204, 51, 0.25) !important;
+  color: #ffcc33 !important;
+}
+
+/* Hide adult cross-page links when embedded in Clubhouse iframe (Clubhouse bar drives navigation) */
+html.kids-mode.kids-embedded a[aria-label="Switch to Bible Browser"],
+html.kids-mode.kids-embedded a[href*="index.html?mode=kids"],
+html.kids-mode.kids-embedded button[aria-label="Browse Bible"] {
+  display: none !important;
+}
+
+/* Fix white right-edge scrollbar/gutter & collapse header to 1 row when bookmarks are empty */
+html.kids-mode,
+html.kids-mode body {
+  background-color: #0f3d4c !important;
+  overflow-x: clip !important;
+}
+
+html.kids-mode #root {
+  background-color: #fdfcfb;
+  min-height: 100vh;
+}
+
+html.kids-mode #root header {
+  width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+html.kids-mode #root header > div:first-child {
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.35rem !important;
+  min-height: 40px !important;
+}
+
+html.kids-mode #root header > div:first-child > div {
+  width: auto !important;
+  margin-top: 0 !important;
+}
+
+/* Hide empty bookmarks pill outline when user has zero bookmarks */
+html.kids-mode #root header div.rounded-full:not(:has(button)) {
+  display: none !important;
+}
+
+/* Teal scrollbar track matching header/border with visible grey thumb */
+html.kids-mode {
+  scrollbar-color: #94a3b8 #0f3d4c;
+  scrollbar-width: thin;
+}
+html.kids-mode::-webkit-scrollbar {
+  width: 10px;
+}
+html.kids-mode::-webkit-scrollbar-track {
+  background: #0f3d4c;
+}
+html.kids-mode::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 999px;
+  border: 2px solid #0f3d4c;
+}
+html.kids-mode::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+/* Daily Reading (index.html): forced 2-row header (Row 1: Date + Bookmarks/Listen, Row 2: Reading pills) */
+html.kids-mode.kids-dbr-page #root header > div:first-child {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: auto !important;
+  row-gap: 0.35rem !important;
+}
+html.kids-mode.kids-dbr-page #root header > div:first-child > div:first-child,
+html.kids-mode.kids-dbr-page #root header > div:first-child > div:first-child > div:first-child {
+  display: contents !important;
+}
+html.kids-mode.kids-dbr-page #root header > div:first-child > div:last-child {
+  order: 2 !important;
+  margin-left: auto !important;
+}
+html.kids-mode.kids-dbr-page #root header .kids-dbr-pills {
+  order: 99 !important;
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  justify-content: flex-start !important;
+  padding-bottom: 0.15rem !important;
+  scrollbar-width: none;
+}
+html.kids-mode.kids-dbr-page #root header .kids-dbr-pills::-webkit-scrollbar {
+  display: none;
+}

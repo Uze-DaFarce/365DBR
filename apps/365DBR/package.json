@@ -1,0 +1,14 @@
+{
+  "name": "365dbr",
+  "private": true,
+  "scripts": {
+    "build": "python build_dbr.py"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
