@@ -3004,6 +3004,155 @@ self.addEventListener('fetch', (event) => {{
 
 MTSINAI_HTACCESS_PATH = BASE_DIR.parent / "mtsinai" / ".htaccess"
 MONOREPO_HTACCESS_PATH = BASE_DIR.parent.parent / ".htaccess"
+MTSINAI_SITEMAP_PATH = BASE_DIR.parent / "mtsinai" / "sitemap.xml"
+MONOREPO_SITEMAP_PATH = BASE_DIR.parent.parent / "sitemap.xml"
+
+SITEMAP_EXCLUDED_LOCS = {
+    "https://mt-sin.ai/fl",
+    "https://mt-sin.ai/fl/",
+    "https://mt-sin.ai/fl/god",
+    "https://mt-sin.ai/fl/edu",
+    "https://mt-sin.ai/fl/gov",
+    "https://mt-sin.ai/fl/love",
+    "https://mt-sin.ai/foundations/index.html",
+    "https://mt-sin.ai/foundations/god.html",
+    "https://mt-sin.ai/foundations/education.html",
+    "https://mt-sin.ai/foundations/government.html",
+    "https://mt-sin.ai/foundations/love.html",
+    "https://mt-sin.ai/foundations/what-we-know.html",
+    "https://mt-sin.ai/foundations/what-we-know-about-god.html",
+    "https://mt-sin.ai/foundations/404-case-router.html",
+    "https://mt-sin.ai/365DBR/index.html",
+    "https://mt-sin.ai/365DBR/What_We_Know.html",
+}
+
+
+def _file_lastmod_ymd(path: Path, fallback: str) -> str:
+    if path.exists():
+        return datetime.fromtimestamp(path.stat().st_mtime).strftime("%Y-%m-%d")
+    return fallback
+
+
+def sync_sitemap(dry_run: bool = False):
+    """Idempotently syncs canonical sitemap.xml to apps/mtsinai/sitemap.xml and monorepo root."""
+    import xml.etree.ElementTree as ET
+
+    today_ymd = datetime.now().strftime("%Y-%m-%d")
+    existing_entries = {}
+    existing_order = []
+
+    # Prefer whichever sitemap already holds the full 365DBR corpus, then merge any other valid entries
+    source_paths = []
+    for p in (MTSINAI_SITEMAP_PATH, MONOREPO_SITEMAP_PATH):
+        if p.exists():
+            source_paths.append(p)
+    source_paths.sort(key=lambda p: p.stat().st_size, reverse=True)
+
+    ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    for src_path in source_paths:
+        raw_xml = src_path.read_text(encoding="utf-8")
+        root_el = ET.fromstring(raw_xml)
+        for url_el in root_el.findall("sm:url", ns):
+            loc_el = url_el.find("sm:loc", ns)
+            if loc_el is None or not (loc_el.text or "").strip():
+                continue
+            loc = loc_el.text.strip()
+            if "#" in loc or loc in SITEMAP_EXCLUDED_LOCS:
+                continue
+            lastmod_el = url_el.find("sm:lastmod", ns)
+            freq_el = url_el.find("sm:changefreq", ns)
+            prio_el = url_el.find("sm:priority", ns)
+            if loc not in existing_entries:
+                existing_entries[loc] = {
+                    "loc": loc,
+                    "lastmod": (lastmod_el.text.strip() if lastmod_el is not None and lastmod_el.text else today_ymd),
+                    "changefreq": (freq_el.text.strip() if freq_el is not None and freq_el.text else "monthly"),
+                    "priority": (prio_el.text.strip() if prio_el is not None and prio_el.text else "0.8"),
+                }
+                existing_order.append(loc)
+
+    root_prev_lastmod = existing_entries.get("https://mt-sin.ai/", {}).get("lastmod", today_ymd)
+    canonical_head = [
+        {
+            "loc": "https://mt-sin.ai/",
+            "lastmod": _file_lastmod_ymd(BASE_DIR.parent / "mtsinai" / "index.html", root_prev_lastmod),
+            "changefreq": "daily",
+            "priority": "1.0",
+        },
+        {
+            "loc": "https://mt-sin.ai/foundations/",
+            "lastmod": _file_lastmod_ymd(BASE_DIR / "index.html", today_ymd),
+            "changefreq": "weekly",
+            "priority": "0.9",
+        },
+        {
+            "loc": GOD_CANONICAL_URL,
+            "lastmod": _file_lastmod_ymd(GOD_CANONICAL_PATH, today_ymd),
+            "changefreq": "monthly",
+            "priority": "0.9",
+        },
+        {
+            "loc": EDU_CANONICAL_URL,
+            "lastmod": _file_lastmod_ymd(EDU_CANONICAL_PATH, today_ymd),
+            "changefreq": "monthly",
+            "priority": "0.9",
+        },
+        {
+            "loc": GOV_CANONICAL_URL,
+            "lastmod": _file_lastmod_ymd(GOV_CANONICAL_PATH, today_ymd),
+            "changefreq": "monthly",
+            "priority": "0.9",
+        },
+        {
+            "loc": LOVE_CANONICAL_URL,
+            "lastmod": _file_lastmod_ymd(LOVE_CANONICAL_PATH, today_ymd),
+            "changefreq": "monthly",
+            "priority": "0.9",
+        },
+        {
+            "loc": "https://mt-sin.ai/365DBR/",
+            "lastmod": _file_lastmod_ymd(MONOREPO_APPS_DIR / "365DBR" / "index.html", today_ymd),
+            "changefreq": "daily",
+            "priority": "0.9",
+        },
+        {
+            "loc": "https://mt-sin.ai/365DBR/bible.html",
+            "lastmod": _file_lastmod_ymd(MONOREPO_APPS_DIR / "365DBR" / "bible.html", today_ymd),
+            "changefreq": "monthly",
+            "priority": "0.9",
+        },
+    ]
+
+    final_entries = []
+    seen_locs = set()
+    for item in canonical_head:
+        final_entries.append(item)
+        seen_locs.add(item["loc"])
+
+    for loc in existing_order:
+        if loc not in seen_locs:
+            final_entries.append(existing_entries[loc])
+            seen_locs.add(loc)
+
+    xml_lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    for entry in final_entries:
+        xml_lines.append("  <url>")
+        xml_lines.append(f"    <loc>{html.escape(entry['loc'])}</loc>")
+        xml_lines.append(f"    <lastmod>{html.escape(entry['lastmod'])}</lastmod>")
+        xml_lines.append(f"    <changefreq>{html.escape(entry['changefreq'])}</changefreq>")
+        xml_lines.append(f"    <priority>{html.escape(entry['priority'])}</priority>")
+        xml_lines.append("  </url>")
+    xml_lines.append("</urlset>\n")
+    xml_output = "\n".join(xml_lines)
+
+    # Validate XML well-formedness prior to disk write
+    ET.fromstring(xml_output)
+
+    write_if_changed(MTSINAI_SITEMAP_PATH, xml_output, dry_run=dry_run)
+    write_if_changed(MONOREPO_SITEMAP_PATH, xml_output, dry_run=dry_run)
 
 FL_ROOT_REWRITE_BLOCK = r"""
 <IfModule mod_rewrite.c>
@@ -3043,9 +3192,9 @@ def main():
     )
     parser.add_argument(
         "--target",
-        choices=["all", "bks", "bk-1", "bk-2", "bk-3", "bk-4", "stubs", "htaccess", "pwa"],
+        choices=["all", "bks", "bk-1", "bk-2", "bk-3", "bk-4", "stubs", "htaccess", "pwa", "sitemap"],
         default=None,
-        help="Build scope: all, bks (all books), bk-1, bk-2, bk-3, bk-4, stubs (redirect stubs), or htaccess (routing)."
+        help="Build scope: all, bks (all books), bk-1..bk-4, stubs, htaccess, pwa, or sitemap."
     )
     parser.add_argument(
         "--bk-1",
@@ -3083,11 +3232,12 @@ def main():
     do_bk3 = args.bk_3 or (target in ("all", "bks", "bk-3"))
     do_bk4 = args.bk_4 or (target in ("all", "bks", "bk-4"))
     do_stubs = target in ("all", "stubs")
-    do_htaccess = target in ("all", "htaccess")
+    do_htaccess = target in ("all", "bks", "htaccess") or do_bk1 or do_bk2 or do_bk3 or do_bk4
     do_pwa = target in ("all", "bks", "pwa")
+    do_sitemap = target in ("all", "bks", "sitemap") or do_bk1 or do_bk2 or do_bk3 or do_bk4
 
     mode_label = "DRY-RUN" if args.dry_run else "WRITE"
-    print(f"[FL Build Start — Mode: {mode_label} | bk1={do_bk1}, bk2={do_bk2}, bk3={do_bk3}, bk4={do_bk4}, stubs={do_stubs}, htaccess={do_htaccess}]")
+    print(f"[FL Build Start — Mode: {mode_label} | bk1={do_bk1}, bk2={do_bk2}, bk3={do_bk3}, bk4={do_bk4}, stubs={do_stubs}, htaccess={do_htaccess}, sitemap={do_sitemap}]")
 
     if do_bk2:
         if not RAW_MD_PATH.exists():
@@ -3135,6 +3285,9 @@ def main():
 
     if do_pwa:
         sync_pwa_assets(dry_run=args.dry_run)
+
+    if do_sitemap:
+        sync_sitemap(dry_run=args.dry_run)
 
     print("[FL Build Complete]")
 
