@@ -149,6 +149,7 @@ ServerSignature Off
   RewriteRule ^fl/god(\.html)?/?$ /foundations/what-does-the-bible-say-about-god.html [R=301,L,NC,QSA]
   RewriteRule ^fl/edu(\.html)?/?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
   RewriteRule ^fl/gov(\.html)?/?$ /foundations/what-does-the-bible-say-about-government.html [R=301,L,NC,QSA]
+  RewriteRule ^fl/love(\.html)?/?$ /foundations/what-does-the-bible-say-about-love.html [R=301,L,NC,QSA]
   RewriteRule ^fl/support(\.html)?/?$ /foundations/#support-fl [R=302,L,NC,NE]
   RewriteRule ^fl/(coffee|support5)(\.html)?/?$ https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta [R=302,L,NC,NE]
   RewriteRule ^fl/support3(\.html)?/?$ https://connect.intuit.com/pay/PattyShaw/scs-v1-c1c2a59720144473a27aee64ff2d9701e09df4cb5801458fb017d7b16833e957f51b78ed6ca2491c8fd5923d577d212f-0?locale=EN_US&cta=saveandcopylink [R=302,L,NC,NE]

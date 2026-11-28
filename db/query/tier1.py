@@ -11,12 +11,17 @@ Speaker and genre come only from stored annotations whose range covers
 that verse. No stored speaker prints as unknown. A speaker is not copied
 onto a neighbor outside its range. Theme is not treated as genre. The
 result means the word is written. It does not mean God said it.
+The locked contract, Speaker rule (2026-11-25), holds that sentence,
+the reading, and the reason.
+
+Bleed runs before a hit counts and again before the result returns.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
+from .bleed import gate
 from .word import search_word
 
 _ENGINE_CODES = ("LSV", "KJV", "YLT")
@@ -39,11 +44,23 @@ def ask_tier1(
     claim "absent" asserts that the word is not written.
     Any other claim is refused.
     """
-    if claim not in (None, "absent"):
-        raise ValueError('claim must be omitted or "absent"')
     span = max(_MIN_WINDOW, min(int(window), _MAX_WINDOW))
     shown = max(1, min(int(show), _MAX_SHOW))
+    # Before a hit counts. The pair is refused even when no verse is open yet.
+    gate(conn, phase="hit", word=word, claim=claim)
+    if claim not in (None, "absent"):
+        raise ValueError('claim must be omitted or "absent"')
     found = search_word(conn, word, limit=shown)
+    hits = []
+    for hit in found["hits"]:
+        gate(
+            conn,
+            phase="hit",
+            word=found["query"],
+            claim=claim,
+            verse_id=hit["verse_id"],
+        )
+        hits.append(hit)
     total = int(found["total_verses"])
     if total == 0:
         result = "silent"
@@ -53,8 +70,8 @@ def ask_tier1(
         result = "speaks"
     passages = []
     if result != "silent":
-        passages = [_passage(conn, hit, span) for hit in found["hits"]]
-    return {
+        passages = [_passage(conn, hit, span) for hit in hits]
+    report = {
         "tier": 1,
         "result": result,
         "stopped": result == "silent",
@@ -66,6 +83,14 @@ def ask_tier1(
         "shown": len(passages),
         "passages": passages,
     }
+    gate(
+        conn,
+        phase="return",
+        word=report["word"],
+        claim=claim,
+        passages=[passage["verse_id"] for passage in passages],
+    )
+    return report
 
 
 def format_tier1(report: dict[str, Any]) -> str:

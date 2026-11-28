@@ -1,0 +1,468 @@
+﻿# What Does the Bible Say About Love?
+> Foundational Truths on True Devotion, Relationships, and Testing Counterfeits — Directly from the Infallible Word of God
+
+**Authors:** Rowley and Patty Shaw (Mt. Sinai LLC) • Attributing Dr. Voddie Baucham Jr., Ken Ham, Patricia Engler & Dr. Nathaniel Jeanson (Answers in Genesis), Ray Comfort (Living Waters), Dr. John MacArthur, Rosaria Butterfield, Allie Beth Stuckey, Paul Washer, and Nick Freitas, with Gemini
+**Series:** Foundations Library — Book 4 — Foundational Truths, Biblically Backed
+**Scripture Standard:** *Sola Scriptura* (Literal Translations with Masoretic Hebrew WLC & Greek TR/NT Alignment)
+
+---
+
+## Introduction: Reclaiming Love Under the Authority of Scripture
+
+No word in the English language has been hijacked more thoroughly than "love." Modern culture uses it to justify sin, excuse cowardice, defend "little white lies," and celebrate open rebellion against God. Even inside many churches, biblical love has been replaced with spineless niceness—a counterfeit that flatters people on their way to destruction rather than speaking the truth that sets them free (Jeremiah 6:14; Ephesians 4:15).
+
+Because the living God cannot lie (Numbers 23:19; Titus 1:2), His written Word holds sole, supreme authority (*Sola Scriptura*) to define what love is and what love is not. Throughout this book, every chapter establishes **Biblical Authority** from the literal Hebrew and Greek text, dismantles the **Worldly Lie** trying to counterfeit it, and closes with an interactive, printable **Heart Check** for personal study and family table discipleship (Psalm 1:2; Deuteronomy 6:6–9). Click any Scripture reference as you read to open the **Scripture Reader** side-by-side and verify every claim against the Word of God yourself (Acts 17:11; 2 Timothy 3:16–17).
+
+### Standing on the Shoulders of Faithful *Sola Scriptura* Voices
+
+We are not inventing a new theology of love; we are returning directly to the manufacturer's handbook. Along the way, we gratefully point families to modern *Sola Scriptura* teachers and ministries whose work aligns directly with these truths—including **Answers in Genesis** (**Ken Ham**, **Patricia Engler**, and **Dr. Nathaniel Jeanson**) on the Genesis foundation of love, marriage, and one human race; **Dr. Voddie Baucham Jr.** (*The Ever-Loving Truth*, *Family Driven Faith*, *What He Must Be*) on 1 Corinthians 13 truth-in-love, biblical courtship, and family discipleship; **Ray Comfort** and **Living Waters** (*The Way of the Master*, *Audacity*) on loving the lost enough to warn them; **Dr. John MacArthur** (*The Love of God*, *The Vanishing Conscience*) and biblical *nouthetic* (*nouthesia* (νουθεσία) — placing God's truth into the mind) counselors (**Dr. Jay Adams**, **Dr. Heath Lambert**) on exposing the idol of self-love; **Rosaria Butterfield** (*The Gospel Comes with a House Key*, *Five Lies of Our Anti-Christian Age*) on *philoxenia* (φιλοξενία) hospitality and resisting counterfeit cultural compassion; **Allie Beth Stuckey** (*You're Not Enough*, *Toxic Empathy*) on testing emotional manipulation against Scripture; and **Paul Washer** (*One Flesh*) and **Nick Freitas** on the Cross, sacrificial husbandry, and capable protection. Yet every human voice—including ours—bows to one infallible judge: *"To the law and to the testimony! if they speak not according to this word, it is because there is no light in them"* (Isaiah 8:20 -KJV).
+
+---
+
+# Part I: The Creator & Authority of Love
+> Why Love Requires a Creator and Who Holds the Right to Define It
+
+## Chapter 1: Why Love Only Makes Sense With a Creator
+> Eternal Love, Free Will, and the Bankruptcy of Evolution
+
+### 1.1 Why God Created Everything: Love, Not Need
+
+Before God spoke light into existence on Day 1, love was already real, active, and eternal (Genesis 1:1–3). Scripture states plainly that *"God is love"* (1 John 4:8 -KJV; 1 John 4:16). That is only logically possible because the one true God exists eternally as three distinct Persons—Father, Son, and Holy Spirit—with the Father loving the Son before the foundation of the world (John 17:24; Matthew 3:17). A solitary, unitarian god could not be love from eternity past without creating something first; the Triune Yahweh lacked nothing.
+
+God did not create the universe because He was lonely or needed anything from us; He is completely self-sufficient (Acts 17:24–25; Psalm 50:12). Neither did He want programmed robots or mindless servants forced to obey Him. He created mankind in His own image (*tselem* (צֶלֶם) *Elohim* (אֱלֹהִים); Genesis 1:26–27) and personally breathed the breath of life (*nishmat chayyim* (נִשְׁמַת חַיִּים), from *neshamah* (נְשָׁמָה); Genesis 2:7) into Adam because He desired a real, loving relationship—to love us and to be freely loved by us in return.
+
+Real love cannot be forced; coerced obedience is programming, not love. That is why God placed the tree of the knowledge of good and evil in the Garden and gave Adam and Eve genuine free will (Genesis 2:16–17; Deuteronomy 30:19; Joshua 24:15). He walked and talked with them daily in the Garden (Genesis 3:8) until mankind committed the ultimate betrayal of love: choosing to believe a liar (the serpent, Satan) over the Creator who had given them everything (Genesis 3:1–7; Revelation 12:9). Every broken relationship on earth traces directly back to that first betrayal.
+
+### 1.2 Why Molecules-to-Man Evolution Destroys the Very Concept of Love
+
+Secular humanism tries to claim the beauty of love while denying the Creator who authored it. As **Ken Ham** and **Answers in Genesis** consistently point out, under molecules-to-man evolution the engine of existence is **survival of the fittest**—ruthless self-preservation and the elimination of the weak over millions of years of death. Biblical love commands the exact opposite: laying down your life for the weak, the helpless, and even your enemies (Romans 5:6–8; 1 John 3:16).
+
+Even on its own terms, the evolutionary story collapses on contact with observable reality:
+* **If Love Evolved to Pass on Genes, How Did Almost Every Species Survive Without It?** Animals possess living souls (*nephesh chayyah* (נֶפֶשׁ חַיָּה); Genesis 1:20–24; Genesis 1:30; Leviticus 17:11) and were subjected to decay under Adam's fallen stewardship—groaning in hope of God's coming restoration where peace returns to the animal kingdom (Genesis 6:12–13; Romans 8:19–22; Isaiah 11:6–9)—yet animals were not made in God's image (Genesis 1:26–27) and did not eat from the tree of the knowledge of good and evil. Across the fallen animal kingdom today, most species do not use "love" to reproduce—they use forced mating (what humans rightly call rape) because it is far more efficient for passing on genes. Countless species abandon their offspring immediately, and many outright eat their own young. Observation of nature proves that "gene survival" does not produce love.
+* **Chemical Fizz Has Zero Moral Authority:** Materialists (people who claim nothing exists except physical matter and energy) insist human love is just oxytocin, dopamine, and firing neurons. If your devotion to your spouse or child is merely an accidental chemical reaction, it has no more meaning or moral weight than stomach acid or a sneeze.
+* **Logic and Love Share One Source:** Universal laws of logic, reason, and objective love only exist because an eternal, rational, unchanging Creator made the universe and stamped mankind with His image (Genesis 1:27; John 1:1–3; Colossians 1:16–17; Romans 2:14–15). Remove the Creator, and both reason and love evaporate.
+
+### 1.3 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Love is an evolved biological instinct—a chemical reaction in the brain that helped our animal ancestors survive and pass on their genes.
+* **Biblical Authority:** Observation of nature itself refutes the claim that love evolved for gene survival, since most species reproduce and raise—or abandon—offspring without anything resembling human covenant love. Sacrificial love contradicts survival of the fittest and only makes sense because an eternal, Triune Creator made mankind in His image with free will to know and love Him (Genesis 1:27; John 17:24; 1 John 4:8; 1 John 4:19).
+
+## Chapter 1 Personal & Family Heart Check (`fl_love_hc1`)
+
+* **Review Question 1 (`fl_love_hc1_q1`):** Why do Acts 17:24–25, John 17:24, and Genesis 2:16–17 prove that God created mankind for real, freely chosen love rather than out of loneliness or to build mindless robots?
+* **Review Question 2 (`fl_love_hc1_q2`):** How does the actual behavior of the fallen animal kingdom (forced mating/rape, abandoning or eating young) dismantle the evolutionary claim that love "evolved to pass on genes"?
+* **Family Heart Check (`fl_love_hc1_disc`):** Adam and Eve walked with God daily (Genesis 3:8) yet betrayed His love by believing a liar. Where do we face that exact same choice—believing a popular cultural lie over God's Word—in our daily life this week?
+
+---
+
+## Chapter 2: The Language, Order & Sole Authority of Love
+> Action Over Emotion, God's Design Over Man's Consensus
+
+### 2.1 The Old Testament Hebrew Precision
+
+English forces one overloaded word—"love"—to cover everything from pizza to marriage to Almighty God. The inspired Masoretic Hebrew text is far sharper, grounding love in **deliberate choice, steadfast loyalty, and active mercy**:
+* ***Ahavah* (אַהֲבָה) / *Ahav* (אָהַב) — Active, Chosen Devotion:** Used when God commands Israel to love Him with all their heart, soul, and might (Deuteronomy 6:5), and when Isaac loved Rebekah (Genesis 24:67). It is a deliberate commitment of the will that moves into action, not a passive crush.
+* ***Chesed* (חֶסֶד) — Steadfast, Promise-Keeping Loyalty:** Often rendered "lovingkindness" or "mercy," *chesed* (חֶסֶד) describes God's unbreakable covenant faithfulness to His people even when they stumble (Exodus 34:6–7; Psalm 136:1; Lamentations 3:22–23).
+* ***Rachamim* (רַחֲמִים) — Deep Parental Compassion:** Derived from the Hebrew root for "womb" (*rechem* (רֶחֶם)), this word pictures the fierce, protective tenderness of a mother or father toward a helpless child (Psalm 103:13; Isaiah 49:15).
+
+### 2.2 The New Testament Greek Precision
+
+The received Greek New Testament text (*Textus Receptus*) reinforces that exact same action-first standard:
+* ***Agapaō* (ἀγαπάω) / *Agapē* (ἀγάπη) — Selfless, Sacrificial Action:** The defining love of Scripture. Governed by the will and proven by sacrifice, regardless of whether the recipient deserves it (John 3:16; Romans 5:8; 1 Corinthians 13:4–7).
+* ***Phileō* (φιλέω) — Warm Brotherly Affection:** The deep bond of shared friendship and family warmth (John 11:3; John 21:15–17; Titus 3:15).
+* ***Storgē* (στοργή) — Natural Family Affection:** Appears in its negated form (*astorgos* (ἄστοργος) — "without natural affection") to warn that a God-rejecting society loses even basic parental and family care (Romans 1:31; 2 Timothy 3:3).
+
+> **Note on Popular "8 Greek Words for Love" Lists & Biblical Counterfeits:** Modern charts often mix biblical Greek with pop-psychology. The Greek word *erōs* (ἔρως — romantic desire) never appears in the New Testament, though Scripture fully honors marital passion inside marriage (Song of Solomon 8:6–7; Hebrews 13:4). Meanwhile, the New Testament explicitly names both godly and corrupted compound "loves": ***philoxenia* (φιλοξενία)**—hospitality or "love of strangers"—is commanded of believers (Romans 12:13; Hebrews 13:2, see Chapter 10), whereas ***philautos* (φίλαυτος — lovers of self)**, ***philēdonos* (φιλήδονος — lovers of pleasure)** rather than ***philotheos* (φιλόθεος — lovers of God)**, and ***philargyria* (φιλαργυρία — the love of money)** are condemned as destructive idols (2 Timothy 3:2; 2 Timothy 3:4; 1 Timothy 6:10, see Chapter 5). The remaining buzzwords on internet charts are not biblical categories of love at all: ***pragma* (πρᾶγμα)** simply means a "matter or event" (Luke 1:1; Hebrews 11:1), ***mania* (μανία)** means "madness" (Acts 26:24), and ***ludus*** is Latin, not Greek—though Scripture condemns playful romantic games outside marriage (1 Thessalonians 4:3–6) while celebrating joyful delight inside it (Proverbs 5:18–19).
+
+### 2.3 Love vs. Lust, and the Biblical Order of Loves
+
+Because Scripture defines love by action rather than feelings, it exposes two counterfeits immediately:
+* **Love Gives; Lust Takes:** In 2 Samuel 13:1–15, Amnon claimed he "loved" Tamar, yet the moment he forced her and got what he wanted, his "love" flipped instantly into bitter hatred. Worldly infatuation consumes another person for self; biblical love sacrifices self for another's true good (1 John 3:18).
+* **Love Has a God-Ordained Order:** Jesus made clear that loving father, mother, son, or daughter more than Him makes a person unworthy of Him (Matthew 10:37). Likewise, no servant can love two masters—you cannot love both God and money (*mammōnas* (μαμωνᾶς), Matthew 6:24; 1 Timothy 6:10). When you love God first, every earthly love falls into its rightful place; when you love any created person, pleasure, or possession above the Creator, that love warps into idolatry (Exodus 20:3; Romans 1:25).
+
+### 2.4 Who Holds Authority to Define Love? Male, Female & the "Love Is Love" Lie
+
+Modern culture repeats the empty slogan "love is love"—a circular phrase that defines nothing and erases every moral boundary. Man's consensus shifts every decade, and Scripture warns plainly that the human heart is deceitful above all things (Jeremiah 17:9). God's Word trumps the consensus of man in every single case: let God be true, and every man a liar (Romans 3:4; Isaiah 8:20).
+
+Scripture settles the definition permanently: **love is proven by obedience to God's commandments and created design, not by human feelings.** Jesus stated plainly that those who love Him keep His commandments (John 14:15), and John confirmed that loving God means obeying His Word—and His commandments are not burdensome (1 John 5:3; 2 John 1:6).
+
+Nowhere is this clash sharper than over biological sex and sexuality. From Day 6 of Creation, God intentionally made humanity strictly male (*zakar* (זָכָר)) and female (*neqevah* (נְקֵבָה)) and ordained marriage exclusively between one man and one woman (Genesis 1:27; Genesis 2:24; Matthew 19:4–6). When a culture rejects the Creator, Paul warns that God hands people over to dishonorable passions—exchanging God's natural design for same-sex rebellion and gender confusion (Romans 1:24–28; Deuteronomy 22:5; Leviticus 18:22). As **Rosaria Butterfield** (*Five Lies of Our Anti-Christian Age*)—herself rescued by Christ out of lesbian activism—and **Allie Beth Stuckey** (*Toxic Empathy*) testify from Scripture, cheering on sexual rebellion or lying with false pronouns is not "empathy" or "love"; it is lawlessness wearing a disguise (Isaiah 5:20; 1 John 3:4). True Christian love refuses to lie about sin precisely so it can hold out real Gospel hope: *"And such were some of you; but you were washed, you were sanctified, you were justified in the name of the Lord Jesus Christ and by the Spirit of our God"* (1 Corinthians 6:9–11).
+
+### 2.5 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** "Love is love"—if a romantic desire or identity feeling is strong and society applauds it, nobody has the right to call it sin.
+* **Biblical Authority:** God's Word overrides human consensus every time (Romans 3:4). True love is measurable action in deed and truth (1 John 3:18), ordered with God first (Matthew 10:37), faithful to His male-and-female creation design (Genesis 1:27; Romans 1:26–27; 1 Corinthians 6:9–11), and proven by obedience to His commandments (John 14:15; 1 John 5:3).
+
+## Chapter 2 Personal & Family Heart Check (`fl_love_hc2`)
+
+* **Review Question 1 (`fl_love_hc2_q1`):** How does Amnon's "love" in 2 Samuel 13:1–15 expose the difference between selfish lust and biblical *agape* (1 John 3:18)?
+* **Review Question 2 (`fl_love_hc2_q2`):** Using Genesis 1:27, John 14:15, Romans 1:24–27, and 1 Corinthians 6:9–11, explain why affirming sexual or gender sin is counterfeit compassion, while speaking God's truth with Gospel hope is genuine love.
+* **Family Heart Check (`fl_love_hc2_disc`):** Why does Matthew 10:37 require loving God above even our own family—and how does keeping God first actually protect us from bowing when a loved one asks us to compromise Scripture?
+
+---
+
+# Part II: Loving God, Truth & The Cross
+> Regenerated Eyes, Christ Taking Our Place on the Cross, and Dying to Self
+
+## Chapter 3: Loving God, Truth & Regenerated Eyes
+> Why a New Heart Replaces "Little White Lies" and False Unity With Truth in Love
+
+### 3.1 The First and Greatest Commandment
+
+When asked which commandment in the Law is greatest, Jesus reached directly back to Moses: we are commanded to love the LORD our God with all our heart, soul, mind, and strength (Deuteronomy 6:4–5; Matthew 22:37–38; Mark 12:30). Notice that Scripture leaves zero room for compartmentalized, Sunday-only affection. Loving God engages the entire person—your inner desires (*levav* (לֵבָב)), your living soul (*nephesh* (נֶפֶשׁ)), your rational mind (*dianoia* (διάνοια)), and your practical daily energy (*me'od* (מְאֹד) / *ischys* (ἰσχύς)).
+
+That love is never measured by emotional highs. Jesus drew a straight line between affection and obedience: those who genuinely love Him keep His commandments (John 14:15; John 14:21; 1 John 5:3). Loving God also means loving His written Word, delighting in His statutes, and refusing to twist them to fit the times (Psalm 119:97; Psalm 119:113; 2 John 1:6).
+
+### 3.2 Truth and Love Are Inseparable — Exposing False "Unity"
+
+Modern culture—and compromised churches—treat truth and love as opposites, insisting you must soften hard doctrine or hide the truth to keep from hurting feelings. As **Dr. Voddie Baucham Jr.** demonstrates in *The Ever-Loving Truth*, Scripture teaches the exact reverse: **love and truth are inseparable.** God Himself cannot lie (Numbers 23:19; Titus 1:2), and He explicitly warns that those who perish do so because they refused to receive the love of the truth (2 Thessalonians 2:10).
+
+In the Apostle Paul's defining portrait of biblical love, love never rejoices in wrongdoing—it rejoices with the truth (1 Corinthians 13:6). Flattery is not kindness; Proverbs warns that a flattering mouth works ruin and spreads a net for a neighbor's feet (Proverbs 26:28; Proverbs 29:5). By contrast, faithful are the wounds of a friend (Proverbs 27:6), and speaking the truth in love is how believers grow up into Christ (Ephesians 4:15).
+
+That same rule destroys the popular church slogan, *"Doctrine divides—just love Jesus!"* The Apostle John—called the Apostle of Love—wrote explicitly that walking in love means walking in truth, and commanded believers **not** to welcome or endorse false teachers who abandon the doctrine of Christ, lest they share in their wicked works (2 John 1:6–11; Romans 16:17; Jude 1:3). Unity built by sweeping God's Word under the rug is treason against Christ, not love.
+
+### 3.3 Regenerated Eyes: Seeing God Reflected Beyond the Skin
+
+By default, fallen humans are hard-hearted, selfish, and quick to lie (Jeremiah 17:9; Romans 3:10–13). When God gives a sinner a new heart and the Holy Spirit takes up residence inside a believer's physical body (Ezekiel 36:26; 1 Corinthians 6:19), everything about how you see other people changes. Man looks at the outward appearance, but the LORD looks at the heart (1 Samuel 16:7).
+
+God Himself is the source of all true beauty, goodness, light, grace, hope, and love (Psalm 27:4; James 1:17; 1 John 1:5). Once His Spirit lives in you, you begin to see the living reflection of Christ inside other believers (2 Corinthians 3:18; 2 Corinthians 5:16–17). That is the real truth buried underneath old sayings like "beauty is in the eye of the beholder" or "she is beautiful to me"—and it completely flips the shallow saying "beauty is only skin deep." With God, real beauty factually goes far deeper than skin (1 Peter 3:3–4; Proverbs 31:30).
+
+Think of looking at a diamond from three feet away versus holding it up to a jeweler's loupe. Through the loupe, both the fullness of its brilliance and every real flaw become immediately clear. In the exact same way, regenerated eyes let you speak with total honesty: compliments that used to feel like polite "little white lies" become genuine truth because you are seeing God's reflection inside that person, while real flaws are addressed with patient, honest love instead of flattery or cruelty (Ephesians 4:15; 1 Peter 1:22).
+
+### 3.4 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Loving people means affirming their feelings with polite "little white lies" and laying aside biblical doctrine in the name of "church unity."
+* **Biblical Authority:** Deceit, flattery, and compromising doctrine are the opposite of love (1 Corinthians 13:6; Proverbs 26:28; 2 John 1:9–11). A new heart indwelt by the Holy Spirit (Ezekiel 36:26; 1 Corinthians 6:19) sees God's beauty reflected in others and speaks unvarnished truth in love (Ephesians 4:15).
+
+## Chapter 3 Personal & Family Heart Check (`fl_love_hc3`)
+
+* **Review Question 1 (`fl_love_hc3_q1`):** Why do Deuteronomy 6:5, John 14:15, and 2 John 1:6–11 prove that loving God can never be separated from obeying His Word and guarding sound doctrine?
+* **Review Question 2 (`fl_love_hc3_q2`):** How do Proverbs 26:28, Proverbs 27:6, and 1 Corinthians 13:6 dismantle the worldly excuse for "little white lies"?
+* **Family Heart Check (`fl_love_hc3_disc`):** Think of a situation where culture pressures people to flatter or tell a "white lie." How does looking through "regenerated eyes" (1 Samuel 16:7; 2 Corinthians 5:16–17) let you speak 100% truth with genuine warmth rather than flattery or harshness?
+
+---
+
+## Chapter 4: The Cross — Where Love Satisfies Justice
+> Why Biblical Love Never Ignores Sin
+
+### 4.1 God's Love Never Sweeps Sin Under the Rug
+
+One of the deadliest counterfeits in modern religion is the idea that a loving God simply overlooks sin. Scripture refuses to pit God's love against His holiness. When the LORD proclaimed His own name to Moses on Mount Sinai, He declared Himself merciful, gracious, and abounding in steadfast love (*chesed* (חֶסֶד))—and in the very next breath stated that He will by no means clear the guilty (Exodus 34:6–7; Nahum 1:3).
+
+Because God is perfectly righteous, His eyes are too pure to approve evil (Habakkuk 1:13), and the wages of sin is literal death (Romans 6:23; Ezekiel 18:4). Just as an earthly judge who lets a convicted murderer walk free out of "kindness" would be a corrupt disgrace to the bench, if God simply pretended our rebellion never happened, He would cease to be righteous. True love never compromises justice.
+
+### 4.2 "For God So Loved the World..." — Christ Taking Our Place
+
+How, then, can a completely holy Judge remain perfectly just and still forgive guilty sinners? As preachers like **Paul Washer** and **Ray Comfort** drive home from **Romans 3:23–26**, the answer is the substitutionary Cross of Jesus Christ—where God Himself stepped into the courtroom and paid the fine His own Law required. Seven centuries before the crucifixion, Isaiah prophesied that the Messiah would be pierced for our rebellions and crushed for our sins, taking the punishment we deserved so we could have peace with God (Isaiah 53:4–6).
+
+God did not wait for mankind to clean itself up before loving us. While we were still helpless sinners and enemies of God, Christ died for us (Romans 5:6–10). God proved His love in history by giving His only begotten Son so that whoever believes in Him will not perish, but have everlasting life (John 3:16; 1 John 4:9–10). On the cross, Jesus bore our sins in His own body and satisfied (*hilastērion* (ἱλαστήριον) — propitiated) God's righteous wrath in full—the exact place where mercy and justice met without compromise (Romans 3:25–26; 2 Corinthians 5:21; 1 Peter 2:24).
+
+### 4.3 He Chose the Cross
+
+Jesus was never a helpless victim overpowered by Roman soldiers. Hours before His arrest, He told His disciples to make sure they had swords—leaving two real blades right there in the garden with Him (Luke 22:36–38). Yet the moment Peter drew one to fight, Jesus ordered him to put it away and stated plainly that He could ask His Father and immediately have more than twelve legions of angels at His side (Matthew 26:52–53; John 18:10–11).
+
+He knew every detail of what was coming and proved that nobody could claim He was trapped or unable to fight. Nobody took His life from Him—He laid it down by His own choice and took it back up in His literal bodily resurrection (John 10:17–18; 1 Corinthians 15:3–4). That willing sacrifice sets the permanent standard for what love looks like: we know love because Christ laid down His life for us, and we ought to lay down our lives for one another (1 John 3:16; John 15:13).
+
+### 4.4 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** A truly loving God would never judge sin, require blood atonement, or punish evil—real love just accepts everyone as they are.
+* **Biblical Authority:** God's love satisfies His justice rather than bypassing it (Exodus 34:6–7; Romans 3:25–26). The Cross is the supreme display of love precisely because the sinless Son of God willingly stood in our place and paid the full penalty for our sin (Isaiah 53:5–6; John 3:16; Romans 5:8).
+
+## Chapter 4 Personal & Family Heart Check (`fl_love_hc4`)
+
+* **Review Question 1 (`fl_love_hc4_q1`):** How does Romans 3:23–26 explain how God remains completely just ("just and the justifier") while forgiving guilty sinners who trust in Jesus?
+* **Review Question 2 (`fl_love_hc4_q2`):** Why do Matthew 26:52–53 and John 10:17–18 matter when defending the Cross as a deliberate act of almighty love rather than a tragic defeat?
+* **Family Heart Check (`fl_love_hc4_disc`):** If a friend says, "My God is a God of love, so He would never judge anyone," how do Exodus 34:6–7 and 1 John 4:9–10 show that erasing God's justice actually erases the Cross?
+
+---
+
+## Chapter 5: Self-Denial vs. The Idols of Self-Love, Pleasure & Money
+> Exposing *Philautos* (φίλαυτος) and Recovering Biblical Stewardship
+
+### 5.1 Scripture's Direct Verdict on Self-Love (*Philautos*), Pleasure & Greed
+
+Modern therapy culture repeats one mantra endlessly: *"You have to love yourself first before you can love anyone else."* Open the New Testament, and you will find the exact opposite verdict. When the Apostle Paul listed the defining sins of perilous last days, the very first vice out of his pen was ***philautos* (φίλαυτος) — lovers of self**—immediately followed by ***philargyros* (φιλάργυρος — lovers of money)** and ***philēdonos* (φιλήδονος — lovers of pleasure) rather than *philotheos* (φιλόθεος — lovers of God)** (2 Timothy 3:1–4; cf. 1 Timothy 6:10).
+
+As **Dr. John MacArthur** (*The Vanishing Conscience*), biblical *nouthetic* (*nouthesia* (νουθεσία)) counseling pioneers like **Dr. Jay Adams** and **Dr. Heath Lambert**, and **Allie Beth Stuckey** (*You're Not Enough (And That's Okay)*) have faithfully warned the Church, secular psychology smuggled self-worship straight into the sanctuary. Scripture never treats "low self-esteem" as mankind's root problem; it diagnoses **pride, covetousness, and self-worship** as the engine of human rebellion—even inside the church, as seen in Diotrephes, who loved to put himself first (*philoprōteuō* (φιλοπρωτεύω), 3 John 1:9; Genesis 3:5; Proverbs 16:18; Proverbs 28:26). Telling a fallen sinner to love himself more is like pouring gasoline on a house fire.
+
+### 5.2 What Jesus Actually Commanded: Deny Yourself
+
+Jesus never once told His disciples to focus on loving themselves or chasing their own happiness. Instead, He issued the sharpest call to self-denial in history: anyone who desires to follow Him must deny himself, take up his cross daily, and follow Him (Luke 9:23; Matthew 16:24–25). Whoever clings to his own life for self will lose it, while whoever loses his life for Christ's sake will find it.
+
+Paul applied that exact mindset to everyday relationships: do nothing from selfish ambition or empty conceit, but in humility consider others more important than yourself, following the pattern of Christ who emptied Himself and became obedient to death on a cross (Philippians 2:3–8; Galatians 2:20). Likewise, freedom from the love of money (*philargyria* (φιλαργυρία)) comes not from chasing wealth, but from godly contentment in God's promise never to leave or forsake His children (Hebrews 13:5; 1 Timothy 6:6–10).
+
+### 5.3 Answering the Misuse of Matthew 22:39 and Ephesians 5:28–29
+
+Proponents of "self-love" routinely point to two verses—and twist both:
+* **"Love Your Neighbor as Yourself" (Leviticus 19:18; Matthew 22:39):** This is not a three-part command (love God, learn to love yourself, then love your neighbor). It is a two-part command that *assumes* you already look out for your own hunger, safety, and comfort by default, and commands you to redirect that same practical care outward toward your neighbor.
+* **Nourishing and Cherishing Your Own Flesh (Ephesians 5:28–29):** Paul explicitly states that *no one ever hated his own flesh*, because humans naturally feed, clothe, and protect themselves. He is not prescribing self-esteem therapy; he is stating an obvious baseline fact of human nature to show husbands how concretely they must care for their wives.
+
+Biblical care for your health, sleep, work, and finances is never self-worship—it is **stewardship**. Your body and resources are not your own; you were bought with the blood of Christ, and your body is a temple of the Holy Spirit to be kept disciplined, pure, and ready for God's service (1 Corinthians 6:19–20; 1 Corinthians 9:27; Romans 12:1).
+
+### 5.4 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Self-love is the foundation of mental health—you must put yourself first, follow your desires, and learn to love yourself before you can genuinely love others.
+* **Biblical Authority:** Scripture condemns lovers of self, money, and pleasure (*philautos* (φίλαυτος), *philargyria* (φιλαργυρία), *philēdonos* (φιλήδονος) — 2 Timothy 3:2–4; 1 Timothy 6:10) and commands daily self-denial, contentment, and humility (Luke 9:23; Philippians 2:3–8; Hebrews 13:5). Caring for our bodies is faithful stewardship of God's temple, not self-worship (1 Corinthians 6:19–20).
+
+## Chapter 5 Personal & Family Heart Check (`fl_love_hc5`)
+
+* **Review Question 1 (`fl_love_hc5_q1`):** Why does 2 Timothy 3:1–4 place *philautos* (φίλαυτος — lovers of self) and *philēdonos* (φιλήδονος — lovers of pleasure) at the top of last-days sins, and how does Matthew 22:39 refute the claim that we must "learn to love ourselves first"?
+* **Review Question 2 (`fl_love_hc5_q2`):** Explain the difference between worldly self-love and biblical stewardship of your body, time, and money using 1 Corinthians 6:19–20 and Hebrews 13:5.
+* **Family Heart Check (`fl_love_hc5_disc`):** How does replacing "How does this make me feel about myself?" with "How can I deny myself to serve Christ and my family today?" (Luke 9:23; Philippians 2:3–4) immediately change the atmosphere of a home?
+
+---
+
+# Part III: Love in God's Designed Relationships
+> Courtship, Covenant Marriage, Family Duty, and the Household of God
+
+## Chapter 6: Biblical Courtship vs. Modern Dating
+> Preparing for a Lifelong Covenant Instead of Practicing for Divorce
+
+### 6.1 Why Modern Recreational Dating Trains People to Break Promises
+
+Scripture never endorses modern recreational dating—the cultural invention of pairing off for entertainment, giving away pieces of your heart and body, and breaking up whenever emotions cool off. As **Dr. Voddie Baucham Jr.** warns in *Family Driven Faith* and *What He Must Be... If He Wants to Marry My Daughter*, repeating that cycle of temporary intimacy followed by breakup literally trains young people to treat covenant commitment as disposable—**practicing for divorce** before they ever reach the marriage altar.
+
+God's design for pursuing a spouse moves with clear, honorable purpose toward marriage. Before two people ever bind their emotions together, they must know whether they are equally yoked as genuine believers in Jesus Christ (2 Corinthians 6:14; Amos 3:3), prepared to shoulder the real spiritual and financial responsibilities of a household (Proverbs 24:27; 1 Timothy 5:8), and committed to treating one another as brothers and sisters in Christ with absolute purity (1 Timothy 5:1–2).
+
+### 6.2 Fleeing Immorality and Guarding the Heart
+
+Paul states God's will for unmarried believers plainly: abstain from sexual immorality (*porneia* (πορνεία)), possess your own vessel in sanctification and honor, and never defraud or take advantage of a brother or sister by stirring up desires you cannot righteously fulfill outside marriage (1 Thessalonians 4:3–6). Rather than asking how close to the cliff you can walk without falling off, Scripture commands you to flee immorality outright—just as Joseph ran out of Potiphar's house rather than linger in temptation (1 Corinthians 6:18; 2 Timothy 2:22; Genesis 39:7–12).
+
+Scripture thrice warns against waking up romantic passion before its rightful covenant time (Song of Solomon 2:7; Song of Solomon 3:5; Song of Solomon 8:4) and commands believers to guard their hearts with total diligence because everything in life flows from the heart (Proverbs 4:23). Real love protects the other person's purity, conscience, and future marriage; selfish lust demands physical or emotional proof right now.
+
+### 6.3 The Wisdom of Parental Counsel and Accountability
+
+In modern dating, two young people isolate themselves in a car, on private text threads, or behind closed doors while shutting their parents out of the process. Biblical courtship brings the relationship into the light. When Abraham sought a wife for Isaac, family involvement, prayerful discernment, and clear character testing—watching Rebekah's servant heart and diligence in real life—came first (Genesis 24:1–67). Proverbs repeatedly teaches that wise sons and daughters honor the counsel of their father and mother and find safety in a multitude of godly counselors (Proverbs 1:8–9; Proverbs 11:14; Proverbs 15:22). Inviting godly parents and church elders into the process is not a cage around love—it is a shield around it.
+
+### 6.4 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Casual dating, living together, and physical "test drives" are the normal way to check compatibility and figure out who you love.
+* **Biblical Authority:** Recreational dating trains hearts for divorce, and premarital sex defrauds both souls before God (1 Thessalonians 4:3–6; Hebrews 13:4). True love guards the heart, flees temptation, honors parental counsel, and pursues marriage in the light (2 Corinthians 6:14; 1 Corinthians 6:18; Proverbs 4:23; Genesis 24:1–67).
+
+## Chapter 6 Personal & Family Heart Check (`fl_love_hc6`)
+
+* **Review Question 1 (`fl_love_hc6_q1`):** How does 1 Thessalonians 4:3–6 define defrauding a brother or sister in a relationship, and why does modern recreational dating act as "practice for divorce"?
+* **Review Question 2 (`fl_love_hc6_q2`):** Why do 2 Corinthians 6:14, Proverbs 4:23, and Song of Solomon 2:7 require testing spiritual alignment and character *before* awakening romantic attachment?
+* **Family Heart Check (`fl_love_hc6_disc`):** What clear, practical boundaries and family checkpoints will our household uphold for courtship so relationships stay completely in the light and honor Christ?
+
+---
+
+## Chapter 7: Love & Marriage
+> One Team by Creation Design, Why Genesis 3:16 Makes Roles Feel Hard, and the Picture of Christ and His Church
+
+### 7.1 Marriage Is a God-Made Covenant, Not a Human Contract
+
+Marriage did not evolve from ancient property customs, and no civil government or Supreme Court invented it. On Day 6 of Creation, God personally formed Eve for Adam as his suitable counterpart (*ezer kenegdo* (עֵזֶר כְּנֶגְדּוֹ) — one united team, Genesis 2:18) and established the permanent blueprint: a man leaves his father and mother, joins to his wife, and the two become one flesh (Genesis 2:21–24). Jesus reaffirmed that literal Genesis history and declared that what God has joined together, man must not separate (Matthew 19:4–6).
+
+Malachi makes clear that marriage is a binding covenant witnessed by God Himself, and the LORD hates treacherous divorce (Malachi 2:14–16). While Scripture itself records narrow exceptions where a covenant is shattered by unrepentant sexual immorality (*porneia* (πορνεία), Matthew 19:9) or willful abandonment by an unbelieving spouse (1 Corinthians 7:15)—never condemning an innocent, betrayed spouse beyond God's Word (Deuteronomy 4:2)—biblical marriage is the exact opposite of a 50/50 consumer contract dissolved whenever someone feels "unfulfilled." It is a sacred vow before Almighty God to love faithfully through sickness, lean years, and old age.
+
+### 7.2 Why Satan Pits Husbands and Wives Against Each Other (Genesis 3:16) — And How God's Design Restores the Team
+
+Modern culture despises God's design for marital roles, and Satan works overtime to turn biblical headship and submission into a war between men and women. To understand why this subject always feels sensitive to fallen human ears, we have to read **Genesis 2** alongside **Genesis 3:16**.
+
+When God created Adam and Eve, He made them **one team**—equal in bearing God's image and equal as fellow heirs of the grace of life (Genesis 1:27; 1 Peter 3:7), yet entrusted with distinct, complementary jobs so the household functions in harmony rather than chaos (1 Corinthians 11:3; 1 Corinthians 14:33). Why, then, do husbands and wives naturally struggle with those roles? God tells us the exact reason in the Garden judgment of **Genesis 3:16**: as a direct consequence of the Fall, God warned Eve, *"Your desire (*teshuqah* (תְּשׁוּקָה)) shall be for your husband, and he shall rule (*mashal* (מָשַׁל)) over you"*—using the exact same Hebrew word *teshuqah* (תְּשׁוּקָה) that appears twelve verses later in **Genesis 4:7**, where sin's "desire" is to master Cain! Sin fractured our teamwork into a two-sided curse: tempting wives to resent or usurp their husband's leadership, and tempting husbands either toward harsh, selfish domination or toward cowardly passivity (like Adam standing silently beside Eve at the tree in Genesis 3:6). Whenever we step outside God's created intent, both spouses struggle and lose.
+
+In **Ephesians 5:22–33**, the Holy Spirit redeems marriage out of that Genesis 3:16 tug-of-war by anchoring each spouse's job directly in **Jesus Christ and His Church**:
+* **The Husband's Job (Sacrificial Servant-Leadership):** As **Paul Washer** (*One Flesh*) and **Nick Freitas** rightly emphasize, biblical headship is never a license to bark orders from a recliner—it is a command to die to self first. Husbands are commanded to love their wives as Christ loved the Church and gave Himself up for her—washing her in the Word, bearing the heaviest weight, and nourishing and cherishing her as his own body (Ephesians 5:25–29). Peter warns husbands to live with their wives in an understanding way and show them honor, or else God Himself will hinder the husband's prayers (1 Peter 3:7; Colossians 3:19).
+* **The Wife's Job (Willing Respect & Teammate Strength):** Wives are commanded to respect and willingly submit (*hypotassō* (ὑποτάσσω)) to their own husbands as the Church submits to Christ (Ephesians 5:22–24; Ephesians 5:33; Titus 2:4–5). Biblical submission is never inferiority or erase-your-mind doormat weakness; Proverbs 31 celebrates the godly wife as wise, strong, resourceful, entrepreneurial, and deeply trusted by her husband (Proverbs 31:10–12; Proverbs 31:26–28).
+* **The Clear Biblical Guardrail Against Abuse or Sin (Acts 5:29):** Just as every human authority stands strictly *under* God, a wife's submission never requires obeying a command to sin against God's Word (Acts 5:29), nor does it ever excuse physical violence, criminal abuse, or terror inside a home. A man who batters his wife or children has abandoned Christ-like headship and stepped directly into the jurisdiction of church discipline and the civil magistrate's sword (1 Timothy 3:3; Matthew 18:15–17; Romans 13:1–4).
+
+### 7.3 Marital Delight and Undivided Loyalty
+
+Inside the walls of covenant marriage, Scripture celebrates physical passion, friendship, and lifelong romance without a hint of shame. The marriage bed is honorable and undefiled, while God judges sexual immorality and adultery (Hebrews 13:4). Solomon urges husbands to rejoice in the wife of their youth and be captivated by her love continually—guarding their eyes and hearts fiercely against pornography or emotional counterfeits (Proverbs 5:15–20; Job 31:1; Matthew 5:28)—and Song of Solomon pictures marital love as a mighty flame that many waters cannot quench (Song of Solomon 8:6–7).
+
+### 7.4 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Marriage is a 50/50 contract between competing individuals that lasts only while both feel happy, and distinct husband-wife roles are outdated oppression.
+* **Biblical Authority:** Husband and wife are one God-designed team displaying Christ and His Church—overcoming the Genesis 3:16 curse through Christ-like sacrificial leadership and willing, honorable partnership inside a lifelong covenant (Genesis 2:18–24; Ephesians 5:22–33; 1 Peter 3:7; Hebrews 13:4).
+
+## Chapter 7 Personal & Family Heart Check (`fl_love_hc7`)
+
+* **Review Question 1 (`fl_love_hc7_q1`):** How does reading Genesis 2:18–24 alongside Genesis 3:16 (and Genesis 4:7) explain why Satan tries to pit husbands and wives against each other, and how does Ephesians 5:22–33 restore them to one team?
+* **Review Question 2 (`fl_love_hc7_q2`):** Why does Ephesians 5:25–29 and 1 Peter 3:7 place a far heavier burden of sacrifice on a husband than "50/50," while Acts 5:29 and Romans 13:4 guard against any misuse of headship to excuse sin or abuse?
+* **Family Heart Check (`fl_love_hc7_disc`):** Name one concrete, unselfish way a husband or wife (or future spouse) can serve their teammate with Christ-like loyalty on an ordinary, tiring weekday.
+
+---
+
+## Chapter 8: Unborn Life, Family Discipline & Caring for Our Own
+> Protecting the Womb, Raising Children in Truth, and Refusing to Outsource Mercy to the State
+
+### 8.1 Love Begins in the Womb: *Rachamim* (רַחֲמִים) vs. the "Compassionate Abortion" Lie
+
+If you want to see how completely a fallen culture can invert the word "love," look at how modern politics and media describe abortion. Ending the life of a defenseless baby in the womb is marketed as "reproductive healthcare," "compassion," or "the loving choice when timing is hard."
+
+Remember from Chapter 2 that the Hebrew word for deep, tender compassion—***rachamim* (רַחֲמִים)**—comes directly from ***rechem* (רֶחֶם), the mother's womb** (Isaiah 49:15; Psalm 103:13). God designed the womb to be the safest, most nurturing sanctuary on earth, where He personally knits each distinct human being together from conception (Psalm 139:13–16; Jeremiah 1:5; Job 31:15). In Luke 1:41–44, the Holy Spirit uses the exact same Greek word (*brephos* (βρέφος)) for unborn John leaping in Elizabeth's womb as for newborn Jesus lying in the manger (Luke 2:12). Look at the unmistakable contrast between Christ and counterfeit love: Jesus said, *"This is My body, which is given for you"* (Luke 22:19), laying down His life so we could live; abortion says, *"This is my body, so you must die for my convenience."* True love defends the unborn, rescues those being led to slaughter, and comes alongside mothers and fathers in crisis with real family and church support (Proverbs 6:16–17; Proverbs 24:11–12).
+
+### 8.2 Why Biblical Discipline and Daily Discipleship Are Acts of Love
+
+Once children are in our arms, secular parenting experts claim that firm correction damages a child's self-esteem and that loving parents simply validate whatever a child feels. Scripture says the exact opposite: withholding faithful correction is not love—it is operational hatred toward your own child, while the parent who truly loves his child disciplines him diligently and early (Proverbs 13:24; Proverbs 22:15; Proverbs 29:15).
+
+God Himself sets the model. The LORD disciplines the sons He loves and chastens every child He receives—never out of uncontrolled temper, cruelty, or frustration, but steadily and calmly to yield the peaceful fruit of righteousness (Proverbs 3:11–12; Hebrews 12:5–11). Fathers and mothers are explicitly warned not to provoke their children to bitterness or discouragement, but to bring them up in the discipline (*paideia* (παιδεία)) and instruction (*nouthesia* (νουθεσία)) of the Lord—refusing to outsource their children's worldview to secular humanism while teaching God's Word daily at home (Ephesians 6:4; Colossians 3:21; Deuteronomy 6:6–9; Psalm 78:4–7).
+
+### 8.3 Caring for Aging Parents, Widows, and Orphans — Our Job, Not the State's
+
+Biblical family love flows downward to children, upward to aging parents, and outward to the helpless—and God's Word leaves zero ambiguity about whose job that is:
+* **Family First:** Alongside providing for one's household (1 Timothy 5:8), the fifth commandment carries a promise (Exodus 20:12), and Jesus sharply rebuked religious leaders who used pious loopholes to dodge supporting their elderly parents (Mark 7:9–13). Paul commands children and grandchildren to practice godliness first at home by repaying their parents and caring for their own widows so the church is not burdened (1 Timothy 5:3–4; 1 Timothy 5:16).
+* **The Local Church Second:** For true widows, orphans, expectant mothers in crisis, and the disabled who have no family able to help, pure and undefiled religion shows up in personal, discerning, hands-on mercy from God's people (James 1:27; Acts 6:1–6; 1 Timothy 5:9–10; Psalm 68:5).
+* **Never the Civil Government:** The world claims it is "compassionate" to hand the elderly, the fatherless, and the poor over to government bureaucracies funded by forced taxation. Scripture never assigns charity to the State—civil government holds the sword to punish violent crime and fraud (Romans 13:1–4), while personal mercy belongs squarely to the family and the church (2 Thessalonians 3:10). Outsourcing your duty to Caesar is not love; it is passing the buck.
+
+### 8.4 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Abortion can be a "loving choice," loving children means permissive affirmation without firm discipline, and caring for aging parents or the needy is the government's responsibility.
+* **Biblical Authority:** True family love protects life from conception in the womb (Psalm 139:13–16; Proverbs 24:11–12), corrects and disciples children faithfully in God's Word without exasperating them (Proverbs 13:24; Deuteronomy 6:6–9; Ephesians 6:4), and personally cares for household members, aging parents, widows, and orphans (1 Timothy 5:4; 1 Timothy 5:8; James 1:27).
+
+## Chapter 8 Personal & Family Heart Check (`fl_love_hc8`)
+
+* **Review Question 1 (`fl_love_hc8_q1`):** How do the Hebrew root of *rachamim* (רַחֲמִים) from *rechem* (רֶחֶם — womb, Isaiah 49:15), Psalm 139:13–16, Luke 1:41–44, and Jesus' words in Luke 22:19 expose the lie that abortion is "compassionate"?
+* **Review Question 2 (`fl_love_hc8_q2`):** How do Proverbs 13:24, Hebrews 12:5–11, and Ephesians 6:4 balance firm, loving correction with refusing to provoke a child to anger—and why does 1 Timothy 5:3–8 assign elder and widow care to families and churches rather than the State?
+* **Family Heart Check (`fl_love_hc8_disc`):** Identify one aging relative, widow, single mom, or local pro-life pregnancy ministry our family can concretely serve this month without waiting for a government agency to step in.
+
+---
+
+## Chapter 9: True Friendship, the Family of God & Reconciliation
+> Faithful Wounds, *Philadelphia* (φιλαδελφία), and Restorative Accountability
+
+### 9.1 Iron Sharpening Iron: True Biblical Friendship
+
+The world treats friendship as a low-commitment fan club—people who validate your bad choices and vanish when trouble hits. Scripture defines a true friend as one who loves at all times and stands closer than a brother in adversity (Proverbs 17:17; Proverbs 18:24). Jonathan's selfless loyalty to David—willingly setting aside his own claim to Saul's throne to protect God's anointed—shows what sacrificial friendship looks like in real life (1 Samuel 18:1–4; 1 Samuel 20:14–17).
+
+Above all, real friends tell each other the hard truth. As iron sharpens iron, one godly friend sharpens another (Proverbs 27:17). Flattering kisses from an enemy are deceitful, whereas the honest wounds of a faithful friend come from genuine love (Proverbs 27:6). Jesus set the highest mark of friendship by laying down His life for His friends (John 15:13).
+
+### 9.2 Loving One Another in the Family of God
+
+Inside the local church, believers are not spectators sitting in rows once a week; they are adopted brothers and sisters in Christ (Hebrews 10:24–25). Jesus gave His disciples an unmistakable badge before a watching world: everyone will recognize His true followers by the genuine, sacrificial love they have for one another (John 13:34–35).
+
+Paul calls believers to be devoted to one another in brotherly love (*philadelphia* (φιλαδελφία)), outdoing each other in showing honor, bearing one another's burdens, and prioritizing practical help for the household of faith—because claiming to love God while shutting your heart against a brother in real need is empty talk (Romans 12:10; Galatians 6:2; Galatians 6:10; 1 John 3:17–18).
+
+### 9.3 Forgiveness and Church Discipline: Two Sides of One Love
+
+Real community among redeemed sinners inevitably brings friction and failure. Scripture gives the Church two tools that work together—never against each other:
+* **Quick Forgiveness for Everyday Offenses:** Love is not thin-skinned, touchy, or score-keeping. Above all, believers are commanded to keep fervent love for one another because love covers a multitude of sins—bearing with one another and forgiving freely just as God in Christ forgave us (1 Peter 4:8; Proverbs 10:12; Colossians 3:13; Ephesians 4:32).
+* **Loving Confrontation for Unrepentant Sin:** Covering minor personal slights never means ignoring destructive, unrepentant sin. When a brother is caught in a trespass, spiritually mature believers restore (*katartizō* (καταρτίζω) — like setting a broken bone) him in a spirit of gentleness (Galatians 6:1). When a professing believer refuses to repent, Jesus commands a clear, step-by-step rescue path—private one-on-one correction, then two or three witnesses, then telling the church—with the explicit goal of winning the brother back and saving his soul from ruin (Matthew 18:15–17; 1 Corinthians 5:5; James 5:19–20). Refusing to practice restorative church discipline out of fear of awkwardness is cowardice, not love.
+
+### 9.4 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Real friends and loving churches never judge or confront sin—they either affirm every choice or quietly ghost people and gossip behind their backs when conflict arises.
+* **Biblical Authority:** Biblical brotherhood forgives personal offenses freely without gossip (1 Peter 4:8; Colossians 3:13), sharpens friends face-to-face with honest truth (Proverbs 27:6; Proverbs 27:17), and practices gentle, restorative church discipline to rescue the unrepentant (Matthew 18:15–17; Galatians 6:1).
+
+## Chapter 9 Personal & Family Heart Check (`fl_love_hc9`)
+
+* **Review Question 1 (`fl_love_hc9_q1`):** How do Proverbs 27:6, 1 Peter 4:8, and Matthew 18:15–17 work together—how do we discern when love should overlook a minor personal slight versus when love must gently confront sin face-to-face?
+* **Review Question 2 (`fl_love_hc9_q2`):** According to John 13:34–35, Hebrews 10:24–25, and 1 John 3:17–18, why is isolated "solo Christianity" impossible if we want to obey Christ's command to love His body?
+* **Family Heart Check (`fl_love_hc9_disc`):** Think of a fellow believer or family friend carrying a heavy load right now. What concrete action will our household take this week to bear that burden in deed and truth (Galatians 6:2; 1 John 3:18)?
+
+---
+
+# Part IV: Neighbor, Enemies & Testing Love
+> Practical Mercy, Warning the Lost, Righteous Justice, and the Final Audit
+
+## Chapter 10: Loving Your Neighbor, Rejecting Partiality & Warning the Lost
+> Practical Hospitality (*Philoxenia* (φιλοξενία)), One Human Family, and Why Silence Is Hatred
+
+### 10.1 Practical Mercy, One Blood, and Hospitality (*Philoxenia*)
+
+When a legal expert tried to narrow down the second great commandment by asking, *"And who is my neighbor?"*, Jesus answered with the Good Samaritan (Leviticus 19:18; Luke 10:25–37). Notice who failed the test: outwardly religious men who crossed the street past a beaten, bleeding stranger to protect their comfort and schedule. The Samaritan proved what neighbor-love looks like on pavement—stopping, binding wounds, and spending his own time and money on a man from a rival group who could never pay him back.
+
+Scripture reinforces two vital dimensions of that practical neighbor-love:
+* **One Human Race Without Partiality or Racism (Acts 17:26; James 2:1–9):** Why did Jesus deliberately make a Samaritan the hero of Luke 10? Because every human being on earth descends from Adam and Noah—literally *"one blood"* (Acts 17:26), as **Ken Ham** (*One Race, One Blood*) and **Dr. Nathaniel Jeanson** (*Traced*) confirm from both Genesis 1–11 and modern genetics. Showing snobbish favoritism toward the rich, famous, or outwardly impressive—or despising anyone over ethnicity or background—directly violates the royal law of Scripture: *"You shall love your neighbor as yourself"* (James 2:1–9).
+* **Open-Door Hospitality (*Philoxenia* (φιλοξενία)):** Paul confirms that genuine neighbor-love does no wrong to a neighbor (Romans 13:8–10) and commands ***philoxenia* (φιλοξενία) — hospitality, literally "love of strangers"** (Romans 12:13; Hebrews 13:2; 1 Peter 4:9). As **Rosaria Butterfield** recounts in *The Gospel Comes with a House Key*, God used a faithful pastor and his wife—who simply opened their dinner table week after week with warm meals, honest listening, and an uncompromising open Bible—to draw her out of bitter unbelief to saving faith in Christ.
+
+### 10.2 Warning the Lost Is the Highest Form of Neighbor-Love
+
+Modern culture insists that loving your neighbor means affirming their unbelief and keeping the Gospel to yourself. Think about how insane that is in physical terms: if your neighbor's house is engulfed in flames at two in the morning and you walk quietly past his bedroom window because you "don't want to impose your beliefs or wake him up," you don't love him—you hate him.
+
+Scripture places infinitely greater urgency on eternal fire. Proverbs commands us to rescue those stumbling toward slaughter instead of claiming we didn't know (Proverbs 24:11–12). God warned Ezekiel that a watchman who sees judgment coming and stays silent to avoid awkwardness will answer for the blood of the unwarned (Ezekiel 33:7–9; Acts 20:26–27). As **Ray Comfort** and **Living Waters** (*The Way of the Master*, *Audacity*) continually remind the Church, using God's moral Law to awaken the conscience cleanly and pointing sinners straight to the saving Cross of Jesus Christ is the ultimate act of love—snatching souls out of the fire with mercy, urgency, and discernment (Romans 3:19–20; 2 Corinthians 5:14; 2 Corinthians 5:20; Jude 1:22–23).
+
+### 10.3 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Loving your neighbor means sorting people by worldly identity politics while keeping your mouth shut about sin, judgment, and Jesus Christ so nobody feels offended.
+* **Biblical Authority:** Neighbor-love rejects all partiality and racism because all mankind is one blood (Acts 17:26; James 2:8–9), opens the home in sacrificial mercy and *philoxenia* (φιλοξενία) hospitality (Luke 10:25–37; Hebrews 13:2), and courageously warns the lost to flee wrath and trust Christ (Proverbs 24:11–12; Ezekiel 33:7–9; Jude 1:22–23).
+
+## Chapter 10 Personal & Family Heart Check (`fl_love_hc10`)
+
+* **Review Question 1 (`fl_love_hc10_q1`):** How do Luke 10:25–37, Acts 17:26, and James 2:1–9 destroy both lazy indifference and every form of ethnic or class partiality?
+* **Review Question 2 (`fl_love_hc10_q2`):** Using the burning-house reality alongside Proverbs 24:11–12, Ezekiel 33:7–9, and Jude 1:22–23, answer the accusation that warning someone about sin and hell is "hateful."
+* **Family Heart Check (`fl_love_hc10_disc`):** Who is one neighbor, coworker, or acquaintance our household will invite to our table (*philoxenia* (φιλοξενία), Hebrews 13:2) this month while praying by name for an open door to share the Gospel?
+
+---
+
+## Chapter 11: Loving Your Enemies Without Erasing Justice
+> Overcoming Personal Spite With Good While Defending the Innocent
+
+### 11.1 Personal Vengeance Belongs to God Alone
+
+Loving people who treat you nicely takes zero supernatural grace—even tax collectors and unbelievers do that (Matthew 5:46–47). Jesus raises His followers to the Father's standard: love your enemies, bless those who curse you, do good to those who hate you, and pray for those who mistreat you (Matthew 5:43–45; Luke 6:27–28).
+
+Paul lays out the clear operating rule for personal mistreatment: never repay evil for evil, live peaceably with all men so far as it depends on you, and leave personal vengeance entirely to the wrath of God (Romans 12:17–21). Giving water to a thirsty adversary and refusing to nurse a grudge hands the courtroom gavel over to the omniscient Judge who will settle every account righteously (Proverbs 25:21–22; 1 Peter 2:23).
+
+### 11.2 Enemy-Love Never Cancels Self-Defense, Capable Protection, or Civil Justice
+
+One of the most dangerous distortions of the Sermon on the Mount is twisting Matthew 5:39 (*"turn the other cheek"*) into helpless pacifism—claiming Christian husbands must stand by passively while violent predators attack their families, or that civil courts should release violent criminals in the name of "compassion." That misreading pits Jesus against His own Word.
+
+Look at the razor-sharp boundary Scripture draws between **personal spite** and **protective justice**:
+* **Personal Insult vs. Lethal Threat:** A backhanded slap on the right cheek in the first century was a personal insult to pride, not a home invasion or an assault on a child. Jesus forbids petty personal retaliation over insulted pride, whereas God's Law explicitly clears the homeowner who strikes down a night-time intruder to protect his household and commands men to fight for their brethren, their sons, their daughters, their wives, and their homes (Exodus 22:2; Nehemiah 4:14; Luke 22:36; 1 Timothy 5:8). As **Nick Freitas** often points out, a harmless man is not "peaceful"—true biblical love requires capable men governed by God who restrain their strength over petty slights yet stand immovable between evil and the innocent (Psalm 82:3–4; Proverbs 24:11).
+* **Romans 12 Sits Directly Beside Romans 13:** Four words after commanding private individuals to leave room for God's wrath (Romans 12:19–21), Paul explains how God executes earthly wrath on violent evildoers: through the civil magistrate bearing the lethal sword (*machaira* (μάχαιρα), Romans 13:1–4; Genesis 9:6). You can pray earnestly for a murderer's soul to repent before eternity while fully upholding the court's duty to execute justice on his crime (Luke 23:40–43; Acts 25:11).
+
+### 11.3 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Loving your enemies means either letting violent criminals trample the innocent without punishment, or—on the flip side—nursing personal hatred and getting even whenever someone insults you.
+* **Biblical Authority:** Believers reject personal bitterness, pray for enemies, and overcome personal insults with good (Matthew 5:44; Romans 12:17–21), while faithfully defending their households and upholding God's mandate for swift civil justice against violent evil (Exodus 22:2; Nehemiah 4:14; Romans 13:1–4).
+
+## Chapter 11 Personal & Family Heart Check (`fl_love_hc11`)
+
+* **Review Question 1 (`fl_love_hc11_q1`):** How do Romans 12:17–21 and Romans 13:1–4 work together as one seamless teaching rather than contradicting each other?
+* **Review Question 2 (`fl_love_hc11_q2`):** Using Matthew 5:39, Exodus 22:2, and Nehemiah 4:14, explain the difference between turning the cheek to a personal insult and defending innocent life from violent attack.
+* **Family Heart Check (`fl_love_hc11_disc`):** Is there someone who has wronged or insulted you personally whom you need to pray for today—handing personal payback over to God (Romans 12:19) while maintaining wise, biblical boundaries?
+
+---
+
+## Chapter 12: Testing Love & What God Hates
+> The 1 Corinthians 13 Standard, Holy Hatred of Evil, and the Unbreakable Love of Christ
+
+### 12.1 Measuring Your Life Against 1 Corinthians 13
+
+The Apostle Paul refuses to leave love as an undefined emotional fog. In 1 Corinthians 13:1–7, he states plainly that eloquent speech, massive biblical knowledge, mountain-moving faith, and even dramatic outward sacrifice count for **nothing** without genuine *agapē* (ἀγάπη)—and then lays down a concrete, testable diagnostic of what real love does in everyday life:
+* **What Real Love Does:** Suffers long with steady patience, acts with practical kindness, rejoices with the truth, bears up under pressure, trusts God's promises, stays hopeful, and endures without quitting (1 Corinthians 13:4; 1 Corinthians 13:6–7).
+* **What Real Love Refuses:** Envy, boasting, arrogant pride, rude behavior, demanding its own way, hair-trigger irritation, keeping a ledger of past wrongs, and celebrating iniquity (1 Corinthians 13:4–6).
+
+Read 1 Corinthians 13:4–7 slowly in the **Scripture Reader** and place your own name where the word "love" stands. First notice that only **Jesus Christ** passes every line without flaw—and then let every spot where your own name stumbles show you plainly where the Holy Spirit is calling you to repent and grow.
+
+### 12.2 Why Real Love Requires Hating Evil
+
+A culture drunk on permissive tolerance recoils at the biblical fact that the God who *is* love also hates. Yet loving someone or something precious *requires* hating whatever seeks to destroy it—just as an oncologist who loves his patient hates the cancer, and a shepherd who loves his sheep hates the wolf.
+
+Scripture commands without apology: *"You who love the LORD, hate evil!"* and *"Let love be without hypocrisy. Abhor what is evil; cling to what is good"* (Psalm 97:10; Romans 12:9; Amos 5:15). Proverbs names seven abominations the LORD detests: proud eyes, a lying tongue, hands that shed innocent blood, a heart that plots wicked schemes, feet that run eagerly to evil, a false witness who breathes out lies, and anyone who sows discord among brothers (Proverbs 6:16–19). Likewise, Jesus praised the church in Ephesus for hating the corrupt deeds of the Nicolaitans—while warning them in the same breath never to leave their **first love** for Him (Revelation 2:2–6), and John warns believers not to love the rebellious world-system lest love for the Father be crowded out (1 John 2:15–17; James 4:4).
+
+### 12.3 Anchored in the Unbreakable Love of Christ
+
+Left to human willpower, none of us could manufacture a single drop of genuine 1 Corinthians 13 love. That is why this book ends exactly where it began: with the eternal Creator and Redeemer who loved us first (1 John 4:19). When you belong to Jesus Christ through repentance and faith, God's love has been poured into your heart through the Holy Spirit (Romans 5:5), and Christ's grip on you is not fragile, fickle, or conditional.
+
+Neither death nor life, neither angels nor principalities nor powers, neither things present nor things to come, neither height nor depth, nor any other created thing will ever be able to separate us from the love of God which is in Christ Jesus our Lord (Romans 8:35–39). Because His covenant love for us never fails, we can walk forward unafraid—speaking unvarnished truth, guarding our homes, warning the lost, and loving in deed and in truth until we see Him face to face (1 Corinthians 13:8; 1 Corinthians 13:12; 1 John 3:18).
+
+### 12.4 Worldly Lie vs. Biblical Authority
+
+* **The Worldly Lie:** Loving people means never hating anything—not even blatant evil—and love is a fragile human feeling that fades whenever people disappoint us.
+* **Biblical Authority:** True love is testable by 1 Corinthians 13:4–7, abhors what God calls evil while clinging to what is good (Psalm 97:10; Proverbs 6:16–19; Romans 12:9), keeps Christ as its first love (Revelation 2:4), and rests securely in the unbreakable love of God in Christ Jesus (1 John 4:19; Romans 8:38–39).
+
+## Chapter 12 Capstone Heart Check & 1 Corinthians 13 Love Audit (`fl_love_hc12`)
+
+*Use this interactive, browser-saved checklist (or print it for personal and family table review) to test your daily walk against 1 Corinthians 13:4–7—not to earn salvation by works (Ephesians 2:8–9), but to ask the Holy Spirit to conform you to Jesus Christ.*
+
+* [ ] (`fl_love_audit_1`) **Steady Patience:** Did I respond slowly and calmly when provoked, interrupted, or inconvenienced this week? (1 Corinthians 13:4)
+* [ ] (`fl_love_audit_2`) **Active Kindness:** Did I take a concrete, unselfish action to serve someone at home, church, or in my neighborhood without looking for credit? (1 Corinthians 13:4)
+* [ ] (`fl_love_audit_3`) **Zero Envy or Ego:** Did I genuinely rejoice in someone else's blessing without jealousy, bragging, or self-promotion? (1 Corinthians 13:4)
+* [ ] (`fl_love_audit_4`) **Selfless Humility:** Did I yield my own preference to serve my spouse, parents, children, or church family instead of insisting on my own way? (1 Corinthians 13:5; Philippians 2:3–4)
+* [ ] (`fl_love_audit_5`) **Controlled Temper & Short Ledger:** Did I refuse to snap in irritation or keep a mental scorecard of past offenses? (1 Corinthians 13:5; 1 Peter 4:8)
+* [ ] (`fl_love_audit_6`) **Truth Over Flattery & Compromise:** Did I hate what is evil, refuse "little white lies," and speak God's truth in love rather than excusing sin? (1 Corinthians 13:6; Romans 12:9; Ephesians 4:15)
+* [ ] (`fl_love_audit_7`) **Enduring Faithfulness:** Did I bear up faithfully, pray, and stay loyal toward someone difficult instead of giving up? (1 Corinthians 13:7; Galatians 6:2)
+
+* **Review Question 1 (`fl_love_hc12_q1`):** Read Psalm 97:10, Proverbs 6:16–19, Romans 12:9, and Revelation 2:2–6. Why is hating evil essential to real love—and how do we guard against becoming cold, loveless fighters who lose our "first love" for Jesus?
+* **Capstone Family & Personal Action Commitment (`fl_love_hc12_disc`):** Looking back across all four parts of *What Does the Bible Say About Love?* and your 1 Corinthians 13 Love Audit above, write down (1) one worldly counterfeit of love our household is shutting the door on permanently, and (2) one specific way we will love God, each other, our church, or a lost neighbor in deed and truth this week—anchored in Romans 8:38–39 and 1 John 4:19.
+
+---
+
+## Scripture & Attribution Notes
+
+* **Scripture Reader Integration:** Every biblical citation in this volume opens directly in the **365DBR Scripture Reader** for side-by-side verification across five literal English translations (**LSB**, **LSV**, **KJV**, **YLT**, **WEB**) alongside Masoretic Hebrew (WLC) and Greek (TR/NT) interlinear morphology.
+* **Translation Attribution:** Public-domain literal renderings (`-KJV`, `-WEB`, `-YLT`) and Creative Commons CC BY-SA 4.0 renderings (`-LSV`, Literal Standard Version) are used freely. Where referenced, **Legacy Standard Bible (`-LSB©`)** text is copyright © 2021 by The Lockman Foundation; **English Standard Version (`-ESV©`)** text is copyright © 2001 by Crossway, a publishing ministry of Good News Publishers.
+* **Ministry & Author Acknowledgments:** Grateful recognition is extended to **Dr. Voddie Baucham Jr.** (*The Ever-Loving Truth*, *Family Driven Faith*, *What He Must Be*); **Answers in Genesis** (**Ken Ham**, **Patricia Engler**, and **Dr. Nathaniel Jeanson**); **Ray Comfort** and **Living Waters** (*The Way of the Master*, *Audacity*); **Dr. John MacArthur** (*Grace to You*) and biblical counseling pioneers (**Dr. Jay Adams**, **Dr. Heath Lambert** / ACBC); **Rosaria Butterfield** (*The Gospel Comes with a House Key*, *Five Lies of Our Anti-Christian Age*); **Allie Beth Stuckey** (*You're Not Enough*, *Toxic Empathy*); **Paul Washer** (*HeartCry Missionary Society*); and **Nick Freitas**—tested always under the sole, infallible authority of God's Word (Isaiah 8:20; Acts 17:11).

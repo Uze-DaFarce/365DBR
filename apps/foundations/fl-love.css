@@ -1,0 +1,414 @@
+/* ==========================================================================
+   Foundations Library (FL) — fl-love.css
+   Book 4: What Does the Bible Say About Love?
+   ========================================================================== */
+body {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: clamp(1.06rem, 2.5vw, 1.16rem);
+  line-height: 1.78;
+  text-align: left;
+}
+
+.fl-layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 32px;
+  padding: 28px 20px 64px;
+}
+
+/* Wide Desktop (>= 1201px and taller than 500px): Collapsible Side-by-Side Table of Contents */
+@media (min-width: 1201px) and (min-height: 501px) {
+  body.toc-collapsed .fl-layout {
+    grid-template-columns: 1fr;
+  }
+  body.toc-collapsed .fl-sidebar {
+    display: none;
+  }
+  body.toc-collapsed .fl-main {
+    margin: 0 auto;
+  }
+}
+
+.fl-sidebar {
+  position: sticky;
+  top: calc(var(--fl-topbar-height, 76px) + 12px);
+  align-self: start;
+  max-height: calc(100vh - var(--fl-topbar-height, 76px) - 24px);
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.fl-sidebar h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.fl-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.fl-toc-list li { margin-bottom: 6px; }
+.fl-toc-part { margin-top: 12px; font-weight: 700; color: var(--crimson); }
+.fl-toc-lab { padding-left: 10px; font-size: 12.5px; }
+.fl-toc-list a,
+.fl-toc-list a:link {
+  color: var(--accent);
+  text-decoration: none;
+  display: block;
+  padding: 2px 0;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.fl-toc-list a:visited { color: var(--link-visited); }
+.fl-toc-list a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+}
+.fl-toc-list a:active { color: var(--link-active); }
+
+/* Compact / Tablet / Mobile / Landscape Phone (<= 1200px OR max-height: 500px) */
+@media (max-width: 1200px), (max-height: 500px) {
+  .fl-layout {
+    grid-template-columns: 1fr;
+    padding: 18px 14px 64px;
+  }
+  .fl-sidebar {
+    position: fixed;
+    top: var(--fl-topbar-height, 64px);
+    left: -340px;
+    width: 300px;
+    max-width: 86vw;
+    height: calc(100vh - var(--fl-topbar-height, 64px));
+    height: calc(100dvh - var(--fl-topbar-height, 64px));
+    max-height: none;
+    z-index: 1000;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 4px 4px 24px rgba(0, 0, 0, 0.18);
+    transition: left 0.25s ease;
+  }
+  body.toc-open .fl-sidebar {
+    left: 0;
+  }
+}
+
+.fl-main {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 42px 48px;
+  max-width: 880px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: left;
+}
+
+h1, h2, h3, h4 {
+  text-align: left;
+  color: var(--accent);
+  line-height: 1.32;
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+}
+
+.fl-hero-header {
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+}
+.fl-hero-header h1 { margin-top: 0; font-size: clamp(1.45rem, 3.8vw, 1.88rem); color: var(--text); }
+.fl-hero-subtitle { font-size: clamp(1.02rem, 2.5vw, 1.18rem); color: var(--muted); font-weight: 400; margin: 8px 0 12px; }
+.fl-hero-meta { font-size: 14px; color: var(--muted); }
+
+.fl-chapter-subtitle,
+.fl-part-subtitle {
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  margin-bottom: 1.1rem;
+}
+
+.fl-chapter-subsection h4,
+.fl-h4-subheading {
+  font-size: 1.05rem;
+  color: var(--crimson);
+  margin-top: 1.25em;
+  margin-bottom: 0.45em;
+  padding-left: 10px;
+  border-left: 3px solid var(--gold);
+}
+
+.fl-list {
+  padding-left: 1.35rem;
+}
+.fl-list li {
+  margin-bottom: 0.65rem;
+}
+.fl-list li.fl-list-lead {
+  list-style: none;
+  margin-left: -1.35rem;
+  margin-top: 1.35rem;
+  margin-bottom: 0.45rem;
+  padding: 5px 10px 5px 12px;
+  background: var(--accent-bg);
+  border-left: 4px solid var(--crimson);
+  border-radius: 0 4px 4px 0;
+  color: var(--crimson);
+  font-size: 1.03em;
+  line-height: 1.4;
+}
+
+.fl-scripture-link,
+.fl-scripture-link:link {
+  color: var(--link);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: rgba(122, 32, 32, 0.45);
+  text-underline-offset: 3px;
+}
+.fl-scripture-link:visited {
+  color: var(--link-visited);
+  text-decoration-color: rgba(92, 67, 50, 0.45);
+}
+.fl-scripture-link:hover {
+  color: var(--link-hover);
+  text-decoration-color: var(--gold);
+}
+.fl-scripture-link:active {
+  color: var(--link-active);
+}
+
+.fl-part-banner {
+  background: var(--accent-bg);
+  border-left: 5px solid var(--accent);
+  padding: 20px 24px;
+  border-radius: 4px;
+  margin: 36px 0 24px;
+}
+.fl-part-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+/* Studyable Callout Card (e.g., Chapter 2 Greek Words Note) */
+.fl-callout {
+  background: #fff8eb;
+  border: 1.5px solid var(--gold);
+  border-left: 4px solid var(--crimson);
+  border-radius: 6px;
+  padding: 16px 22px;
+  margin: 18px 0 22px;
+  font-size: 0.96em;
+  line-height: 1.65;
+}
+.fl-callout p:last-child {
+  margin-bottom: 0;
+}
+
+/* Heart Check Cards & Interactive 1 Corinthians 13 Love Audit Checklist */
+.fl-lab-card {
+  background: var(--lab-bg);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 24px 28px;
+  margin: 34px 0;
+}
+.fl-lab-badge {
+  display: inline-block;
+  background: var(--crimson);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.fl-lab-response-block { margin: 16px 0; }
+.fl-response-label { display: block; font-weight: 700; margin-bottom: 6px; color: var(--accent); }
+.fl-textarea, .fl-sig-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 15px;
+  padding: 10px 12px;
+  border: 1px solid #b8ae9c;
+  border-radius: 4px;
+  background: #fff;
+}
+.fl-print-blank-line { display: none; }
+
+.fl-audit-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.fl-audit-item {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 10px 14px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.fl-audit-item.is-checked {
+  background: #f2f8f3;
+  border-left-color: #3d6b47;
+}
+.fl-audit-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  line-height: 1.55;
+  font-size: 0.96rem;
+}
+.fl-persist-checkbox {
+  margin-top: 4px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--crimson);
+  cursor: pointer;
+}
+.fl-print-check-box {
+  display: none;
+}
+
+.fl-attribution-card {
+  background: #faf8f5;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin: 32px 0;
+  font-size: 0.96em;
+}
+.fl-attribution-card h2 {
+  margin-top: 0;
+  font-size: 1.22rem;
+}
+
+@media (max-width: 1100px), (max-height: 500px) {
+  body {
+    font-size: clamp(1.06rem, 2.5vw, 1.16rem);
+    line-height: 1.75;
+  }
+  .fl-layout { padding: 12px 10px 68px; }
+  .fl-main { padding: 20px 15px; border-radius: 6px; }
+  h2 { font-size: 1.32rem; }
+  h3 { font-size: 1.14rem; }
+  .fl-part-banner,
+  .fl-callout,
+  .fl-lab-card { padding: 16px 14px; }
+}
+
+@page { size: letter; margin: 1.0in; }
+@media print {
+  body {
+    font-size: 11.5pt;
+    line-height: 1.55;
+    text-align: left !important;
+  }
+  .fl-sidebar,
+  .fl-lab-actions {
+    display: none !important;
+  }
+  .fl-layout { display: block !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+  .fl-main { border: none !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+  h1, h2, h3, h4 { text-align: left !important; color: #000 !important; page-break-after: avoid; break-after: avoid; }
+  .fl-page-break-before { page-break-before: always; break-before: page; }
+
+  .fl-callout,
+  .fl-part-banner,
+  .fl-lab-response-block,
+  .fl-audit-item,
+  .fl-attribution-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .fl-callout {
+    background: #fff !important;
+    border: 1pt solid #444 !important;
+    border-left: 2.5pt solid #000 !important;
+    padding: 10pt 12pt !important;
+  }
+  .fl-attribution-card {
+    border: 1pt solid #444 !important;
+    padding: 10pt 12pt !important;
+  }
+
+  /* Single-Heart-Check & All-12-Heart-Checks Print Modes */
+  body.fl-print-single-lab .fl-intro-card,
+  body.fl-print-single-lab .fl-part-section,
+  body.fl-print-single-lab .fl-attribution-card,
+  body.fl-print-single-lab .fl-chapter-article > :not(.fl-lab-target-active),
+  body.fl-print-single-lab .print-qr {
+    display: none !important;
+  }
+  body.fl-print-all-labs .fl-intro-card,
+  body.fl-print-all-labs .fl-part-section,
+  body.fl-print-all-labs .fl-attribution-card,
+  body.fl-print-all-labs .fl-chapter-article > :not(.fl-lab-card) {
+    display: none !important;
+  }
+  body.fl-print-single-lab .fl-chapter-article,
+  body.fl-print-all-labs .fl-chapter-article {
+    page-break-before: auto !important;
+    break-before: auto !important;
+  }
+
+  .fl-persist-input.fl-is-empty { display: none !important; }
+  .fl-persist-input.fl-is-empty + .fl-print-blank-line {
+    display: block !important;
+    color: #000;
+    margin-top: 6pt;
+    line-height: 2.0;
+  }
+  .fl-persist-input:not(.fl-is-empty) {
+    border: 1px solid #444 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .fl-persist-checkbox { display: none !important; }
+  .fl-print-check-box {
+    display: inline-block !important;
+    font-size: 13pt;
+    line-height: 1;
+    font-weight: 700;
+    color: #000 !important;
+  }
+  .fl-audit-item {
+    border: 1pt solid #bbb !important;
+    padding: 6pt 9pt !important;
+    background: #fff !important;
+  }
+
+  .fl-scripture-link,
+  .fl-ext-link {
+    color: #000 !important;
+    text-decoration: none !important;
+    font-weight: 700;
+  }
+}

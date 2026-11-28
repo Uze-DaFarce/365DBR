@@ -1,14 +1,16 @@
-const CACHE_NAME = 'fl-v-20261120_184815'; // seed_ns=1795225695020469100
+const CACHE_NAME = 'fl-v-20261128_015524'; // seed_ns=1795856124935449400
 const CORE_ASSETS = [
   '/foundations/index.html',
   '/foundations/what-does-the-bible-say-about-god.html',
   '/foundations/what-does-the-bible-say-about-education.html',
   '/foundations/what-does-the-bible-say-about-government.html',
-  '/foundations/fl-core.css?v=3',
+  '/foundations/what-does-the-bible-say-about-love.html',
+  '/foundations/fl-core.css?v=6',
   '/foundations/fl-god.css',
   '/foundations/fl-education.css',
   '/foundations/fl-government.css',
-  '/foundations/fl-core.js?v=3',
+  '/foundations/fl-love.css',
+  '/foundations/fl-core.js?v=6',
   '/foundations/fl-pwa.js',
   '/foundations/manifest.webmanifest',
   '/foundations/icons/icon-192.png',

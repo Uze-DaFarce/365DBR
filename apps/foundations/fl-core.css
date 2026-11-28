@@ -396,12 +396,35 @@ a:focus-visible,
   background: var(--bg);
 }
 
-/* Desktop Push Applies ONLY to Content Container (Never Crushes Topbar) */
+/* Desktop Push Centers Content Cleanly Inside Available Left Viewport (Zero Inner Crush or Right Dead Space) */
 @media (min-width: 901px) {
-  body.drawer-open .container,
-  body.drawer-open .fl-layout,
+  body.drawer-open .fl-layout {
+    max-width: min(1320px, calc(100% - 450px));
+    margin-left: max(0px, calc((100% - 450px - 1320px) / 2));
+    margin-right: calc(450px + max(0px, (100% - 450px - 1320px) / 2));
+    padding-right: 20px;
+  }
   body.drawer-open .hub-container {
-    padding-right: 466px;
+    max-width: min(1140px, calc(100% - 450px));
+    margin-left: max(0px, calc((100% - 450px - 1140px) / 2));
+    margin-right: calc(450px + max(0px, (100% - 450px - 1140px) / 2));
+    padding-right: 24px;
+  }
+  body.drawer-open .container {
+    padding-right: 0;
+  }
+}
+/* Compact 3-Pane Fit (TOC + Book + Scripture Reader Open Together on 1201px–1700px Screens) */
+@media (min-width: 1201px) and (max-width: 1700px) and (min-height: 501px) {
+  body.drawer-open:not(.toc-collapsed) .fl-layout {
+    grid-template-columns: 236px minmax(0, 1fr);
+    gap: 20px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  body.drawer-open:not(.toc-collapsed) .fl-main {
+    max-width: 960px;
+    padding: 28px 30px;
   }
 }
 @media (max-width: 900px) {
@@ -922,4 +945,535 @@ a:focus-visible,
     width: auto;
   }
 }
+
+/* ==========================================================================
+   Reader Study Framework (fl_study_v1): Progress, Highlights, Study Notes,
+   Print Toggle & Local JSON Backup (Zero Text-Selection Interception)
+   ========================================================================== */
+[data-pid] {
+  position: relative;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+p[data-pid] {
+  padding-right: 26px;
+}
+
+.point[data-pid] {
+  padding-right: 26px;
+}
+
+/* Library-Toned Highlight Washes (WCAG-AA on #fdfbf7 / #ffffff) */
+[data-pid][data-fl-hl="gold"] {
+  background-color: rgba(212, 175, 55, 0.22);
+  border-left: 3px solid #b8860b;
+  border-radius: 3px;
+}
+[data-pid][data-fl-hl="sage"] {
+  background-color: rgba(79, 115, 83, 0.16);
+  border-left: 3px solid #4f7353;
+  border-radius: 3px;
+}
+[data-pid][data-fl-hl="rose"] {
+  background-color: rgba(158, 42, 43, 0.12);
+  border-left: 3px solid #8b2626;
+  border-radius: 3px;
+}
+[data-pid][data-fl-hl="slate"] {
+  background-color: rgba(58, 98, 138, 0.14);
+  border-left: 3px solid #3a628a;
+  border-radius: 3px;
+}
+
+p[data-pid][data-fl-hl] {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 10px;
+}
+
+.point[data-pid][data-fl-hl] {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 26px;
+}
+
+aside[data-pid][data-fl-hl] {
+  box-shadow: inset 4px 0 0 var(--gold);
+}
+
+/* Unobtrusive Margin/Corner Study Action Button */
+.fl-study-trigger {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.22;
+  user-select: none;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+aside[data-pid] > .fl-study-trigger {
+  top: 8px;
+  right: 8px;
+}
+
+[data-pid]:hover > .fl-study-trigger,
+.fl-study-trigger:focus-visible,
+[data-pid][data-fl-hl] > .fl-study-trigger,
+[data-pid].has-study-note > .fl-study-trigger {
+  opacity: 0.92;
+}
+
+[data-pid][data-fl-hl] > .fl-study-trigger,
+[data-pid].has-study-note > .fl-study-trigger {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: var(--border);
+}
+
+.fl-study-trigger:hover {
+  opacity: 1 !important;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: var(--gold);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .fl-study-trigger {
+    opacity: 0.52;
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
+  }
+}
+
+/* Shared Floating Highlight & Study Note Popover */
+.fl-study-popover {
+  position: fixed;
+  z-index: 1500;
+  background: var(--card);
+  color: var(--text);
+  border: 1.5px solid var(--gold);
+  border-radius: 8px;
+  padding: 7px 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  max-width: calc(100vw - 16px);
+}
+.fl-study-popover[hidden] {
+  display: none !important;
+}
+
+.fl-hl-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.fl-hl-swatch:hover {
+  transform: scale(1.12);
+}
+.fl-hl-swatch.is-active {
+  box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--accent);
+}
+.fl-hl-swatch[data-hl-color="gold"] { background: #ead484; border-color: #b8860b; }
+.fl-hl-swatch[data-hl-color="sage"] { background: #b8cfb9; border-color: #4f7353; }
+.fl-hl-swatch[data-hl-color="rose"] { background: #e3b5b6; border-color: #8b2626; }
+.fl-hl-swatch[data-hl-color="slate"] { background: #b6cbe0; border-color: #3a628a; }
+
+.fl-study-pop-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 2px;
+}
+
+.fl-study-pop-btn {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.fl-study-pop-btn:hover {
+  background: var(--accent-bg);
+  border-color: var(--gold);
+}
+.fl-study-pop-close {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 5px;
+}
+.fl-study-pop-close:hover {
+  color: var(--text);
+}
+
+/* Inline Private Study Note Box & Saved Display */
+.fl-study-note-card {
+  margin: -4px 0 14px 0;
+  padding: 9px 12px;
+  background: #fcf8ee;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 5px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.48;
+  color: var(--text);
+}
+.fl-study-note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.fl-study-note-actions {
+  display: inline-flex;
+  gap: 6px;
+}
+.fl-study-note-linkbtn {
+  background: transparent;
+  border: none;
+  color: var(--link);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 1px 4px;
+  text-decoration: underline;
+}
+.fl-study-note-text {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+.fl-study-note-textarea {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid #c7bda8;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text);
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 0.9rem;
+  line-height: 1.48;
+  resize: vertical;
+}
+.fl-study-note-editor-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 7px;
+  flex-wrap: wrap;
+}
+
+/* Reader Study Bar (Top of Book Main) & Unit Completion Bar */
+.fl-study-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 9px 14px;
+  margin: 0 0 20px 0;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12.5px;
+  color: var(--text);
+}
+.fl-study-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.fl-study-mini-track {
+  width: 88px;
+  height: 8px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.fl-study-mini-fill {
+  height: 100%;
+  width: 0%;
+  background: #3d6b47;
+  transition: width 0.25s ease;
+}
+.fl-study-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.fl-print-notes-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+  user-select: none;
+}
+.fl-print-notes-label input[type="checkbox"] {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.fl-study-backup-link {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fl-unit-complete-bar {
+  margin: 18px 0 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.fl-unit-complete-btn {
+  background: var(--bg);
+  color: var(--accent);
+  border: 1.5px solid var(--border);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12.5px;
+  padding: 5px 12px;
+}
+.fl-unit-complete-btn:hover {
+  border-color: var(--gold);
+  background: var(--accent-bg);
+}
+.fl-unit-complete-btn.is-completed {
+  background: #eef5ef;
+  color: #265430;
+  border-color: #4f7353;
+}
+
+/* Table of Contents Progress & Completion Indicators */
+.fl-toc-progress {
+  margin: 0 0 12px 0;
+  padding: 7px 9px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.fl-toc-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.fl-toc-progress .fl-study-mini-track {
+  width: 100%;
+  height: 6px;
+}
+.fl-toc-list li[data-toc-unit].is-completed > a::before {
+  content: "✓ ";
+  color: #2e6b3e;
+  font-weight: 800;
+}
+.fl-toc-list li[data-toc-unit].is-current > a {
+  background: var(--accent-bg);
+  border-left: 3px solid var(--gold);
+  padding-left: 6px;
+  border-radius: 0 4px 4px 0;
+  font-weight: 700;
+}
+
+/* Hub Book Cards: Progress Bars, Continue Reading & Backup Card */
+.fl-card-progress {
+  margin: 0 0 12px 0;
+  padding: 9px 11px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+}
+.fl-card-progress-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.fl-card-progress-track {
+  width: 100%;
+  height: 7px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.fl-card-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #3d6b47;
+  transition: width 0.25s ease;
+}
+.fl-card-progress-meta {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.fl-study-backup-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+}
+.fl-study-backup-info h3 {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.05rem;
+  color: var(--accent);
+  margin: 0 0 4px 0;
+}
+.fl-study-backup-info p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--muted);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.fl-study-backup-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.fl-study-import-select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+.fl-study-backup-status {
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #265430;
+}
+.fl-study-backup-status.is-error {
+  color: var(--crimson);
+}
+.fl-study-backup-status:empty {
+  display: none;
+}
+
+/* Print Integration: Clean Default vs. Optional Study Notes & Highlights */
+@media print {
+  .fl-study-trigger,
+  .fl-study-popover,
+  .fl-study-bar,
+  .fl-unit-complete-bar,
+  .fl-toc-progress,
+  .fl-card-progress,
+  .fl-btn-continue,
+  .fl-study-backup-card,
+  .fl-study-note-editor,
+  .fl-study-note-actions {
+    display: none !important;
+  }
+
+  p[data-pid],
+  .point[data-pid] {
+    padding-right: 0 !important;
+  }
+
+  body:not(.fl-print-with-notes) [data-pid][data-fl-hl] {
+    background: transparent !important;
+    border-left: none !important;
+    box-shadow: none !important;
+  }
+  body:not(.fl-print-with-notes) p[data-pid][data-fl-hl] {
+    padding-left: 0 !important;
+  }
+  body:not(.fl-print-with-notes) .fl-study-note-card {
+    display: none !important;
+  }
+
+  body.fl-print-single-lab .fl-study-note-card,
+  body.fl-print-all-labs .fl-study-note-card {
+    display: none !important;
+  }
+
+  body.fl-print-with-notes:not(.fl-print-single-lab):not(.fl-print-all-labs) [data-pid][data-fl-hl] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body.fl-print-with-notes:not(.fl-print-single-lab):not(.fl-print-all-labs) .fl-study-note-card.has-saved-note {
+    display: block !important;
+    background: #fafafa !important;
+    border: 1pt solid #bbb !important;
+    border-left: 2.5pt solid #333 !important;
+    padding: 5pt 8pt !important;
+    margin: 3pt 0 8pt 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    color: #000 !important;
+  }
+  body.fl-print-with-notes:not(.fl-print-single-lab):not(.fl-print-all-labs) .fl-study-note-text {
+    font-size: 9.5pt !important;
+    color: #000 !important;
+  }
+}
+
 

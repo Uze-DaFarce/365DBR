@@ -53,6 +53,13 @@ GOV_CANONICAL_PATH = BASE_DIR / GOV_CANONICAL_SLUG
 GOV_RAW_MD_PATH = BASE_DIR / "raw" / "government_manuscript.md"
 GOV_JSON_OUT_PATH = BASE_DIR / "data" / "government.json"
 
+# Book 4: What Does the Bible Say About Love?
+LOVE_CANONICAL_SLUG = "what-does-the-bible-say-about-love.html"
+LOVE_CANONICAL_URL = f"https://mt-sin.ai/foundations/{LOVE_CANONICAL_SLUG}"
+LOVE_CANONICAL_PATH = BASE_DIR / LOVE_CANONICAL_SLUG
+LOVE_RAW_MD_PATH = BASE_DIR / "raw" / "love_manuscript.md"
+LOVE_JSON_OUT_PATH = BASE_DIR / "data" / "love.json"
+
 # Redirect & Server Config Paths
 REDIRECT_365DBR_PATH = MONOREPO_APPS_DIR / "365DBR" / "What_We_Know.html"
 HTACCESS_PATH = BASE_DIR / ".htaccess"
@@ -82,9 +89,15 @@ BIBLE_BOOKS = {
 
 BOOK_NAMES_SORTED = sorted(BIBLE_BOOKS.keys(), key=len, reverse=True)
 BOOK_PATTERN = "|".join(re.escape(b) for b in BOOK_NAMES_SORTED)
+NUMBERED_BOOK_STEMS = "Samuel|Kings|Chronicles|Corinthians|Thessalonians|Timothy|Peter|John"
+SINGLE_REF_PART = (
+    rf"\d+(?:[-–—]\d+)?(?::\d+(?:[-–—]\d+)?"
+    rf"(?:\s*,\s*\d+(?!\s+(?:{NUMBERED_BOOK_STEMS})\b)(?:[-–—]\d+)?)*)?"
+)
 
 CITATION_REGEX = re.compile(
-    rf"\b(?P<book>{BOOK_PATTERN})\s+(?P<ref>\d+(?:[:\d,\s\-\–—]*\d+)?)(?P<tail>(?:\s*;\s*\d+[:\d,\s\-\–—]*\d+)*)"
+    rf"\b(?P<book>{BOOK_PATTERN})\s+(?P<ref>{SINGLE_REF_PART})"
+    rf"(?P<tail>(?:\s*;\s*(?!\d+\s+(?:{NUMBERED_BOOK_STEMS})\b){SINGLE_REF_PART})*)"
 )
 
 def build_365dbr_url(book_code: str, ch_verse_str: str) -> str:
@@ -707,19 +720,25 @@ def render_lab2_interactive_calculator() -> str:
     </div>
     """
 
-def render_blocks_html(blocks: list) -> str:
+def render_blocks_html(blocks: list, pid_prefix: str = "") -> str:
     html_out = []
     in_ul = False
     in_ol = False
+    in_audit = False
+    p_idx = 0
+    c_idx = 0
 
     def close_lists():
-        nonlocal in_ul, in_ol
+        nonlocal in_ul, in_ol, in_audit
         if in_ul:
             html_out.append("</ul>")
             in_ul = False
         if in_ol:
             html_out.append("</ol>")
             in_ol = False
+        if in_audit:
+            html_out.append("</ul>")
+            in_audit = False
 
     for b in blocks:
         btype = b["type"]
@@ -727,6 +746,9 @@ def render_blocks_html(blocks: list) -> str:
           if in_ol:
             html_out.append("</ol>")
             in_ol = False
+          if in_audit:
+            html_out.append("</ul>")
+            in_audit = False
           if not in_ul:
             html_out.append('<ul class="fl-list">')
             in_ul = True
@@ -739,14 +761,51 @@ def render_blocks_html(blocks: list) -> str:
             if in_ul:
                 html_out.append("</ul>")
                 in_ul = False
+            if in_audit:
+                html_out.append("</ul>")
+                in_audit = False
             if not in_ol:
                 html_out.append('<ol class="fl-list">')
                 in_ol = True
             html_out.append(f"<li>{format_inline_md(b['text'])}</li>")
+        elif btype == "audit_checkbox":
+            if in_ul:
+                html_out.append("</ul>")
+                in_ul = False
+            if in_ol:
+                html_out.append("</ol>")
+                in_ol = False
+            if not in_audit:
+                html_out.append('<ul class="fl-audit-checklist">')
+                in_audit = True
+            fid = b["input_id"]
+            lbl = format_inline_md(b["label"])
+            html_out.append(
+                f'<li class="fl-audit-item" data-audit-item="{fid}">'
+                f'<label class="fl-audit-label" for="{fid}">'
+                f'<input type="checkbox" id="{fid}" class="fl-persist-checkbox" data-storage-key="{fid}" />'
+                f'<span class="fl-print-check-box" data-print-check="{fid}">☐</span>'
+                f'<span>{lbl}</span>'
+                f'</label></li>'
+            )
         else:
             close_lists()
             if btype == "paragraph":
-                html_out.append(f"<p>{format_inline_md(b['text'])}</p>")
+                if pid_prefix:
+                    p_idx += 1
+                    pid_attr = f' data-pid="{pid_prefix}-p{p_idx}"'
+                else:
+                    pid_attr = ""
+                html_out.append(f"<p{pid_attr}>{format_inline_md(b['text'])}</p>")
+            elif btype in ("callout", "blockquote"):
+                if pid_prefix:
+                    c_idx += 1
+                    pid_attr = f' data-pid="{pid_prefix}-callout{c_idx}"'
+                else:
+                    pid_attr = ""
+                c_title = f'<h4>{format_inline_md(b["title"])}</h4>' if b.get("title") else ""
+                c_body = render_blocks_html(b["blocks"]) if b.get("blocks") else f'<p>{format_inline_md(b.get("text", ""))}</p>'
+                html_out.append(f'<aside class="fl-callout"{pid_attr}>{c_title}{c_body}</aside>')
             elif btype == "h4":
                 html_out.append(f'<h4 class="fl-h4-subheading">{format_inline_md(b["text"])}</h4>')
             elif btype == "widget":
@@ -793,11 +852,12 @@ def render_blocks_html(blocks: list) -> str:
 def build_education_html(doc_data: dict) -> str:
     toc_items = []
     body_sections = []
+    total_chapters = sum(len(p["chapters"]) for p in doc_data["parts"])
 
     intro_html = f"""
     <section id="about-resource" class="fl-intro-card">
       <h2>{html.escape(doc_data['intro']['title'])}</h2>
-      {render_blocks_html(doc_data['intro']['blocks'])}
+      {render_blocks_html(doc_data['intro']['blocks'], pid_prefix="edu-intro")}
     </section>
     """
     body_sections.append(intro_html)
@@ -810,7 +870,7 @@ def build_education_html(doc_data: dict) -> str:
         if part.get("baton_callout"):
             bc = part["baton_callout"]
             baton_html = f"""
-            <aside class="fl-baton-callout" id="baton-pass-diabetes-principle">
+            <aside class="fl-baton-callout" id="baton-pass-diabetes-principle" data-pid="edu-part{part['part_number']}-callout">
               <h3>{format_inline_md(bc['title'])}</h3>
               {render_blocks_html(bc['blocks'])}
             </aside>
@@ -831,10 +891,11 @@ def build_education_html(doc_data: dict) -> str:
 
         for ch in part["chapters"]:
             cid = ch["id"]
-            toc_items.append(f'<li class="fl-toc-ch"><a href="#{cid}">{html.escape(ch["title"])}</a></li>')
+            cnum = ch["chapter_number"]
+            toc_items.append(f'<li class="fl-toc-ch" data-toc-unit="{cid}"><a href="#{cid}">{html.escape(ch["title"])}</a></li>')
 
             sec_html_list = []
-            for sec in ch["sections"]:
+            for s_idx, sec in enumerate(ch["sections"], 1):
               extra_print_card = ""
               if sec["id"] == "ch-8-sec-5":
                 extra_print_card = """
@@ -849,7 +910,7 @@ def build_education_html(doc_data: dict) -> str:
               sec_html_list.append(f"""
                 <div id="{sec['id']}" class="fl-chapter-subsection">
                   <h3>{format_inline_md(sec['heading'])}</h3>
-                  {render_blocks_html(sec['blocks'])}
+                  {render_blocks_html(sec['blocks'], pid_prefix=f"edu-c{cnum}-s{s_idx}")}
                   {extra_print_card}
                 </div>
                 """)
@@ -866,7 +927,7 @@ def build_education_html(doc_data: dict) -> str:
                     <h3>{format_inline_md(lab['title'])}</h3>
                   </div>
                   <div class="fl-lab-body">
-                    {render_blocks_html(lab['blocks'])}
+                    {render_blocks_html(lab['blocks'], pid_prefix=f"edu-lab{lab['lab_number']}")}
                   </div>
                   <div class="fl-lab-actions no-print">
                     <button type="button" class="fl-btn fl-btn-primary" data-fl-print-lab="{lid}">🖨️ Print / Save Completed Lab #{lab['lab_number']}</button>
@@ -877,13 +938,13 @@ def build_education_html(doc_data: dict) -> str:
                 """
 
             ch_html = f"""
-            <article id="{cid}" class="fl-chapter-article fl-page-break-before">
+            <article id="{cid}" class="fl-chapter-article fl-page-break-before" data-fl-unit="{cid}" data-fl-unit-num="{cnum}" data-fl-unit-title="{html.escape(ch['title'], quote=True)}">
               <header class="fl-chapter-header">
                 <h2>{format_inline_md(ch['title'])}</h2>
                 {f'<p class="fl-chapter-subtitle">{format_inline_md(ch["subtitle"])}</p>' if ch.get("subtitle") else ''}
               </header>
               <div class="fl-chapter-intro">
-                {render_blocks_html(ch['blocks'])}
+                {render_blocks_html(ch['blocks'], pid_prefix=f"edu-c{cnum}")}
               </div>
               {"".join(sec_html_list)}
               {lab_html}
@@ -969,13 +1030,13 @@ def build_education_html(doc_data: dict) -> str:
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/foundations/fl-core.css?v=3" />
+  <link rel="stylesheet" href="/foundations/fl-core.css?v=6" />
   <link rel="stylesheet" href="/foundations/fl-education.css" />
   <script type="application/ld+json">
 {json.dumps(schema_ld, indent=2)}
   </script>
 </head>
-<body>
+<body data-fl-book="edu" data-fl-unit-label="Chapter" data-fl-units="{total_chapters}">
 
   <header class="fl-topbar no-print">
     <div class="fl-topbar-row1">
@@ -1002,6 +1063,8 @@ def build_education_html(doc_data: dict) -> str:
       <a href="#" class="fl-active-book" aria-current="page"><span class="fl-lbl-full">📖 Book 2: What Does the Bible Say About Education?<span class="fl-book-sub"> — Foundational Truths, Biblically Backed</span></span><span class="fl-lbl-short">📖 #2: Education</span></a>
       <span class="fl-topbar-sep">|</span>
       <a href="/foundations/{GOV_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">3: Biblical Government ↗</span><span class="fl-lbl-short">3: Government ↗</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{LOVE_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">4: Biblical Love ↗</span><span class="fl-lbl-short">4: Love ↗</span></a>
     </div>
   </header>
 
@@ -1071,7 +1134,7 @@ def build_education_html(doc_data: dict) -> str:
     </iframe>
   </aside>
 
-  <script src="/foundations/fl-core.js?v=3"></script>
+  <script src="/foundations/fl-core.js?v=6"></script>
 </body>
 </html>
 """
@@ -1352,6 +1415,7 @@ def build_god_html(doc_data: dict) -> str:
     toc_items = []
     body_parts = []
     rendered_parts = set()
+    total_days = len(doc_data["days"])
 
     for day in doc_data["days"]:
         d_num = day["day_number"]
@@ -1364,7 +1428,7 @@ def build_god_html(doc_data: dict) -> str:
             toc_items.append(f'<li class="fl-toc-part"><a href="#{p_id}">{html.escape(p_title)}</a></li>')
             body_parts.append(f'  <h2 id="{p_id}">{html.escape(p_title)}</h2>')
 
-        toc_items.append(f'<li class="fl-toc-day"><a href="#{d_id}">{html.escape(day["title"])}</a></li>')
+        toc_items.append(f'<li class="fl-toc-day" data-toc-unit="{d_id}"><a href="#{d_id}">{html.escape(day["title"])}</a></li>')
 
         pts_html = []
         for pt in day["points"]:
@@ -1374,7 +1438,7 @@ def build_god_html(doc_data: dict) -> str:
                 f'<li class="fl-toc-pt"><a href="#{pt_id}">{html.escape(pt["short_label"])}</a></li>'
             )
             pts_html.append(
-                f'    <div id="{pt_id}" class="point">'
+                f'    <div id="{pt_id}" class="point" data-pid="god-d{d_num}-pt{pt_num}">'
                 f'<span class="pt-num">{pt_num}.</span> { html.escape(pt["text"], quote=False) } '
                 f'<span class="refs">{pt["refs_html"]}</span></div>'
             )
@@ -1387,9 +1451,11 @@ def build_god_html(doc_data: dict) -> str:
                 f'<li class="fl-toc-lab"><a href="#{r_id}">↳ Day {d_num} Personal &amp; Family Review</a></li>'
             )
             rev_blocks_html = []
+            r_p_idx = 0
             for b in rev["blocks"]:
                 if b["type"] == "paragraph":
-                    rev_blocks_html.append(f'<p>{format_inline_md(b["text"])}</p>')
+                    r_p_idx += 1
+                    rev_blocks_html.append(f'<p data-pid="god-r{d_num}-p{r_p_idx}">{format_inline_md(b["text"])}</p>')
                 elif b["type"] == "review_input":
                     fid = b["input_id"]
                     lbl = format_inline_md(b["label"])
@@ -1421,7 +1487,7 @@ def build_god_html(doc_data: dict) -> str:
 
         sub_html = f'<p class="fl-day-sub">{html.escape(day["subtitle"])}</p>' if day.get("subtitle") else ""
         day_section_html = f"""
-  <section id="{d_id}" class="fl-day-section">
+  <section id="{d_id}" class="fl-day-section" data-fl-unit="{d_id}" data-fl-unit-num="{d_num}" data-fl-unit-title="{html.escape(day['title'], quote=True)}">
     <header class="fl-day-header">
       <h3 class="fl-day-title">{html.escape(day["title"])}</h3>
       {sub_html}
@@ -1449,10 +1515,10 @@ def build_god_html(doc_data: dict) -> str:
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/foundations/fl-core.css?v=3">
+  <link rel="stylesheet" href="/foundations/fl-core.css?v=6">
   <link rel="stylesheet" href="/foundations/fl-god.css">
 </head>
-<body>
+<body data-fl-book="god" data-fl-unit-label="Day" data-fl-units="{total_days}">
   <header class="fl-topbar no-print">
     <div class="fl-topbar-row1">
       <div class="fl-brand-group">
@@ -1478,6 +1544,8 @@ def build_god_html(doc_data: dict) -> str:
       <a href="/foundations/{EDU_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">2: Biblical Education ↗</span><span class="fl-lbl-short">2: Education ↗</span></a>
       <span class="fl-topbar-sep">|</span>
       <a href="/foundations/{GOV_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">3: Biblical Government ↗</span><span class="fl-lbl-short">3: Government ↗</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{LOVE_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">4: Biblical Love ↗</span><span class="fl-lbl-short">4: Love ↗</span></a>
     </div>
   </header>
 
@@ -1546,7 +1614,7 @@ def build_god_html(doc_data: dict) -> str:
     </iframe>
   </aside>
 
-  <script src="/foundations/fl-core.js?v=3"></script>
+  <script src="/foundations/fl-core.js?v=6"></script>
 </body>
 </html>
 """
@@ -1824,20 +1892,21 @@ def parse_government_manuscript_to_json(raw_md: str) -> dict:
 def build_government_html(doc_data: dict) -> str:
     toc_items = []
     body_sections = []
+    total_chapters = sum(len(p["chapters"]) for p in doc_data["parts"])
 
     intro_sub_html = []
-    for isec in doc_data["intro"].get("sections", []):
+    for isec_idx, isec in enumerate(doc_data["intro"].get("sections", []), 1):
         intro_sub_html.append(f"""
         <div id="{isec['id']}" class="fl-chapter-subsection">
           <h3>{format_inline_md(isec['heading'])}</h3>
-          {render_blocks_html(isec['blocks'])}
+          {render_blocks_html(isec['blocks'], pid_prefix=f"gov-intro-s{isec_idx}")}
         </div>
         """)
 
     intro_html = f"""
     <section id="about-resource" class="fl-intro-card">
       <h2>{format_inline_md(doc_data['intro']['title'])}</h2>
-      {render_blocks_html(doc_data['intro']['blocks'])}
+      {render_blocks_html(doc_data['intro']['blocks'], pid_prefix="gov-intro")}
       {"".join(intro_sub_html)}
     </section>
     """
@@ -1870,14 +1939,14 @@ def build_government_html(doc_data: dict) -> str:
         for ch in part["chapters"]:
             cid = ch["id"]
             cnum = ch["chapter_number"]
-            toc_items.append(f'<li class="fl-toc-ch"><a href="#{cid}">{html.escape(ch["title"])}</a></li>')
+            toc_items.append(f'<li class="fl-toc-ch" data-toc-unit="{cid}"><a href="#{cid}">{html.escape(ch["title"])}</a></li>')
 
             sec_html_list = []
-            for sec in ch["sections"]:
+            for s_idx, sec in enumerate(ch["sections"], 1):
                 sec_html_list.append(f"""
                 <div id="{sec['id']}" class="fl-chapter-subsection">
                   <h3>{format_inline_md(sec['heading'])}</h3>
-                  {render_blocks_html(sec['blocks'])}
+                  {render_blocks_html(sec['blocks'], pid_prefix=f"gov-c{cnum}-s{s_idx}")}
                 </div>
                 """)
 
@@ -1895,7 +1964,7 @@ def build_government_html(doc_data: dict) -> str:
                     <h3>{format_inline_md(lab['title'])}</h3>
                   </div>
                   <div class="fl-lab-body">
-                    {render_blocks_html(lab['blocks'])}
+                    {render_blocks_html(lab['blocks'], pid_prefix=f"gov-lab{lnum}")}
                   </div>
                   <div class="fl-lab-actions no-print">
                     <button type="button" class="fl-btn fl-btn-primary" data-fl-print-lab="{lid}">🖨️ Print / Save Ch {lnum} Lab</button>
@@ -1906,13 +1975,13 @@ def build_government_html(doc_data: dict) -> str:
                 """
 
             ch_html = f"""
-            <article id="{cid}" class="fl-chapter-article fl-page-break-before">
+            <article id="{cid}" class="fl-chapter-article fl-page-break-before" data-fl-unit="{cid}" data-fl-unit-num="{cnum}" data-fl-unit-title="{html.escape(ch['title'], quote=True)}">
               <header class="fl-chapter-header">
                 <h2>{format_inline_md(ch['title'])}</h2>
                 {f'<p class="fl-chapter-subtitle">{format_inline_md(ch["subtitle"])}</p>' if ch.get("subtitle") else ''}
               </header>
               <div class="fl-chapter-intro">
-                {render_blocks_html(ch['blocks'])}
+                {render_blocks_html(ch['blocks'], pid_prefix=f"gov-c{cnum}")}
               </div>
               {"".join(sec_html_list)}
               {lab_html}
@@ -1925,7 +1994,7 @@ def build_government_html(doc_data: dict) -> str:
         attr_html = f"""
         <section id="scripture-attribution-notes" class="fl-attribution-card">
           <h2>{html.escape(doc_data['attribution_notes']['title'])}</h2>
-          {render_blocks_html(doc_data['attribution_notes']['blocks'])}
+          {render_blocks_html(doc_data['attribution_notes']['blocks'], pid_prefix="gov-attr")}
         </section>
         """
         body_sections.append(attr_html)
@@ -2011,13 +2080,13 @@ def build_government_html(doc_data: dict) -> str:
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/foundations/fl-core.css?v=3" />
+  <link rel="stylesheet" href="/foundations/fl-core.css?v=6" />
   <link rel="stylesheet" href="/foundations/fl-government.css" />
   <script type="application/ld+json">
 {json.dumps(schema_ld, indent=2)}
   </script>
 </head>
-<body>
+<body data-fl-book="gov" data-fl-unit-label="Chapter" data-fl-units="{total_chapters}">
 
   <header class="fl-topbar no-print">
     <div class="fl-topbar-row1">
@@ -2044,6 +2113,8 @@ def build_government_html(doc_data: dict) -> str:
       <a href="/foundations/{EDU_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">2: Biblical Education ↗</span><span class="fl-lbl-short">2: Education ↗</span></a>
       <span class="fl-topbar-sep">|</span>
       <a href="#" class="fl-active-book" aria-current="page"><span class="fl-lbl-full">📖 Book 3: What Does the Bible Say About Government?<span class="fl-book-sub"> — Foundational Laws, Biblically Backed</span></span><span class="fl-lbl-short">📖 #3: Government</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{LOVE_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">4: Biblical Love ↗</span><span class="fl-lbl-short">4: Love ↗</span></a>
     </div>
   </header>
 
@@ -2115,7 +2186,7 @@ def build_government_html(doc_data: dict) -> str:
     </iframe>
   </aside>
 
-  <script src="/foundations/fl-core.js?v=3"></script>
+  <script src="/foundations/fl-core.js?v=6"></script>
 </body>
 </html>
 """
@@ -2131,6 +2202,578 @@ def sync_book3_government_html(dry_run: bool = False):
     html_out = build_government_html(gov_data)
     html_out = inject_pwa_tags(sync_support_footer_in_html(html_out))
     write_if_changed(GOV_CANONICAL_PATH, html_out, dry_run=dry_run)
+
+
+# ==============================================================================
+# 7C. BOOK 4 COMPILER (WHAT DOES THE BIBLE SAY ABOUT LOVE?)
+# ==============================================================================
+def parse_love_manuscript_to_json(raw_md: str) -> dict:
+    cleaned = raw_md.lstrip("\ufeff").replace("\r\n", "\n").replace("\u00a0", " ")
+    lines = cleaned.split("\n")
+
+    doc_data = {
+        "schema_version": "1.2.0",
+        "app": {
+            "name": "Foundations Library",
+            "abbr": "FL",
+            "slug": "foundations",
+            "storage_prefix": "fl_love_",
+            "base_url": "https://mt-sin.ai/foundations/",
+            "canonical_url": LOVE_CANONICAL_URL,
+            "short_url": "https://mt-sin.ai/fl/love",
+            "sibling_god_url": GOD_CANONICAL_URL,
+            "sibling_education_url": EDU_CANONICAL_URL,
+            "sibling_government_url": GOV_CANONICAL_URL,
+            "scripture_engine_url": "https://mt-sin.ai/365DBR/"
+        },
+        "metadata": {
+            "id": "fl-book-love",
+            "slug": "what-does-the-bible-say-about-love",
+            "short_slug": "love",
+            "title": "What Does the Bible Say About Love?",
+            "subtitle": "Foundational Truths on True Devotion, Relationships, and Testing Counterfeits — Directly from the Infallible Word of God",
+            "series_label": "Foundations Library — Book 4 — Foundational Truths, Biblically Backed",
+            "authors": ["Rowley Shaw", "Patty Shaw"],
+            "publisher": "Mt. Sinai LLC",
+            "attributions": [
+                "Dr. Voddie Baucham Jr.",
+                "Ken Ham",
+                "Patricia Engler",
+                "Dr. Nathaniel Jeanson",
+                "Answers in Genesis (AiG)",
+                "Ray Comfort",
+                "Living Waters",
+                "Dr. John MacArthur",
+                "Rosaria Butterfield",
+                "Allie Beth Stuckey",
+                "Paul Washer",
+                "Nick Freitas",
+                "Gemini"
+            ],
+            "anchor_scriptures": [
+                "1 John 4:8–10",
+                "John 14:15",
+                "1 Corinthians 13:4–7",
+                "Ephesians 5:25",
+                "Romans 8:38–39"
+            ]
+        },
+        "intro": {
+            "title": "Introduction: Reclaiming Love Under the Authority of Scripture",
+            "blocks": [],
+            "sections": []
+        },
+        "parts": [],
+        "attribution_notes": {
+            "title": "Scripture & Attribution Notes",
+            "blocks": []
+        },
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    }
+
+    mode = "frontmatter"
+    current_part = None
+    current_chapter = None
+    current_section = None
+    current_hc = None
+    last_header_obj = None
+
+    def add_love_block(target_list: list, raw_line: str, in_hc: bool = False):
+        s = raw_line.strip()
+        if not s or s == "---":
+            return
+
+        if in_hc:
+            m_chk = re.match(r"^[\*\-]\s+\[\s*\]\s*\(`(fl_love_[a-zA-Z0-9_]+)`\)\s*(.+)$", s)
+            if m_chk:
+                target_list.append({
+                    "type": "audit_checkbox",
+                    "input_id": m_chk.group(1).strip(),
+                    "label": m_chk.group(2).strip()
+                })
+                return
+
+            m_q = re.match(r"^[\*\-]\s+\*\*(.+?)\s*\(`(fl_love_[a-zA-Z0-9_]+)`\)\s*:\*\*\s*(.+)$", s)
+            if not m_q:
+                m_q = re.match(r"^[\*\-]\s+\*\*(.+?)\s*\(`(fl_love_[a-zA-Z0-9_]+)`\)\*\*\s*:?\s*(.+)$", s)
+            if m_q:
+                q_heading = m_q.group(1).strip().rstrip(":")
+                fid = m_q.group(2).strip()
+                q_prompt = m_q.group(3).strip()
+                target_list.append({
+                    "type": "lab_input",
+                    "input_id": fid,
+                    "label": f"**{q_heading}:** {q_prompt}",
+                    "input_kind": "textarea",
+                    "prompt_items": []
+                })
+                return
+
+        if s.startswith(">"):
+            target_list.append({"type": "callout", "text": s.lstrip(">").strip()})
+            return
+        if s.startswith("#### "):
+            target_list.append({"type": "h4", "text": s[5:].strip()})
+            return
+        if re.match(r"^[\*\-]\s+", s):
+            content = re.sub(r"^[\*\-]\s+", "", s).strip()
+            target_list.append({"type": "ul_item", "text": content})
+            return
+        if re.match(r"^\d+\.\s+", s):
+            content = re.sub(r"^\d+\.\s+", "", s).strip()
+            target_list.append({"type": "ol_item", "text": content})
+            return
+
+        target_list.append({"type": "paragraph", "text": s})
+
+    for raw_line in lines:
+        s = raw_line.strip()
+        if not s or s == "---":
+            continue
+
+        if s.startswith("# What Does the Bible Say About Love?"):
+            last_header_obj = doc_data["metadata"]
+            continue
+        if mode == "frontmatter" and s.startswith(">"):
+            doc_data["metadata"]["subtitle"] = s.lstrip(">").strip()
+            continue
+        if mode == "frontmatter" and (s.startswith("**Authors:**") or s.startswith("**Series:**") or s.startswith("**Scripture Standard:**")):
+            continue
+
+        if s.startswith("## Introduction:"):
+            mode = "intro"
+            doc_data["intro"]["title"] = s[3:].strip()
+            current_section = None
+            last_header_obj = None
+            continue
+
+        if s.startswith("## Scripture & Attribution Notes"):
+            mode = "attribution"
+            doc_data["attribution_notes"]["title"] = s[3:].strip()
+            current_section = None
+            current_hc = None
+            last_header_obj = None
+            continue
+
+        m_part = re.match(r"^#\s+(Part\s+(?:I|II|III|IV)\s*:\s*.+)$", s, re.IGNORECASE)
+        if m_part:
+            mode = "body"
+            p_num = len(doc_data["parts"]) + 1
+            current_part = {
+                "part_number": p_num,
+                "id": f"part-{p_num}",
+                "title": m_part.group(1).strip(),
+                "subtitle": "",
+                "chapters": []
+            }
+            doc_data["parts"].append(current_part)
+            current_chapter = None
+            current_section = None
+            current_hc = None
+            last_header_obj = current_part
+            continue
+
+        m_hc = re.match(r"^##\s+(.+?(?:Heart Check|Love Audit).*?)\s*(?:\(`(fl_love_[a-zA-Z0-9_]+)`\))?\s*$", s)
+        if m_hc and current_chapter is not None:
+            mode = "hc"
+            hc_title_raw = m_hc.group(1).strip()
+            ch_num = current_chapter["chapter_number"]
+            hc_id = m_hc.group(2).strip() if m_hc.group(2) else f"fl_love_hc{ch_num}"
+            is_capstone = "Love Audit" in hc_title_raw or "Capstone" in hc_title_raw
+            badge_str = f"Chapter {ch_num} Capstone Heart Check & Love Audit" if is_capstone else f"Chapter {ch_num} Personal & Family Heart Check"
+            current_hc = {
+                "hc_number": ch_num,
+                "id": hc_id,
+                "badge": badge_str,
+                "title": hc_title_raw,
+                "blocks": []
+            }
+            current_chapter["heart_check"] = current_hc
+            current_section = None
+            last_header_obj = current_hc
+            continue
+
+        m_ch = re.match(r"^##\s+Chapter\s+(\d+)\s*:\s*(.+)$", s, re.IGNORECASE)
+        if m_ch:
+            mode = "body"
+            ch_num = int(m_ch.group(1))
+            ch_title = f"Chapter {ch_num}: {m_ch.group(2).strip()}"
+            current_chapter = {
+                "chapter_number": ch_num,
+                "id": f"ch-{ch_num}",
+                "title": ch_title,
+                "subtitle": "",
+                "blocks": [],
+                "sections": [],
+                "heart_check": None
+            }
+            current_part["chapters"].append(current_chapter)
+            current_section = None
+            current_hc = None
+            last_header_obj = current_chapter
+            continue
+
+        if s.startswith(">") and last_header_obj is not None and "subtitle" in last_header_obj and not last_header_obj["subtitle"]:
+            last_header_obj["subtitle"] = s.lstrip(">").strip()
+            last_header_obj = None
+            continue
+
+        if s.startswith("### "):
+            sec_heading = s[4:].strip()
+            if mode == "intro":
+                sec_idx = len(doc_data["intro"]["sections"]) + 1
+                current_section = {
+                    "id": f"intro-sec-{sec_idx}",
+                    "heading": sec_heading,
+                    "blocks": []
+                }
+                doc_data["intro"]["sections"].append(current_section)
+            elif current_chapter is not None:
+                sec_idx = len(current_chapter["sections"]) + 1
+                current_section = {
+                    "id": f"ch-{current_chapter['chapter_number']}-sec-{sec_idx}",
+                    "heading": sec_heading,
+                    "blocks": []
+                }
+                current_chapter["sections"].append(current_section)
+            last_header_obj = None
+            continue
+
+        last_header_obj = None
+        if mode == "intro":
+            if current_section is not None:
+                add_love_block(current_section["blocks"], raw_line)
+            else:
+                add_love_block(doc_data["intro"]["blocks"], raw_line)
+        elif mode == "hc" and current_hc is not None:
+            add_love_block(current_hc["blocks"], raw_line, in_hc=True)
+        elif mode == "attribution":
+            add_love_block(doc_data["attribution_notes"]["blocks"], raw_line)
+        elif current_section is not None:
+            add_love_block(current_section["blocks"], raw_line)
+        elif current_chapter is not None:
+            add_love_block(current_chapter["blocks"], raw_line)
+
+    return doc_data
+
+
+def build_love_html(doc_data: dict) -> str:
+    toc_items = []
+    body_sections = []
+    total_chapters = sum(len(p["chapters"]) for p in doc_data["parts"])
+
+    intro_sub_html = []
+    for isec_idx, isec in enumerate(doc_data["intro"].get("sections", []), 1):
+        intro_sub_html.append(f"""
+        <div id="{isec['id']}" class="fl-chapter-subsection">
+          <h3>{format_inline_md(isec['heading'])}</h3>
+          {render_blocks_html(isec['blocks'], pid_prefix=f"love-intro-s{isec_idx}")}
+        </div>
+        """)
+
+    intro_html = f"""
+    <section id="about-resource" class="fl-intro-card">
+      <h2>{format_inline_md(doc_data['intro']['title'])}</h2>
+      {render_blocks_html(doc_data['intro']['blocks'], pid_prefix="love-intro")}
+      {"".join(intro_sub_html)}
+    </section>
+    """
+    body_sections.append(intro_html)
+
+    part_badges = {
+        1: "Part I • The Creator & Authority of Love",
+        2: "Part II • Loving God, Truth & The Cross",
+        3: "Part III • God's Designed Relationships",
+        4: "Part IV • Neighbor, Enemies & Testing Love"
+    }
+
+    for part in doc_data["parts"]:
+        pid = part["id"]
+        pnum = part["part_number"]
+        toc_items.append(f'<li class="fl-toc-part"><a href="#{pid}">{html.escape(part["title"])}</a></li>')
+
+        p_badge = part_badges.get(pnum, f"Part {pnum}")
+        part_header_html = f"""
+        <section id="{pid}" class="fl-part-section fl-page-break-before">
+          <div class="fl-part-banner">
+            <span class="fl-part-badge">{html.escape(p_badge)}</span>
+            <h1>{format_inline_md(part['title'])}</h1>
+            {f'<h2 class="fl-part-subtitle">{format_inline_md(part["subtitle"])}</h2>' if part.get("subtitle") else ''}
+          </div>
+        </section>
+        """
+        body_sections.append(part_header_html)
+
+        for ch in part["chapters"]:
+            cid = ch["id"]
+            cnum = ch["chapter_number"]
+            toc_items.append(f'<li class="fl-toc-ch" data-toc-unit="{cid}"><a href="#{cid}">{html.escape(ch["title"])}</a></li>')
+
+            sec_html_list = []
+            for s_idx, sec in enumerate(ch["sections"], 1):
+                sec_html_list.append(f"""
+                <div id="{sec['id']}" class="fl-chapter-subsection">
+                  <h3>{format_inline_md(sec['heading'])}</h3>
+                  {render_blocks_html(sec['blocks'], pid_prefix=f"love-c{cnum}-s{s_idx}")}
+                </div>
+                """)
+
+            hc_html = ""
+            if ch.get("heart_check"):
+                hc = ch["heart_check"]
+                hid = hc["id"]
+                hnum = hc["hc_number"]
+                toc_label = f"↳ Ch {hnum} Heart Check & Love Audit" if "Love Audit" in hc["title"] else f"↳ Ch {hnum} Heart Check"
+                toc_items.append(f'<li class="fl-toc-lab"><a href="#{hid}">{html.escape(toc_label)}</a></li>')
+                hc_html = f"""
+                <section id="{hid}" class="fl-lab-card fl-page-break-before" data-lab-num="{hnum}">
+                  <div class="fl-lab-header">
+                    <span class="fl-lab-badge">{html.escape(hc['badge'])}</span>
+                    <h3>{format_inline_md(hc['title'])}</h3>
+                  </div>
+                  <div class="fl-lab-body">
+                    {render_blocks_html(hc['blocks'], pid_prefix=f"love-hc{hnum}")}
+                  </div>
+                  <div class="fl-lab-actions no-print">
+                    <button type="button" class="fl-btn fl-btn-primary" data-fl-print-lab="{hid}">🖨️ Print / Save Heart Check #{hnum}</button>
+                    <button type="button" class="fl-btn fl-btn-light" data-fl-action="share-page" data-share-url="https://mt-sin.ai/fl/love#{hid}" data-share-title="{html.escape(hc['title'])} | What Does the Bible Say About Love?" data-share-desc="Interactive &amp; printable Sola Scriptura personal &amp; family Heart Check from Foundations Library Book 4 — 100% free to use, print, and share.">{SHARE_BTN_SVG} <span>Share Heart Check #{hnum}</span></button>
+                    <button type="button" class="fl-btn fl-btn-outline" data-fl-clear-lab="{hid}">Clear Heart Check #{hnum}</button>
+                  </div>
+                </section>
+                """
+
+            ch_html = f"""
+            <article id="{cid}" class="fl-chapter-article fl-page-break-before" data-fl-unit="{cid}" data-fl-unit-num="{cnum}" data-fl-unit-title="{html.escape(ch['title'], quote=True)}">
+              <header class="fl-chapter-header">
+                <h2>{format_inline_md(ch['title'])}</h2>
+                {f'<p class="fl-chapter-subtitle">{format_inline_md(ch["subtitle"])}</p>' if ch.get("subtitle") else ''}
+              </header>
+              <div class="fl-chapter-intro">
+                {render_blocks_html(ch['blocks'], pid_prefix=f"love-c{cnum}")}
+              </div>
+              {"".join(sec_html_list)}
+              {hc_html}
+            </article>
+            """
+            body_sections.append(ch_html)
+
+    if doc_data.get("attribution_notes") and doc_data["attribution_notes"].get("blocks"):
+        toc_items.append('<li><a href="#scripture-attribution-notes">Scripture &amp; Attribution Notes</a></li>')
+        attr_html = f"""
+        <section id="scripture-attribution-notes" class="fl-attribution-card">
+          <h2>{html.escape(doc_data['attribution_notes']['title'])}</h2>
+          {render_blocks_html(doc_data['attribution_notes']['blocks'], pid_prefix="love-attr")}
+        </section>
+        """
+        body_sections.append(attr_html)
+
+    schema_ld = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": ["Book", "LearningResource"],
+                "@id": f"{LOVE_CANONICAL_URL}#book",
+                "name": "What Does the Bible Say About Love?: Foundational Truths on True Devotion, Relationships, and Testing Counterfeits",
+                "headline": "What Does the Bible Say About Love?",
+                "alternativeHeadline": doc_data["metadata"]["subtitle"],
+                "author": [
+                    {"@type": "Person", "name": "Rowley Shaw"},
+                    {"@type": "Person", "name": "Patty Shaw"}
+                ],
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "Mt. Sinai LLC",
+                    "url": "https://mt-sin.ai/"
+                },
+                "contributor": [
+                    {"@type": "Person", "name": "Dr. Voddie Baucham Jr."},
+                    {"@type": "Person", "name": "Ken Ham"},
+                    {"@type": "Person", "name": "Ray Comfort"},
+                    {"@type": "Person", "name": "Dr. John MacArthur"},
+                    {"@type": "Person", "name": "Rosaria Butterfield"},
+                    {"@type": "Person", "name": "Allie Beth Stuckey"},
+                    {"@type": "Person", "name": "Paul Washer"},
+                    {"@type": "Person", "name": "Nick Freitas"},
+                    {"@type": "Organization", "name": "Answers in Genesis"}
+                ],
+                "inLanguage": "en-US",
+                "isAccessibleForFree": True,
+                "url": LOVE_CANONICAL_URL,
+                "sameAs": "https://mt-sin.ai/foundations/love.html",
+                "educationalUse": ["Discipleship", "Marriage & Family Study", "Youth Apologetics", "Personal Bible Study"],
+                "about": ["Biblical Love", "Agape", "Covenant Marriage", "1 Corinthians 13", "Sola Scriptura"]
+            },
+            {
+                "@type": "FAQPage",
+                "@id": f"{LOVE_CANONICAL_URL}#faq",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "Why does sacrificial love require the biblical Creator rather than Darwinian evolution?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Darwinian evolution runs on survival of the fittest and selfish gene preservation, whereas most animal species reproduce without covenant love. Sacrificial love (1 John 3:16; 1 John 4:8) exists only because the eternal Triune Creator—Father, Son, and Holy Spirit—loved from eternity past (John 17:24) and created mankind in His image with genuine free will."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Does the Bible teach that you must love yourself first before you can love others?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "No. In 2 Timothy 3:1–2, Scripture explicitly condemns self-love (philautos) as the leading sin of perilous last days, while Jesus commands believers to deny themselves daily (Luke 9:23). Matthew 22:39 and Ephesians 5:29 assume humans naturally care for their own survival and command redirecting that practical care outward to neighbors and spouses while stewarding our bodies as God's temple (1 Corinthians 6:19–20)."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Why do husbands and wives struggle over marital roles, and how does Ephesians 5 resolve that tension?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "God created husband and wife on Day 6 as one united team with distinct, complementary roles (Genesis 2:18–24). At the Fall (Genesis 3:16), sin fractured that teamwork into a tug-of-war between usurping leadership and harsh or passive rule. Ephesians 5:22–33 restores the team by commanding husbands to lay down their lives sacrificially like Christ and wives to respect and partner with their husbands under God (Acts 5:29)."
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Does the Bible Say About Love?: True Devotion, Relationships &amp; Testing Counterfeits | Foundations Library</title>
+  <meta name="description" content="What Does the Bible Say About Love?: Foundational Truths on True Devotion, Relationships, and Testing Counterfeits by Rowley and Patty Shaw (Mt. Sinai LLC), with 12 Personal &amp; Family Heart Checks and the 1 Corinthians 13 Love Audit." />
+  <link rel="canonical" href="{LOVE_CANONICAL_URL}" />
+  <meta property="og:title" content="What Does the Bible Say About Love?: True Devotion, Relationships &amp; Testing Counterfeits" />
+  <meta property="og:description" content="A 4-Part, 12-Chapter Sola Scriptura guide on Agape, Truth vs. Flattery, the Cross, Self-Denial, Courtship, Covenant Marriage, Family Mercy, and the 1 Corinthians 13 Love Audit." />
+  <meta property="og:url" content="{LOVE_CANONICAL_URL}" />
+  <meta property="og:type" content="book" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/foundations/fl-core.css?v=6" />
+  <link rel="stylesheet" href="/foundations/fl-love.css" />
+  <script type="application/ld+json">
+{json.dumps(schema_ld, indent=2)}
+  </script>
+</head>
+<body data-fl-book="love" data-fl-unit-label="Chapter" data-fl-units="{total_chapters}">
+
+  <header class="fl-topbar no-print">
+    <div class="fl-topbar-row1">
+      <div class="fl-brand-group">
+        <a href="/foundations/" class="fl-brand-title"><span class="fl-lbl-full">🏛️ Foundations Library</span><span class="fl-lbl-short">🏛️ FL</span></a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/" target="_blank" rel="noopener" class="fl-dbr-link"><span class="fl-lbl-full">🕮 365DBR Daily</span><span class="fl-lbl-short">🕮 365DBR</span></a>
+        <span class="fl-topbar-sep">|</span>
+        <a href="/365DBR/bible.html" target="_blank" rel="noopener" class="fl-nav-link"><span class="fl-lbl-full">✝️ Multi-Translation Bible</span><span class="fl-lbl-short">✝️ Bible</span></a>
+        <div id="fl-cobrand-box" class="fl-cobrand-banner"></div>
+      </div>
+      <div class="fl-top-actions">
+        <a href="#support-fl" class="fl-btn fl-btn-support" title="Support Rowley &amp; Patty Shaw's independent writing"><span class="fl-lbl-full">❤️ Support FL 🏛️</span><span class="fl-lbl-short">❤️ FL</span></a>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="share-page" title="Freely share or co-brand this book">{SHARE_BTN_SVG} <span class="fl-lbl-full">Share</span><span class="fl-lbl-short">Share</span></button>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-all-labs" title="Print only the 12 Personal &amp; Family Heart Checks &amp; Love Audit"><span class="fl-lbl-full">🖨️ Print All 12 Heart Checks</span><span class="fl-lbl-short">🖨️ 12 Checks</span></button>
+        <button type="button" class="fl-btn fl-btn-light" data-fl-action="print-page" title="Print full book and Heart Checks"><span class="fl-lbl-full">🖨️ Print</span><span class="fl-lbl-short">🖨️ Print</span></button>
+      </div>
+    </div>
+    <div class="fl-topbar-row2">
+      <button type="button" class="fl-btn fl-toc-toggle" data-fl-action="toggle-toc" aria-expanded="true" title="Toggle Table of Contents"><span class="fl-lbl-full">☰ Contents</span><span class="fl-lbl-short">☰ TOC</span></button>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{GOD_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">1: What About God? ↗</span><span class="fl-lbl-short">1: God ↗</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{EDU_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">2: Biblical Education ↗</span><span class="fl-lbl-short">2: Education ↗</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="/foundations/{GOV_CANONICAL_SLUG}" class="fl-nav-link"><span class="fl-lbl-full">3: Biblical Government ↗</span><span class="fl-lbl-short">3: Government ↗</span></a>
+      <span class="fl-topbar-sep">|</span>
+      <a href="#" class="fl-active-book" aria-current="page"><span class="fl-lbl-full">📖 Book 4: What Does the Bible Say About Love?<span class="fl-book-sub"> — Foundational Truths, Biblically Backed</span></span><span class="fl-lbl-short">📖 #4: Love</span></a>
+    </div>
+  </header>
+
+  <div class="fl-layout">
+    <aside id="toc-drawer" class="fl-sidebar no-print" aria-label="Table of Contents">
+      <h3>Contents &amp; 12 Heart Checks</h3>
+      <ul class="fl-toc-list">
+        <li><a href="#about-resource">Introduction &amp; Authority</a></li>
+        {"".join(toc_items)}
+      </ul>
+    </aside>
+
+    <main class="fl-main">
+      <div class="fl-hero-header">
+        <h1>{html.escape(doc_data['metadata']['title'])}</h1>
+        <p class="fl-hero-subtitle">{html.escape(doc_data['metadata']['subtitle'])}</p>
+        <p class="fl-hero-meta">
+          By <strong>Rowley and Patty Shaw</strong> (<em>Mt. Sinai LLC</em>) &bull;
+          Attributing <strong>Dr. Voddie Baucham Jr.</strong>, <strong>Ken Ham &amp; Answers in Genesis (AiG)</strong>, <strong>Ray Comfort (Living Waters)</strong>, <strong>Dr. John MacArthur</strong>, <strong>Rosaria Butterfield</strong>, <strong>Allie Beth Stuckey</strong>, <strong>Paul Washer</strong>, and <strong>Nick Freitas</strong>, with <strong>Gemini</strong>
+        </p>
+      </div>
+
+      {"".join(body_sections)}
+
+      {load_support_footer_partial()}
+
+      <div class="print-qr">
+        <div class="print-qr-item">
+          <div class="print-qr-title">Foundations Library</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2F" alt="Foundations Library QR"/>
+          <div class="print-qr-desc">100% free to read, print, duplicate &amp; share</div>
+          <div class="print-qr-url">mt-sin.ai/fl/</div>
+        </div>
+        <div class="print-qr-item">
+          <div class="print-qr-title">Book 4 Online</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2Ffl%2Flove" alt="Book 4 Online QR"/>
+          <div class="print-qr-desc">Tap any verse online for live Hebrew/Greek interlinear</div>
+          <div class="print-qr-url">mt-sin.ai/fl/love</div>
+        </div>
+        <div class="print-qr-item">
+          <div class="print-qr-title">365 Daily Bible Plan</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2F" alt="365DBR Daily QR"/>
+          <div class="print-qr-desc">OT, NT, Psalms &amp; Proverbs (~15 min/day)</div>
+          <div class="print-qr-url">mt-sin.ai/365DBR/</div>
+        </div>
+        <div class="print-qr-item">
+          <div class="print-qr-title">Bible &amp; Interlinear Lookup</div>
+          <img src="https://quickchart.io/qr?format=svg&margin=1&size=120&text=https%3A%2F%2Fmt-sin.ai%2F365DBR%2Fbible.html" alt="Multi-Translation Lookup QR"/>
+          <div class="print-qr-desc">Hebrew/Greek + LSB &amp; KJV side-by-side</div>
+          <div class="print-qr-url">mt-sin.ai/365DBR/bible.html</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Live 365DBR Scripture Reader (100% Free & Non-Commercial) -->
+  <aside id="bible-drawer" aria-hidden="true" inert>
+    <div class="drawer-header">
+      <span id="drawer-title">Scripture Reader</span>
+      <div class="drawer-actions">
+        <a id="drawer-ext" href="/365DBR/bible.html" target="_blank" rel="noopener">Open Full Tab ↗</a>
+        <button class="drawer-close" id="drawer-close-btn" type="button">✕ Close</button>
+      </div>
+    </div>
+    <iframe
+      id="bible-frame"
+      src="about:blank"
+      title="365DBR Multi-Translation Bible">
+    </iframe>
+  </aside>
+
+  <script src="/foundations/fl-core.js?v=6"></script>
+</body>
+</html>
+"""
+
+
+def sync_book4_love_html(dry_run: bool = False):
+    """Compiles raw/love_manuscript.md -> data/love.json and what-does-the-bible-say-about-love.html."""
+    if not LOVE_RAW_MD_PATH.exists():
+        raise FileNotFoundError(f"Book 4 source manuscript not found at: {LOVE_RAW_MD_PATH}")
+    raw_md = LOVE_RAW_MD_PATH.read_text(encoding="utf-8")
+    love_data = parse_love_manuscript_to_json(raw_md)
+    write_json_if_changed(LOVE_JSON_OUT_PATH, love_data, dry_run=dry_run)
+
+    html_out = build_love_html(love_data)
+    html_out = inject_pwa_tags(sync_support_footer_in_html(html_out))
+    write_if_changed(LOVE_CANONICAL_PATH, html_out, dry_run=dry_run)
 
 
 # ==============================================================================
@@ -2195,6 +2838,10 @@ RewriteRule ^(what-does-the-bible-say-about-education|biblical-education|educati
 RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-government\\.html$
 RewriteRule ^(what-does-the-bible-say-about-government|biblical-government|government|gov)(\\.html)?$ /foundations/what-does-the-bible-say-about-government.html [R=301,L,NC,QSA]
 
+# 3C. Case-Insensitive [NC] 301 Redirects for Book 4 (What Does the Bible Say About Love?)
+RewriteCond %{REQUEST_URI} !^/foundations/what-does-the-bible-say-about-love\\.html$
+RewriteRule ^(what-does-the-bible-say-about-love|biblical-love|love)(\\.html)?$ /foundations/what-does-the-bible-say-about-love.html [R=301,L,NC,QSA]
+
 # 4. Fallback Case-Normalizer for any other future Foundations Library guide
 RewriteRule ^support(\.html)?/?$ /foundations/#support-fl [R=302,L,NC,NE]
 RewriteRule ^(coffee|support5)(\.html)?/?$ https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-455b9660e2924c238018ff5e2d3b67933b548fe02d4945ed9ccdb365515b6a6f28ed8416a246409d93f611b3a965160d-1?locale=EN_US&cta [R=302,L,NC,NE]
@@ -2212,7 +2859,7 @@ CASE_ROUTER_HTML = """<!DOCTYPE html>
   <meta charset="UTF-8" />
   <title>Routing | Foundations Library (Mt. Sinai LLC)</title>
   <meta name="robots" content="noindex, follow" />
-  <link rel="stylesheet" href="/foundations/fl-core.css?v=3" />
+  <link rel="stylesheet" href="/foundations/fl-core.css?v=6" />
 </head>
 <body data-fl-case-router="true" style="font-family: Georgia, serif; padding: 40px;">
   <h2>Mt. Sinai LLC — Foundations Library</h2>
@@ -2221,8 +2868,9 @@ CASE_ROUTER_HTML = """<!DOCTYPE html>
     <li><a href="/foundations/what-does-the-bible-say-about-god.html">1: What Does the Bible Say About God? (What We Know About God — Foundational Facts, Biblically Backed)</a></li>
     <li><a href="/foundations/what-does-the-bible-say-about-education.html">2: What Does the Bible Say About Education? (Foundational Truths for Parents &amp; Students)</a></li>
     <li><a href="/foundations/what-does-the-bible-say-about-government.html">3: What Does the Bible Say About Government? (Foundational Laws, Biblically Backed)</a></li>
+    <li><a href="/foundations/what-does-the-bible-say-about-love.html">4: What Does the Bible Say About Love? (Foundational Truths on True Devotion, Relationships &amp; Testing Counterfeits)</a></li>
   </ul>
-  <script src="/foundations/fl-core.js?v=3"></script>
+  <script src="/foundations/fl-core.js?v=6"></script>
 </body>
 </html>
 """
@@ -2285,11 +2933,13 @@ const CORE_ASSETS = [
   '/foundations/what-does-the-bible-say-about-god.html',
   '/foundations/what-does-the-bible-say-about-education.html',
   '/foundations/what-does-the-bible-say-about-government.html',
-  '/foundations/fl-core.css?v=3',
+  '/foundations/what-does-the-bible-say-about-love.html',
+  '/foundations/fl-core.css?v=6',
   '/foundations/fl-god.css',
   '/foundations/fl-education.css',
   '/foundations/fl-government.css',
-  '/foundations/fl-core.js?v=3',
+  '/foundations/fl-love.css',
+  '/foundations/fl-core.js?v=6',
   '/foundations/fl-pwa.js',
   '/foundations/manifest.webmanifest',
   '/foundations/icons/icon-192.png',
@@ -2363,6 +3013,7 @@ FL_ROOT_REWRITE_BLOCK = r"""
   RewriteRule ^fl/god(\.html)?/?$ /foundations/what-does-the-bible-say-about-god.html [R=301,L,NC,QSA]
   RewriteRule ^fl/edu(\.html)?/?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]
   RewriteRule ^fl/gov(\.html)?/?$ /foundations/what-does-the-bible-say-about-government.html [R=301,L,NC,QSA]
+  RewriteRule ^fl/love(\.html)?/?$ /foundations/what-does-the-bible-say-about-love.html [R=301,L,NC,QSA]
 </IfModule>
 """
 
@@ -2374,10 +3025,14 @@ def sync_root_htaccess(dry_run: bool = False):
     root_content = root_content.replace("/foundations/#support-coffee", "/foundations/#support-fl")
     edu_rule = "RewriteRule ^fl/edu(\\.html)?/?$ /foundations/what-does-the-bible-say-about-education.html [R=301,L,NC,QSA]"
     gov_rule = "RewriteRule ^fl/gov(\\.html)?/?$ /foundations/what-does-the-bible-say-about-government.html [R=301,L,NC,QSA]"
+    love_rule = "RewriteRule ^fl/love(\\.html)?/?$ /foundations/what-does-the-bible-say-about-love.html [R=301,L,NC,QSA]"
     if "RewriteRule ^fl/god" not in root_content:
         root_content = root_content.rstrip() + "\n" + FL_ROOT_REWRITE_BLOCK
-    elif "RewriteRule ^fl/gov" not in root_content:
-        root_content = root_content.replace(edu_rule, edu_rule + "\n  " + gov_rule)
+    else:
+        if "RewriteRule ^fl/gov" not in root_content:
+            root_content = root_content.replace(edu_rule, edu_rule + "\n  " + gov_rule)
+        if "RewriteRule ^fl/love" not in root_content:
+            root_content = root_content.replace(gov_rule, gov_rule + "\n  " + love_rule)
     write_if_changed(MTSINAI_HTACCESS_PATH, root_content, dry_run=dry_run)
     write_if_changed(MONOREPO_HTACCESS_PATH, root_content, dry_run=dry_run)
 
@@ -2388,9 +3043,9 @@ def main():
     )
     parser.add_argument(
         "--target",
-        choices=["all", "bks", "bk-1", "bk-2", "bk-3", "stubs", "htaccess", "pwa"],
+        choices=["all", "bks", "bk-1", "bk-2", "bk-3", "bk-4", "stubs", "htaccess", "pwa"],
         default=None,
-        help="Build scope: all, bks (all books), bk-1, bk-2, bk-3, stubs (redirect stubs), or htaccess (routing)."
+        help="Build scope: all, bks (all books), bk-1, bk-2, bk-3, bk-4, stubs (redirect stubs), or htaccess (routing)."
     )
     parser.add_argument(
         "--bk-1",
@@ -2408,6 +3063,11 @@ def main():
         help="Compile Foundations Book 3 (What Does the Bible Say About Government?)"
     )
     parser.add_argument(
+        "--bk-4",
+        action="store_true",
+        help="Compile Foundations Book 4 (What Does the Bible Say About Love?)"
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Report which files would be modified vs. unchanged without writing to disk."
@@ -2415,18 +3075,19 @@ def main():
     args = parser.parse_args()
 
     target = args.target
-    if target is None and not (args.bk_1 or args.bk_2 or args.bk_3):
+    if target is None and not (args.bk_1 or args.bk_2 or args.bk_3 or args.bk_4):
         target = "bks"
 
     do_bk1 = args.bk_1 or (target in ("all", "bks", "bk-1"))
     do_bk2 = args.bk_2 or (target in ("all", "bks", "bk-2"))
     do_bk3 = args.bk_3 or (target in ("all", "bks", "bk-3"))
+    do_bk4 = args.bk_4 or (target in ("all", "bks", "bk-4"))
     do_stubs = target in ("all", "stubs")
     do_htaccess = target in ("all", "htaccess")
     do_pwa = target in ("all", "bks", "pwa")
 
     mode_label = "DRY-RUN" if args.dry_run else "WRITE"
-    print(f"[FL Build Start — Mode: {mode_label} | bk1={do_bk1}, bk2={do_bk2}, bk3={do_bk3}, stubs={do_stubs}, htaccess={do_htaccess}]")
+    print(f"[FL Build Start — Mode: {mode_label} | bk1={do_bk1}, bk2={do_bk2}, bk3={do_bk3}, bk4={do_bk4}, stubs={do_stubs}, htaccess={do_htaccess}]")
 
     if do_bk2:
         if not RAW_MD_PATH.exists():
@@ -2442,11 +3103,15 @@ def main():
     if do_bk3:
         sync_book3_government_html(dry_run=args.dry_run)
 
+    if do_bk4:
+        sync_book4_love_html(dry_run=args.dry_run)
+
     if do_bk1:
         sync_book1_god_html(dry_run=args.dry_run)
 
     if do_stubs:
         stubs = [
+            (BASE_DIR / "love.html", f"/foundations/{LOVE_CANONICAL_SLUG}", "What Does the Bible Say About Love?"),
             (BASE_DIR / "government.html", f"/foundations/{GOV_CANONICAL_SLUG}", "What Does the Bible Say About Government?"),
             (BASE_DIR / "education.html", f"/foundations/{EDU_CANONICAL_SLUG}", "What Does the Bible Say About Education?"),
             (BASE_DIR / "god.html", f"/foundations/{GOD_CANONICAL_SLUG}", "What Does the Bible Say About God? (What We Know About God)"),

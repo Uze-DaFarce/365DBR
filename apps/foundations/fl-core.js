@@ -5,6 +5,8 @@
    ========================================================================== */
 const FLApp = (() => {
   const COBRAND_STORAGE_KEY = "fl_cobrand_config_v1";
+  const STUDY_STORAGE_KEY = "fl_study_v1";
+  const VALID_HL_COLORS = ["gold", "sage", "rose", "slate"];
 
   const SVGS = {
     share: '<svg class="fl-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>',
@@ -54,6 +56,10 @@ const FLApp = (() => {
     }
     if (lower.indexOf("government") !== -1 || lower.indexOf("gov") !== -1) {
       window.location.replace("/foundations/what-does-the-bible-say-about-government.html" + search + hash);
+      return;
+    }
+    if (lower.indexOf("love") !== -1) {
+      window.location.replace("/foundations/what-does-the-bible-say-about-love.html" + search + hash);
       return;
     }
     if (path !== lower) {
@@ -347,6 +353,10 @@ const FLApp = (() => {
       shortUrl = "https://mt-sin.ai/fl/gov";
       title = "Book 3: What Does the Bible Say About Government? (Foundational Laws, Biblically Backed)";
       desc = "4 Parts, 14 Chapters & 14 printable family study labs on Civil Authority, the Three Jurisdictions, True Law vs. Sharia & Marxism, and America's Constitutional Republic — 100% free to read, print & share.";
+    } else if (path.indexOf("love") !== -1) {
+      shortUrl = "https://mt-sin.ai/fl/love";
+      title = "Book 4: What Does the Bible Say About Love? (Foundational Truths, Biblically Backed)";
+      desc = "4 Parts, 12 Chapters, 12 Personal & Family Heart Checks & the 1 Corinthians 13 Love Audit — testing cultural counterfeits against the infallible Word of God. 100% free to read, print & share.";
     }
 
     if (triggerEl) {
@@ -774,6 +784,12 @@ const FLApp = (() => {
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        const studyPop = document.getElementById("fl-study-popover");
+        if (studyPop && !studyPop.hidden) {
+          studyPop.hidden = true;
+          studyPop.removeAttribute("data-active-pid");
+          return;
+        }
         const shareBackdrop = document.getElementById("fl-share-backdrop");
         if (shareBackdrop && shareBackdrop.classList.contains("open")) {
           shareBackdrop.classList.remove("open");
@@ -811,6 +827,25 @@ const FLApp = (() => {
         if (el.classList.contains("fl-calc-input")) {
           updateLab2Calculator();
         }
+      });
+    });
+
+    const checkboxes = document.querySelectorAll(".fl-persist-checkbox");
+    const syncCheckboxPrint = (cb) => {
+      const key = cb.getAttribute("data-storage-key") || cb.id;
+      const item = cb.closest(".fl-audit-item");
+      if (item) item.classList.toggle("is-checked", cb.checked);
+      const printBox = document.querySelector(`[data-print-check="${CSS.escape(key)}"]`);
+      if (printBox) printBox.textContent = cb.checked ? "☑" : "☐";
+    };
+    checkboxes.forEach((cb) => {
+      const key = cb.getAttribute("data-storage-key") || cb.id;
+      cb.checked = localStorage.getItem(key) === "1";
+      syncCheckboxPrint(cb);
+      cb.addEventListener("change", () => {
+        if (cb.checked) localStorage.setItem(key, "1");
+        else localStorage.removeItem(key);
+        syncCheckboxPrint(cb);
       });
     });
   }
@@ -878,7 +913,913 @@ const FLApp = (() => {
       el.value = el.classList.contains("fl-calc-input") ? "0" : "";
       syncEmptyState(el);
     });
+    const checkboxes = target.querySelectorAll(".fl-persist-checkbox");
+    checkboxes.forEach((cb) => {
+      const key = cb.getAttribute("data-storage-key") || cb.id;
+      localStorage.removeItem(key);
+      cb.checked = false;
+      const item = cb.closest(".fl-audit-item");
+      if (item) item.classList.remove("is-checked");
+      const printBox = target.querySelector(`[data-print-check="${CSS.escape(key)}"]`);
+      if (printBox) printBox.textContent = "☐";
+    });
     updateLab2Calculator();
+  }
+
+  /* ==========================================================================
+     Reader Study Framework (fl_study_v1): Progress, Highlights, Study Notes,
+     Print Toggle & Local JSON Backup / Restore (Book 1..N Auto-Inheritance)
+     ========================================================================== */
+  function sanitizeStudyId(raw) {
+    if (typeof raw !== "string") return "";
+    const trimmed = raw.trim();
+    return /^[a-zA-Z0-9_-]{1,80}$/.test(trimmed) ? trimmed : "";
+  }
+
+  function normalizeStudyObject(parsed) {
+    const base = {
+      schema: "fl_study_v1",
+      version: 1,
+      updatedAt: (parsed && typeof parsed.updatedAt === "string") ? parsed.updatedAt : "",
+      prefs: {
+        printStudyNotes: Boolean(parsed && parsed.prefs && parsed.prefs.printStudyNotes)
+      },
+      books: {}
+    };
+    if (!parsed || typeof parsed !== "object" || !parsed.books || typeof parsed.books !== "object") {
+      return base;
+    }
+    Object.keys(parsed.books).forEach((rawBookKey) => {
+      const bk = sanitizeStudyId(rawBookKey);
+      if (!bk) return;
+      const src = parsed.books[rawBookKey];
+      if (!src || typeof src !== "object") return;
+      const completed = Array.isArray(src.completedUnits)
+        ? Array.from(new Set(src.completedUnits.map(sanitizeStudyId).filter(Boolean)))
+        : [];
+      const blocks = {};
+      if (src.blocks && typeof src.blocks === "object") {
+        Object.keys(src.blocks).forEach((rawPid) => {
+          const pid = sanitizeStudyId(rawPid);
+          if (!pid) return;
+          const b = src.blocks[rawPid];
+          if (!b || typeof b !== "object") return;
+          const hl = VALID_HL_COLORS.includes(b.hl) ? b.hl : "";
+          const note = typeof b.note === "string" ? b.note.slice(0, 20000).trim() : "";
+          if (!hl && !note) return;
+          blocks[pid] = {
+            hl,
+            note,
+            updatedAt: typeof b.updatedAt === "string" ? b.updatedAt : ""
+          };
+        });
+      }
+      base.books[bk] = {
+        lastUnit: sanitizeStudyId(src.lastUnit || ""),
+        lastPid: sanitizeStudyId(src.lastPid || ""),
+        lastTitle: typeof src.lastTitle === "string" ? src.lastTitle.slice(0, 200) : "",
+        updatedAt: typeof src.updatedAt === "string" ? src.updatedAt : "",
+        completedUnits: completed,
+        blocks
+      };
+    });
+    return base;
+  }
+
+  function loadStudyState() {
+    try {
+      const raw = localStorage.getItem(STUDY_STORAGE_KEY);
+      if (!raw) return normalizeStudyObject(null);
+      return normalizeStudyObject(JSON.parse(raw));
+    } catch (e) {
+      return normalizeStudyObject(null);
+    }
+  }
+
+  function saveStudyState(state) {
+    try {
+      state.schema = "fl_study_v1";
+      state.version = 1;
+      state.updatedAt = new Date().toISOString();
+      localStorage.setItem(STUDY_STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {}
+  }
+
+  function ensureBookStudyEntry(state, bookId) {
+    if (!state.books[bookId]) {
+      state.books[bookId] = {
+        lastUnit: "",
+        lastPid: "",
+        lastTitle: "",
+        updatedAt: "",
+        completedUnits: [],
+        blocks: {}
+      };
+    }
+    return state.books[bookId];
+  }
+
+  function syncPrintNotesMode(state) {
+    const enabled = Boolean(state && state.prefs && state.prefs.printStudyNotes);
+    document.body.classList.toggle("fl-print-with-notes", enabled);
+    const toggle = document.getElementById("fl-print-notes-toggle");
+    if (toggle) toggle.checked = enabled;
+  }
+
+  function renderOrUpdateNoteCard(blockEl, bookId, pid, openEditor) {
+    const state = loadStudyState();
+    const bEntry = ensureBookStudyEntry(state, bookId);
+    const blkData = bEntry.blocks[pid] || { hl: "", note: "" };
+    const savedNote = (blkData.note || "").trim();
+
+    let card = blockEl.nextElementSibling;
+    if (!card || !card.classList.contains("fl-study-note-card") || card.getAttribute("data-note-for") !== pid) {
+      card = null;
+    }
+
+    if (!savedNote && !openEditor) {
+      if (card) card.remove();
+      blockEl.classList.remove("has-study-note");
+      return;
+    }
+
+    if (!card) {
+      card = document.createElement("div");
+      card.className = "fl-study-note-card";
+      card.setAttribute("data-note-for", pid);
+      blockEl.insertAdjacentElement("afterend", card);
+    }
+
+    card.innerHTML = "";
+    card.classList.toggle("has-saved-note", Boolean(savedNote));
+    blockEl.classList.toggle("has-study-note", Boolean(savedNote));
+
+    const header = document.createElement("div");
+    header.className = "fl-study-note-header";
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = "📝 Study Note";
+    header.appendChild(titleSpan);
+
+    if (!openEditor && savedNote) {
+      const actions = document.createElement("div");
+      actions.className = "fl-study-note-actions no-print";
+
+      const editBtn = document.createElement("button");
+      editBtn.type = "button";
+      editBtn.className = "fl-study-note-linkbtn";
+      editBtn.textContent = "Edit";
+      editBtn.addEventListener("click", () => renderOrUpdateNoteCard(blockEl, bookId, pid, true));
+
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "fl-study-note-linkbtn";
+      delBtn.textContent = "Delete";
+      delBtn.addEventListener("click", () => {
+        const nextState = loadStudyState();
+        const nextBook = ensureBookStudyEntry(nextState, bookId);
+        if (nextBook.blocks[pid]) {
+          nextBook.blocks[pid].note = "";
+          nextBook.blocks[pid].updatedAt = new Date().toISOString();
+          if (!nextBook.blocks[pid].hl) delete nextBook.blocks[pid];
+          saveStudyState(nextState);
+        }
+        renderOrUpdateNoteCard(blockEl, bookId, pid, false);
+      });
+
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+      header.appendChild(actions);
+      card.appendChild(header);
+
+      const textP = document.createElement("p");
+      textP.className = "fl-study-note-text";
+      textP.textContent = savedNote;
+      card.appendChild(textP);
+      return;
+    }
+
+    card.appendChild(header);
+    const editorWrap = document.createElement("div");
+    editorWrap.className = "fl-study-note-editor no-print";
+
+    const ta = document.createElement("textarea");
+    ta.className = "fl-study-note-textarea";
+    ta.rows = 3;
+    ta.placeholder = "Write your personal or family study note on this passage (saved privately on this device)...";
+    ta.value = savedNote;
+    editorWrap.appendChild(ta);
+
+    const btnRow = document.createElement("div");
+    btnRow.className = "fl-study-note-editor-btns";
+
+    const saveBtn = document.createElement("button");
+    saveBtn.type = "button";
+    saveBtn.className = "fl-btn fl-btn-primary";
+    saveBtn.textContent = "Save Study Note";
+    saveBtn.addEventListener("click", () => {
+      const val = (ta.value || "").trim();
+      const nextState = loadStudyState();
+      const nextBook = ensureBookStudyEntry(nextState, bookId);
+      const existingHl = (nextBook.blocks[pid] && nextBook.blocks[pid].hl) || "";
+      const nowIso = new Date().toISOString();
+      if (!val && !existingHl) {
+        delete nextBook.blocks[pid];
+      } else {
+        nextBook.blocks[pid] = { hl: existingHl, note: val, updatedAt: nowIso };
+      }
+      nextBook.updatedAt = nowIso;
+      saveStudyState(nextState);
+      renderOrUpdateNoteCard(blockEl, bookId, pid, false);
+    });
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.type = "button";
+    cancelBtn.className = "fl-btn fl-btn-outline";
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.addEventListener("click", () => {
+      renderOrUpdateNoteCard(blockEl, bookId, pid, false);
+    });
+
+    btnRow.appendChild(saveBtn);
+    btnRow.appendChild(cancelBtn);
+    editorWrap.appendChild(btnRow);
+    card.appendChild(editorWrap);
+
+    if (savedNote) {
+      const printText = document.createElement("p");
+      printText.className = "fl-study-note-text print-only";
+      printText.textContent = savedNote;
+      card.appendChild(printText);
+    }
+
+    requestAnimationFrame(() => ta.focus());
+  }
+
+  function ensureStudyPopover(bookId) {
+    let pop = document.getElementById("fl-study-popover");
+    if (pop) return pop;
+
+    pop = document.createElement("div");
+    pop.id = "fl-study-popover";
+    pop.className = "fl-study-popover no-print";
+    pop.hidden = true;
+    pop.setAttribute("role", "toolbar");
+    pop.setAttribute("aria-label", "Passage Highlight and Study Note Options");
+
+    const colorLabels = {
+      gold: "Warm Gold Highlight",
+      sage: "Olive Sage Highlight",
+      rose: "Crimson Rose Highlight",
+      slate: "Slate Blue Highlight"
+    };
+
+    VALID_HL_COLORS.forEach((c) => {
+      const sw = document.createElement("button");
+      sw.type = "button";
+      sw.className = "fl-hl-swatch";
+      sw.setAttribute("data-hl-color", c);
+      sw.title = colorLabels[c];
+      sw.setAttribute("aria-label", colorLabels[c]);
+      pop.appendChild(sw);
+    });
+
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.className = "fl-study-pop-btn";
+    clearBtn.setAttribute("data-study-pop-action", "clear-hl");
+    clearBtn.textContent = "Clear";
+    pop.appendChild(clearBtn);
+
+    const sep = document.createElement("span");
+    sep.className = "fl-study-pop-sep";
+    pop.appendChild(sep);
+
+    const noteBtn = document.createElement("button");
+    noteBtn.type = "button";
+    noteBtn.className = "fl-study-pop-btn";
+    noteBtn.setAttribute("data-study-pop-action", "open-note");
+    noteBtn.textContent = "📝 Study Note";
+    pop.appendChild(noteBtn);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "fl-study-pop-close";
+    closeBtn.setAttribute("data-study-pop-action", "close");
+    closeBtn.setAttribute("aria-label", "Close Study Options");
+    closeBtn.textContent = "✕";
+    pop.appendChild(closeBtn);
+
+    document.body.appendChild(pop);
+
+    pop.addEventListener("click", (e) => {
+      const pid = pop.getAttribute("data-active-pid") || "";
+      if (!pid) return;
+      const blockEl = document.querySelector(`[data-pid="${CSS.escape(pid)}"]`);
+      if (!blockEl) return;
+
+      const swatch = e.target.closest("[data-hl-color]");
+      if (swatch) {
+        const chosen = swatch.getAttribute("data-hl-color") || "";
+        const state = loadStudyState();
+        const bEntry = ensureBookStudyEntry(state, bookId);
+        const prev = bEntry.blocks[pid] || { hl: "", note: "" };
+        const nextHl = prev.hl === chosen ? "" : chosen;
+        const nowIso = new Date().toISOString();
+
+        if (!nextHl && !prev.note) {
+          delete bEntry.blocks[pid];
+          blockEl.removeAttribute("data-fl-hl");
+        } else {
+          bEntry.blocks[pid] = { hl: nextHl, note: prev.note || "", updatedAt: nowIso };
+          if (nextHl) blockEl.setAttribute("data-fl-hl", nextHl);
+          else blockEl.removeAttribute("data-fl-hl");
+        }
+        bEntry.updatedAt = nowIso;
+        saveStudyState(state);
+        pop.querySelectorAll("[data-hl-color]").forEach((btn) => {
+          btn.classList.toggle("is-active", btn.getAttribute("data-hl-color") === nextHl);
+        });
+        return;
+      }
+
+      const actBtn = e.target.closest("[data-study-pop-action]");
+      if (!actBtn) return;
+      const act = actBtn.getAttribute("data-study-pop-action");
+
+      if (act === "clear-hl") {
+        const state = loadStudyState();
+        const bEntry = ensureBookStudyEntry(state, bookId);
+        const prev = bEntry.blocks[pid];
+        if (prev) {
+          prev.hl = "";
+          prev.updatedAt = new Date().toISOString();
+          if (!prev.note) delete bEntry.blocks[pid];
+          saveStudyState(state);
+        }
+        blockEl.removeAttribute("data-fl-hl");
+        pop.hidden = true;
+        pop.removeAttribute("data-active-pid");
+      } else if (act === "open-note") {
+        pop.hidden = true;
+        pop.removeAttribute("data-active-pid");
+        renderOrUpdateNoteCard(blockEl, bookId, pid, true);
+      } else if (act === "close") {
+        pop.hidden = true;
+        pop.removeAttribute("data-active-pid");
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (pop.hidden) return;
+      if (e.target.closest("#fl-study-popover") || e.target.closest(".fl-study-trigger")) return;
+      pop.hidden = true;
+      pop.removeAttribute("data-active-pid");
+    });
+
+    return pop;
+  }
+
+  function openStudyPopoverForTrigger(triggerBtn, bookId) {
+    const blockEl = triggerBtn.closest("[data-pid]");
+    if (!blockEl) return;
+    const pid = blockEl.getAttribute("data-pid") || "";
+    if (!pid) return;
+
+    const pop = ensureStudyPopover(bookId);
+    if (!pop.hidden && pop.getAttribute("data-active-pid") === pid) {
+      pop.hidden = true;
+      pop.removeAttribute("data-active-pid");
+      return;
+    }
+
+    const curHl = blockEl.getAttribute("data-fl-hl") || "";
+    pop.setAttribute("data-active-pid", pid);
+    pop.querySelectorAll("[data-hl-color]").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.getAttribute("data-hl-color") === curHl);
+    });
+
+    pop.hidden = false;
+    const btnRect = triggerBtn.getBoundingClientRect();
+    const popRect = pop.getBoundingClientRect();
+    let top = btnRect.bottom + 6;
+    if (top + popRect.height > window.innerHeight - 16) {
+      top = Math.max(8, btnRect.top - popRect.height - 6);
+    }
+    let left = btnRect.right - popRect.width;
+    left = Math.max(8, Math.min(left, window.innerWidth - popRect.width - 8));
+
+    pop.style.top = `${Math.round(top)}px`;
+    pop.style.left = `${Math.round(left)}px`;
+  }
+
+  function initBookStudyFramework() {
+    const bookId = sanitizeStudyId(document.body?.getAttribute("data-fl-book") || "");
+    if (!bookId) return;
+
+    const unitLabel = document.body.getAttribute("data-fl-unit-label") || "Chapter";
+    const unitLabelPlural = unitLabel + "s";
+    const units = Array.from(document.querySelectorAll("[data-fl-unit]"));
+    const totalUnits = parseInt(document.body.getAttribute("data-fl-units") || "0", 10) || units.length;
+
+    const initialState = loadStudyState();
+    syncPrintNotesMode(initialState);
+
+    window.addEventListener("beforeprint", () => {
+      syncPrintNotesMode(loadStudyState());
+    });
+
+    // 1. Inject Study Bar at top of .fl-main
+    const mainEl = document.querySelector(".fl-main");
+    let barProgressText = null;
+    let barFill = null;
+    if (mainEl && !document.getElementById("fl-study-bar")) {
+      const bar = document.createElement("div");
+      bar.id = "fl-study-bar";
+      bar.className = "fl-study-bar no-print";
+
+      const left = document.createElement("div");
+      left.className = "fl-study-bar-left";
+      const track = document.createElement("div");
+      track.className = "fl-study-mini-track";
+      barFill = document.createElement("div");
+      barFill.className = "fl-study-mini-fill";
+      track.appendChild(barFill);
+
+      barProgressText = document.createElement("strong");
+      left.appendChild(track);
+      left.appendChild(barProgressText);
+
+      const right = document.createElement("div");
+      right.className = "fl-study-bar-right";
+      const printLabel = document.createElement("label");
+      printLabel.className = "fl-print-notes-label";
+      const printCb = document.createElement("input");
+      printCb.type = "checkbox";
+      printCb.id = "fl-print-notes-toggle";
+      printCb.checked = Boolean(initialState.prefs.printStudyNotes);
+      printCb.addEventListener("change", () => {
+        const st = loadStudyState();
+        st.prefs.printStudyNotes = printCb.checked;
+        saveStudyState(st);
+        syncPrintNotesMode(st);
+      });
+      const printSpan = document.createElement("span");
+      printSpan.textContent = "Include My Study Notes & Highlights in Print";
+      printLabel.appendChild(printCb);
+      printLabel.appendChild(printSpan);
+
+      const backupLink = document.createElement("a");
+      backupLink.href = "/foundations/#fl-study-backup";
+      backupLink.className = "fl-study-backup-link";
+      backupLink.textContent = "Backup Study Notes ↗";
+
+      right.appendChild(printLabel);
+      right.appendChild(backupLink);
+      bar.appendChild(left);
+      bar.appendChild(right);
+
+      const heroTarget = mainEl.querySelector(".fl-hero-header, .container");
+      if (heroTarget) mainEl.insertBefore(bar, heroTarget);
+      else mainEl.insertBefore(bar, mainEl.firstChild);
+    }
+
+    // 2. Inject TOC Progress Summary inside Table of Contents
+    const tocAside = document.querySelector(".fl-sidebar");
+    let tocPctLabel = null;
+    let tocCountLabel = null;
+    let tocFill = null;
+    if (tocAside) {
+      tocAside.setAttribute("aria-label", "Table of Contents");
+      const tocHeading = tocAside.querySelector("h3");
+      if (tocHeading && !tocAside.querySelector(".fl-toc-progress")) {
+        const tocProg = document.createElement("div");
+        tocProg.className = "fl-toc-progress no-print";
+        const topRow = document.createElement("div");
+        topRow.className = "fl-toc-progress-label";
+        tocCountLabel = document.createElement("span");
+        tocPctLabel = document.createElement("span");
+        topRow.appendChild(tocCountLabel);
+        topRow.appendChild(tocPctLabel);
+
+        const track = document.createElement("div");
+        track.className = "fl-study-mini-track";
+        tocFill = document.createElement("div");
+        tocFill.className = "fl-study-mini-fill";
+        track.appendChild(tocFill);
+
+        tocProg.appendChild(topRow);
+        tocProg.appendChild(track);
+        tocHeading.insertAdjacentElement("afterend", tocProg);
+      }
+    }
+
+    function syncUnitCompletionUI() {
+      const st = loadStudyState();
+      const bEntry = ensureBookStudyEntry(st, bookId);
+      const doneSet = new Set(bEntry.completedUnits);
+      const validUnitIds = units.map((u) => u.getAttribute("data-fl-unit")).filter(Boolean);
+      const doneCount = validUnitIds.filter((id) => doneSet.has(id)).length;
+      const denom = Math.max(totalUnits, 1);
+      const pct = Math.min(100, Math.round((doneCount / denom) * 100));
+
+      if (barProgressText) {
+        barProgressText.textContent = `${doneCount} of ${totalUnits} ${unitLabelPlural} Complete (${pct}%)`;
+      }
+      if (barFill) barFill.style.width = `${pct}%`;
+      if (tocCountLabel) tocCountLabel.textContent = `${doneCount} / ${totalUnits} Complete`;
+      if (tocPctLabel) tocPctLabel.textContent = `${pct}%`;
+      if (tocFill) tocFill.style.width = `${pct}%`;
+
+      document.querySelectorAll("li[data-toc-unit]").forEach((li) => {
+        const uid = li.getAttribute("data-toc-unit") || "";
+        li.classList.toggle("is-completed", doneSet.has(uid));
+        li.classList.toggle("is-current", Boolean(bEntry.lastUnit && bEntry.lastUnit === uid));
+      });
+
+      document.querySelectorAll(".fl-unit-complete-btn[data-complete-unit]").forEach((btn) => {
+        const uid = btn.getAttribute("data-complete-unit") || "";
+        const num = btn.getAttribute("data-unit-num") || "";
+        const isDone = doneSet.has(uid);
+        btn.classList.toggle("is-completed", isDone);
+        btn.setAttribute("aria-pressed", isDone ? "true" : "false");
+        btn.textContent = isDone
+          ? `✓ ${unitLabel} ${num} Completed`
+          : `☐ Mark ${unitLabel} ${num} Complete`;
+      });
+    }
+
+    // 3. Inject Mark Complete buttons per Chapter / Day
+    units.forEach((unitEl, idx) => {
+      const uid = unitEl.getAttribute("data-fl-unit") || "";
+      if (!uid) return;
+      const num = unitEl.getAttribute("data-fl-unit-num") || String(idx + 1);
+      const wrap = document.createElement("div");
+      wrap.className = "fl-unit-complete-bar no-print";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "fl-btn fl-unit-complete-btn";
+      btn.setAttribute("data-complete-unit", uid);
+      btn.setAttribute("data-unit-num", num);
+      btn.addEventListener("click", () => {
+        const st = loadStudyState();
+        const bEntry = ensureBookStudyEntry(st, bookId);
+        const set = new Set(bEntry.completedUnits);
+        if (set.has(uid)) set.delete(uid);
+        else set.add(uid);
+        bEntry.completedUnits = Array.from(set);
+        bEntry.lastUnit = uid;
+        bEntry.lastTitle = unitEl.getAttribute("data-fl-unit-title") || `${unitLabel} ${num}`;
+        bEntry.updatedAt = new Date().toISOString();
+        saveStudyState(st);
+        syncUnitCompletionUI();
+      });
+      wrap.appendChild(btn);
+      unitEl.appendChild(wrap);
+    });
+
+    // 4. Stamp Study Triggers & Restore Highlights / Notes on [data-pid] blocks
+    const bInitial = ensureBookStudyEntry(initialState, bookId);
+    const pidBlocks = Array.from(document.querySelectorAll("[data-pid]"));
+    pidBlocks.forEach((blockEl) => {
+      const pid = sanitizeStudyId(blockEl.getAttribute("data-pid") || "");
+      if (!pid) return;
+
+      const trig = document.createElement("button");
+      trig.type = "button";
+      trig.className = "fl-study-trigger no-print";
+      trig.setAttribute("aria-label", "Highlight passage or add Study Note");
+      trig.title = "Highlight or add Study Note";
+      trig.textContent = "✎";
+      blockEl.appendChild(trig);
+
+      const savedBlk = bInitial.blocks[pid];
+      if (savedBlk) {
+        if (VALID_HL_COLORS.includes(savedBlk.hl)) {
+          blockEl.setAttribute("data-fl-hl", savedBlk.hl);
+        }
+        if (savedBlk.note) {
+          renderOrUpdateNoteCard(blockEl, bookId, pid, false);
+        }
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      const trig = e.target.closest(".fl-study-trigger");
+      if (trig) {
+        e.preventDefault();
+        e.stopPropagation();
+        openStudyPopoverForTrigger(trig, bookId);
+      }
+    });
+
+    syncUnitCompletionUI();
+
+    // 5. Auto-Save Last-Read Chapter/Block via Debounced IntersectionObserver
+    let userHasNavigatedOrScrolled = Boolean(window.location.hash) || window.scrollY > 120;
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (window.scrollY > 80) userHasNavigatedOrScrolled = true;
+      },
+      { passive: true }
+    );
+
+    let pendingAnchorEl = null;
+    let saveTimer = null;
+
+    function flushReadingProgress() {
+      if (!pendingAnchorEl || !userHasNavigatedOrScrolled) return;
+      const el = pendingAnchorEl;
+      pendingAnchorEl = null;
+
+      const pid = sanitizeStudyId(el.getAttribute("data-pid") || "");
+      const unitEl = el.closest("[data-fl-unit]") || (el.hasAttribute("data-fl-unit") ? el : null);
+      const unitId = sanitizeStudyId(unitEl ? unitEl.getAttribute("data-fl-unit") || "" : "");
+      if (!pid && !unitId) return;
+
+      const st = loadStudyState();
+      const bEntry = ensureBookStudyEntry(st, bookId);
+      if (pid) bEntry.lastPid = pid;
+      if (unitId) {
+        bEntry.lastUnit = unitId;
+        bEntry.lastTitle = unitEl.getAttribute("data-fl-unit-title") || unitId;
+      }
+      bEntry.updatedAt = new Date().toISOString();
+      saveStudyState(st);
+
+      document.querySelectorAll("li[data-toc-unit]").forEach((li) => {
+        li.classList.toggle("is-current", Boolean(bEntry.lastUnit && li.getAttribute("data-toc-unit") === bEntry.lastUnit));
+      });
+    }
+
+    if ("IntersectionObserver" in window && (pidBlocks.length > 0 || units.length > 0)) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!userHasNavigatedOrScrolled) return;
+          let topCandidate = null;
+          let topY = Infinity;
+          for (let i = 0; i < entries.length; i++) {
+            const ent = entries[i];
+            if (ent.isIntersecting && ent.boundingClientRect.top < topY) {
+              topY = ent.boundingClientRect.top;
+              topCandidate = ent.target;
+            }
+          }
+          if (topCandidate) {
+            pendingAnchorEl = topCandidate;
+            if (saveTimer) clearTimeout(saveTimer);
+            saveTimer = setTimeout(flushReadingProgress, 450);
+          }
+        },
+        { rootMargin: "-85px 0px -62% 0px", threshold: 0.05 }
+      );
+      pidBlocks.forEach((el) => observer.observe(el));
+      units.forEach((el) => observer.observe(el));
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") flushReadingProgress();
+    });
+  }
+
+  /* ==========================================================================
+     Hub Progress Bars, Continue Reading & JSON Export / Import Utility
+     ========================================================================== */
+  function mergeStudyStates(existing, incoming) {
+    const out = normalizeStudyObject(existing);
+    const inc = normalizeStudyObject(incoming);
+    if (inc.prefs && typeof inc.prefs.printStudyNotes === "boolean") {
+      out.prefs.printStudyNotes = out.prefs.printStudyNotes || inc.prefs.printStudyNotes;
+    }
+    Object.keys(inc.books).forEach((bk) => {
+      const srcBook = inc.books[bk];
+      const dstBook = ensureBookStudyEntry(out, bk);
+      dstBook.completedUnits = Array.from(new Set([...dstBook.completedUnits, ...srcBook.completedUnits]));
+
+      if (!dstBook.updatedAt || (srcBook.updatedAt && srcBook.updatedAt >= dstBook.updatedAt)) {
+        if (srcBook.lastUnit) dstBook.lastUnit = srcBook.lastUnit;
+        if (srcBook.lastPid) dstBook.lastPid = srcBook.lastPid;
+        if (srcBook.lastTitle) dstBook.lastTitle = srcBook.lastTitle;
+        if (srcBook.updatedAt) dstBook.updatedAt = srcBook.updatedAt;
+      }
+
+      Object.keys(srcBook.blocks).forEach((pid) => {
+        const srcBlk = srcBook.blocks[pid];
+        const dstBlk = dstBook.blocks[pid];
+        if (!dstBlk || !dstBlk.updatedAt || (srcBlk.updatedAt && srcBlk.updatedAt >= dstBlk.updatedAt)) {
+          dstBook.blocks[pid] = { ...srcBlk };
+        }
+      });
+    });
+    return out;
+  }
+
+  function countStudyStats(state) {
+    let completed = 0;
+    let highlights = 0;
+    let notes = 0;
+    let booksTouched = 0;
+    Object.keys(state.books || {}).forEach((bk) => {
+      const b = state.books[bk];
+      if (!b) return;
+      const cLen = (b.completedUnits || []).length;
+      let bHl = 0;
+      let bNotes = 0;
+      Object.values(b.blocks || {}).forEach((blk) => {
+        if (blk && blk.hl) bHl++;
+        if (blk && blk.note) bNotes++;
+      });
+      completed += cLen;
+      highlights += bHl;
+      notes += bNotes;
+      if (cLen > 0 || bHl > 0 || bNotes > 0 || b.lastUnit || b.lastPid) {
+        booksTouched++;
+      }
+    });
+    return { completed, highlights, notes, booksTouched };
+  }
+
+  function refreshHubStudyUI() {
+    const cards = document.querySelectorAll(".book-card[data-fl-book-card]");
+    const summaryEl = document.getElementById("fl-study-backup-summary");
+    if (!cards.length && !summaryEl) return;
+
+    const state = loadStudyState();
+
+    cards.forEach((card) => {
+      const bk = sanitizeStudyId(card.getAttribute("data-fl-book-card") || "");
+      if (!bk) return;
+      const totalUnits = Math.max(1, parseInt(card.getAttribute("data-fl-units") || "8", 10));
+      const unitLabel = card.getAttribute("data-fl-unit-label") || "Chapter";
+      const unitPlural = unitLabel + "s";
+      const primaryLink = card.querySelector(".book-actions a.fl-btn-primary");
+      const baseHref = primaryLink ? (primaryLink.getAttribute("href") || "").split("#")[0] : "";
+      const actionsRow = card.querySelector(".book-actions");
+
+      const bData = state.books[bk] || { completedUnits: [], blocks: {}, lastUnit: "", lastPid: "", lastTitle: "" };
+      const doneCount = Math.min(totalUnits, (bData.completedUnits || []).length);
+      const pct = Math.min(100, Math.round((doneCount / totalUnits) * 100));
+
+      let hlCount = 0;
+      let noteCount = 0;
+      Object.values(bData.blocks || {}).forEach((blk) => {
+        if (blk && blk.hl) hlCount++;
+        if (blk && blk.note) noteCount++;
+      });
+
+      let progBox = card.querySelector(".fl-card-progress");
+      if (!progBox && actionsRow) {
+        progBox = document.createElement("div");
+        progBox.className = "fl-card-progress no-print";
+        actionsRow.insertAdjacentElement("beforebegin", progBox);
+      }
+      if (progBox) {
+        progBox.innerHTML = "";
+        const top = document.createElement("div");
+        top.className = "fl-card-progress-top";
+        const leftSpan = document.createElement("span");
+        leftSpan.textContent = `${doneCount} of ${totalUnits} ${unitPlural} Complete`;
+        const rightSpan = document.createElement("span");
+        rightSpan.textContent = `${pct}%`;
+        top.appendChild(leftSpan);
+        top.appendChild(rightSpan);
+
+        const track = document.createElement("div");
+        track.className = "fl-card-progress-track";
+        const fill = document.createElement("div");
+        fill.className = "fl-card-progress-fill";
+        fill.style.width = `${pct}%`;
+        track.appendChild(fill);
+
+        progBox.appendChild(top);
+        progBox.appendChild(track);
+
+        const metaParts = [];
+        if (bData.lastTitle) metaParts.push(`Last read: ${bData.lastTitle}`);
+        if (hlCount > 0) metaParts.push(`${hlCount} Highlight${hlCount === 1 ? "" : "s"}`);
+        if (noteCount > 0) metaParts.push(`${noteCount} Study Note${noteCount === 1 ? "" : "s"}`);
+        if (metaParts.length > 0) {
+          const meta = document.createElement("div");
+          meta.className = "fl-card-progress-meta";
+          meta.textContent = metaParts.join(" • ");
+          progBox.appendChild(meta);
+        }
+      }
+
+      if (actionsRow && baseHref) {
+        let contBtn = actionsRow.querySelector(".fl-btn-continue");
+        const anchorId = sanitizeStudyId(bData.lastPid || bData.lastUnit || "");
+        if (anchorId) {
+          if (!contBtn) {
+            contBtn = document.createElement("a");
+            contBtn.className = "fl-btn fl-btn-support fl-btn-continue";
+            actionsRow.insertBefore(contBtn, actionsRow.firstChild);
+          }
+          contBtn.setAttribute("href", `${baseHref}#${anchorId}`);
+          const shortResume = bData.lastTitle ? bData.lastTitle.split(":")[0] : "";
+          contBtn.textContent = shortResume ? `▶ Continue Reading (${shortResume})` : "▶ Continue Reading";
+        } else if (contBtn) {
+          contBtn.remove();
+        }
+      }
+    });
+
+    if (summaryEl) {
+      const stats = countStudyStats(state);
+      summaryEl.textContent =
+        `Saved privately on this browser: ${stats.completed} completed chapters/days, ` +
+        `${stats.highlights} highlight${stats.highlights === 1 ? "" : "s"}, and ` +
+        `${stats.notes} study note${stats.notes === 1 ? "" : "s"} (zero cloud tracking).`;
+    }
+  }
+
+  function initHubStudyFramework() {
+    refreshHubStudyUI();
+
+    const exportBtn = document.querySelector('[data-fl-action="export-study-json"]');
+    const importTriggerBtn = document.querySelector('[data-fl-action="import-study-json"]');
+    const fileInput = document.getElementById("fl-study-import-file");
+    const modeSelect = document.getElementById("fl-study-import-mode");
+    const statusEl = document.getElementById("fl-study-backup-status");
+
+    const setStatus = (msg, isError) => {
+      if (!statusEl) return;
+      statusEl.textContent = msg;
+      statusEl.classList.toggle("is-error", Boolean(isError));
+    };
+
+    if (exportBtn) {
+      exportBtn.addEventListener("click", () => {
+        const state = loadStudyState();
+        state.exportedAt = new Date().toISOString();
+        const jsonStr = JSON.stringify(state, null, 2);
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+        const filename = `foundations-study-notes-${stamp}.json`;
+
+        const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+        const stats = countStudyStats(state);
+        setStatus(`✓ Exported ${filename} (${stats.highlights} highlights, ${stats.notes} study notes, ${stats.completed} completed units).`, false);
+      });
+    }
+
+    if (importTriggerBtn && fileInput) {
+      importTriggerBtn.addEventListener("click", () => {
+        fileInput.value = "";
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const rawText = String(reader.result || "");
+            const parsed = JSON.parse(rawText);
+            if (!parsed || typeof parsed !== "object" || (!parsed.books && parsed.schema !== "fl_study_v1")) {
+              setStatus("✕ Invalid file: expected a Foundations Library Study Notes JSON backup.", true);
+              return;
+            }
+            const mode = modeSelect ? modeSelect.value : "merge";
+            const nextState = mode === "replace"
+              ? normalizeStudyObject(parsed)
+              : mergeStudyStates(loadStudyState(), parsed);
+
+            saveStudyState(nextState);
+            refreshHubStudyUI();
+            initCoBranding();
+            const stats = countStudyStats(nextState);
+            setStatus(
+              `✓ ${mode === "replace" ? "Restored" : "Merged"} backup: ${stats.highlights} highlights, ${stats.notes} study notes, and ${stats.completed} completed units active.`,
+              false
+            );
+          } catch (err) {
+            setStatus("✕ Could not read JSON backup file. Please select a valid .json export.", true);
+          }
+        };
+        reader.onerror = () => {
+          setStatus("✕ File read failed. Please try selecting the .json file again.", true);
+        };
+        reader.readAsText(file, "UTF-8");
+      });
+    }
+
+    window.addEventListener("storage", (e) => {
+      if (e.key === STUDY_STORAGE_KEY) {
+        refreshHubStudyUI();
+      }
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -887,6 +1828,8 @@ const FLApp = (() => {
     initDelegatedActions();
     initStorageInputs();
     updateLab2Calculator();
+    initBookStudyFramework();
+    initHubStudyFramework();
     initCoBranding();
   });
 

@@ -1,6 +1,6 @@
 ﻿# Scriptural Intelligence (S.I.) — Architecture & Tier 1 Specification
 **Codename:** "Deep Thought"
-**Last Updated:** 2026-11-16
+**Last Updated:** 2026-11-25
 **Priority:** Truth/Accuracy > Safety/Security > Performance ($0 Budget Constraint)
 
 ## Locked contract (2026-11-16)
@@ -39,6 +39,16 @@ Before a hit is allowed to count, the words have to be about the same claim, not
 Silence stops the answer. A lower tier does not fill a silent Tier 1. Man's opinion is labeled, and it is not an answer.
 
 The written-word place list (`search_word`, `ws/word/`) is a list. It is not the bleed layer. Pass 4 of the retrieval cascade, the weighted Boolean OR, must not be built as a "close enough" match. Until bleed can reject a near neighbor, leave Pass 4 unbuilt.
+
+### Speaker rule (2026-11-25)
+
+Old sentence (Tier 1 loop, 2026-11-16): "The result still means the word is written, not that God said it." The code docstring says the same rule in two sentences: "The result means the word is written. It does not mean God said it." Both stay. Do not delete them and do not replace them with a shorter slogan.
+
+Reading, confirmed 2026-11-25. The biblical writer's own words are the inspired Word of God: God said it, or God revealed that truth and the writer wrote it down. That is the default. A quoted speaker other than God is stored and attributed to that speaker. The serpent is a liar: the record of his words is inspired, and his claim is not cited as God's. "The word is written" means a concordance hit. It does not mean the speaker in that verse is God. A missing speaker annotation prints unknown. Unknown means the row is missing. It does not mean the verse is outside God's Word.
+
+Rowley, the same day. The speaker is a liar whenever any human contradicts the Word of God in context from a sola scriptura perspective. Lying is default human behavior, but a sin from a Biblical perspective. The biblical writer who records that speech is not the liar. The speaker who contradicts is. The record stays inspired. That claim is not cited as God's. This rule is core. A lie introduced here makes the library useless.
+
+Reason. The old sentence stays on the page because it is true, and because a later session must still see the words it is not allowed to reinterpret in private. Read alone, "not that God said it" can be taken to mean that the verse is outside God's Word, or that the speaker of a concordance hit is God. A missing speaker row can be taken the same way. Those readings are false. Either one corrupts the engine: one cites a liar as God, and the other treats the inspired record as if it were not the Word. Section 4's speaker weights stay as written. Bleed does not assign the speaker. This rule does not turn shared words into a match.
 
 ### What a later session must not do
 
